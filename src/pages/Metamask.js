@@ -21,6 +21,9 @@ const StyledWrapper = styled.div`
 
 const StyledMessage = styled.div`
   height: 177px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: rgb(${colors.grey});
   font-weight: ${fonts.weight.medium};
 `;
@@ -30,8 +33,8 @@ class Metamask extends Component {
     this.props.accountsGetPrices();
   }
   renderMessage() {
-    if (this.props.web3Available) return `Please install Metamask chrome extension`;
-    if (this.props.web3Mainnet) return `Please switch to Main Network`;
+    if (!this.props.web3Available) return `Please install Metamask chrome extension`;
+    if (!this.props.web3Mainnet) return `Please switch to Main Network`;
     if (!this.props.metamaskAccount) return `Please unlock your Metamask`;
   }
   componentWillUnmount() {

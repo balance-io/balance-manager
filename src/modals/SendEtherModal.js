@@ -162,7 +162,7 @@ const StyledSubTitle = styled.div`
   }
 `;
 
-const StyledButton = styled(Button)`
+const StyledGasButton = styled(Button)`
   width: 100%;
   height: 54px;
   & p {
@@ -436,24 +436,24 @@ class SendEtherModal extends Component {
                 }
               />
               <StyledGasOptions>
-                <StyledButton dark onClick={() => this.props.sendUpdateGasPrice('safeLow')}>
+                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('safeLow')}>
                   <p>{`Slow: ${convertToNativeString(
                     fromWei((this.props.gasPrices.safeLow || 0) * 21000 * 10 ** 9)
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.safeLowWait || 0, 'minutes')}`}</p>
-                </StyledButton>
-                <StyledButton dark onClick={() => this.props.sendUpdateGasPrice('average')}>
+                </StyledGasButton>
+                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('average')}>
                   <p>{`Average: ${convertToNativeString(
                     fromWei((this.props.gasPrices.average || 0) * 21000 * 10 ** 9)
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.avgWait || 0, 'minutes')}`}</p>
-                </StyledButton>
-                <StyledButton dark onClick={() => this.props.sendUpdateGasPrice('fast')}>
+                </StyledGasButton>
+                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('fast')}>
                   <p>{`Fast: ${convertToNativeString(
                     fromWei((this.props.gasPrices.fast || 0) * 21000 * 10 ** 9)
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.fastWait || 0, 'minutes')}`}</p>
-                </StyledButton>
+                </StyledGasButton>
               </StyledGasOptions>
               <LineBreak noMargin />
               <StyledBottomModal>

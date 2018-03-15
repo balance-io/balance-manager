@@ -1,0 +1,16 @@
+{
+  "USER_NOT_ACCOUNT_OWNER": "You don't have permissions to access this account",
+  "USER_NOT_FOUND": "This email is not registered",
+  "EMAIL_ALREADY_EXISTS": "This email is already in use",
+  "MISSING_USER_ID": "This user is not registered",
+  "INVALID_PASSWORD": "Password is incorrect, please try again",
+  "INVALID_JWT": "Failed to authenticate, please signin again",
+  "REQUIRE_TWO_FACTOR": "Two Factor authentication is required",
+  "TWO_FACTOR_CODE_MISSING": "Please enter your Two Factor code",
+  "FAILED_TWO_FACTOR_AUTH": "Failed to authenticate Two Factor code",
+  "EARLY_TWO_FACTOR_CODE": "Two Factor code was too early, please try again",
+  "LATE_TWO_FACTOR_CODE": "Two Factor code was too late, please try again",
+  "UNKNOWN_WEBSOCKET_ENPOINT": "Something went wrong, please refresh page",
+  "ACCOUNT_ALREADY_EXISTS": "This account already exists, please check archived",
+  "USER_NOT_WAITING_LIST": "User can't be remove because it's not on waiting list"
+}

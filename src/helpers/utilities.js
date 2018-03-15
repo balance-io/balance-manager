@@ -168,7 +168,7 @@ export const capitalize = string =>
  */
 export const convertFromNativeValue = (nativeValue = '', crypto = 'ETH', decimals = 8) => {
   const prices = getLocal('NATIVE_PRICES');
-  if (prices && !prices[crypto]) return '';
+  if (!prices || (prices && !prices[crypto])) return '';
   const value = Number(Number(nativeValue) / Number(prices[crypto])).toFixed(decimals);
   return Number(value) ? value : '';
 };
@@ -182,7 +182,7 @@ export const convertFromNativeValue = (nativeValue = '', crypto = 'ETH', decimal
  */
 export const convertToNativeValue = (value = '', crypto = 'ETH', decimals = 8) => {
   const prices = getLocal('NATIVE_PRICES');
-  if (prices && !prices[crypto]) return '';
+  if (!prices || (prices && !prices[crypto])) return '';
   const nativeValue = Number(Number(value) * Number(prices[crypto])).toFixed(decimals);
   return Number(nativeValue) ? nativeValue : '';
 };
@@ -195,6 +195,7 @@ export const convertToNativeValue = (value = '', crypto = 'ETH', decimals = 8) =
  */
 export const convertToNativeString = (value = '', crypto = 'ETH') => {
   const prices = getLocal('NATIVE_PRICES');
+  if (!prices || (prices && !prices[crypto])) return '';
   const nativeSymbols = {
     ETH: 'Ξ',
     BTC: '₿',
@@ -202,7 +203,6 @@ export const convertToNativeString = (value = '', crypto = 'ETH') => {
     EUR: '€',
     GBP: '£'
   };
-  if (prices && !prices[crypto]) return '';
   if (prices.native === 'ETH' || prices.native === 'BTC') {
     const native = prices.native;
     const decimals = 8;

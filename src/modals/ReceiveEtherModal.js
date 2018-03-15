@@ -5,6 +5,7 @@ import Card from '../components/Card';
 import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import arrowUp from '../assets/arrow-up.svg';
+import { capitalize } from '../helpers/utilities';
 import { fonts, colors, responsive } from '../styles';
 
 const StyledContainer = styled.div`
@@ -73,7 +74,7 @@ class ReceiveEtherModal extends Component {
         <StyledJustifyContent>
           <StyledSubTitle>
             <StyledIcon color="grey" icon={arrowUp} rotation={180} />
-            {`Receive to ${this.props.modalProps.name}`}
+            {`Receive to ${capitalize(this.props.modalProps.name)}`}
           </StyledSubTitle>
           <Button onClick={this.onClose}>Close</Button>
         </StyledJustifyContent>

@@ -10,6 +10,7 @@ import LineBreak from '../components/LineBreak';
 import DropdownCrypto from '../components/DropdownCrypto';
 import Button from '../components/Button';
 import Form from '../components/Form';
+import metamaskOriginal from '../assets/metamask-original.png';
 import convertSymbol from '../assets/convert-symbol.svg';
 import arrowUp from '../assets/arrow-up.svg';
 import qrIcon from '../assets/qr-code-bnw.png';
@@ -162,7 +163,7 @@ const StyledSubTitle = styled.div`
   }
 `;
 
-const StyledButton = styled(Button)`
+const StyledGasButton = styled(Button)`
   width: 100%;
   height: 54px;
   & p {
@@ -177,8 +178,25 @@ const StyledButton = styled(Button)`
   }
 `;
 
+const StyledInvalidAddress = styled.p`
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 22px;
+  line-height: 1.8em;
+  font-size: ${fonts.size.small};
+  font-weight: ${fonts.weight.medium};
+  color: rgba(${colors.red});
+  @media (hover: hover) {
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+`;
+
 const StyledMaxBalance = styled.p`
   position: absolute;
+  cursor: pointer;
   top: 0;
   right: 0;
   line-height: 1.8em;
@@ -189,6 +207,27 @@ const StyledMaxBalance = styled.p`
     &:hover {
       opacity: 0.6;
     }
+  }
+`;
+
+const StyledApproveMetamask = styled.div`
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  & > div {
+    margin-top: 15px;
+  }
+  & > p {
+    margin-top: 32px;
+  }
+`;
+
+const StyledFox = styled.div`
+  width: 200px;
+  height: 185px;
+  & img {
+    width: 100%;
   }
 `;
 
@@ -207,7 +246,7 @@ class SendEtherModal extends Component {
   }
   state = {
     confirm: false,
-    isChecksum: false,
+    isValidAddress: false,
     showQRCodeReader: false,
     QRCodeReaderTarget: ''
   };
@@ -229,6 +268,9 @@ class SendEtherModal extends Component {
     }
     this.props.sendUpdateSelected(selected);
   };
+  onAddressInputFocus = () => this.setState({ isValidAddress: true });
+  onAddressInputBlur = () =>
+    this.setState({ isValidAddress: isValidAddress(this.props.recipient) });
   onGoBack = () => {
     if (this.props.modalProps.type === 'COLD') {
       this.props.sendUpdatePrivateKey('');
@@ -366,10 +408,16 @@ class SendEtherModal extends Component {
                   placeholder="0x..."
                   type="text"
                   value={this.props.recipient}
+                  onFocus={this.onAddressInputFocus}
+                  onBlur={this.onAddressInputBlur}
                   onChange={({ target }) =>
                     this.props.sendUpdateRecipient(target.value, this.props.selected.symbol)
                   }
                 />
+                {this.props.recipient &&
+                  !this.state.isValidAddress && (
+                    <StyledInvalidAddress>Invalid Address</StyledInvalidAddress>
+                  )}
                 <StyledQRIcon onClick={() => this.toggleQRCodeReader('recipient')}>
                   <img src={qrIcon} alt="recipient" />
                 </StyledQRIcon>
@@ -436,24 +484,24 @@ class SendEtherModal extends Component {
                 }
               />
               <StyledGasOptions>
-                <StyledButton dark onClick={() => this.props.sendUpdateGasPrice('safeLow')}>
+                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('safeLow')}>
                   <p>{`Slow: ${convertToNativeString(
                     fromWei((this.props.gasPrices.safeLow || 0) * 21000 * 10 ** 9)
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.safeLowWait || 0, 'minutes')}`}</p>
-                </StyledButton>
-                <StyledButton dark onClick={() => this.props.sendUpdateGasPrice('average')}>
+                </StyledGasButton>
+                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('average')}>
                   <p>{`Average: ${convertToNativeString(
                     fromWei((this.props.gasPrices.average || 0) * 21000 * 10 ** 9)
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.avgWait || 0, 'minutes')}`}</p>
-                </StyledButton>
-                <StyledButton dark onClick={() => this.props.sendUpdateGasPrice('fast')}>
+                </StyledGasButton>
+                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('fast')}>
                   <p>{`Fast: ${convertToNativeString(
                     fromWei((this.props.gasPrices.fast || 0) * 21000 * 10 ** 9)
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.fastWait || 0, 'minutes')}`}</p>
-                </StyledButton>
+                </StyledGasButton>
               </StyledGasOptions>
               <LineBreak noMargin />
               <StyledBottomModal>
@@ -492,12 +540,15 @@ class SendEtherModal extends Component {
               )}
             </Form>
           ) : this.props.modalProps.type === 'METAMASK' ? (
-            <div>
+            <StyledApproveMetamask>
+              <StyledFox>
+                <img src={metamaskOriginal} alt="metamask" />
+              </StyledFox>
               <StyledParagraph>Approve transaction on Metamask</StyledParagraph>
               <StyledActions single>
                 <Button onClick={this.onClose}>Close</Button>
               </StyledActions>
-            </div>
+            </StyledApproveMetamask>
           ) : (
             <Form onSubmit={this.onSubmit}>
               <StyledSubTitle>

@@ -336,7 +336,7 @@ export const bootIntercom = () => {
 };
 
 /**
- * @desc handle decimals to maximum decimal parament
+ * @desc handle decimals to maximum decimals parameter
  * @param {String|Number} [value='']
  * @param {Number} [decimals=8]
  * @return {String}

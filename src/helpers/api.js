@@ -33,7 +33,7 @@ export const apiGetEthplorerInfo = (address = '', type = 'METAMASK') =>
               name: token.tokenInfo.name || 'Unknown Token',
               symbol: token.tokenInfo.symbol || '---',
               address: token.tokenInfo.address,
-              decimal: token.tokenInfo.decimal,
+              decimals: Number(token.tokenInfo.decimals),
               balance: balance
             };
           })

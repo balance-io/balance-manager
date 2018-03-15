@@ -153,7 +153,11 @@ export const parseError = error => {
  * @param  {String} [string]
  * @return {String}
  */
-export const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1);
+export const capitalize = string =>
+  string
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 
 /**
  * @desc convert from current native value to crypto value

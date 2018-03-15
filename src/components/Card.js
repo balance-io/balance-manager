@@ -62,7 +62,7 @@ Card.propTypes = {
 Card.defaultProps = {
   fetching: false,
   background: 'white',
-  maxWidth: 600
+  maxWidth: null
 };
 
 export default Card;

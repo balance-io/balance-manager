@@ -9,14 +9,8 @@ import qrCode from '../assets/qr-code-transparent.svg';
 import { convertToNativeString, handleDecimals } from '../helpers/utilities';
 import { colors, fonts, shadows, responsive } from '../styles';
 
-const StyledWrapper = styled.div`
+const StyledAccount = styled.div`
   width: 100%;
-  padding-top: 10px;
-`;
-
-const StyledCard = styled(Card)`
-  margin-bottom: 15px;
-  max-width: none;
 `;
 
 const StyledFlex = styled.div`
@@ -171,10 +165,6 @@ const StyledAsset = styled.div`
   }
 `;
 
-const StyledAccount = styled.div`
-  width: 100%;
-`;
-
 class Account extends Component {
   state = {
     openSettings: false
@@ -209,63 +199,57 @@ class Account extends Component {
   }
   render() {
     return (
-      <StyledWrapper>
-        {!!this.props.account ? (
-          <StyledAccount>
-            <StyledCard fetching={this.props.fetching}>
-              <StyledFlex>
-                <StyledTop>
-                  <div>
-                    <h6>{'Your wallet address'} </h6>
-                    <StyledAddress>{this.props.account.address}</StyledAddress>
-                  </div>
+      <StyledAccount>
+        <Card fetching={this.props.fetching}>
+          <StyledFlex>
+            <StyledTop>
+              <div>
+                <h6>{'Your wallet address'} </h6>
+                <StyledAddress>{this.props.account.address}</StyledAddress>
+              </div>
 
-                  <StyledActions>
-                    <Button left color="blue" icon={qrCode} onClick={this.openReceiveModal}>
-                      Receive
-                    </Button>
-                    <Button left color="blue" icon={arrowUp} onClick={this.openSendModal}>
-                      Send
-                    </Button>
-                  </StyledActions>
-                </StyledTop>
-                <StyledGrid>
-                  <StyledLabelsRow>
-                    <StyledLabels>Asset</StyledLabels>
-                    <StyledLabels>Quantity</StyledLabels>
-                    <StyledLabels>Price</StyledLabels>
-                    <StyledLabels>Total</StyledLabels>
-                  </StyledLabelsRow>
+              <StyledActions>
+                <Button left color="blue" icon={qrCode} onClick={this.openReceiveModal}>
+                  Receive
+                </Button>
+                <Button left color="blue" icon={arrowUp} onClick={this.openSendModal}>
+                  Send
+                </Button>
+              </StyledActions>
+            </StyledTop>
+            <StyledGrid>
+              <StyledLabelsRow>
+                <StyledLabels>Asset</StyledLabels>
+                <StyledLabels>Quantity</StyledLabels>
+                <StyledLabels>Price</StyledLabels>
+                <StyledLabels>Total</StyledLabels>
+              </StyledLabelsRow>
 
-                  <StyledEthereum>
+              <StyledEthereum>
+                <StyledAsset>
+                  <CryptoIcon currency="ETH" />
+                  <p>{'Ethereum'}</p>
+                </StyledAsset>
+                <p>{`${handleDecimals(this.props.account.balance)} ETH`}</p>
+                <p>{convertToNativeString(1, 'ETH')}</p>
+                <p>{convertToNativeString(this.props.account.balance, 'ETH')}</p>
+              </StyledEthereum>
+              {!!this.props.account.tokens &&
+                this.props.account.tokens.map(token => (
+                  <StyledToken key={`${this.props.account.address}-${token.symbol}`}>
                     <StyledAsset>
-                      <CryptoIcon currency="ETH" />
-                      <p>{'Ethereum'}</p>
+                      <CryptoIcon currency={token.symbol} />
+                      <p>{token.name}</p>
                     </StyledAsset>
-                    <p>{`${handleDecimals(this.props.account.balance)} ETH`}</p>
-                    <p>{convertToNativeString(1, 'ETH')}</p>
-                    <p>{convertToNativeString(this.props.account.balance, 'ETH')}</p>
-                  </StyledEthereum>
-                  {!!this.props.account.tokens &&
-                    this.props.account.tokens.map(token => (
-                      <StyledToken key={`${this.props.account.address}-${token.symbol}`}>
-                        <StyledAsset>
-                          <CryptoIcon currency={token.symbol} />
-                          <p>{token.name}</p>
-                        </StyledAsset>
-                        <p>{`${handleDecimals(token.balance)} ${token.symbol}`}</p>
-                        <p>{convertToNativeString(1, token.symbol)}</p>
-                        <p>{convertToNativeString(token.balance, token.symbol)}</p>
-                      </StyledToken>
-                    ))}
-                </StyledGrid>
-              </StyledFlex>
-            </StyledCard>
-          </StyledAccount>
-        ) : (
-          <StyledCard fetching={this.props.fetching}>Generate, Import or Add account</StyledCard>
-        )}
-      </StyledWrapper>
+                    <p>{`${handleDecimals(token.balance)} ${token.symbol}`}</p>
+                    <p>{convertToNativeString(1, token.symbol)}</p>
+                    <p>{convertToNativeString(token.balance, token.symbol)}</p>
+                  </StyledToken>
+                ))}
+            </StyledGrid>
+          </StyledFlex>
+        </Card>
+      </StyledAccount>
     );
   }
 }

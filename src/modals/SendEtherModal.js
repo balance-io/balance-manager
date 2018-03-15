@@ -34,7 +34,8 @@ import {
   fromWei,
   convertToNativeString,
   getLocal,
-  getTimeString
+  getTimeString,
+  capitalize
 } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
@@ -194,7 +195,7 @@ const StyledMaxBalance = styled.p`
 const StyledActions = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: ${({ single }) => (single ? `center` : `space-between`)};
   & button {
     margin: 0 5px;
   }
@@ -345,7 +346,7 @@ class SendEtherModal extends Component {
             <Form onSubmit={this.onSubmit}>
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
-                {`Send from ${this.props.modalProps.name}`}
+                {`Send from ${capitalize(this.props.modalProps.name)}`}
               </StyledSubTitle>
 
               <div>
@@ -456,16 +457,16 @@ class SendEtherModal extends Component {
               </StyledGasOptions>
               <LineBreak noMargin />
               <StyledBottomModal>
-                <StyledParagraph>
-                  {`Fee:`}
-                  {this.props.txFee
-                    ? ` ${BigNumber(this.props.txFee).toFormat(6)} ETH (${convertToNativeString(
-                        this.props.txFee
-                      )})`
-                    : ` 0.000000 ETH ($0.00)`}
-                </StyledParagraph>
                 <StyledActions>
                   <Button onClick={this.onClose}>Cancel</Button>
+                  <StyledParagraph>
+                    {`Fee:`}
+                    {this.props.txFee
+                      ? ` ${BigNumber(this.props.txFee).toFormat(6)} ETH (${convertToNativeString(
+                          this.props.txFee
+                        )})`
+                      : ` 0.000000 ETH ($0.00)`}
+                  </StyledParagraph>
                   <Button
                     left
                     color="blue"
@@ -493,7 +494,7 @@ class SendEtherModal extends Component {
           ) : this.props.modalProps.type === 'METAMASK' ? (
             <div>
               <StyledParagraph>Approve transaction on Metamask</StyledParagraph>
-              <StyledActions>
+              <StyledActions single>
                 <Button onClick={this.onClose}>Close</Button>
               </StyledActions>
             </div>
@@ -501,7 +502,7 @@ class SendEtherModal extends Component {
             <Form onSubmit={this.onSubmit}>
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
-                {`Confirm transaction from ${this.props.modalProps.name}`}
+                {`Confirm transaction from ${capitalize(this.props.modalProps.name)}`}
               </StyledSubTitle>
               <div>
                 {this.props.modalProps.type === 'COLD' && (

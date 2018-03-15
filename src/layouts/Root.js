@@ -4,19 +4,11 @@ import { connect } from 'react-redux';
 import styled, { injectGlobal } from 'styled-components';
 import logo from '../assets/logo-light.png';
 import Modal from '../components/Modal';
-import Account from '../components/Account';
 import IconPreload from '../components/IconPreload';
 import Wrapper from '../components/Wrapper';
 import Notification from '../components/Notification';
-import {
-  accountsGetEthplorerInfo,
-  accountsUpdateDefaultAccount,
-  accountsConnectMetamask,
-  accountsClearUpdateAccountInterval,
-  accountsGetPrices,
-  accountsChangeNativeCurrency
-} from '../reducers/_accounts';
-import { modalOpen } from '../reducers/_modal';
+import Metamask from '../pages/Metamask';
+import SelectWallet from '../pages/SelectWallet';
 import { fonts, transitions, globalStyles } from '../styles';
 
 // eslint-disable-next-line
@@ -79,20 +71,21 @@ const StyledContentWrapper = styled.div`
 `;
 
 class Root extends Component {
-  componentDidMount() {
-    this.props.accountsGetPrices();
-  }
-  onConnectMetamask = () => this.props.accountsConnectMetamask();
-  componentWillUnmount() {
-    this.props.accountsClearUpdateAccountInterval();
-  }
+  selectedWallet = () => {
+    switch (this.props.selectedWallet) {
+      case 'METAMASK':
+        return <Metamask />;
+      default:
+        return <SelectWallet />;
+    }
+  };
   render = () => (
     <StyledWrapper>
       <IconPreload />
       <StyledColumn>
         <StyledHeaderWrapper>
           <StyledHeader>
-            <StyledBranding onClick={this.props.accountsConnectMetamask}>
+            <StyledBranding>
               <StyledLogo src={logo} alt="Balance" />
               <StyledHero>
                 <strong>Balance</strong> Manager
@@ -104,33 +97,7 @@ class Root extends Component {
             </StyledToolbar> */}
           </StyledHeader>
         </StyledHeaderWrapper>
-        <StyledContentWrapper>
-          {this.props.web3Available ? (
-            this.props.web3Mainnet ? (
-              this.props.defaultAccount ? (
-                <Account
-                  account={this.props.account}
-                  fetching={this.props.fetching}
-                  prices={this.props.prices}
-                  nativeCurrency={this.props.nativeCurrency}
-                  modalOpen={this.props.modalOpen}
-                />
-              ) : (
-                <p>Please unlock your Metamask</p>
-              )
-            ) : (
-              <p>Please switch to Main Network</p>
-            )
-          ) : (
-            <p>
-              Please install{' '}
-              <a href="https://metamask.io/" target="_blank" rel="noopener noreferrer">
-                Metamask
-              </a>{' '}
-              extension first
-            </p>
-          )}
-        </StyledContentWrapper>
+        <StyledContentWrapper>{this.selectedWallet()}</StyledContentWrapper>
       </StyledColumn>
       <Modal />
       <Notification />
@@ -139,40 +106,11 @@ class Root extends Component {
 }
 
 Root.propTypes = {
-  accountsGetEthplorerInfo: PropTypes.func.isRequired,
-  accountsUpdateDefaultAccount: PropTypes.func.isRequired,
-  accountsConnectMetamask: PropTypes.func.isRequired,
-  accountsClearUpdateAccountInterval: PropTypes.func.isRequired,
-  accountsGetPrices: PropTypes.func.isRequired,
-  accountsChangeNativeCurrency: PropTypes.func.isRequired,
-  modalOpen: PropTypes.func.isRequired,
-  prices: PropTypes.object.isRequired,
-  nativeCurrency: PropTypes.string.isRequired,
-  web3Available: PropTypes.bool.isRequired,
-  web3Mainnet: PropTypes.bool.isRequired,
-  defaultAccount: PropTypes.string.isRequired,
-  account: PropTypes.object.isRequired,
-  fetching: PropTypes.bool.isRequired,
-  error: PropTypes.bool.isRequired
+  selectedWallet: PropTypes.string.isRequired
 };
 
 const reduxProps = ({ accounts }) => ({
-  prices: accounts.prices,
-  nativeCurrency: accounts.nativeCurrency,
-  web3Available: accounts.web3Available,
-  web3Mainnet: accounts.web3Mainnet,
-  defaultAccount: accounts.defaultAccount,
-  account: accounts.account,
-  fetching: accounts.fetching,
-  error: accounts.error
+  selectedWallet: accounts.selectedWallet
 });
 
-export default connect(reduxProps, {
-  accountsGetEthplorerInfo,
-  accountsUpdateDefaultAccount,
-  accountsConnectMetamask,
-  accountsClearUpdateAccountInterval,
-  accountsGetPrices,
-  accountsChangeNativeCurrency,
-  modalOpen
-})(Root);
+export default connect(reduxProps, null)(Root);

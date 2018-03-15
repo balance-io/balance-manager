@@ -30,8 +30,10 @@ export const apiGetEthplorerInfo = (address = '', type = 'METAMASK') =>
         ? data.tokens.map(token => {
             const balance = parseTokenBalances(token.balance, token.tokenInfo.decimals);
             return {
-              name: token.tokenInfo.name,
-              symbol: token.tokenInfo.symbol,
+              name: token.tokenInfo.name || 'Unknown Token',
+              symbol: token.tokenInfo.symbol || '---',
+              address: token.tokenInfo.address,
+              decimal: token.tokenInfo.decimal,
               balance: balance
             };
           })

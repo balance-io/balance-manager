@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import styled, { injectGlobal } from 'styled-components';
+import styled from 'styled-components';
+import Link from '../components/Link';
 import logo from '../assets/logo-light.png';
 import Modal from '../components/Modal';
 import Background from '../components/Background';
@@ -9,12 +9,7 @@ import IconPreload from '../components/IconPreload';
 import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
 import Notification from '../components/Notification';
-import Metamask from '../pages/Metamask';
-import SelectWallet from '../pages/SelectWallet';
-import { fonts, globalStyles } from '../styles';
-
-// eslint-disable-next-line
-injectGlobal`${globalStyles}`;
+import { fonts } from '../styles';
 
 const StyledLayout = styled.div`
   position: relative;
@@ -55,45 +50,33 @@ const StyledLogo = styled.img`
   width: 20px;
 `;
 
-class Root extends Component {
-  selectedWallet = () => {
-    switch (this.props.selectedWallet) {
-      case 'METAMASK':
-        return <Metamask />;
-      default:
-        return <SelectWallet />;
-    }
-  };
-  render = () => (
-    <StyledLayout>
-      <Background />
-      <IconPreload />
-      <Column maxWidth={800}>
-        <StyledHeader>
+const BaseLayout = ({ children, ...props }) => (
+  <StyledLayout>
+    <Background />
+    <IconPreload />
+    <Column maxWidth={800}>
+      <StyledHeader>
+        <Link to="/">
           <StyledBranding>
             <StyledLogo src={logo} alt="Balance" />
             <StyledHero>
               <strong>Balance</strong> Manager
             </StyledHero>
           </StyledBranding>
-          {/* <StyledToolbar>
+        </Link>
+        {/* <StyledToolbar>
               <Dropdown />
             </StyledToolbar> */}
-        </StyledHeader>
-        <StyledContent>{this.selectedWallet()}</StyledContent>
-      </Column>
-      <Modal />
-      <Notification />
-    </StyledLayout>
-  );
-}
+      </StyledHeader>
+      <StyledContent>{children}</StyledContent>
+    </Column>
+    <Modal />
+    <Notification />
+  </StyledLayout>
+);
 
-Root.propTypes = {
-  selectedWallet: PropTypes.string.isRequired
+BaseLayout.propTypes = {
+  children: PropTypes.node.isRequired
 };
 
-const reduxProps = ({ accounts }) => ({
-  selectedWallet: accounts.selectedWallet
-});
-
-export default connect(reduxProps, null)(Root);
+export default BaseLayout;

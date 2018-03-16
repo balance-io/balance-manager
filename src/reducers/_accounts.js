@@ -4,8 +4,6 @@ import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //
 
-const ACCOUNTS_UPDATED_SELECTED_WALLET = 'accounts/ACCOUNTS_UPDATED_SELECTED_WALLET';
-
 const ACCOUNTS_GET_ETHPLORER_INFO_REQUEST = 'accounts/ACCOUNTS_GET_ETHPLORER_INFO_REQUEST';
 const ACCOUNTS_GET_ETHPLORER_INFO_SUCCESS = 'accounts/ACCOUNTS_GET_ETHPLORER_INFO_SUCCESS';
 const ACCOUNTS_GET_ETHPLORER_INFO_FAILURE = 'accounts/ACCOUNTS_GET_ETHPLORER_INFO_FAILURE';
@@ -27,11 +25,6 @@ const ACCOUNTS_CHANGE_NATIVE_CURRENCY = 'accounts/ACCOUNTS_CHANGE_NATIVE_CURRENC
 
 let accountInterval = null;
 let getPricesInterval = null;
-
-export const accountsUpdateSelectedWallet = wallet => ({
-  type: ACCOUNTS_UPDATED_SELECTED_WALLET,
-  payload: wallet.toUpperCase()
-});
 
 export const accountsGetEthplorerInfo = (address, type) => dispatch => {
   dispatch({ type: ACCOUNTS_GET_ETHPLORER_INFO_REQUEST });
@@ -75,7 +68,7 @@ export const accountsConnectMetamask = () => (dispatch, getState) => {
   }
 };
 
-export const accountsClearUpdateAccountInterval = () => clearInterval(accountInterval);
+export const accountsClearUpdateAccountInterval = () => dispatch => clearInterval(accountInterval);
 
 export const accountsGetPrices = () => (dispatch, getState) => {
   let { nativeCurrency, crypto, account } = getState().accounts;
@@ -128,7 +121,6 @@ const INITIAL_STATE = {
   nativePriceRequest: 'USD',
   nativeCurrency: 'USD',
   prices: {},
-  selectedWallet: '',
   web3Available: false,
   web3Mainnet: false,
   metamaskAccount: '',
@@ -140,8 +132,6 @@ const INITIAL_STATE = {
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case ACCOUNTS_UPDATED_SELECTED_WALLET:
-      return { ...state, selectedWallet: action.payload };
     case ACCOUNTS_UPDATE_METAMASK_ACCOUNT:
       return { ...state, metamaskAccount: action.payload };
     case ACCOUNTS_GET_ETHPLORER_INFO_REQUEST:

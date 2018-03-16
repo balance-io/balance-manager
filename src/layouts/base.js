@@ -9,7 +9,7 @@ import IconPreload from '../components/IconPreload';
 import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
 import Notification from '../components/Notification';
-import { fonts } from '../styles';
+import { fonts, responsive } from '../styles';
 
 const StyledLayout = styled.div`
   position: relative;
@@ -17,6 +17,9 @@ const StyledLayout = styled.div`
   min-height: 100vh;
   width: 100vw;
   text-align: center;
+  @media screen and (${responsive.sm.max}) {
+    padding: 15px;
+  }
 `;
 
 const StyledContent = styled(Wrapper)`
@@ -29,6 +32,10 @@ const StyledHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  @media screen and (${responsive.sm.max}) {
+    margin: 0;
+    margin-bottom: 15px;
+  }
 `;
 
 const StyledBranding = styled.div`

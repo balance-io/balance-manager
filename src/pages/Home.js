@@ -1,16 +1,18 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import metamaskOriginal from '../assets/metamask-original.png';
-import ledgerLogo from '../assets/ledger-logo.png';
-import trezorLogo from '../assets/trezor-logo.png';
-import metamaskWhite from '../assets/metamask-white.png';
+import Link from '../components/Link';
+import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
 import Column from '../components/Column';
 import SubscribeForm from '../components/SubscribeForm';
 import Button from '../components/Button';
-import { accountsConnectMetamask, accountsUpdateSelectedWallet } from '../reducers/_accounts';
+import metamaskOriginal from '../assets/metamask-original.png';
+import ledgerLogo from '../assets/ledger-logo.png';
+import trezorLogo from '../assets/trezor-logo.png';
+import metamaskWhite from '../assets/metamask-white.png';
+import { accountsConnectMetamask } from '../reducers/_accounts';
 import { responsive } from '../styles';
 
 const StyledCardContainer = styled.div`
@@ -19,7 +21,7 @@ const StyledCardContainer = styled.div`
   justify-content: space-between;
   @media screen and (${responsive.sm.max}) {
     flex-direction: column;
-    justify-content: center;
+    justify-content: ;
   }
 `;
 
@@ -62,13 +64,9 @@ const StyledTrezorWallet = styled(StyledImageWrapper)`
   height: 82.5px;
 `;
 
-class SelectWallet extends Component {
-  onConnectMetamask = () => {
-    this.props.accountsConnectMetamask();
-    this.props.accountsUpdateSelectedWallet('METAMASK');
-  };
-  render = () => (
-    <Card>
+const Home = ({ accountsConnectMetamask, ...props }) => (
+  <BaseLayout>
+    <Card {...props}>
       <StyledCardContainer>
         <StyledHardwareWallets>
           <StyledLedgerWallet>
@@ -84,20 +82,21 @@ class SelectWallet extends Component {
           <StyledFox>
             <img src={metamaskOriginal} alt="metamask" />
           </StyledFox>
-          <Button left color="orange" icon={metamaskWhite} onClick={this.onConnectMetamask}>
-            Connect to Metamask
-          </Button>
+          <Link to="/metamask">
+            <Button left color="orange" icon={metamaskWhite} onClick={accountsConnectMetamask}>
+              Connect to Metamask
+            </Button>
+          </Link>
         </StyledMetamaskConnect>
       </StyledCardContainer>
     </Card>
-  );
-}
+  </BaseLayout>
+);
 
-SelectWallet.propTypes = {
+Home.propTypes = {
   accountsConnectMetamask: PropTypes.func.isRequired
 };
 
 export default connect(null, {
-  accountsConnectMetamask,
-  accountsUpdateSelectedWallet
-})(SelectWallet);
+  accountsConnectMetamask
+})(Home);

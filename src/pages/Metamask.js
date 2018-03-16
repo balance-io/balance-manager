@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import BaseLayout from '../layouts/base';
 import Account from '../components/Account';
 import Card from '../components/Card';
 import {
@@ -31,6 +32,7 @@ const StyledMessage = styled.div`
 class Metamask extends Component {
   componentDidMount() {
     this.props.accountsGetPrices();
+    this.props.accountsConnectMetamask();
   }
   renderMessage() {
     if (!this.props.web3Available) return `Please install Metamask chrome extension`;
@@ -41,21 +43,23 @@ class Metamask extends Component {
     this.props.accountsClearUpdateAccountInterval();
   }
   render = () => (
-    <StyledWrapper>
-      {this.props.fetching || this.props.metamaskAccount ? (
-        <Account
-          account={this.props.account}
-          fetching={this.props.fetching}
-          prices={this.props.prices}
-          nativeCurrency={this.props.nativeCurrency}
-          modalOpen={this.props.modalOpen}
-        />
-      ) : (
-        <Card fetching={this.props.fetching}>
-          <StyledMessage>{this.renderMessage()}</StyledMessage>
-        </Card>
-      )}
-    </StyledWrapper>
+    <BaseLayout>
+      <StyledWrapper>
+        {this.props.fetching || this.props.metamaskAccount ? (
+          <Account
+            account={this.props.account}
+            fetching={this.props.fetching}
+            prices={this.props.prices}
+            nativeCurrency={this.props.nativeCurrency}
+            modalOpen={this.props.modalOpen}
+          />
+        ) : (
+          <Card fetching={this.props.fetching}>
+            <StyledMessage>{this.renderMessage()}</StyledMessage>
+          </Card>
+        )}
+      </StyledWrapper>
+    </BaseLayout>
   );
 }
 

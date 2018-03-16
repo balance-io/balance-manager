@@ -1,20 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, applyMiddleware } from 'redux';
-import { Provider } from 'react-redux';
-import ReduxThunk from 'redux-thunk';
-import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
-import Root from './layouts/Root.js';
-import ReduxReset from './helpers/reduxReset';
-import reducers from './reducers';
+import { injectGlobal } from 'styled-components';
+import { globalStyles } from './styles';
+import './helpers/intercom';
+import { bootIntercom } from './helpers/utilities';
 import registerServiceWorker from './helpers/registerServiceWorker';
+import Root from './Root';
 
-const store = createStore(reducers, composeWithDevTools(applyMiddleware(ReduxThunk), ReduxReset()));
+// eslint-disable-next-line
+injectGlobal`${globalStyles}`;
 
-ReactDOM.render(
-  <Provider store={store}>
-    <Root />
-  </Provider>,
-  document.getElementById('root')
-);
+// Intercom
+bootIntercom();
+
+ReactDOM.render(<Root />, document.getElementById('root'));
 registerServiceWorker();

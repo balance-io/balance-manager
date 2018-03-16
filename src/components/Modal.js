@@ -20,6 +20,20 @@ const StyledLightbox = styled.div`
   visibility: ${({ modal }) => (modal ? 'visible' : 'hidden')};
   pointer-events: ${({ modal }) => (modal ? 'auto' : 'none')};
   background: rgba(${colors.dark}, 0.2);
+`;
+
+const StyledHitbox = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+`;
+
+const StyledContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,7 +66,10 @@ class Modal extends Component {
     }
     return (
       <StyledLightbox modal={this.props.modal}>
-        <Column center>{this.modalController()}</Column>
+        <StyledContainer>
+          <StyledHitbox onClick={this.props.modalClose} />
+          <Column center>{this.modalController()}</Column>
+        </StyledContainer>
       </StyledLightbox>
     );
   };

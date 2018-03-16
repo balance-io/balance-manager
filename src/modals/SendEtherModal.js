@@ -26,7 +26,8 @@ import {
   sendUpdateNativeAmount,
   sendUpdateCryptoAmount,
   sendUpdatePrivateKey,
-  sendUpdateSelected
+  sendUpdateSelected,
+  sendToggleConfirmationView
 } from '../reducers/_send';
 import { notificationShow } from '../reducers/_notification';
 import { isValidAddress } from '../helpers/validators';
@@ -245,7 +246,6 @@ class SendEtherModal extends Component {
     this.props.sendGetGasPrices();
   }
   state = {
-    confirm: false,
     isValidAddress: false,
     showQRCodeReader: false,
     QRCodeReaderTarget: ''
@@ -275,7 +275,7 @@ class SendEtherModal extends Component {
     if (this.props.modalProps.type === 'COLD') {
       this.props.sendUpdatePrivateKey('');
     }
-    this.setState({ confirm: false });
+    this.props.sendToggleConfirmationView(false);
   };
   onSendEntireBalance = () => {
     if (this.props.selected.symbol === 'ETH') {
@@ -284,14 +284,18 @@ class SendEtherModal extends Component {
       const txFeeWei = toWei(this.props.txFee);
       const remaining = balanceWei - txFeeWei;
       const ether = fromWei(remaining < 0 ? 0 : remaining);
-      this.props.sendUpdateCryptoAmount(ether);
+      this.props.sendUpdateCryptoAmount(ether, 'ETH', this.props.modalProps.prices);
     } else {
-      this.props.sendUpdateCryptoAmount(this.props.selected.balance.replace(/[^0-9.]/gi, ''));
+      this.props.sendUpdateCryptoAmount(
+        this.props.selected.balance.replace(/[^0-9.]/gi, ''),
+        this.props.selected.symbol,
+        this.props.modalProps.prices
+      );
     }
   };
   onSendAnother = () => {
     this.props.sendGetGasPrices();
-    this.setState({ confirm: false });
+    this.props.sendToggleConfirmationView(false);
     this.props.sendClearFields();
   };
   onSubmit = e => {
@@ -310,8 +314,8 @@ class SendEtherModal extends Component {
       } else {
         this.props.sendTokenMetamask(request);
       }
-      this.setState({ confirm: true });
-    } else if (!this.state.confirm) {
+      this.props.sendToggleConfirmationView(true);
+    } else if (!this.props.confirm) {
       if (!isValidAddress(this.props.recipient)) {
         this.props.notificationShow(`Address is invalid, please check again`, true);
         return;
@@ -339,7 +343,7 @@ class SendEtherModal extends Component {
           return;
         }
       }
-      this.setState({ confirm: true });
+      this.props.sendToggleConfirmationView(true);
     } else {
       if (this.props.selected.symbol === 'ETH') {
         this.props.sendEtherClient(request);
@@ -385,7 +389,7 @@ class SendEtherModal extends Component {
     return (
       <Card background="lightGrey">
         {!this.props.transaction ? (
-          !this.state.confirm ? (
+          !this.props.confirm ? (
             <Form onSubmit={this.onSubmit}>
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
@@ -671,6 +675,7 @@ SendEtherModal.propTypes = {
   sendUpdateCryptoAmount: PropTypes.func.isRequired,
   sendUpdatePrivateKey: PropTypes.func.isRequired,
   sendUpdateSelected: PropTypes.func.isRequired,
+  sendToggleConfirmationView: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
   modalProps: PropTypes.object.isRequired,
@@ -685,7 +690,8 @@ SendEtherModal.propTypes = {
   gasPrices: PropTypes.object.isRequired,
   gasPrice: PropTypes.number.isRequired,
   gasPriceOption: PropTypes.string.isRequired,
-  txFee: PropTypes.string.isRequired
+  txFee: PropTypes.string.isRequired,
+  confirm: PropTypes.bool.isRequired
 };
 
 const reduxProps = ({ send }) => ({
@@ -700,7 +706,8 @@ const reduxProps = ({ send }) => ({
   gasPrices: send.gasPrices,
   gasPrice: send.gasPrice,
   gasPriceOption: send.gasPriceOption,
-  txFee: send.txFee
+  txFee: send.txFee,
+  confirm: send.confirm
 });
 
 export default connect(reduxProps, {
@@ -716,5 +723,6 @@ export default connect(reduxProps, {
   sendUpdateCryptoAmount,
   sendUpdatePrivateKey,
   sendUpdateSelected,
+  sendToggleConfirmationView,
   notificationShow
 })(SendEtherModal);

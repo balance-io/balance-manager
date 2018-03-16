@@ -140,7 +140,15 @@ export const deleteSession = () => {
  * @return {String}
  */
 export const parseError = error => {
-  if (error.error && error.message) {
+  if (error.message.includes('MetaMask')) {
+    const msgIndex = error.message.indexOf('MetaMask');
+    const msgWhole = error.message.slice(msgIndex);
+    const msgStart = msgWhole.indexOf(':');
+    const msgEnd = msgWhole.indexOf('\n');
+    const message = msgWhole.slice(msgStart + 2, msgEnd);
+    console.log('message', message);
+    return message;
+  } else if (error.error && error.message) {
     return errors[error.message];
   } else if (!error.response || !errors[error.response.data.message]) {
     console.error(error);

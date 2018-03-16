@@ -36,6 +36,8 @@ const SEND_TOKEN_CLIENT_REQUEST = 'send/SEND_TOKEN_CLIENT_REQUEST';
 const SEND_TOKEN_CLIENT_SUCCESS = 'send/SEND_TOKEN_CLIENT_SUCCESS';
 const SEND_TOKEN_CLIENT_FAILURE = 'send/SEND_TOKEN_CLIENT_FAILURE';
 
+const SEND_TOGGLE_CONFIRMATION_VIEW = 'send/SEND_TOGGLE_CONFIRMATION_VIEW';
+
 const SEND_UPDATE_NATIVE_AMOUNT = 'send/SEND_UPDATE_NATIVE_AMOUNT';
 
 const SEND_UPDATE_RECIPIENT = 'send/SEND_UPDATE_RECIPIENT';
@@ -206,6 +208,14 @@ export const sendTokenClient = ({
     });
 };
 
+export const sendToggleConfirmationView = boolean => (dispatch, getState) => {
+  let confirm = boolean;
+  if (!confirm) {
+    confirm = !getState().send.confirm;
+  }
+  dispatch({ type: SEND_TOGGLE_CONFIRMATION_VIEW, payload: confirm });
+};
+
 export const sendUpdateRecipient = recipient => dispatch => {
   const input = recipient.replace(/[^\w.]/g, '');
   if (input.length <= 42) {
@@ -261,6 +271,7 @@ const INITIAL_STATE = {
   cryptoAmount: '',
   transaction: '',
   privateKey: '',
+  confirm: false,
   selected: { symbol: 'ETH' }
 };
 
@@ -321,14 +332,25 @@ export default (state = INITIAL_STATE, action) => {
       };
     case SEND_ETHER_METAMASK_FAILURE:
     case SEND_TOKEN_METAMASK_FAILURE:
-      return { ...state, fetching: false, transaction: '' };
+      return {
+        ...state,
+        fetching: false,
+        transaction: '',
+        confirm: false
+      };
     case SEND_ETHER_CLIENT_FAILURE:
     case SEND_TOKEN_CLIENT_FAILURE:
       return {
         ...state,
         fetching: false,
         transaction: '',
-        privateKey: ''
+        privateKey: '',
+        confirm: false
+      };
+    case SEND_TOGGLE_CONFIRMATION_VIEW:
+      return {
+        ...state,
+        confirm: action.payload
       };
     case SEND_UPDATE_RECIPIENT:
       return { ...state, recipient: action.payload };

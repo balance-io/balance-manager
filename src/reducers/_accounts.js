@@ -1,5 +1,5 @@
 import { apiGetEthplorerInfo, apiGetPrices, apiGetMetamaskNetwork } from '../helpers/api';
-import { parseError, saveLocal } from '../helpers/utilities';
+import { parseError, saveLocal, parseAccountBalances } from '../helpers/utilities';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //
@@ -15,9 +15,9 @@ const ACCOUNTS_METAMASK_GET_NETWORK_SUCCESS = 'accounts/ACCOUNTS_METAMASK_GET_NE
 const ACCOUNTS_METAMASK_GET_NETWORK_FAILURE = 'accounts/ACCOUNTS_METAMASK_GET_NETWORK_FAILURE';
 const ACCOUNTS_METAMASK_NOT_AVAILABLE = 'accounts/ACCOUNTS_METAMASK_NOT_AVAILABLE';
 
-const ACCOUNTS_GET_PRICES_REQUEST = 'accounts/ACCOUNTS_GET_PRICES_REQUEST';
-const ACCOUNTS_GET_PRICES_SUCCESS = 'accounts/ACCOUNTS_GET_PRICES_SUCCESS';
-const ACCOUNTS_GET_PRICES_FAILURE = 'accounts/ACCOUNTS_GET_PRICES_FAILURE';
+const ACCOUNTS_GET_NATIVE_PRICES_REQUEST = 'accounts/ACCOUNTS_GET_NATIVE_PRICES_REQUEST';
+const ACCOUNTS_GET_NATIVE_PRICES_SUCCESS = 'accounts/ACCOUNTS_GET_NATIVE_PRICES_SUCCESS';
+const ACCOUNTS_GET_NATIVE_PRICES_FAILURE = 'accounts/ACCOUNTS_GET_NATIVE_PRICES_FAILURE';
 
 const ACCOUNTS_CHANGE_NATIVE_CURRENCY = 'accounts/ACCOUNTS_CHANGE_NATIVE_CURRENCY';
 
@@ -31,7 +31,7 @@ export const accountsGetEthplorerInfo = (address, type) => dispatch => {
   apiGetEthplorerInfo(address, type)
     .then(account => {
       dispatch({ type: ACCOUNTS_GET_ETHPLORER_INFO_SUCCESS, payload: account });
-      dispatch(accountsGetPrices());
+      dispatch(accountsGetNativePrices(account));
     })
     .catch(err => {
       console.error(err);
@@ -40,9 +40,7 @@ export const accountsGetEthplorerInfo = (address, type) => dispatch => {
 };
 
 export const accountsUpdateMetamaskAccount = () => (dispatch, getState) => {
-  const { metamaskAccount } = getState().accounts;
-  const defaultAccount = window.web3.eth.defaultAccount;
-  if (defaultAccount !== metamaskAccount) {
+  if (window.web3.eth.defaultAccount !== getState().accounts.metamaskAccount) {
     const newAccount = window.web3.eth.defaultAccount;
     dispatch({ type: ACCOUNTS_UPDATE_METAMASK_ACCOUNT, payload: newAccount });
     dispatch(accountsGetEthplorerInfo(newAccount, 'METAMASK'));
@@ -70,35 +68,34 @@ export const accountsConnectMetamask = () => (dispatch, getState) => {
 
 export const accountsClearUpdateAccountInterval = () => dispatch => clearInterval(accountInterval);
 
-export const accountsGetPrices = () => (dispatch, getState) => {
-  let { nativeCurrency, crypto, account } = getState().accounts;
-  if (account.tokens) {
-    for (let j = 0; j < account.tokens.length; j++) {
-      if (!crypto.includes(account.tokens[j].symbol)) {
-        crypto.push(account.tokens[j].symbol);
-      }
-    }
-  }
+export const accountsGetNativePrices = account => (dispatch, getState) => {
+  let _account = account || getState().accounts.account;
+  const cryptoSymbols = _account.crypto.map(crypto => crypto.symbol);
   const getPrices = () => {
-    dispatch({ type: ACCOUNTS_GET_PRICES_REQUEST, payload: nativeCurrency });
-    apiGetPrices(crypto, nativeCurrency)
+    dispatch({
+      type: ACCOUNTS_GET_NATIVE_PRICES_REQUEST,
+      payload: getState().accounts.nativeCurrency
+    });
+    apiGetPrices(cryptoSymbols, getState().accounts.nativeCurrency)
       .then(({ data }) => {
-        if (getState().nativeCurrency === getState().nativePriceRequest) {
-          let prices = { native: nativeCurrency };
-          crypto.map(coin => (prices[coin] = data[coin] ? data[coin][nativeCurrency] : null));
+        if (getState().accounts.nativeCurrency === getState().accounts.nativePriceRequest) {
+          let prices = { native: getState().accounts.nativeCurrency };
+          cryptoSymbols.map(
+            coin =>
+              (prices[coin] = data[coin] ? data[coin][getState().accounts.nativeCurrency] : null)
+          );
           prices['WETH'] = prices['ETH'];
-          if (process.env.NODE_ENV === 'development') {
-            prices['STT'] = 0.21;
-          }
+          prices['STT'] = 0.21;
+          _account = parseAccountBalances(_account, prices);
           saveLocal('NATIVE_PRICES', prices);
           dispatch({
-            type: ACCOUNTS_GET_PRICES_SUCCESS,
-            payload: prices
+            type: ACCOUNTS_GET_NATIVE_PRICES_SUCCESS,
+            payload: { account: _account, prices }
           });
         }
       })
       .catch(error => {
-        dispatch({ type: ACCOUNTS_GET_PRICES_FAILURE });
+        dispatch({ type: ACCOUNTS_GET_NATIVE_PRICES_FAILURE });
         const message = parseError(error);
         dispatch(notificationShow(message, true));
       });
@@ -113,7 +110,7 @@ export const accountsChangeNativeCurrency = nativeCurrency => dispatch => {
     type: ACCOUNTS_CHANGE_NATIVE_CURRENCY,
     payload: nativeCurrency
   });
-  dispatch(accountsGetPrices());
+  dispatch(accountsGetNativePrices());
 };
 
 // -- Reducer --------------------------------------------------------------- //
@@ -125,7 +122,21 @@ const INITIAL_STATE = {
   web3Mainnet: false,
   metamaskAccount: '',
   crypto: ['ETH'],
-  account: { address: '', type: 'METAMASK', balance: '0.00000000', tokens: null },
+  account: {
+    address: '',
+    type: 'METAMASK',
+    crypto: [
+      {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        address: null,
+        decimals: 18,
+        balance: '0.00000000',
+        native: null
+      }
+    ],
+    totalNative: '---'
+  },
   fetching: false,
   error: false
 };
@@ -142,7 +153,21 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: false,
-        account: { address: '', type: 'METAMASK', balance: '0.00000000', tokens: null }
+        account: {
+          address: '',
+          type: 'METAMASK',
+          crypto: [
+            {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              address: null,
+              decimals: 18,
+              balance: '0.00000000',
+              native: null
+            }
+          ],
+          totalNative: '---'
+        }
       };
     case ACCOUNTS_METAMASK_GET_NETWORK_REQUEST:
       return {
@@ -172,18 +197,19 @@ export default (state = INITIAL_STATE, action) => {
         web3Available: false,
         web3Mainnet: false
       };
-    case ACCOUNTS_GET_PRICES_REQUEST:
+    case ACCOUNTS_GET_NATIVE_PRICES_REQUEST:
       return {
         ...state,
         nativePriceRequest: action.payload
       };
-    case ACCOUNTS_GET_PRICES_SUCCESS:
+    case ACCOUNTS_GET_NATIVE_PRICES_SUCCESS:
       return {
         ...state,
         nativePriceRequest: '',
-        prices: action.payload
+        prices: action.payload.prices,
+        account: action.payload.account
       };
-    case ACCOUNTS_GET_PRICES_FAILURE:
+    case ACCOUNTS_GET_NATIVE_PRICES_FAILURE:
       return {
         ...state,
         nativePriceRequest: ''

@@ -10,7 +10,7 @@ import {
   accountsUpdateMetamaskAccount,
   accountsConnectMetamask,
   accountsClearUpdateAccountInterval,
-  accountsGetPrices,
+  accountsGetNativePrices,
   accountsChangeNativeCurrency
 } from '../reducers/_accounts';
 import { modalOpen } from '../reducers/_modal';
@@ -31,7 +31,7 @@ const StyledMessage = styled.div`
 
 class Metamask extends Component {
   componentDidMount() {
-    this.props.accountsGetPrices();
+    this.props.accountsGetNativePrices();
     this.props.accountsConnectMetamask();
   }
   renderMessage() {
@@ -68,7 +68,7 @@ Metamask.propTypes = {
   accountsUpdateMetamaskAccount: PropTypes.func.isRequired,
   accountsConnectMetamask: PropTypes.func.isRequired,
   accountsClearUpdateAccountInterval: PropTypes.func.isRequired,
-  accountsGetPrices: PropTypes.func.isRequired,
+  accountsGetNativePrices: PropTypes.func.isRequired,
   accountsChangeNativeCurrency: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired,
   prices: PropTypes.object.isRequired,
@@ -97,7 +97,7 @@ export default connect(reduxProps, {
   accountsUpdateMetamaskAccount,
   accountsConnectMetamask,
   accountsClearUpdateAccountInterval,
-  accountsGetPrices,
+  accountsGetNativePrices,
   accountsChangeNativeCurrency,
   modalOpen
 })(Metamask);

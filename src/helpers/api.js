@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { parseTokenBalances } from './utilities';
+import { parseTokenBalances, handleDecimals } from './utilities';
 
 /**
  * @desc get prices
@@ -25,24 +25,34 @@ export const apiGetEthplorerInfo = (address = '', type = 'METAMASK') =>
   axios
     .get(`https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`)
     .then(({ data }) => {
-      const balance = data.ETH.balance || '0.00000000';
-      const tokens = data.tokens
-        ? data.tokens.map(token => {
-            const balance = parseTokenBalances(token.balance, token.tokenInfo.decimals);
-            return {
-              name: token.tokenInfo.name || 'Unknown Token',
-              symbol: token.tokenInfo.symbol || '---',
-              address: token.tokenInfo.address,
-              decimals: Number(token.tokenInfo.decimals),
-              balance: balance
-            };
-          })
-        : null;
+      const ethereum = {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        address: null,
+        decimals: 18,
+        balance: data.ETH.balance ? handleDecimals(data.ETH.balance) : '0.00000000',
+        native: null
+      };
+      let crypto = [ethereum];
+      if (data.tokens) {
+        const tokens = data.tokens.map(token => {
+          const balance = parseTokenBalances(token.balance, token.tokenInfo.decimals);
+          return {
+            name: token.tokenInfo.name || 'Unknown Token',
+            symbol: token.tokenInfo.symbol || '---',
+            address: token.tokenInfo.address,
+            decimals: Number(token.tokenInfo.decimals),
+            balance: handleDecimals(balance),
+            native: null
+          };
+        });
+        crypto = [...crypto, ...tokens];
+      }
       return {
         address,
         type,
-        balance,
-        tokens
+        crypto,
+        totalNative: '---'
       };
     });
 

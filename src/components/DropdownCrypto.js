@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import CryptoIcon from '../components/CryptoIcon';
 import selector from '../assets/selector-grey.svg';
-import { convertToNativeString } from '../helpers/utilities';
 import { fonts, colors, shadows, responsive } from '../styles';
 
 const StyledWrapper = styled.div`
@@ -89,21 +88,11 @@ class DropdownCrypto extends Component {
   };
   toggleDropdown = () => this.setState({ showDropdown: !this.state.showDropdown });
   render() {
-    const { selected, ethBalance, tokens, ...props } = this.props;
-    let options = {
-      ETH: {
-        name: 'Ethereum',
-        symbol: 'ETH',
-        balance: ethBalance
-      }
-    };
-    if (tokens) {
-      let parsedTokens = {};
-      tokens.forEach(token => {
-        parsedTokens[token.symbol] = token;
-      });
-      options = { ...options, ...parsedTokens };
-    }
+    const { selected, crypto, ...props } = this.props;
+    const options = {};
+    crypto.forEach(option => {
+      options[option.symbol] = option;
+    });
     return (
       <StyledWrapper show={this.state.showDropdown} {...props}>
         <StyledSelected noOptions={Object.keys(options).length < 2} onClick={this.toggleDropdown}>
@@ -112,12 +101,9 @@ class DropdownCrypto extends Component {
               <CryptoIcon size={18} currency={options[this.state.selected].symbol} />
               <p>{options[this.state.selected].name}</p>
             </StyledAsset>
-            <p>{`${options[this.state.selected].balance} ${
-              options[this.state.selected].symbol
-            } ≈ ${convertToNativeString(
-              options[this.state.selected].balance,
-              options[this.state.selected].symbol
-            )}`}</p>
+            <p>{`${options[this.state.selected].balance} ${options[this.state.selected].symbol} ≈ ${
+              options[this.state.selected].native.string
+            }`}</p>
           </div>
         </StyledSelected>
         <StyledDropdown show={this.state.showDropdown}>
@@ -132,10 +118,9 @@ class DropdownCrypto extends Component {
                   <CryptoIcon size={18} currency={options[key].symbol} />
                   <p>{options[key].name}</p>
                 </StyledAsset>
-                <p>{`${options[key].balance} ${options[key].symbol} ≈ ${convertToNativeString(
-                  options[key].balance,
-                  options[key].symbol
-                )}`}</p>
+                <p>{`${options[key].balance} ${options[key].symbol} ≈ ${
+                  options[key].native.string
+                }`}</p>
               </div>
             ))}
         </StyledDropdown>
@@ -145,9 +130,8 @@ class DropdownCrypto extends Component {
 }
 
 DropdownCrypto.propTypes = {
-  selected: PropTypes.string.isRequired,
-  tokens: PropTypes.array.isRequired,
-  ethBalance: PropTypes.string.isRequired
+  crypto: PropTypes.array.isRequired,
+  onChange: PropTypes.func.isRequired
 };
 
 export default DropdownCrypto;

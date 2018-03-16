@@ -99,7 +99,6 @@ export const sendUpdateSelected = selected => (dispatch, getState) => {
 export const sendEtherMetamask = ({ address, recipient, amount, gasPrice }) => dispatch => {
   dispatch({ type: SEND_ETHER_METAMASK_REQUEST });
   const _gasPrice = String(parseInt(gasPrice, 10) * 10 ** 9);
-  console.log(JSON.stringify({ address, recipient, amount, gasPrice }, null, 2));
   metamaskSendTransaction({ from: address, to: recipient, value: amount, gasPrice: _gasPrice })
     .then(txHash =>
       dispatch({
@@ -217,18 +216,20 @@ export const sendUpdateRecipient = recipient => dispatch => {
   }
 };
 
-export const sendUpdateNativeAmount = (nativeAmount, selected) => dispatch => {
+export const sendUpdateNativeAmount = (nativeAmount, selected, prices) => dispatch => {
   const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
-  const cryptoAmount = convertFromNativeValue(_nativeAmount, selected) || _nativeAmount;
+  const cryptoAmount =
+    String(convertFromNativeValue(_nativeAmount, selected, prices)) || _nativeAmount;
   dispatch({
     type: SEND_UPDATE_CRYPTO_AMOUNT,
     payload: { cryptoAmount, nativeAmount: _nativeAmount }
   });
 };
 
-export const sendUpdateCryptoAmount = (cryptoAmount, selected) => dispatch => {
+export const sendUpdateCryptoAmount = (cryptoAmount, selected, prices) => dispatch => {
   const _cryptoAmount = cryptoAmount.replace(/[^0-9.]/g, '');
-  const nativeAmount = convertToNativeValue(_cryptoAmount, selected) || _cryptoAmount;
+  const nativeAmount =
+    String(convertToNativeValue(_cryptoAmount, selected, prices)) || _cryptoAmount;
   dispatch({
     type: SEND_UPDATE_CRYPTO_AMOUNT,
     payload: { cryptoAmount: _cryptoAmount, nativeAmount }

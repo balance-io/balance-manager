@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { web3Instance } from './web3';
 import errors from '../libraries/errors.json';
+import nativeCurrencies from '../libraries/native-currencies.json';
 
 /**
  * @desc save to local storage
@@ -163,59 +164,100 @@ export const capitalize = string =>
  * @desc convert from current native value to crypto value
  * @param  {String} [nativeValue='']
  * @param  {String} [crypto='ETH']
- * @param  {Number} [decimals=8]
- * @return {String}
+ * @param  {Object} [prices=null]
+ * @return {Number}
  */
-export const convertFromNativeValue = (nativeValue = '', crypto = 'ETH', decimals = 8) => {
-  const prices = getLocal('NATIVE_PRICES');
-  if (!prices || (prices && !prices[crypto])) return '';
-  const value = Number(Number(nativeValue) / Number(prices[crypto])).toFixed(decimals);
-  return Number(value) ? value : '';
+export const convertFromNativeValue = (nativeValue = '', crypto = 'ETH', prices = null) => {
+  if (!prices || (prices && !prices[crypto])) return 0;
+  return Number(Number(Number(nativeValue) / Number(prices[crypto])).toFixed(8));
 };
 
 /**
  * @desc convert crypto value to current native value
  * @param  {String} [value='']
  * @param  {String} [crypto='ETH']
- * @param  {Number} [decimals=2]
- * @return {String}
+ * @param  {Object} [prices=null]
+ * @return {Number}
  */
-export const convertToNativeValue = (value = '', crypto = 'ETH', decimals = 8) => {
-  const prices = getLocal('NATIVE_PRICES');
-  if (!prices || (prices && !prices[crypto])) return '';
-  const nativeValue = Number(Number(value) * Number(prices[crypto])).toFixed(decimals);
-  return Number(nativeValue) ? nativeValue : '';
+export const convertToNativeValue = (value = '', crypto = 'ETH', prices = null) => {
+  if (!prices || (prices && !prices[crypto])) return 0;
+  return Number(Number(Number(value) * Number(prices[crypto])).toFixed(8));
 };
 
 /**
  * @desc convert crypto value to current native string
  * @param  {String} [value='']
  * @param  {String} [crypto='ETH']
+ * @param  {Object} [prices=null]
  * @return {String}
  */
-export const convertToNativeString = (value = '', crypto = 'ETH') => {
-  const prices = getLocal('NATIVE_PRICES');
-  if (!prices || (prices && !prices[crypto])) return '';
-  const nativeSymbols = {
-    ETH: 'Ξ',
-    BTC: '₿',
-    USD: '$',
-    EUR: '€',
-    GBP: '£'
-  };
+export const convertToNativeString = (value = '', cryptoSymbol = 'ETH', prices = null) => {
+  if (!prices || (prices && !prices[cryptoSymbol])) return '';
   if (prices.native === 'ETH' || prices.native === 'BTC') {
-    const native = prices.native;
+    const nativeSymbol = prices.native;
     const decimals = 8;
-    const nativeValue = convertToNativeValue(value, crypto) || 0;
+    const nativeValue = convertToNativeValue(value, cryptoSymbol, prices);
     const formatted = BigNumber(nativeValue).toFormat(decimals);
-    return `${formatted} ${native}`;
+    return Number(formatted) ? `${formatted} ${nativeSymbol}` : `--- ${nativeSymbol}`;
   } else {
-    const native = nativeSymbols[prices.native];
+    const nativeSymbol = nativeCurrencies[prices.native];
     const decimals = 2;
-    const nativeValue = convertToNativeValue(value, crypto) || 0;
+    const nativeValue = convertToNativeValue(value, cryptoSymbol, prices);
     const formatted = BigNumber(nativeValue).toFormat(decimals);
-    return `${native}${formatted}`;
+    return Number(formatted) ? `${nativeSymbol}${formatted}` : `${nativeSymbol}---`;
   }
+};
+
+/**
+ * @desc format native value to string
+ * @param  {String} [value='']
+ * @param  {Object} [native=null]
+ * @return {String}
+ */
+export const formatNativeString = (value = '', native = 'USD') => {
+  const _value = Number(value).toFixed(8);
+  if (native === 'ETH' || native === 'BTC') {
+    const nativeSymbol = native;
+    const decimals = 8;
+    const formatted = BigNumber(_value).toFormat(decimals);
+    return Number(formatted) ? `${formatted} ${nativeSymbol}` : `--- ${nativeSymbol}`;
+  } else {
+    const nativeSymbol = nativeCurrencies[native];
+    const decimals = 2;
+    const formatted = BigNumber(_value).toFormat(decimals);
+    return Number(formatted) ? `${nativeSymbol}${formatted}` : `${nativeSymbol}---`;
+  }
+};
+
+/**
+ * @desc parse account balances from native prices
+ * @param  {Object} [account=null]
+ * @param  {Object} [prices=null]
+ * @return {String}
+ */
+export const parseAccountBalances = (account = null, prices = null) => {
+  let totalNative = '---';
+  if (account.crypto) {
+    account.crypto = account.crypto.map(crypto => {
+      const price = convertToNativeString('1', crypto.symbol, prices);
+      const value = convertToNativeValue(crypto.balance, crypto.symbol, prices);
+      const string = convertToNativeString(crypto.balance, crypto.symbol, prices);
+      crypto.native = {
+        currency: prices.native,
+        price: price,
+        value: value,
+        string: string
+      };
+      return crypto;
+    });
+    totalNative = account.crypto.reduce(
+      (total, crypto) => Number(total) + Number(crypto.native.value),
+      0
+    );
+    totalNative = formatNativeString(totalNative, prices.native);
+  }
+  account.totalNative = totalNative;
+  return account;
 };
 
 /**

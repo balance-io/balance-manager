@@ -133,7 +133,6 @@ export const metamaskSendTransaction = transaction =>
     getTxDetails(from, to, data, value, transaction.gasPrice)
       .then(txDetails => {
         if (typeof window.web3 !== 'undefined') {
-          console.log('txDetails', txDetails);
           window.web3.eth.sendTransaction(txDetails, (err, txHash) => {
             if (err) {
               reject(err);

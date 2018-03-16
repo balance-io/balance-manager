@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Card from './Card';
 import Button from './Button';
+import AddressCopy from './AddressCopy';
 import CryptoIcon from './CryptoIcon';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
@@ -39,18 +40,8 @@ const StyledTop = styled.div`
   }
 `;
 
-const StyledAddress = styled.div`
-  opacity: 0.7;
-  line-height: 1.25;
-  margin: 0.2em 0;
-  letter-spacing: -0.2px;
-  font-weight: ${fonts.weight.semibold};
-  @media screen and (${responsive.sm.max}) {
-    font-size: ${fonts.size.small};
-  }
-  @media screen and (${responsive.xs.max}) {
-    font-size: ${fonts.size.tiny};
-  }
+const StyledAddressWrapper = styled.div`
+  width: 100%;
 `;
 
 const StyledActions = styled.div`
@@ -216,10 +207,10 @@ class Account extends Component {
         <Card fetching={this.props.fetching}>
           <StyledFlex>
             <StyledTop>
-              <div>
+              <StyledAddressWrapper>
                 <h6>{'Your wallet address'} </h6>
-                <StyledAddress>{this.props.account.address}</StyledAddress>
-              </div>
+                <AddressCopy address={this.props.account.address} />
+              </StyledAddressWrapper>
 
               <StyledActions>
                 <Button left color="blue" icon={qrCode} onClick={this.openReceiveModal}>
@@ -263,7 +254,7 @@ class Account extends Component {
                 <p> </p>
                 <p> </p>
                 <p> </p>
-                <p>{`Total Balance ${this.props.account.totalNative || '---'}`}</p>
+                <p>{`Balance ${this.props.account.totalNative || '---'}`}</p>
               </StyledTotalBalance>
             </StyledGrid>
           </StyledFlex>

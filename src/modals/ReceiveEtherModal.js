@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Card from '../components/Card';
+import AddressCopy from '../components/AddressCopy';
 import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import arrowUp from '../assets/arrow-up.svg';
@@ -49,7 +50,7 @@ const StyledJustifyContent = styled.div`
   align-items: center;
 `;
 
-const StyledAddress = styled.div`
+const StyledAddressCopy = styled(AddressCopy)`
   font-weight: ${fonts.weight.semibold};
   text-align: center;
   letter-spacing: 2px;
@@ -79,7 +80,7 @@ class ReceiveEtherModal extends Component {
           <Button onClick={this.onClose}>Close</Button>
         </StyledJustifyContent>
         <StyledQRCodeDisplay data={this.props.modalProps.address} />
-        <StyledAddress>{this.props.modalProps.address}</StyledAddress>
+        <StyledAddressCopy textHover address={this.props.modalProps.address} />
       </StyledContainer>
     </Card>
   );

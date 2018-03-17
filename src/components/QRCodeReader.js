@@ -66,7 +66,7 @@ class QRCodeReader extends Component {
     return (
       <StyledWrapper>
         <StyledClose onClick={this.onClose} />
-        <Column center>
+        <Column spanHeight center>
           <QrReader
             delay={this.state.delay}
             onError={this.handleError}

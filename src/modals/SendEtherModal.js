@@ -26,7 +26,8 @@ import {
   sendUpdateNativeAmount,
   sendUpdateCryptoAmount,
   sendUpdatePrivateKey,
-  sendUpdateSelected
+  sendUpdateSelected,
+  sendToggleConfirmationView
 } from '../reducers/_send';
 import { notificationShow } from '../reducers/_notification';
 import { isValidAddress } from '../helpers/validators';
@@ -34,7 +35,6 @@ import {
   toWei,
   fromWei,
   convertToNativeString,
-  getLocal,
   getTimeString,
   capitalize
 } from '../helpers/utilities';
@@ -245,7 +245,6 @@ class SendEtherModal extends Component {
     this.props.sendGetGasPrices();
   }
   state = {
-    confirm: false,
     isValidAddress: false,
     showQRCodeReader: false,
     QRCodeReaderTarget: ''
@@ -262,9 +261,9 @@ class SendEtherModal extends Component {
     }
   }
   onChangeSelected = value => {
-    let selected = { symbol: 'ETH' };
+    let selected = this.props.modalProps.crypto.filter(crypto => crypto.symbol === 'ETH')[0];
     if (value !== 'ETH') {
-      selected = this.props.modalProps.tokens.filter(token => token.symbol === value)[0];
+      selected = this.props.modalProps.crypto.filter(crypto => crypto.symbol === value)[0];
     }
     this.props.sendUpdateSelected(selected);
   };
@@ -275,22 +274,27 @@ class SendEtherModal extends Component {
     if (this.props.modalProps.type === 'COLD') {
       this.props.sendUpdatePrivateKey('');
     }
-    this.setState({ confirm: false });
+    this.props.sendToggleConfirmationView(false);
   };
   onSendEntireBalance = () => {
     if (this.props.selected.symbol === 'ETH') {
-      const balanceWei = toWei(this.props.modalProps.balance);
+      const ethereum = this.props.modalProps.crypto.filter(crypto => crypto.symbol === 'ETH')[0];
+      const balanceWei = toWei(ethereum.balance);
       const txFeeWei = toWei(this.props.txFee);
       const remaining = balanceWei - txFeeWei;
       const ether = fromWei(remaining < 0 ? 0 : remaining);
-      this.props.sendUpdateCryptoAmount(ether);
+      this.props.sendUpdateCryptoAmount(ether, 'ETH', this.props.modalProps.prices);
     } else {
-      this.props.sendUpdateCryptoAmount(this.props.selected.balance.replace(/[^0-9.]/gi, ''));
+      this.props.sendUpdateCryptoAmount(
+        this.props.selected.balance.replace(/[^0-9.]/gi, ''),
+        this.props.selected.symbol,
+        this.props.modalProps.prices
+      );
     }
   };
   onSendAnother = () => {
     this.props.sendGetGasPrices();
-    this.setState({ confirm: false });
+    this.props.sendToggleConfirmationView(false);
     this.props.sendClearFields();
   };
   onSubmit = e => {
@@ -309,8 +313,8 @@ class SendEtherModal extends Component {
       } else {
         this.props.sendTokenMetamask(request);
       }
-      this.setState({ confirm: true });
-    } else if (!this.state.confirm) {
+      this.props.sendToggleConfirmationView(true);
+    } else if (!this.props.confirm) {
       if (!isValidAddress(this.props.recipient)) {
         this.props.notificationShow(`Address is invalid, please check again`, true);
         return;
@@ -338,7 +342,7 @@ class SendEtherModal extends Component {
           return;
         }
       }
-      this.setState({ confirm: true });
+      this.props.sendToggleConfirmationView(true);
     } else {
       if (this.props.selected.symbol === 'ETH') {
         this.props.sendEtherClient(request);
@@ -380,11 +384,10 @@ class SendEtherModal extends Component {
     this.props.closeModal();
   };
   render = () => {
-    const network = getLocal('NETWORK_PROVIDER');
     return (
       <Card background="lightGrey">
         {!this.props.transaction ? (
-          !this.state.confirm ? (
+          !this.props.confirm ? (
             <Form onSubmit={this.onSubmit}>
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
@@ -393,9 +396,7 @@ class SendEtherModal extends Component {
 
               <div>
                 <DropdownCrypto
-                  ethBalance={`${this.props.modalProps.balance}`}
-                  tokens={this.props.modalProps.tokens}
-                  selected={this.props.selected.symbol}
+                  crypto={this.props.modalProps.crypto}
                   onChange={this.onChangeSelected}
                 />
               </div>
@@ -432,7 +433,11 @@ class SendEtherModal extends Component {
                     type="text"
                     value={this.props.cryptoAmount}
                     onChange={({ target }) =>
-                      this.props.sendUpdateCryptoAmount(target.value, this.props.selected.symbol)
+                      this.props.sendUpdateCryptoAmount(
+                        target.value,
+                        this.props.selected.symbol,
+                        this.props.modalProps.prices
+                      )
                     }
                   />
                   <StyledMaxBalance onClick={this.onSendEntireBalance}>Send max</StyledMaxBalance>
@@ -449,11 +454,15 @@ class SendEtherModal extends Component {
                     placeholder="0.0"
                     type="text"
                     value={this.props.nativeAmount}
-                    onChange={({ target }) => this.props.sendUpdateNativeAmount(target.value)}
+                    onChange={({ target }) =>
+                      this.props.sendUpdateNativeAmount(
+                        target.value,
+                        this.props.selected.symbol,
+                        this.props.modalProps.prices
+                      )
+                    }
                   />
-                  <StyledAmountCurrency>
-                    {this.props.modalProps.nativeCurrency}
-                  </StyledAmountCurrency>
+                  <StyledAmountCurrency>{this.props.modalProps.prices.native}</StyledAmountCurrency>
                 </StyledFlex>
               </StyledFlex>
 
@@ -486,19 +495,25 @@ class SendEtherModal extends Component {
               <StyledGasOptions>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('safeLow')}>
                   <p>{`Slow: ${convertToNativeString(
-                    fromWei((this.props.gasPrices.safeLow || 0) * 21000 * 10 ** 9)
+                    fromWei((this.props.gasPrices.safeLow || 0) * 21000 * 10 ** 9),
+                    'ETH',
+                    this.props.modalProps.prices
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.safeLowWait || 0, 'minutes')}`}</p>
                 </StyledGasButton>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('average')}>
                   <p>{`Average: ${convertToNativeString(
-                    fromWei((this.props.gasPrices.average || 0) * 21000 * 10 ** 9)
+                    fromWei((this.props.gasPrices.average || 0) * 21000 * 10 ** 9),
+                    'ETH',
+                    this.props.modalProps.prices
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.avgWait || 0, 'minutes')}`}</p>
                 </StyledGasButton>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('fast')}>
                   <p>{`Fast: ${convertToNativeString(
-                    fromWei((this.props.gasPrices.fast || 0) * 21000 * 10 ** 9)
+                    fromWei((this.props.gasPrices.fast || 0) * 21000 * 10 ** 9),
+                    'ETH',
+                    this.props.modalProps.prices
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.fastWait || 0, 'minutes')}`}</p>
                 </StyledGasButton>
@@ -511,7 +526,9 @@ class SendEtherModal extends Component {
                     {`Fee:`}
                     {this.props.txFee
                       ? ` ${BigNumber(this.props.txFee).toFormat(6)} ETH (${convertToNativeString(
-                          this.props.txFee
+                          this.props.txFee,
+                          'ETH',
+                          this.props.modalProps.prices
                         )})`
                       : ` 0.000000 ETH ($0.00)`}
                   </StyledParagraph>
@@ -576,10 +593,15 @@ class SendEtherModal extends Component {
                     ` ${BigNumber(this.props.cryptoAmount).toFormat(6)} ${
                       this.props.selected.symbol
                     } ${
-                      convertToNativeString(this.props.cryptoAmount, this.props.selected.symbol)
+                      convertToNativeString(
+                        this.props.cryptoAmount,
+                        this.props.selected.symbol,
+                        this.props.modalProps.prices
+                      )
                         ? `(${convertToNativeString(
                             this.props.cryptoAmount,
-                            this.props.selected.symbol
+                            this.props.selected.symbol,
+                            this.props.modalProps.prices
                           )})`
                         : ``
                     }`}
@@ -588,7 +610,9 @@ class SendEtherModal extends Component {
                   <strong>Transaction Fee:</strong>
                   {this.props.txFee &&
                     ` ${BigNumber(this.props.txFee).toFormat(6)} ETH (${convertToNativeString(
-                      this.props.txFee
+                      this.props.txFee,
+                      'ETH',
+                      this.props.modalProps.prices
                     )})`}
                 </StyledParagraph>
               </div>
@@ -615,9 +639,9 @@ class SendEtherModal extends Component {
             <StyledParagraph>
               You can verify your transaction{' '}
               <a
-                href={`https://${network !== 'mainnet' ? `${network}.` : ''}etherscan.io/tx/${
-                  this.props.transaction
-                }`}
+                href={`https://${
+                  this.props.web3Network !== 'mainnet' ? `${this.props.web3Network}.` : ''
+                }etherscan.io/tx/${this.props.transaction}`}
                 target="_blank"
               >
                 here
@@ -649,6 +673,7 @@ SendEtherModal.propTypes = {
   sendUpdateCryptoAmount: PropTypes.func.isRequired,
   sendUpdatePrivateKey: PropTypes.func.isRequired,
   sendUpdateSelected: PropTypes.func.isRequired,
+  sendToggleConfirmationView: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
   modalProps: PropTypes.object.isRequired,
@@ -663,10 +688,12 @@ SendEtherModal.propTypes = {
   gasPrices: PropTypes.object.isRequired,
   gasPrice: PropTypes.number.isRequired,
   gasPriceOption: PropTypes.string.isRequired,
-  txFee: PropTypes.string.isRequired
+  txFee: PropTypes.string.isRequired,
+  confirm: PropTypes.bool.isRequired,
+  web3Network: PropTypes.string.isRequired
 };
 
-const reduxProps = ({ send }) => ({
+const reduxProps = ({ send, accounts }) => ({
   fetching: send.fetching,
   recipient: send.recipient,
   nativeAmount: send.nativeAmount,
@@ -678,7 +705,9 @@ const reduxProps = ({ send }) => ({
   gasPrices: send.gasPrices,
   gasPrice: send.gasPrice,
   gasPriceOption: send.gasPriceOption,
-  txFee: send.txFee
+  txFee: send.txFee,
+  confirm: send.confirm,
+  web3Network: accounts.web3Network
 });
 
 export default connect(reduxProps, {
@@ -694,5 +723,6 @@ export default connect(reduxProps, {
   sendUpdateCryptoAmount,
   sendUpdatePrivateKey,
   sendUpdateSelected,
+  sendToggleConfirmationView,
   notificationShow
 })(SendEtherModal);

@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Card from './Card';
 import Button from './Button';
+import AddressCopy from './AddressCopy';
 import CryptoIcon from './CryptoIcon';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
-import { convertToNativeString, handleDecimals } from '../helpers/utilities';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledAccount = styled.div`
@@ -40,18 +40,8 @@ const StyledTop = styled.div`
   }
 `;
 
-const StyledAddress = styled.div`
-  opacity: 0.7;
-  line-height: 1.25;
-  margin: 0.2em 0;
-  letter-spacing: -0.2px;
-  font-weight: ${fonts.weight.semibold};
-  @media screen and (${responsive.sm.max}) {
-    font-size: ${fonts.size.small};
-  }
-  @media screen and (${responsive.xs.max}) {
-    font-size: ${fonts.size.tiny};
-  }
+const StyledAddressWrapper = styled.div`
+  width: 100%;
 `;
 
 const StyledActions = styled.div`
@@ -127,6 +117,7 @@ const StyledEthereum = styled(StyledRow)`
     font-weight: ${fonts.weight.medium};
   }
   & > p {
+    font-weight: ${fonts.weight.semibold};
     font-family: ${fonts.family.SFMono};
   }
 `;
@@ -143,6 +134,18 @@ const StyledToken = styled(StyledRow)`
   }
   &:nth-child(n + 2) {
     border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
+  }
+`;
+
+const StyledTotalBalance = styled(StyledEthereum)`
+  width: 100%;
+  & > p {
+    font-size: ${fonts.size.medium};
+  }
+  @media screen and (${responsive.sm.max}) {
+    & p {
+      font-size: ${fonts.size.h6};
+    }
   }
 `;
 
@@ -180,9 +183,8 @@ class Account extends Component {
       name: this.props.account.name || `${this.props.account.type} Wallet`,
       address: this.props.account.address,
       type: this.props.account.type,
-      balance: this.props.account.balance,
-      tokens: this.props.account.tokens,
-      nativeCurrency: this.props.nativeCurrency
+      crypto: this.props.account.crypto,
+      prices: this.props.prices
     });
   openReceiveModal = () =>
     this.props.modalOpen('RECEIVE_ETHER', {
@@ -198,15 +200,17 @@ class Account extends Component {
     return true;
   }
   render() {
+    const ethereum = this.props.account.crypto.filter(crypto => crypto.symbol === 'ETH')[0];
+    const tokens = this.props.account.crypto.filter(crypto => crypto.symbol !== 'ETH');
     return (
       <StyledAccount>
         <Card fetching={this.props.fetching}>
           <StyledFlex>
             <StyledTop>
-              <div>
+              <StyledAddressWrapper>
                 <h6>{'Your wallet address'} </h6>
-                <StyledAddress>{this.props.account.address}</StyledAddress>
-              </div>
+                <AddressCopy address={this.props.account.address} />
+              </StyledAddressWrapper>
 
               <StyledActions>
                 <Button left color="blue" icon={qrCode} onClick={this.openReceiveModal}>
@@ -227,25 +231,31 @@ class Account extends Component {
 
               <StyledEthereum>
                 <StyledAsset>
-                  <CryptoIcon currency="ETH" />
+                  <CryptoIcon currency={ethereum.symbol} />
                   <p>{'Ethereum'}</p>
                 </StyledAsset>
-                <p>{`${handleDecimals(this.props.account.balance)} ETH`}</p>
-                <p>{convertToNativeString(1, 'ETH')}</p>
-                <p>{convertToNativeString(this.props.account.balance, 'ETH')}</p>
+                <p>{`${ethereum.balance} ${ethereum.symbol}`}</p>
+                <p>{ethereum.native ? ethereum.native.price : '---'}</p>
+                <p>{ethereum.native ? ethereum.native.string : '---'}</p>
               </StyledEthereum>
-              {!!this.props.account.tokens &&
-                this.props.account.tokens.map(token => (
+              {!!tokens &&
+                tokens.map(token => (
                   <StyledToken key={`${this.props.account.address}-${token.symbol}`}>
                     <StyledAsset>
                       <CryptoIcon currency={token.symbol} />
                       <p>{token.name}</p>
                     </StyledAsset>
-                    <p>{`${handleDecimals(token.balance)} ${token.symbol}`}</p>
-                    <p>{convertToNativeString(1, token.symbol)}</p>
-                    <p>{convertToNativeString(token.balance, token.symbol)}</p>
+                    <p>{`${token.balance} ${token.symbol}`}</p>
+                    <p>{token.native ? token.native.price : '---'}</p>
+                    <p>{token.native ? token.native.string : '---'}</p>
                   </StyledToken>
                 ))}
+              <StyledTotalBalance>
+                <p> </p>
+                <p> </p>
+                <p> </p>
+                <p>{`Balance ${this.props.account.totalNative || '---'}`}</p>
+              </StyledTotalBalance>
             </StyledGrid>
           </StyledFlex>
         </Card>

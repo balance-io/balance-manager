@@ -56,10 +56,11 @@ const StyledInput = styled.input`
   line-height: 1.25;
   margin: 0.2em 0;
   letter-spacing: -0.2px;
+  color: transparent;
+  text-shadow: 0 0 0 rgb(${colors.dark});
   font-weight: ${fonts.weight.semibold};
   font-size: ${fonts.size.medium};
   font-family: ${fonts.family.SFProText};
-  color: rgb(${colors.dark});
   @media screen and (${responsive.sm.max}) {
     font-size: ${fonts.size.small};
   }

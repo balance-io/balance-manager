@@ -64,6 +64,9 @@ const StyledLogo = styled.img`
 `;
 
 const StyledToolbar = styled.div`
+  opacity: ${({ show }) => (show ? 1 : 0)};
+  visibility: ${({ show }) => (show ? 'visible' : 'hidden')};
+  pointer-events: ${({ show }) => (show ? 'auto' : 'none')};
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -97,20 +100,18 @@ const BaseLayout = ({
               </StyledHero>
             </StyledBranding>
           </Link>
-          {showToolbar && (
-            <StyledToolbar>
-              <Dropdown
-                selected={web3Network}
-                iconColor={web3Connected ? 'green' : 'red'}
-                options={ethereumNetworks}
-              />
-              <Dropdown
-                selected={nativeCurrency}
-                options={nativeCurrencies}
-                onChange={accountsChangeNativeCurrency}
-              />
-            </StyledToolbar>
-          )}
+          <StyledToolbar show={showToolbar}>
+            <Dropdown
+              selected={web3Network}
+              iconColor={web3Connected ? 'green' : 'red'}
+              options={ethereumNetworks}
+            />
+            <Dropdown
+              selected={nativeCurrency}
+              options={nativeCurrencies}
+              onChange={accountsChangeNativeCurrency}
+            />
+          </StyledToolbar>
         </StyledHeader>
         <StyledContent>{children}</StyledContent>
       </Column>

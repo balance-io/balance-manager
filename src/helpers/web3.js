@@ -174,23 +174,28 @@ export const metamaskTransferToken = transaction =>
  * @param {Object} [{selected, address, recipient, amount, gasPrice}]
  * @return {String}
  */
-export const getTransactionFee = async ({ tokenObject, address, recipient, amount, gasPrice }) => {
+export const getTransactionFee = async ({ tokenObject, recipient, amount, gasPrice }) => {
+  console.log({ tokenObject, recipient, amount, gasPrice });
   let data = '0x';
   let _amount = amount && Number(amount) ? amount : '100';
   let _recipient =
     recipient && isValidAddress(recipient)
       ? recipient
       : '0x737e583620f4ac1842d4e354789ca0c5e0651fbb';
+  console.log({ tokenObject, _recipient, _amount, gasPrice });
   let estimateGasData = { to: _recipient, data };
   if (tokenObject.symbol !== 'ETH') {
     const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
+    console.log('transferHexMethod', transferHexMethod);
     const value = new BigNumber(_amount)
       .times(new BigNumber(10).pow(tokenObject.decimals))
       .toString(16);
     data = getDataString(transferHexMethod, [getNakedAddress(_recipient), value]);
-    estimateGasData = { from: address, to: tokenObject.address, data };
+    estimateGasData = { to: tokenObject.address, data };
   }
+  console.log('estimateGasData', estimateGasData);
   const gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
+  console.log('gasLimit', gasLimit);
   const _gasPrice = gasPrice * 10 ** 9;
   const wei = String(gasLimit * _gasPrice);
   const txFee = fromWei(wei);

@@ -72,11 +72,11 @@ export const sendGetGasPrices = () => (dispatch, getState) => {
 
 export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
   const { send } = getState();
-  const { selected, address, recipient, amount, gasPrice, gasPriceOption, gasPrices } = send;
+  const { selected, recipient, amount, gasPrice, gasPriceOption, gasPrices } = send;
   const _gasPriceOption = newGasPriceOption || gasPriceOption;
   const _gasPrice = gasPriceOption ? gasPrices[_gasPriceOption] : gasPrice;
   dispatch({ type: SEND_UPDATE_GAS_PRICE_REQUEST });
-  getTransactionFee({ tokenObject: selected, address, recipient, amount, gasPrice: _gasPrice })
+  getTransactionFee({ tokenObject: selected, recipient, amount, gasPrice: _gasPrice })
     .then(txFee =>
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_SUCCESS,
@@ -88,7 +88,7 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
       dispatch(notificationShow(`Failed to estimate Transaction fee`, true));
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_FAILURE,
-        payload: { txFee: '', gasPrice: _gasPrice }
+        payload: { txFee: '', gasPrice: _gasPrice, gasPriceOption: _gasPriceOption }
       });
     });
 };
@@ -292,9 +292,6 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetchingGasPrices: false,
-        gasPrices: {},
-        gasPrice: 0,
-        gasPriceOption: 'average',
         txFee: ''
       };
     case SEND_UPDATE_GAS_PRICE_REQUEST:

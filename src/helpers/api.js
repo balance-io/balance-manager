@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { parseTokenBalances, handleDecimals } from './utilities';
+import ethereumNetworks from '../libraries/ethereum-networks';
 
 /**
  * @desc get prices
@@ -68,16 +69,13 @@ export const apiGetGasPrices = () => axios.get(`https://ethgasstation.info/json/
  */
 export const apiGetMetamaskNetwork = () =>
   new Promise((resolve, reject) => {
+    const networks = Object.keys(ethereumNetworks);
     if (typeof window.web3 !== 'undefined') {
       window.web3.version.getNetwork((err, networkID) => {
         if (err) {
           reject(err);
         }
-        if (Number(networkID) === 1) {
-          resolve('mainnet');
-        } else {
-          resolve(null);
-        }
+        resolve(networks[Number(networkID) - 1] || null);
       });
     }
   });

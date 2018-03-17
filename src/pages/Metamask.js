@@ -6,12 +6,11 @@ import BaseLayout from '../layouts/base';
 import Account from '../components/Account';
 import Card from '../components/Card';
 import {
-  accountsGetEthplorerInfo,
   accountsUpdateMetamaskAccount,
   accountsConnectMetamask,
-  accountsClearUpdateAccountInterval,
-  accountsGetNativePrices,
-  accountsChangeNativeCurrency
+  accountsClearIntervals,
+  accountsChangeNativeCurrency,
+  accountsCheckNetworkIsConnected
 } from '../reducers/_accounts';
 import { modalOpen } from '../reducers/_modal';
 import { fonts, colors } from '../styles';
@@ -31,21 +30,23 @@ const StyledMessage = styled.div`
 
 class Metamask extends Component {
   componentDidMount() {
-    this.props.accountsGetNativePrices();
     this.props.accountsConnectMetamask();
+    window.onoffline = () => this.props.accountsCheckNetworkIsConnected(false);
+    window.ononline = () => this.props.accountsCheckNetworkIsConnected(true);
   }
   renderMessage() {
     if (!this.props.web3Available) return `Please install Metamask chrome extension`;
-    if (!this.props.web3Mainnet) return `Please switch to Main Network`;
     if (!this.props.metamaskAccount) return `Please unlock your Metamask`;
+    if (!this.props.web3Network) return `Unknown network, please switch to another one`;
   }
   componentWillUnmount() {
-    this.props.accountsClearUpdateAccountInterval();
+    this.props.accountsClearIntervals();
   }
   render = () => (
     <BaseLayout>
       <StyledWrapper>
-        {this.props.fetching || this.props.metamaskAccount ? (
+        {this.props.fetching ||
+        (this.props.web3Network && this.props.metamaskAccount && this.props.web3Available) ? (
           <Account
             account={this.props.account}
             fetching={this.props.fetching}
@@ -64,17 +65,16 @@ class Metamask extends Component {
 }
 
 Metamask.propTypes = {
-  accountsGetEthplorerInfo: PropTypes.func.isRequired,
   accountsUpdateMetamaskAccount: PropTypes.func.isRequired,
   accountsConnectMetamask: PropTypes.func.isRequired,
-  accountsClearUpdateAccountInterval: PropTypes.func.isRequired,
-  accountsGetNativePrices: PropTypes.func.isRequired,
+  accountsClearIntervals: PropTypes.func.isRequired,
   accountsChangeNativeCurrency: PropTypes.func.isRequired,
+  accountsCheckNetworkIsConnected: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired,
   prices: PropTypes.object.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
-  web3Mainnet: PropTypes.bool.isRequired,
+  web3Network: PropTypes.string.isRequired,
   metamaskAccount: PropTypes.string.isRequired,
   account: PropTypes.object.isRequired,
   fetching: PropTypes.bool.isRequired,
@@ -85,7 +85,7 @@ const reduxProps = ({ accounts }) => ({
   prices: accounts.prices,
   nativeCurrency: accounts.nativeCurrency,
   web3Available: accounts.web3Available,
-  web3Mainnet: accounts.web3Mainnet,
+  web3Network: accounts.web3Network,
   metamaskAccount: accounts.metamaskAccount,
   account: accounts.account,
   fetching: accounts.fetching,
@@ -93,11 +93,10 @@ const reduxProps = ({ accounts }) => ({
 });
 
 export default connect(reduxProps, {
-  accountsGetEthplorerInfo,
   accountsUpdateMetamaskAccount,
+  accountsCheckNetworkIsConnected,
   accountsConnectMetamask,
-  accountsClearUpdateAccountInterval,
-  accountsGetNativePrices,
+  accountsClearIntervals,
   accountsChangeNativeCurrency,
   modalOpen
 })(Metamask);

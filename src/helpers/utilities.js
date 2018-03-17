@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { web3Instance } from './web3';
 import errors from '../libraries/errors.json';
-import nativeCurrencies from '../libraries/native-currencies.json';
+import nativeCurrencies from '../libraries/native-currencies.js';
 
 /**
  * @desc save to local storage
@@ -146,7 +146,6 @@ export const parseError = error => {
     const msgStart = msgWhole.indexOf(':');
     const msgEnd = msgWhole.indexOf('\n');
     const message = msgWhole.slice(msgStart + 2, msgEnd);
-    console.log('message', message);
     return message;
   } else if (error.error && error.message) {
     return errors[error.message];
@@ -208,7 +207,7 @@ export const convertToNativeString = (value = '', cryptoSymbol = 'ETH', prices =
     const formatted = BigNumber(nativeValue).toFormat(decimals);
     return Number(formatted) ? `${formatted} ${nativeSymbol}` : `--- ${nativeSymbol}`;
   } else {
-    const nativeSymbol = nativeCurrencies[prices.native];
+    const nativeSymbol = nativeCurrencies[prices.native].symbol;
     const decimals = 2;
     const nativeValue = convertToNativeValue(value, cryptoSymbol, prices);
     const formatted = BigNumber(nativeValue).toFormat(decimals);
@@ -230,7 +229,7 @@ export const formatNativeString = (value = '', native = 'USD') => {
     const formatted = BigNumber(_value).toFormat(decimals);
     return Number(formatted) ? `${formatted} ${nativeSymbol}` : `--- ${nativeSymbol}`;
   } else {
-    const nativeSymbol = nativeCurrencies[native];
+    const nativeSymbol = nativeCurrencies[native].symbol;
     const decimals = 2;
     const formatted = BigNumber(_value).toFormat(decimals);
     return Number(formatted) ? `${nativeSymbol}${formatted}` : `${nativeSymbol}---`;

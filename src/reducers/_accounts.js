@@ -1,5 +1,6 @@
 import { apiGetEthplorerInfo, apiGetPrices, apiGetMetamaskNetwork } from '../helpers/api';
-import { parseError, saveLocal, parseAccountBalances } from '../helpers/utilities';
+import { parseError, parseAccountBalances } from '../helpers/utilities';
+import { warningOffline, warningOnline } from './_warning';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //
@@ -9,6 +10,7 @@ const ACCOUNTS_GET_ETHPLORER_INFO_SUCCESS = 'accounts/ACCOUNTS_GET_ETHPLORER_INF
 const ACCOUNTS_GET_ETHPLORER_INFO_FAILURE = 'accounts/ACCOUNTS_GET_ETHPLORER_INFO_FAILURE';
 
 const ACCOUNTS_UPDATE_METAMASK_ACCOUNT = 'accounts/ACCOUNTS_UPDATE_METAMASK_ACCOUNT';
+const ACCOUNTS_CHECK_NETWORK_IS_CONNECTED = 'accounts/ACCOUNTS_CHECK_NETWORK_IS_CONNECTED';
 
 const ACCOUNTS_METAMASK_GET_NETWORK_REQUEST = 'accounts/ACCOUNTS_METAMASK_GET_NETWORK_REQUEST';
 const ACCOUNTS_METAMASK_GET_NETWORK_SUCCESS = 'accounts/ACCOUNTS_METAMASK_GET_NETWORK_SUCCESS';
@@ -31,7 +33,7 @@ export const accountsGetEthplorerInfo = (address, type) => dispatch => {
   apiGetEthplorerInfo(address, type)
     .then(account => {
       dispatch({ type: ACCOUNTS_GET_ETHPLORER_INFO_SUCCESS, payload: account });
-      dispatch(accountsGetNativePrices(account));
+      dispatch(accountsGetNativePrices());
     })
     .catch(err => {
       console.error(err);
@@ -47,30 +49,38 @@ export const accountsUpdateMetamaskAccount = () => (dispatch, getState) => {
   }
 };
 
+export const accountsCheckNetworkIsConnected = online => dispatch => {
+  if (online) {
+    dispatch(warningOnline());
+  } else {
+    dispatch(warningOffline());
+  }
+  dispatch({ type: ACCOUNTS_CHECK_NETWORK_IS_CONNECTED, payload: online });
+};
+
 export const accountsConnectMetamask = () => (dispatch, getState) => {
+  dispatch(accountsGetNativePrices());
   dispatch({ type: ACCOUNTS_METAMASK_GET_NETWORK_REQUEST });
   if (typeof window.web3 !== 'undefined') {
     accountInterval = setInterval(() => dispatch(accountsUpdateMetamaskAccount()), 100);
     apiGetMetamaskNetwork()
-      .then(network => {
-        if (network === 'mainnet') {
-          dispatch({ type: ACCOUNTS_METAMASK_GET_NETWORK_SUCCESS, payload: true });
-          dispatch(accountsGetEthplorerInfo(getState().accounts.metamaskAccount, 'METAMASK'));
-        } else {
-          dispatch({ type: ACCOUNTS_METAMASK_GET_NETWORK_SUCCESS, payload: false });
-        }
-      })
+      .then(network =>
+        dispatch({ type: ACCOUNTS_METAMASK_GET_NETWORK_SUCCESS, payload: network || '' })
+      )
       .catch(err => dispatch({ type: ACCOUNTS_METAMASK_GET_NETWORK_FAILURE }));
   } else {
     dispatch({ type: ACCOUNTS_METAMASK_NOT_AVAILABLE });
   }
 };
 
-export const accountsClearUpdateAccountInterval = () => dispatch => clearInterval(accountInterval);
+export const accountsClearIntervals = () => dispatch => {
+  clearInterval(accountInterval);
+  clearInterval(getPricesInterval);
+};
 
-export const accountsGetNativePrices = account => (dispatch, getState) => {
-  let _account = account || getState().accounts.account;
-  const cryptoSymbols = _account.crypto.map(crypto => crypto.symbol);
+export const accountsGetNativePrices = () => (dispatch, getState) => {
+  let account = getState().accounts.account;
+  const cryptoSymbols = account.crypto.map(crypto => crypto.symbol);
   const getPrices = () => {
     dispatch({
       type: ACCOUNTS_GET_NATIVE_PRICES_REQUEST,
@@ -86,11 +96,10 @@ export const accountsGetNativePrices = account => (dispatch, getState) => {
           );
           prices['WETH'] = prices['ETH'];
           prices['STT'] = 0.21;
-          _account = parseAccountBalances(_account, prices);
-          saveLocal('NATIVE_PRICES', prices);
+          account = parseAccountBalances(account, prices);
           dispatch({
             type: ACCOUNTS_GET_NATIVE_PRICES_SUCCESS,
-            payload: { account: _account, prices }
+            payload: { account, prices }
           });
         }
       })
@@ -118,8 +127,9 @@ const INITIAL_STATE = {
   nativePriceRequest: 'USD',
   nativeCurrency: 'USD',
   prices: {},
+  web3Connected: true,
   web3Available: false,
-  web3Mainnet: false,
+  web3Network: 'mainnet',
   metamaskAccount: '',
   crypto: ['ETH'],
   account: {
@@ -145,6 +155,8 @@ export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ACCOUNTS_UPDATE_METAMASK_ACCOUNT:
       return { ...state, metamaskAccount: action.payload };
+    case ACCOUNTS_CHECK_NETWORK_IS_CONNECTED:
+      return { ...state, web3Connected: action.payload };
     case ACCOUNTS_GET_ETHPLORER_INFO_REQUEST:
       return { ...state, fetching: true };
     case ACCOUNTS_GET_ETHPLORER_INFO_SUCCESS:
@@ -173,29 +185,26 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: true,
-        web3Available: false,
-        web3Mainnet: false
+        web3Available: false
       };
     case ACCOUNTS_METAMASK_GET_NETWORK_SUCCESS:
       return {
         ...state,
         fetching: false,
         web3Available: true,
-        web3Mainnet: action.payload
+        web3Network: action.payload
       };
     case ACCOUNTS_METAMASK_GET_NETWORK_FAILURE:
       return {
         ...state,
         fetching: false,
-        web3Available: true,
-        web3Mainnet: false
+        web3Available: true
       };
     case ACCOUNTS_METAMASK_NOT_AVAILABLE:
       return {
         ...state,
         fetching: false,
-        web3Available: false,
-        web3Mainnet: false
+        web3Available: false
       };
     case ACCOUNTS_GET_NATIVE_PRICES_REQUEST:
       return {

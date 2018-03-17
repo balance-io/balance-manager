@@ -35,7 +35,6 @@ import {
   toWei,
   fromWei,
   convertToNativeString,
-  getLocal,
   getTimeString,
   capitalize
 } from '../helpers/utilities';
@@ -385,7 +384,6 @@ class SendEtherModal extends Component {
     this.props.closeModal();
   };
   render = () => {
-    const network = getLocal('NETWORK_PROVIDER');
     return (
       <Card background="lightGrey">
         {!this.props.transaction ? (
@@ -641,9 +639,9 @@ class SendEtherModal extends Component {
             <StyledParagraph>
               You can verify your transaction{' '}
               <a
-                href={`https://${network !== 'mainnet' ? `${network}.` : ''}etherscan.io/tx/${
-                  this.props.transaction
-                }`}
+                href={`https://${
+                  this.props.web3Network !== 'mainnet' ? `${this.props.web3Network}.` : ''
+                }etherscan.io/tx/${this.props.transaction}`}
                 target="_blank"
               >
                 here
@@ -691,10 +689,11 @@ SendEtherModal.propTypes = {
   gasPrice: PropTypes.number.isRequired,
   gasPriceOption: PropTypes.string.isRequired,
   txFee: PropTypes.string.isRequired,
-  confirm: PropTypes.bool.isRequired
+  confirm: PropTypes.bool.isRequired,
+  web3Network: PropTypes.string.isRequired
 };
 
-const reduxProps = ({ send }) => ({
+const reduxProps = ({ send, accounts }) => ({
   fetching: send.fetching,
   recipient: send.recipient,
   nativeAmount: send.nativeAmount,
@@ -707,7 +706,8 @@ const reduxProps = ({ send }) => ({
   gasPrice: send.gasPrice,
   gasPriceOption: send.gasPriceOption,
   txFee: send.txFee,
-  confirm: send.confirm
+  confirm: send.confirm,
+  web3Network: accounts.web3Network
 });
 
 export default connect(reduxProps, {

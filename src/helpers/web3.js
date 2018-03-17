@@ -29,6 +29,38 @@ export const web3SetProvider = provider => {
 };
 
 /**
+ * @desc get account ether balance
+ * @param  {String} accountAddress
+ * @param  {String} tokenAddress
+ * @return {Array}
+ */
+export const getAccountBalance = async address => {
+  const wei = await web3Instance.eth.getBalance(address);
+  const ether = fromWei(wei);
+  const balance = Number(ether) !== 0 ? BigNumber(ether).toFormat(8) : 0;
+  return balance;
+};
+
+/**
+ * @desc get account token balance
+ * @param  {String} accountAddress
+ * @param  {String} tokenAddress
+ * @return {Array}
+ */
+export const getTokenBalanceOf = (accountAddress, tokenAddress) =>
+  new Promise((resolve, reject) => {
+    const balanceHexMethod = web3Instance.utils.sha3('balanceOf(address)').substring(0, 10);
+    const dataString = getDataString(balanceHexMethod, [getNakedAddress(accountAddress)]);
+    web3Instance.eth
+      .call({ to: tokenAddress, data: dataString })
+      .then(balanceHexResult => {
+        const balance = web3Instance.utils.fromWei(balanceHexResult);
+        resolve(balance);
+      })
+      .catch(error => reject(error));
+  });
+
+/**
  * @desc sign transaction
  * @param {Object} txDetails
  * @param {String} privateKey
@@ -133,7 +165,6 @@ export const metamaskSendTransaction = transaction =>
     getTxDetails(from, to, data, value, transaction.gasPrice)
       .then(txDetails => {
         if (typeof window.web3 !== 'undefined') {
-          console.log('txDetails', txDetails);
           window.web3.eth.sendTransaction(txDetails, (err, txHash) => {
             if (err) {
               reject(err);
@@ -175,7 +206,7 @@ export const metamaskTransferToken = transaction =>
  * @param {Object} [{selected, address, recipient, amount, gasPrice}]
  * @return {String}
  */
-export const getTransactionFee = async ({ tokenObject, address, recipient, amount, gasPrice }) => {
+export const getTransactionFee = async ({ tokenObject, recipient, amount, gasPrice }) => {
   let data = '0x';
   let _amount = amount && Number(amount) ? amount : '100';
   let _recipient =
@@ -189,7 +220,7 @@ export const getTransactionFee = async ({ tokenObject, address, recipient, amoun
       .times(new BigNumber(10).pow(tokenObject.decimals))
       .toString(16);
     data = getDataString(transferHexMethod, [getNakedAddress(_recipient), value]);
-    estimateGasData = { from: address, to: tokenObject.address, data };
+    estimateGasData = { to: tokenObject.address, data };
   }
   const gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
   const _gasPrice = gasPrice * 10 ** 9;

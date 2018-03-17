@@ -53,7 +53,6 @@ export const apiGetMetamaskNetwork = () =>
         Object.keys(networkList).forEach(network => {
           networkIDList[networkList[network].id] = network;
         });
-        console.log('networkIDList', networkIDList);
         resolve(networkIDList[Number(networkID)] || null);
       });
     }

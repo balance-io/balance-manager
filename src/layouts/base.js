@@ -57,10 +57,16 @@ const StyledHero = styled.h1`
   & strong {
     font-weight: bold;
   }
+  @media screen and (${responsive.sm.max}) {
+    font-size: ${fonts.size.medium};
+  }
 `;
 
 const StyledLogo = styled.img`
   width: 20px;
+  @media screen and (${responsive.sm.max}) {
+    width: 16px;
+  }
 `;
 
 const StyledToolbar = styled.div`

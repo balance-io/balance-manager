@@ -5,11 +5,10 @@ import styled from 'styled-components';
 const StyledColumn = styled.div`
   position: relative;
   width: 100%;
-  ${'' /* height: ${({ spanHeight }) => (spanHeight ? '100%' : 'auto')}; */};
+  height: ${({ spanHeight }) => (spanHeight ? '100%' : 'auto')};
   max-width: ${({ maxWidth }) => `${maxWidth}px`};
   margin: 0 auto;
   display: flex;
-  ${'' /* flex-grow: 1; */};
   flex-direction: column;
   align-items: center;
   justify-content: ${({ center }) => (center ? 'center' : 'flex-start')};

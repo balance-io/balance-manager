@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { parseTokenBalances, handleDecimals } from './utilities';
-import ethereumNetworks from '../libraries/ethereum-networks';
+import { parseEthplorerAddressInfo } from './utilities';
+import { testnetGetAddressInfo } from './testnet';
+import networkList from '../libraries/ethereum-networks';
 
 /**
  * @desc get prices
@@ -17,45 +18,19 @@ export const apiGetPrices = (crypto = [], native = []) => {
 };
 
 /**
- * @desc get ethplorer address information
+ * @desc get ethplorer address info
  * @param  {String}   [address = '']
- * @param  {String}   [type = 'METAMASK']
+ * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
-export const apiGetEthplorerInfo = (address = '', type = 'METAMASK') =>
-  axios
+export const apiGetEthplorerAddressInfo = (address = '', network = 'mainnet') => {
+  if (network !== 'mainnet') {
+    return testnetGetAddressInfo(address, network).then(data => parseEthplorerAddressInfo(data));
+  }
+  return axios
     .get(`https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`)
-    .then(({ data }) => {
-      const ethereum = {
-        name: 'Ethereum',
-        symbol: 'ETH',
-        address: null,
-        decimals: 18,
-        balance: data.ETH.balance ? handleDecimals(data.ETH.balance) : '0.00000000',
-        native: null
-      };
-      let crypto = [ethereum];
-      if (data.tokens) {
-        const tokens = data.tokens.map(token => {
-          const balance = parseTokenBalances(token.balance, token.tokenInfo.decimals);
-          return {
-            name: token.tokenInfo.name || 'Unknown Token',
-            symbol: token.tokenInfo.symbol || '---',
-            address: token.tokenInfo.address,
-            decimals: Number(token.tokenInfo.decimals),
-            balance: handleDecimals(balance),
-            native: null
-          };
-        });
-        crypto = [...crypto, ...tokens];
-      }
-      return {
-        address,
-        type,
-        crypto,
-        totalNative: '---'
-      };
-    });
+    .then(({ data }) => parseEthplorerAddressInfo(data));
+};
 
 /**
  * @desc get ethereum gas prices
@@ -69,13 +44,17 @@ export const apiGetGasPrices = () => axios.get(`https://ethgasstation.info/json/
  */
 export const apiGetMetamaskNetwork = () =>
   new Promise((resolve, reject) => {
-    const networks = Object.keys(ethereumNetworks);
     if (typeof window.web3 !== 'undefined') {
       window.web3.version.getNetwork((err, networkID) => {
         if (err) {
           reject(err);
         }
-        resolve(networks[Number(networkID) - 1] || null);
+        let networkIDList = {};
+        Object.keys(networkList).forEach(network => {
+          networkIDList[networkList[network].id] = network;
+        });
+        console.log('networkIDList', networkIDList);
+        resolve(networkIDList[Number(networkID)] || null);
       });
     }
   });

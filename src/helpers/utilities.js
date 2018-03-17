@@ -211,7 +211,7 @@ export const convertToNativeString = (value = '', cryptoSymbol = 'ETH', prices =
     const decimals = 2;
     const nativeValue = convertToNativeValue(value, cryptoSymbol, prices);
     const formatted = BigNumber(nativeValue).toFormat(decimals);
-    return Number(formatted) ? `${nativeSymbol}${formatted}` : `${nativeSymbol}---`;
+    return `${nativeSymbol}${formatted}`;
   }
 };
 
@@ -227,12 +227,12 @@ export const formatNativeString = (value = '', native = 'USD') => {
     const nativeSymbol = native;
     const decimals = 8;
     const formatted = BigNumber(_value).toFormat(decimals);
-    return Number(formatted) ? `${formatted} ${nativeSymbol}` : `--- ${nativeSymbol}`;
+    return `${formatted} ${nativeSymbol}`;
   } else {
     const nativeSymbol = nativeCurrencies[native].symbol;
     const decimals = 2;
     const formatted = BigNumber(_value).toFormat(decimals);
-    return Number(formatted) ? `${nativeSymbol}${formatted}` : `${nativeSymbol}---`;
+    return `${nativeSymbol}${formatted}`;
   }
 };
 
@@ -265,6 +265,26 @@ export const parseAccountBalances = (account = null, prices = null) => {
   }
   account.totalNative = totalNative;
   return account;
+};
+
+/**
+ * @desc parse prices object from api response
+ * @param  {Object} [data=null]
+ * @param  {Array} [crypto=[]]
+ * @param  {String} [native='USD']
+ * @return {Object}
+ */
+export const parsePricesObject = (data = null, crypto = [], native = 'USD') => {
+  let prices = { native };
+  crypto.map(coin => (prices[coin] = data[coin] ? data[coin][native] : null));
+  // APPEND prices for WETH same as ETH
+  prices['WETH'] = prices['ETH'];
+  // APPEND random prices for testnet tokens
+  prices['💥 PLASMA'] = 1.24;
+  prices['STT'] = 0.21;
+  prices['GUP'] = 23.21;
+  prices['Aeternity'] = 124.32;
+  return prices;
 };
 
 /**
@@ -507,4 +527,41 @@ export const getTimeString = (value = '', unit = '', short = false) => {
   } else {
     return `${_value} ${_unit}`;
   }
+};
+
+/**
+ * @desc parse ethplorer address info response
+ * @param  {String}   [data = null]
+ * @return {Promise}
+ */
+export const parseEthplorerAddressInfo = (data = null) => {
+  const ethereum = {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    address: null,
+    decimals: 18,
+    balance: data && data.ETH.balance ? handleDecimals(data.ETH.balance) : '0.00000000',
+    native: null
+  };
+  let crypto = [ethereum];
+  if (data && data.tokens) {
+    const tokens = data.tokens.map(token => {
+      const balance = parseTokenBalances(token.balance, token.tokenInfo.decimals);
+      return {
+        name: token.tokenInfo.name || 'Unknown Token',
+        symbol: token.tokenInfo.symbol || '---',
+        address: token.tokenInfo.address,
+        decimals: Number(token.tokenInfo.decimals),
+        balance: handleDecimals(balance),
+        native: null
+      };
+    });
+    crypto = [...crypto, ...tokens];
+  }
+  return {
+    address: (data && data.address) || '',
+    type: 'METAMASK',
+    crypto,
+    totalNative: '---'
+  };
 };

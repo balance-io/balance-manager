@@ -24,7 +24,6 @@ export const warningHide = key => (dispatch, getState) => {
 };
 
 export const warningOffline = () => dispatch => {
-  console.log('dispatch warningOffline', window.navigator.onLine);
   dispatch(
     warningShow({
       key: 'USER_IS_OFFLINE',
@@ -38,7 +37,6 @@ export const warningOffline = () => dispatch => {
 let timeoutHide;
 
 export const warningOnline = () => dispatch => {
-  console.log('dispatch warningOnline', window.navigator.onLine);
   clearTimeout(timeoutHide);
   dispatch(warningHide('USER_IS_OFFLINE'));
   dispatch(

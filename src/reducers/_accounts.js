@@ -1,6 +1,12 @@
-import { apiGetEthplorerInfo, apiGetPrices, apiGetMetamaskNetwork } from '../helpers/api';
-import { parseError, parseAccountBalances } from '../helpers/utilities';
+import { apiGetEthplorerAddressInfo, apiGetPrices, apiGetMetamaskNetwork } from '../helpers/api';
+import {
+  parseError,
+  parseAccountBalances,
+  parsePricesObject,
+  parseEthplorerAddressInfo
+} from '../helpers/utilities';
 import { warningOffline, warningOnline } from './_warning';
+import { web3SetProvider } from '../helpers/web3';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //
@@ -28,11 +34,12 @@ const ACCOUNTS_CHANGE_NATIVE_CURRENCY = 'accounts/ACCOUNTS_CHANGE_NATIVE_CURRENC
 let accountInterval = null;
 let getPricesInterval = null;
 
-export const accountsGetEthplorerInfo = (address, type) => dispatch => {
+export const accountsGetEthplorerInfo = (address, type) => (dispatch, getState) => {
+  const { web3Network } = getState().accounts;
   dispatch({ type: ACCOUNTS_GET_ETHPLORER_INFO_REQUEST });
-  apiGetEthplorerInfo(address, type)
+  apiGetEthplorerAddressInfo(address, web3Network)
     .then(account => {
-      dispatch({ type: ACCOUNTS_GET_ETHPLORER_INFO_SUCCESS, payload: account });
+      dispatch({ type: ACCOUNTS_GET_ETHPLORER_INFO_SUCCESS, payload: { type, ...account } });
       dispatch(accountsGetNativePrices());
     })
     .catch(err => {
@@ -62,11 +69,13 @@ export const accountsConnectMetamask = () => (dispatch, getState) => {
   dispatch(accountsGetNativePrices());
   dispatch({ type: ACCOUNTS_METAMASK_GET_NETWORK_REQUEST });
   if (typeof window.web3 !== 'undefined') {
-    accountInterval = setInterval(() => dispatch(accountsUpdateMetamaskAccount()), 100);
     apiGetMetamaskNetwork()
-      .then(network =>
-        dispatch({ type: ACCOUNTS_METAMASK_GET_NETWORK_SUCCESS, payload: network || '' })
-      )
+      .then(network => {
+        web3SetProvider(`https://${network}.infura.io/`);
+        dispatch({ type: ACCOUNTS_METAMASK_GET_NETWORK_SUCCESS, payload: network });
+        dispatch(accountsUpdateMetamaskAccount());
+        accountInterval = setInterval(() => dispatch(accountsUpdateMetamaskAccount()), 100);
+      })
       .catch(err => dispatch({ type: ACCOUNTS_METAMASK_GET_NETWORK_FAILURE }));
   } else {
     dispatch({ type: ACCOUNTS_METAMASK_NOT_AVAILABLE });
@@ -89,13 +98,7 @@ export const accountsGetNativePrices = () => (dispatch, getState) => {
     apiGetPrices(cryptoSymbols, getState().accounts.nativeCurrency)
       .then(({ data }) => {
         if (getState().accounts.nativeCurrency === getState().accounts.nativePriceRequest) {
-          let prices = { native: getState().accounts.nativeCurrency };
-          cryptoSymbols.map(
-            coin =>
-              (prices[coin] = data[coin] ? data[coin][getState().accounts.nativeCurrency] : null)
-          );
-          prices['WETH'] = prices['ETH'];
-          prices['STT'] = 0.21;
+          const prices = parsePricesObject(data, cryptoSymbols, getState().accounts.nativeCurrency);
           account = parseAccountBalances(account, prices);
           dispatch({
             type: ACCOUNTS_GET_NATIVE_PRICES_SUCCESS,
@@ -132,21 +135,7 @@ const INITIAL_STATE = {
   web3Network: 'mainnet',
   metamaskAccount: '',
   crypto: ['ETH'],
-  account: {
-    address: '',
-    type: 'METAMASK',
-    crypto: [
-      {
-        name: 'Ethereum',
-        symbol: 'ETH',
-        address: null,
-        decimals: 18,
-        balance: '0.00000000',
-        native: null
-      }
-    ],
-    totalNative: '---'
-  },
+  account: parseEthplorerAddressInfo(null),
   fetching: false,
   error: false
 };
@@ -165,21 +154,7 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: false,
-        account: {
-          address: '',
-          type: 'METAMASK',
-          crypto: [
-            {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              address: null,
-              decimals: 18,
-              balance: '0.00000000',
-              native: null
-            }
-          ],
-          totalNative: '---'
-        }
+        account: parseEthplorerAddressInfo(null)
       };
     case ACCOUNTS_METAMASK_GET_NETWORK_REQUEST:
       return {

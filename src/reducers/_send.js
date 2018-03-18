@@ -72,11 +72,11 @@ export const sendGetGasPrices = () => (dispatch, getState) => {
 
 export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
   const { send } = getState();
-  const { selected, recipient, amount, gasPrice, gasPriceOption, gasPrices } = send;
+  const { selected, recipient, cryptoAmount, gasPrice, gasPriceOption, gasPrices } = send;
   const _gasPriceOption = newGasPriceOption || gasPriceOption;
   const _gasPrice = gasPriceOption ? gasPrices[_gasPriceOption] : gasPrice;
   dispatch({ type: SEND_UPDATE_GAS_PRICE_REQUEST });
-  getTransactionFee({ tokenObject: selected, recipient, amount, gasPrice: _gasPrice })
+  getTransactionFee({ tokenObject: selected, recipient, amount: cryptoAmount, gasPrice: _gasPrice })
     .then(txFee =>
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_SUCCESS,
@@ -101,7 +101,12 @@ export const sendUpdateSelected = selected => (dispatch, getState) => {
 export const sendEtherMetamask = ({ address, recipient, amount, gasPrice }) => dispatch => {
   dispatch({ type: SEND_ETHER_METAMASK_REQUEST });
   const _gasPrice = String(parseInt(gasPrice, 10) * 10 ** 9);
-  metamaskSendTransaction({ from: address, to: recipient, value: amount, gasPrice: _gasPrice })
+  metamaskSendTransaction({
+    from: address,
+    to: recipient,
+    value: amount,
+    gasPrice: _gasPrice
+  })
     .then(txHash =>
       dispatch({
         type: SEND_ETHER_METAMASK_SUCCESS,
@@ -129,7 +134,7 @@ export const sendTokenMetamask = ({
     tokenObject,
     from: address,
     to: recipient,
-    value: amount,
+    amount: amount,
     gasPrice: _gasPrice
   })
     .then(txHash =>
@@ -190,7 +195,7 @@ export const sendTokenClient = ({
     tokenObject,
     from: address,
     to: recipient,
-    cryptoAmount: amount,
+    amount: amount,
     gasPrice: _gasPrice,
     privateKey: privateKey
   })

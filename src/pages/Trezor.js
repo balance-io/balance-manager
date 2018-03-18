@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
 import Column from '../components/Column';
 import SubscribeForm from '../components/SubscribeForm';
-import trezorLogo from '../assets/trezor-logo.png';
+import TrezorLogo from '../components/TrezorLogo';
 import { responsive } from '../styles';
 
 const StyledCardContainer = styled.div`
@@ -27,26 +27,12 @@ const StyledColumn = styled(Column)`
   }
 `;
 
-const StyledImageWrapper = styled.div`
-  width: 100%;
-  & img {
-    width: 100%;
-  }
-`;
-
-const StyledTrezorWallet = styled(StyledImageWrapper)`
-  width: 275px;
-  height: 82.5px;
-`;
-
 const Trezor = ({ ...props }) => (
   <BaseLayout>
     <Card {...props}>
       <StyledCardContainer>
         <StyledColumn>
-          <StyledTrezorWallet>
-            <img src={trezorLogo} alt="Ledger Wallet" />
-          </StyledTrezorWallet>
+          <TrezorLogo />
           <SubscribeForm />
         </StyledColumn>
       </StyledCardContainer>

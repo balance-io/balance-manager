@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
 import Column from '../components/Column';
 import SubscribeForm from '../components/SubscribeForm';
-import ledgerLogo from '../assets/ledger-logo.png';
+import LedgerLogo from '../components/LedgerLogo';
 import { responsive } from '../styles';
 
 const StyledCardContainer = styled.div`
@@ -27,26 +27,12 @@ const StyledColumn = styled(Column)`
   }
 `;
 
-const StyledImageWrapper = styled.div`
-  width: 100%;
-  & img {
-    width: 100%;
-  }
-`;
-
-const StyledLedgerWallet = styled(StyledImageWrapper)`
-  width: 300px;
-  height: 75px;
-`;
-
 const Ledger = ({ ...props }) => (
   <BaseLayout>
     <Card {...props}>
       <StyledCardContainer>
         <StyledColumn>
-          <StyledLedgerWallet>
-            <img src={ledgerLogo} alt="Ledger Wallet" />
-          </StyledLedgerWallet>
+          <LedgerLogo />
           <SubscribeForm />
         </StyledColumn>
       </StyledCardContainer>

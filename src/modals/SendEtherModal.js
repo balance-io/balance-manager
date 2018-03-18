@@ -10,7 +10,9 @@ import LineBreak from '../components/LineBreak';
 import DropdownCrypto from '../components/DropdownCrypto';
 import Button from '../components/Button';
 import Form from '../components/Form';
-import metamaskOriginal from '../assets/metamask-original.png';
+import MetamaskLogo from '../components/MetamaskLogo';
+import LedgerLogo from '../components/LedgerLogo';
+import TrezorLogo from '../components/TrezorLogo';
 import convertSymbol from '../assets/convert-symbol.svg';
 import arrowUp from '../assets/arrow-up.svg';
 import qrIcon from '../assets/qr-code-bnw.png';
@@ -40,14 +42,14 @@ import {
 } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
-const StyledMessage = styled.div`
+const StyledSuccessMessage = styled.div`
   padding: 22px;
   & a {
     text-decoration: underline;
     font-weight: ${fonts.weight.semibold};
   }
-  & > * {
-    margin-top: 10px;
+  & > *:nth-child(n + 2) {
+    margin-top: 24px;
   }
 `;
 
@@ -81,10 +83,14 @@ const StyledParagraph = styled.p`
 `;
 
 const StyledHash = styled.p`
-  margin: 0;
-  padding: 0;
-  font-family: monospace;
   font-size: ${fonts.size.small};
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: -0.4px;
+  background: rgb(${colors.white});
+  border-radius: 8px;
+  margin: 0 auto;
+  padding: 12px 18px;
 `;
 
 const StyledQRIcon = styled.div`
@@ -210,7 +216,7 @@ const StyledMaxBalance = styled.p`
   }
 `;
 
-const StyledApproveMetamask = styled.div`
+const StyledApproveTransaction = styled.div`
   padding: 22px;
   display: flex;
   flex-direction: column;
@@ -220,14 +226,6 @@ const StyledApproveMetamask = styled.div`
   }
   & > p {
     margin-top: 32px;
-  }
-`;
-
-const StyledFox = styled.div`
-  width: 200px;
-  height: 185px;
-  & img {
-    width: 100%;
   }
 `;
 
@@ -557,16 +555,27 @@ class SendEtherModal extends Component {
                 />
               )}
             </Form>
-          ) : this.props.modalProps.type === 'METAMASK' ? (
-            <StyledApproveMetamask>
-              <StyledFox>
-                <img src={metamaskOriginal} alt="metamask" />
-              </StyledFox>
-              <StyledParagraph>Approve transaction on Metamask</StyledParagraph>
+          ) : this.props.modalProps.type !== 'COLD' ? (
+            <StyledApproveTransaction>
+              {(() => {
+                switch (this.props.modalProps.type) {
+                  case 'METAMASK':
+                    return <MetamaskLogo />;
+                  case 'LEDGER':
+                    return <LedgerLogo />;
+                  case 'TREZOR':
+                    return <TrezorLogo />;
+                  default:
+                    return <div />;
+                }
+              })()}
+              <StyledParagraph>
+                {`Approve transaction on ${capitalize(this.props.modalProps.type)}`}
+              </StyledParagraph>
               <StyledActions single>
                 <Button onClick={this.onClose}>Close</Button>
               </StyledActions>
-            </StyledApproveMetamask>
+            </StyledApproveTransaction>
           ) : (
             <Form onSubmit={this.onSubmit}>
               <StyledSubTitle>
@@ -574,12 +583,6 @@ class SendEtherModal extends Component {
                 {`Confirm transaction from ${capitalize(this.props.modalProps.name)}`}
               </StyledSubTitle>
               <div>
-                {this.props.modalProps.type === 'COLD' && (
-                  <StyledParagraph>
-                    <strong>Private Key:</strong>
-                    {` Private Key Confirmed`}
-                  </StyledParagraph>
-                )}
                 <StyledParagraph>
                   <strong>Sender:</strong>
                   {` ${this.props.modalProps.address}`}
@@ -627,16 +630,17 @@ class SendEtherModal extends Component {
             </Form>
           )
         ) : (
-          <StyledMessage>
+          <StyledSuccessMessage>
             <StyledSubTitle>
               <StyledIcon color="grey" icon={arrowUp} />
               {`Success`}
             </StyledSubTitle>
-            <StyledParagraph>Your transaction is currently pending</StyledParagraph>
-            <StyledParagraph>
-              <strong>Transaction Hash:</strong>
-            </StyledParagraph>
-            <StyledHash>{` ${this.props.transaction}`}</StyledHash>
+            <div>
+              <StyledParagraph>
+                <strong>Transaction Hash:</strong>
+              </StyledParagraph>
+              <StyledHash>{` ${this.props.transaction}`}</StyledHash>
+            </div>
             <StyledParagraph>
               You can verify your transaction{' '}
               <a
@@ -654,7 +658,7 @@ class SendEtherModal extends Component {
                 Close
               </Button>
             </StyledActions>
-          </StyledMessage>
+          </StyledSuccessMessage>
         )}
       </Card>
     );

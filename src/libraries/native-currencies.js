@@ -10,23 +10,23 @@ export default {
     value: 'USD',
     icon: iconUSD
   },
-  ETH: {
-    symbol: 'Ξ',
+  GBP: {
+    symbol: '£',
     value: 'GBP',
     icon: iconGBP
   },
-  BTC: {
-    symbol: '₿',
+  EUR: {
+    symbol: '€',
     value: 'EUR',
     icon: iconEUR
   },
-  EUR: {
-    symbol: '€',
+  BTC: {
+    symbol: '₿',
     value: 'BTC',
     icon: iconBTC
   },
-  GBP: {
-    symbol: '£',
+  ETH: {
+    symbol: 'Ξ',
     value: 'ETH',
     icon: iconETH
   }

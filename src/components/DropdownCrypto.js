@@ -40,6 +40,7 @@ const StyledRow = styled.div`
   text-align: center;
   outline: none;
   & > div {
+    cursor: pointer;
     padding: ${({ noOptions }) => (noOptions ? `10px` : `10px 26px 10px 10px`)};
     background-size: 8px;
     display: flex;

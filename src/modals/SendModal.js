@@ -699,7 +699,7 @@ SendModal.propTypes = {
   web3Network: PropTypes.string.isRequired
 };
 
-const reduxProps = ({ modal, send, accounts }) => ({
+const reduxProps = ({ modal, send, account }) => ({
   modalProps: modal.modalProps,
   fetching: send.fetching,
   recipient: send.recipient,
@@ -714,7 +714,7 @@ const reduxProps = ({ modal, send, accounts }) => ({
   gasPriceOption: send.gasPriceOption,
   txFee: send.txFee,
   confirm: send.confirm,
-  web3Network: accounts.web3Network
+  web3Network: account.web3Network
 });
 
 export default connect(reduxProps, {

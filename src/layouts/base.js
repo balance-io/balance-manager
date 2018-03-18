@@ -14,7 +14,7 @@ import Warning from '../components/Warning';
 import logo from '../assets/logo-light.png';
 import ethereumNetworks from '../libraries/ethereum-networks';
 import nativeCurrencies from '../libraries/native-currencies';
-import { accountsChangeNativeCurrency } from '../reducers/_accounts';
+import { accountChangeNativeCurrency } from '../reducers/_account';
 import { fonts, responsive } from '../styles';
 
 const StyledLayout = styled.div`
@@ -88,7 +88,7 @@ const BaseLayout = ({
   web3Network,
   web3Available,
   web3Connected,
-  accountsChangeNativeCurrency,
+  accountChangeNativeCurrency,
   ...props
 }) => {
   const showToolbar = window.location.pathname !== '/' && !fetching && web3Available && web3Network;
@@ -115,7 +115,7 @@ const BaseLayout = ({
             <Dropdown
               selected={nativeCurrency}
               options={nativeCurrencies}
-              onChange={accountsChangeNativeCurrency}
+              onChange={accountChangeNativeCurrency}
             />
           </StyledToolbar>
         </StyledHeader>
@@ -130,7 +130,7 @@ const BaseLayout = ({
 
 BaseLayout.propTypes = {
   children: PropTypes.node.isRequired,
-  accountsChangeNativeCurrency: PropTypes.func.isRequired,
+  accountChangeNativeCurrency: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
   web3Network: PropTypes.string.isRequired,
@@ -138,14 +138,14 @@ BaseLayout.propTypes = {
   web3Connected: PropTypes.bool.isRequired
 };
 
-const reduxProps = ({ accounts }) => ({
-  fetching: accounts.fetching,
-  nativeCurrency: accounts.nativeCurrency,
-  web3Network: accounts.web3Network,
-  web3Available: accounts.web3Available,
-  web3Connected: accounts.web3Connected
+const reduxProps = ({ account }) => ({
+  fetching: account.fetching,
+  nativeCurrency: account.nativeCurrency,
+  web3Network: account.web3Network,
+  web3Available: account.web3Available,
+  web3Connected: account.web3Connected
 });
 
 export default connect(reduxProps, {
-  accountsChangeNativeCurrency
+  accountChangeNativeCurrency
 })(BaseLayout);

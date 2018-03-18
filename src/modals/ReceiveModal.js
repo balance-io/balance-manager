@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Card from '../components/Card';
 import AddressCopy from '../components/AddressCopy';
 import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import arrowUp from '../assets/arrow-up.svg';
+import { modalClose } from '../reducers/_modal';
 import { capitalize } from '../helpers/utilities';
 import { fonts, colors, responsive } from '../styles';
 
@@ -65,9 +67,9 @@ const StyledAddressCopy = styled(AddressCopy)`
   }
 `;
 
-class ReceiveEtherModal extends Component {
+class ReceiveModal extends Component {
   onClose = () => {
-    this.props.closeModal();
+    this.props.modalClose();
   };
   render = () => (
     <Card background="lightGrey">
@@ -86,9 +88,15 @@ class ReceiveEtherModal extends Component {
   );
 }
 
-ReceiveEtherModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+ReceiveModal.propTypes = {
+  modalClose: PropTypes.func.isRequired,
   modalProps: PropTypes.object.isRequired
 };
 
-export default ReceiveEtherModal;
+const reduxProps = ({ modal }) => ({
+  modalProps: modal.modalProps
+});
+
+export default connect(reduxProps, {
+  modalClose
+})(ReceiveModal);

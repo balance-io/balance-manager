@@ -179,7 +179,7 @@ class Account extends Component {
     this.setState({ openSettings: !this.state.openSettings });
   };
   openSendModal = () =>
-    this.props.modalOpen('SEND_ETHER', {
+    this.props.modalOpen('SEND_MODAL', {
       name: this.props.account.name || `${this.props.account.type} Wallet`,
       address: this.props.account.address,
       type: this.props.account.type,
@@ -187,7 +187,7 @@ class Account extends Component {
       prices: this.props.prices
     });
   openReceiveModal = () =>
-    this.props.modalOpen('RECEIVE_ETHER', {
+    this.props.modalOpen('RECEIVE_MODAL', {
       name: this.props.account.name || `${this.props.account.type} Wallet`,
       address: this.props.account.address
     });

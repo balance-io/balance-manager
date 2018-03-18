@@ -16,6 +16,7 @@ import TrezorLogo from '../components/TrezorLogo';
 import convertSymbol from '../assets/convert-symbol.svg';
 import arrowUp from '../assets/arrow-up.svg';
 import qrIcon from '../assets/qr-code-bnw.png';
+import { modalClose } from '../reducers/_modal';
 import {
   sendGetGasPrices,
   sendUpdateGasPrice,
@@ -238,7 +239,7 @@ const StyledActions = styled.div`
   }
 `;
 
-class SendEtherModal extends Component {
+class SendModal extends Component {
   componentDidMount() {
     this.props.sendGetGasPrices();
   }
@@ -379,7 +380,7 @@ class SendEtherModal extends Component {
   };
   onClose = () => {
     this.props.sendClearFields();
-    this.props.closeModal();
+    this.props.modalClose();
   };
   render = () => {
     return (
@@ -665,7 +666,7 @@ class SendEtherModal extends Component {
   };
 }
 
-SendEtherModal.propTypes = {
+SendModal.propTypes = {
   sendGetGasPrices: PropTypes.func.isRequired,
   sendUpdateGasPrice: PropTypes.func.isRequired,
   sendEtherMetamask: PropTypes.func.isRequired,
@@ -680,7 +681,7 @@ SendEtherModal.propTypes = {
   sendUpdateSelected: PropTypes.func.isRequired,
   sendToggleConfirmationView: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
-  closeModal: PropTypes.func.isRequired,
+  modalClose: PropTypes.func.isRequired,
   modalProps: PropTypes.object.isRequired,
   fetching: PropTypes.bool.isRequired,
   recipient: PropTypes.string.isRequired,
@@ -698,7 +699,8 @@ SendEtherModal.propTypes = {
   web3Network: PropTypes.string.isRequired
 };
 
-const reduxProps = ({ send, accounts }) => ({
+const reduxProps = ({ modal, send, accounts }) => ({
+  modalProps: modal.modalProps,
   fetching: send.fetching,
   recipient: send.recipient,
   nativeAmount: send.nativeAmount,
@@ -716,6 +718,7 @@ const reduxProps = ({ send, accounts }) => ({
 });
 
 export default connect(reduxProps, {
+  modalClose,
   sendGetGasPrices,
   sendUpdateGasPrice,
   sendEtherMetamask,
@@ -730,4 +733,4 @@ export default connect(reduxProps, {
   sendUpdateSelected,
   sendToggleConfirmationView,
   notificationShow
-})(SendEtherModal);
+})(SendModal);

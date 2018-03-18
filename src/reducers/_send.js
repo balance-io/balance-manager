@@ -1,6 +1,7 @@
 import { apiGetGasPrices } from '../helpers/api';
 import { notificationShow } from './_notification';
-import { parseError, convertFromNativeValue, convertToNativeValue } from '../helpers/utilities';
+import { fromWei, convertFromNativeValue, convertToNativeValue } from '../helpers/utilities';
+import { parseError } from '../helpers/parsers';
 import {
   metamaskSendTransaction,
   metamaskTransferToken,
@@ -8,7 +9,6 @@ import {
   transferToken,
   getTransactionFee
 } from '../helpers/web3';
-import { fromWei } from '../helpers/utilities';
 
 // -- Constants ------------------------------------------------------------- //
 

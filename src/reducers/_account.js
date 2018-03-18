@@ -1,19 +1,28 @@
-import { apiGetEthplorerAddressInfo, apiGetPrices, apiGetMetamaskNetwork } from '../helpers/api';
+import {
+  apiGetEthplorerAddressInfo,
+  apiGetEtherscanAccountTransactions,
+  apiGetPrices,
+  apiGetMetamaskNetwork
+} from '../helpers/api';
 import {
   parseError,
   parseAccountBalances,
   parsePricesObject,
   parseEthplorerAddressInfo
-} from '../helpers/utilities';
+} from '../helpers/parsers';
 import { warningOffline, warningOnline } from './_warning';
 import { web3SetProvider } from '../helpers/web3';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //
 
-const ACCOUNT_GET_ETHPLORER_INFO_REQUEST = 'account/ACCOUNT_GET_ETHPLORER_INFO_REQUEST';
-const ACCOUNT_GET_ETHPLORER_INFO_SUCCESS = 'account/ACCOUNT_GET_ETHPLORER_INFO_SUCCESS';
-const ACCOUNT_GET_ETHPLORER_INFO_FAILURE = 'account/ACCOUNT_GET_ETHPLORER_INFO_FAILURE';
+const ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST = 'account/ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST';
+const ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS = 'account/ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS';
+const ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE = 'account/ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE';
+
+const ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST';
+const ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS';
+const ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE';
 
 const ACCOUNT_UPDATE_METAMASK_ACCOUNT = 'account/ACCOUNT_UPDATE_METAMASK_ACCOUNT';
 const ACCOUNT_CHECK_NETWORK_IS_CONNECTED = 'account/ACCOUNT_CHECK_NETWORK_IS_CONNECTED';
@@ -34,17 +43,30 @@ const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 let accountInterval = null;
 let getPricesInterval = null;
 
-export const accountGetEthplorerInfo = (address, type) => (dispatch, getState) => {
+export const accountGetAccountTransactions = (address, type) => (dispatch, getState) => {
   const { web3Network } = getState().account;
-  dispatch({ type: ACCOUNT_GET_ETHPLORER_INFO_REQUEST });
+  dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST });
+  apiGetEtherscanAccountTransactions(address, web3Network)
+    .then(account => {
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: { type, ...account } });
+    })
+    .catch(err => {
+      console.error(err);
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE });
+    });
+};
+
+export const accountGetAccountBalances = (address, type) => (dispatch, getState) => {
+  const { web3Network } = getState().account;
+  dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST });
   apiGetEthplorerAddressInfo(address, web3Network)
     .then(account => {
-      dispatch({ type: ACCOUNT_GET_ETHPLORER_INFO_SUCCESS, payload: { type, ...account } });
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS, payload: { type, ...account } });
       dispatch(accountGetNativePrices());
     })
     .catch(err => {
       console.error(err);
-      dispatch({ type: ACCOUNT_GET_ETHPLORER_INFO_FAILURE });
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE });
     });
 };
 
@@ -52,7 +74,7 @@ export const accountUpdateMetamaskAccount = () => (dispatch, getState) => {
   if (window.web3.eth.defaultAccount !== getState().account.metamaskAccount) {
     const newAccount = window.web3.eth.defaultAccount;
     dispatch({ type: ACCOUNT_UPDATE_METAMASK_ACCOUNT, payload: newAccount });
-    dispatch(accountGetEthplorerInfo(newAccount, 'METAMASK'));
+    dispatch(accountGetAccountBalances(newAccount, 'METAMASK'));
   }
 };
 
@@ -136,6 +158,7 @@ const INITIAL_STATE = {
   metamaskAccount: '',
   crypto: ['ETH'],
   account: parseEthplorerAddressInfo(null),
+  transactions: [],
   fetching: false,
   error: false
 };
@@ -146,11 +169,11 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, metamaskAccount: action.payload };
     case ACCOUNT_CHECK_NETWORK_IS_CONNECTED:
       return { ...state, web3Connected: action.payload };
-    case ACCOUNT_GET_ETHPLORER_INFO_REQUEST:
+    case ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST:
       return { ...state, fetching: true };
-    case ACCOUNT_GET_ETHPLORER_INFO_SUCCESS:
+    case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:
       return { ...state, fetching: false, account: action.payload };
-    case ACCOUNT_GET_ETHPLORER_INFO_FAILURE:
+    case ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE:
       return {
         ...state,
         fetching: false,

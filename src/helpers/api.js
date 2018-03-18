@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { parseEthplorerAddressInfo } from './utilities';
+import { parseEthplorerAddressInfo } from './parsers';
 import { testnetGetAddressInfo } from './testnet';
 import networkList from '../libraries/ethereum-networks';
 

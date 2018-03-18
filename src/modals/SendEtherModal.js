@@ -396,6 +396,7 @@ class SendEtherModal extends Component {
 
               <div>
                 <DropdownCrypto
+                  selected={this.props.selected.symbol}
                   crypto={this.props.modalProps.crypto}
                   onChange={this.onChangeSelected}
                 />

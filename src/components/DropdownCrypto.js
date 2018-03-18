@@ -79,11 +79,10 @@ const StyledDropdown = styled(StyledRow)`
 
 class DropdownCrypto extends Component {
   state = {
-    selected: 'ETH',
     showDropdown: false
   };
   onChangeSelected = selected => {
-    this.setState({ showDropdown: false, selected });
+    this.setState({ showDropdown: false });
     this.props.onChange(selected);
   };
   toggleDropdown = () => this.setState({ showDropdown: !this.state.showDropdown });
@@ -98,17 +97,17 @@ class DropdownCrypto extends Component {
         <StyledSelected noOptions={Object.keys(options).length < 2} onClick={this.toggleDropdown}>
           <div>
             <StyledAsset>
-              <CryptoIcon size={18} currency={options[this.state.selected].symbol} />
-              <p>{options[this.state.selected].name}</p>
+              <CryptoIcon size={18} currency={options[this.props.selected].symbol} />
+              <p>{options[this.props.selected].name}</p>
             </StyledAsset>
-            <p>{`${options[this.state.selected].balance} ${options[this.state.selected].symbol} ≈ ${
-              options[this.state.selected].native.string
+            <p>{`${options[this.props.selected].balance} ${options[this.props.selected].symbol} ≈ ${
+              options[this.props.selected].native.string
             }`}</p>
           </div>
         </StyledSelected>
         <StyledDropdown show={this.state.showDropdown}>
           {Object.keys(options)
-            .filter(key => key !== this.state.selected)
+            .filter(key => key !== this.props.selected)
             .map(key => (
               <div
                 key={options[key].symbol}
@@ -130,6 +129,7 @@ class DropdownCrypto extends Component {
 }
 
 DropdownCrypto.propTypes = {
+  selected: PropTypes.string.isRequired,
   crypto: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired
 };

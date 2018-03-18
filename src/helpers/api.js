@@ -57,3 +57,16 @@ export const apiGetMetamaskNetwork = () =>
       });
     }
   });
+
+/**
+ * @desc get ethplorer address info
+ * @param  {String}   [address = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetEtherscanAccountTransactions = (address = '', network = 'mainnet') => {
+  const subdomain = network === 'mainnet' ? `api` : `api-${network}`;
+  return axios.get(
+    `http://${subdomain}.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=8KDJ1H41UEGEA6CF4P8NEPUANQ3SE8HZGE`
+  );
+};

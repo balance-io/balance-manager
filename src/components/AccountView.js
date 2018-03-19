@@ -71,7 +71,7 @@ const StyledTabsWrapper = styled.div`
   box-shadow: none;
   display: flex;
   & :nth-child(n + 2) {
-    margin-left: 15px;
+    margin-left: 10px;
   }
 `;
 
@@ -82,7 +82,7 @@ const StyledTab = styled(Button)`
   background-color: transparent;
   color: rgb(${colors.darkGrey});
   border-width: 1px 1px 0 1px;
-  border-color: rgb(${colors.grey});
+  border-color: rgba(${colors.grey}, 0.7);
   border-style: solid;
   border-radius: 6px 6px 0 0;
   margin: 0;

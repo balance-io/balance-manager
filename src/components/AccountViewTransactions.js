@@ -171,7 +171,7 @@ const AccountViewTransactions = ({
           );
         })}
         {limitTransactions < transactions.length && (
-          <StyledShowMoreTransactions onClick={this.onShowMoreTransactions}>
+          <StyledShowMoreTransactions onClick={onShowMoreTransactions}>
             <p>{`Show more`}</p>
           </StyledShowMoreTransactions>
         )}

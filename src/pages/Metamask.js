@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
-import Account from '../components/Account';
+import AccountView from '../components/AccountView';
 import Card from '../components/Card';
 import {
   accountUpdateMetamaskAccount,
@@ -46,7 +46,7 @@ class Metamask extends Component {
       <StyledWrapper>
         {this.props.fetching ||
         (this.props.web3Network && this.props.metamaskAccount && this.props.web3Available) ? (
-          <Account />
+          <AccountView />
         ) : (
           <Card fetching={this.props.fetching}>
             <StyledMessage>{this.renderMessage()}</StyledMessage>

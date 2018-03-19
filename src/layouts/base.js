@@ -57,6 +57,9 @@ const StyledHero = styled.h1`
   & strong {
     font-weight: bold;
   }
+  & span {
+    opacity: 0.5;
+  }
   @media screen and (${responsive.sm.max}) {
     font-size: ${fonts.size.medium};
   }
@@ -102,7 +105,8 @@ const BaseLayout = ({
             <StyledBranding>
               <StyledLogo src={logo} alt="Balance" />
               <StyledHero>
-                <strong>Balance</strong> Manager
+                <strong>Balance.io</strong>
+                <span>{` Manager`}</span>
               </StyledHero>
             </StyledBranding>
           </Link>

@@ -49,9 +49,9 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST });
   apiGetEtherscanAccountTransactions(account.address, web3Network)
     .then(transactions => {
-      transactions = prices ? parseTransactionsPrices(transactions, prices) : transactions;
+      transactions = parseTransactionsPrices(transactions, prices);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: transactions });
-      dispatch(accountGetNativePrices(null, transactions));
+      dispatch(accountGetNativePrices());
     })
     .catch(err => {
       console.error(err);
@@ -66,7 +66,7 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
     .then(account => {
       account = { type, ...account };
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS, payload: account });
-      dispatch(accountGetNativePrices(account));
+      dispatch(accountGetNativePrices());
       if (account.txCount) dispatch(accountGetAccountTransactions());
     })
     .catch(err => {
@@ -113,10 +113,10 @@ export const accountClearIntervals = () => dispatch => {
   clearInterval(getPricesInterval);
 };
 
-export const accountGetNativePrices = (account, transactions) => (dispatch, getState) => {
-  let _account = account || getState().account.account;
-  let _transactions = transactions || getState().account.transactions;
-  const cryptoSymbols = _account.crypto.map(crypto => crypto.symbol);
+export const accountGetNativePrices = account => (dispatch, getState) => {
+  let account = getState().account.account;
+  let transactions = getState().account.transactions;
+  const cryptoSymbols = account.crypto.map(crypto => crypto.symbol);
   const getPrices = () => {
     dispatch({
       type: ACCOUNT_GET_NATIVE_PRICES_REQUEST,
@@ -126,11 +126,11 @@ export const accountGetNativePrices = (account, transactions) => (dispatch, getS
       .then(({ data }) => {
         if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
           const prices = parsePricesObject(data, cryptoSymbols, getState().account.nativeCurrency);
-          _account = parseAccountBalances(_account, prices);
-          _transactions = parseTransactionsPrices(_transactions, prices);
+          account = parseAccountBalances(account, prices);
+          transactions = parseTransactionsPrices(transactions, prices);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
-            payload: { account: _account, transactions: _transactions, prices }
+            payload: { account, transactions, prices }
           });
         }
       })

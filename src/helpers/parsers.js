@@ -100,7 +100,7 @@ export const parseAccountBalances = (account = null, prices = null) => {
  * @return {String}
  */
 export const parseTransactionsPrices = (transactions = null, prices = null) => {
-  if (transactions) {
+  if (transactions && prices) {
     transactions = transactions.map(tx => {
       const price = convertToNativeString('1', tx.crypto.symbol, prices);
       const total = convertToNativeString(tx.value, tx.crypto.symbol, prices);

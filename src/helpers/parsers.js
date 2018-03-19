@@ -146,6 +146,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       const timestamp = tx.timeStamp;
       const from = tx.from;
       const error = tx.isError === '1';
+      let interaction = false;
       let to = tx.to;
       let crypto = {
         name: 'Ethereum',
@@ -172,6 +173,8 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
 
         to = address;
         value = handleDecimals(convertTokenAmountToUnit(amount, crypto.decimals));
+      } else if (tx.input !== '0x') {
+        interaction = true;
       }
 
       return {
@@ -181,6 +184,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
         to,
         error,
         crypto,
+        interaction,
         value
       };
     })

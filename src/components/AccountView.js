@@ -116,6 +116,40 @@ class AccountView extends Component {
     showTokensWithNoValue: false,
     limitTransactions: 10
   };
+  componentWillMount() {
+    const tabName = this.nestedRouter({ tabName: null });
+    console.log(tabName);
+    this.setState({ tabName });
+  }
+  nestedRouter = ({ tabName }) => {
+    const origin = window.location.origin;
+    const pathname = this.props.match.url;
+    const viewPath = this.props.match.params.view;
+    if (tabName) {
+      let path = '/';
+      switch (tabName) {
+        case 'BALANCES_TAB':
+          path = `${origin}${pathname}`;
+          window.history.pushState({ urlPath: path }, '', path);
+          break;
+        case 'TRANSACTIONS_TAB':
+          path = `${origin}${pathname}/transactions`;
+          window.history.pushState({ urlPath: path }, '', path);
+          break;
+        default:
+          break;
+      }
+    } else {
+      switch (viewPath) {
+        case '/':
+          return 'BALANCES_TAB';
+        case '/transactions':
+          return 'TRANSACTIONS_TAB';
+        default:
+          break;
+      }
+    }
+  };
   toggleSettings = () => {
     this.setState({ openSettings: !this.state.openSettings });
   };
@@ -126,7 +160,10 @@ class AccountView extends Component {
     if (this.state.limitTransactions > this.props.transactions.length) return null;
     this.setState({ limitTransactions: this.state.limitTransactions + 10 });
   };
-  onChangeTabs = tabName => this.setState({ activeTab: tabName });
+  onChangeTabs = tabName => {
+    this.nestedRouter({ tabName });
+    this.setState({ activeTab: tabName });
+  };
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
       name: this.props.account.name || `${this.props.account.type} Wallet`,
@@ -223,7 +260,8 @@ AccountView.propTypes = {
   prices: PropTypes.object.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
   transactions: PropTypes.array.isRequired,
-  fetchingTransactions: PropTypes.bool.isRequired
+  fetchingTransactions: PropTypes.bool.isRequired,
+  match: PropTypes.object.isRequired
 };
 
 const reduxProps = ({ account }) => ({

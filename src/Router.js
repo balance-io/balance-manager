@@ -19,10 +19,10 @@ class Router extends Component {
   render = () => (
     <Switch>
       <Route exact path="/" component={Home} />
-      <Route exact path="/wallet" component={Wallet} />
-      <Route exact path="/metamask" component={Metamask} />
-      <Route exact path="/ledger" component={Ledger} />
-      <Route exact path="/trezor" component={Trezor} />
+      <Route exact path="/wallet/:view" component={Wallet} />
+      <Route exact path="/metamask/:view" component={Metamask} />
+      <Route exact path="/ledger/:view" component={Ledger} />
+      <Route exact path="/trezor/:view" component={Trezor} />
       <Route component={NotFound} />
     </Switch>
   );

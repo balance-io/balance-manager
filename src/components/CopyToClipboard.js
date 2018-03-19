@@ -28,21 +28,31 @@ const StyledText = styled.p`
   letter-spacing: -0.2px;
 `;
 
-const StyledAddress = styled.div`
+const StyledCopyToClipboard = styled.div`
   width: 100%;
   position: relative;
   @media (hover: hover) {
     &:hover ${StyledIcon} {
-      opacity: ${({ textHover }) => (textHover ? '0' : '1')};
+      opacity: ${({ iconOnHover }) => (iconOnHover ? '1' : '0')};
     }
     &:hover ${StyledText} {
-      opacity: ${({ textHover }) => (textHover ? '0.7' : '0')};
+      opacity: ${({ iconOnHover }) => (iconOnHover ? '0' : '0.7')};
     }
   }
 `;
 
+const StyledContainer = styled.div`
+  position: relative;
+  display: inline;
+  padding: 6px 6px 6px 0;
+`;
+
 const StyledInput = styled.input`
   width: 100%;
+  position: absolute;
+  left: 0;
+  top: 3px;
+  margin: 0;
   cursor: pointer;
   border: none;
   -webkit-appearance: none;
@@ -54,14 +64,13 @@ const StyledInput = styled.input`
   letter-spacing: normal;
   text-align: left;
   opacity: 0.7;
-  line-height: 1.25;
-  margin: 0.2em 0;
-  letter-spacing: -0.2px;
   color: transparent;
   text-shadow: 0 0 0 rgb(${colors.dark});
   font-weight: ${fonts.weight.semibold};
   font-size: ${fonts.size.medium};
   font-family: ${fonts.family.SFProText};
+  line-height: 1.25;
+  letter-spacing: -0.2px;
   @media screen and (${responsive.sm.max}) {
     font-size: ${fonts.size.small};
   }
@@ -70,10 +79,27 @@ const StyledInput = styled.input`
   }
 `;
 
+const StyledInvisible = styled.p`
+  width: auto;
+  display: inline;
+  border-style: none;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  font-weight: ${fonts.weight.semibold};
+  font-size: ${fonts.size.medium};
+  font-family: ${fonts.family.SFProText};
+  line-height: 1.25;
+  letter-spacing: -0.2px;
+  opacity: 0;
+`;
+
 let timeout = null;
 
-class Clipboard extends Component {
-  copyToClipboard = ({ target }) => {
+class CopyToClipboard extends Component {
+  copyToCopyToClipboard = ({ target }) => {
     clearTimeout(timeout);
     target.select();
     document.execCommand('Copy');
@@ -81,25 +107,28 @@ class Clipboard extends Component {
     this.props.notificationShow(`Address copied to clipboard`);
   };
   render() {
-    const { notificationShow, textHover, address, ...props } = this.props;
+    const { notificationShow, iconOnHover, text, ...props } = this.props;
     return (
-      <StyledAddress textHover={textHover}>
-        <StyledInput
-          value={address}
-          onChange={() => {}}
-          onClick={this.copyToClipboard}
-          {...props}
-        />
-        <StyledText>Click to copy to clipboard</StyledText>
-        <StyledIcon src={clipboardIcon} alt="copy" />
-      </StyledAddress>
+      <StyledCopyToClipboard iconOnHover={iconOnHover} {...props}>
+        <StyledContainer>
+          <StyledInvisible>{text}</StyledInvisible>
+          <StyledInput value={text} onChange={() => {}} onClick={this.copyToCopyToClipboard} />
+          <StyledText>Click to copy to clipboard</StyledText>
+          <StyledIcon src={clipboardIcon} alt="copy" />
+        </StyledContainer>
+      </StyledCopyToClipboard>
     );
   }
 }
 
-Clipboard.propTypes = {
+CopyToClipboard.propTypes = {
   notificationShow: PropTypes.func.isRequired,
-  address: PropTypes.string.isRequired
+  text: PropTypes.string.isRequired,
+  iconOnHover: PropTypes.bool
 };
 
-export default connect(null, { notificationShow })(Clipboard);
+CopyToClipboard.defaultProps = {
+  iconOnHover: false
+};
+
+export default connect(null, { notificationShow })(CopyToClipboard);

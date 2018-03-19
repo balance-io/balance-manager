@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Card from './Card';
 import Button from './Button';
 import Dropdown from './Dropdown';
-import AddressCopy from './AddressCopy';
+import CopyToClipboard from './CopyToClipboard';
 import AccountViewBalances from './AccountViewBalances';
 import AccountViewTransactions from './AccountViewTransactions';
 import arrowUp from '../assets/arrow-up.svg';
@@ -29,11 +29,12 @@ const StyledTop = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
-  padding: 20px;
-  padding-top: 15px;
+  justify-content: space-between;
+  padding: 15px 20px;
   & h6 {
     color: rgba(${colors.darkGrey}, 0.7);
     font-weight: ${fonts.weight.semibold};
+    margin-bottom: 4px;
   }
   @media screen and (${responsive.sm.max}) {
     padding: 16px;
@@ -41,7 +42,7 @@ const StyledTop = styled.div`
       margin-top: 15px;
     }
   }
-  @media screen and (max-width: 768px) {
+  @media screen and (${responsive.sm.max}) {
     flex-direction: column-reverse;
   }
 `;
@@ -51,7 +52,6 @@ const StyledAddressWrapper = styled.div`
 `;
 
 const StyledActions = styled.div`
-  width: 100%;
   display: flex;
   justify-content: flex-end;
   @media screen and (${responsive.sm.max}) {
@@ -90,9 +90,16 @@ const StyledTab = styled(Button)`
   border-radius: 6px 6px 0 0;
   margin: 0;
   display: flex;
-  box-shadow: none;
-  &:hover {
-    box-shadow: none;
+  opacity: 1 !important;
+  outline: none !important;
+  box-shadow: none !important;
+
+  &:hover,
+  &:active,
+  &:focus {
+    opacity: 1 !important;
+    outline: none !important;
+    box-shadow: none !important;
   }
 `;
 
@@ -173,7 +180,7 @@ class AccountView extends Component {
             <StyledTop>
               <StyledAddressWrapper>
                 <h6>{'Your wallet address'} </h6>
-                <AddressCopy address={this.props.account.address} />
+                <CopyToClipboard iconOnHover text={this.props.account.address} />
               </StyledAddressWrapper>
 
               <StyledActions>

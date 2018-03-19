@@ -260,7 +260,14 @@ class Account extends Component {
   }
   render() {
     const ethereum = this.props.account.crypto.filter(crypto => crypto.symbol === 'ETH')[0];
-    const tokens = this.props.account.crypto.filter(crypto => crypto.symbol !== 'ETH');
+    const tokensWithPrice = this.props.account.crypto.filter(
+      crypto => crypto.symbol !== 'ETH' && (crypto.native && crypto.native.value)
+    );
+    const tokensWithoutPrice = this.props.account.crypto.filter(
+      crypto =>
+        crypto.symbol !== 'ETH' && (!crypto.native || (crypto.native && !crypto.native.value))
+    );
+    const tokens = [...tokensWithPrice, ...tokensWithoutPrice];
     return (
       <StyledAccount>
         <Card fetching={this.props.fetching}>
@@ -296,13 +303,13 @@ class Account extends Component {
                   <p>{'Ethereum'}</p>
                 </StyledAsset>
                 <p>{`${ethereum.balance} ${ethereum.symbol}`}</p>
-                <p>{ethereum.native ? ethereum.native.price : '---'}</p>
+                <p>{ethereum.native && ethereum.native.price ? ethereum.native.price : '---'}</p>
                 <StyledPercentage
                   percentage={ethereum.native ? Number(ethereum.native.change.slice(0, -1)) : 0}
                 >
-                  {ethereum.native ? ethereum.native.change : '---'}
+                  {ethereum.native && ethereum.native.change ? ethereum.native.change : '---'}
                 </StyledPercentage>
-                <p>{ethereum.native ? ethereum.native.string : '---'}</p>
+                <p>{ethereum.native && ethereum.native.string ? ethereum.native.string : '---'}</p>
               </StyledEthereum>
               {!!tokens &&
                 tokens.map((token, idx) => {
@@ -314,13 +321,13 @@ class Account extends Component {
                         <p>{token.name}</p>
                       </StyledAsset>
                       <p>{`${token.balance} ${token.symbol}`}</p>
-                      <p>{token.native ? token.native.price : '---'}</p>
+                      <p>{token.native && token.native.price ? token.native.price : '---'}</p>
                       <StyledPercentage
                         percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
                       >
-                        {token.native ? token.native.change : '---'}
+                        {token.native && token.native.change ? token.native.change : '---'}
                       </StyledPercentage>
-                      <p>{token.native ? token.native.string : '---'}</p>
+                      <p>{token.native && token.native.string ? token.native.string : '---'}</p>
                     </StyledToken>
                   );
                 })}

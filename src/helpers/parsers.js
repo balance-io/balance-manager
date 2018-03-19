@@ -126,7 +126,16 @@ export const parseEthplorerAddressInfo = (data = null) => {
     balance: data && data.ETH.balance ? handleDecimals(data.ETH.balance) : '0.00000000',
     native: null
   };
-  let crypto = [ethereum];
+
+  const test = {
+    name: 'FSFASFAS',
+    symbol: '---',
+    address: null,
+    decimals: 18,
+    balance: '0',
+    native: null
+  };
+  let crypto = [ethereum, test];
   if (data && data.tokens) {
     const tokens = data.tokens.map(token => {
       const balance = convertTokenAmountToUnit(token.balance, Number(token.tokenInfo.decimals));

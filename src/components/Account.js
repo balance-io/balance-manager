@@ -131,6 +131,9 @@ const StyledToken = styled(StyledRow)`
   & > * {
     color: rgba(${colors.dark}, 0.6);
   }
+  & > p:first-child {
+    justify-content: flex-start;
+  }
   & > p {
     font-family: ${fonts.family.SFMono};
   }
@@ -217,7 +220,8 @@ const StyledShowMore = styled.p`
 class Account extends Component {
   state = {
     openSettings: false,
-    limit: 10
+    limitBalances: 10,
+    limitTransactions: 10
   };
   toggleSettings = () => {
     this.setState({ openSettings: !this.state.openSettings });
@@ -225,9 +229,13 @@ class Account extends Component {
   toggleSettings = () => {
     this.setState({ openSettings: !this.state.openSettings });
   };
-  onShowMore = () => {
-    if (this.state.limit > this.props.transactions.length) return null;
-    this.setState({ limit: this.state.limit + 10 });
+  onShowMoreBalances = () => {
+    if (this.state.limitBalances > this.props.account.crypto.length) return null;
+    this.setState({ limitBalances: this.state.limitBalances + 10 });
+  };
+  onShowMoreTransactions = () => {
+    if (this.state.limitTransactions > this.props.transactions.length) return null;
+    this.setState({ limitTransactions: this.state.limitTransactions + 10 });
   };
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
@@ -297,22 +305,34 @@ class Account extends Component {
                 <p>{ethereum.native ? ethereum.native.string : '---'}</p>
               </StyledEthereum>
               {!!tokens &&
-                tokens.map(token => (
-                  <StyledToken key={`${this.props.account.address}-${token.symbol}`}>
-                    <StyledAsset>
-                      <CryptoIcon currency={token.symbol} />
-                      <p>{token.name}</p>
-                    </StyledAsset>
-                    <p>{`${token.balance} ${token.symbol}`}</p>
-                    <p>{token.native ? token.native.price : '---'}</p>
-                    <StyledPercentage
-                      percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
-                    >
-                      {token.native ? token.native.change : '---'}
-                    </StyledPercentage>
-                    <p>{token.native ? token.native.string : '---'}</p>
-                  </StyledToken>
-                ))}
+                tokens.map((token, idx) => {
+                  if (idx > this.state.limitBalances) return null;
+                  return (
+                    <StyledToken key={`${this.props.account.address}-${token.symbol}`}>
+                      <StyledAsset>
+                        <CryptoIcon currency={token.symbol} />
+                        <p>{token.name}</p>
+                      </StyledAsset>
+                      <p>{`${token.balance} ${token.symbol}`}</p>
+                      <p>{token.native ? token.native.price : '---'}</p>
+                      <StyledPercentage
+                        percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
+                      >
+                        {token.native ? token.native.change : '---'}
+                      </StyledPercentage>
+                      <p>{token.native ? token.native.string : '---'}</p>
+                    </StyledToken>
+                  );
+                })}
+              {this.state.limitBalances < this.props.account.crypto.length && (
+                <StyledToken>
+                  <StyledShowMore onClick={this.onShowMoreBalances}>{`Show more`}</StyledShowMore>
+                  <p> </p>
+                  <p> </p>
+                  <p> </p>
+                  <p> </p>{' '}
+                </StyledToken>
+              )}
               <StyledMiddleRow>
                 <p>{!!this.props.transactions ? `Transactions` : ' '}</p>
                 <p> </p>
@@ -332,7 +352,7 @@ class Account extends Component {
                   <StyledLabels>Total</StyledLabels>
                 </StyledLabelsRow>
                 {this.props.transactions.map((tx, idx) => {
-                  if (idx > this.state.limit) return null;
+                  if (idx > this.state.limitTransactions) return null;
                   return (
                     <StyledToken key={tx.hash}>
                       <StyledAsset>
@@ -349,8 +369,10 @@ class Account extends Component {
                   );
                 })}
                 <StyledLastRow>
-                  <StyledShowMore onClick={this.onShowMore}>
-                    {this.state.limit < this.props.transactions.length ? `Show more` : ' '}
+                  <StyledShowMore onClick={this.onShowMoreTransactions}>
+                    {this.state.limitTransactions < this.props.transactions.length
+                      ? `Show more`
+                      : ' '}
                   </StyledShowMore>
                   <p> </p>
                   <p> </p>

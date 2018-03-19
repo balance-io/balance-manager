@@ -126,7 +126,6 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
       .then(({ data }) => {
         if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
           const prices = parsePricesObject(data, cryptoSymbols, getState().account.nativeCurrency);
-          console.log('prices', prices);
           _account = parseAccountBalances(_account, prices);
           transactions = parseTransactionsPrices(transactions, prices);
           dispatch({
@@ -173,7 +172,7 @@ const INITIAL_STATE = {
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ACCOUNT_UPDATE_METAMASK_ACCOUNT:
-      return { ...state, metamaskAccount: action.payload, transactions: '' };
+      return { ...state, metamaskAccount: action.payload, transactions: [] };
     case ACCOUNT_CHECK_NETWORK_IS_CONNECTED:
       return { ...state, web3Connected: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST:

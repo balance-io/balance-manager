@@ -100,14 +100,10 @@ export const parseAccountBalances = (account = null, prices = null) => {
  * @return {String}
  */
 export const parseTransactionsPrices = (transactions = null, prices = null) => {
-  console.log(prices);
   if (transactions) {
     transactions = transactions.map(tx => {
-      console.log('tx', tx);
       const price = convertToNativeString('1', tx.crypto.symbol, prices);
-      console.log('price', price);
       const total = convertToNativeString(tx.value, tx.crypto.symbol, prices);
-      console.log('total', total);
       tx.price = price;
       tx.total = total;
       return tx;
@@ -205,6 +201,5 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       };
     })
   );
-  console.log(transactions);
   return transactions;
 };

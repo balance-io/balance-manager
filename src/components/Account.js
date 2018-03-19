@@ -159,23 +159,6 @@ const StyledMiddleRow = styled(StyledEthereum)`
   }
 `;
 
-const StyledLastRow = styled(StyledEthereum)`
-  width: 100%;
-  box-shadow: none;
-  & > p:first-child {
-    font-family: ${fonts.family.SFProText};
-    justify-content: flex-start;
-  }
-  & > p {
-    font-size: ${fonts.size.medium};
-  }
-  @media screen and (${responsive.sm.max}) {
-    & p {
-      font-size: ${fonts.size.h6};
-    }
-  }
-`;
-
 const StyledAsset = styled.div`
   display: flex;
   align-items: center;
@@ -206,12 +189,39 @@ const StyledTransactionType = styled.p`
   font-weight: ${fonts.weight.semibold};
 `;
 
-const StyledShowMore = styled.p`
-  cursor: pointer;
-  font-size: ${fonts.size.h6};
-  color: rgb(${colors.grey});
+const StyledShowMoreTokens = styled(StyledToken)`
+  grid-template-columns: auto;
+  padding: 8px 20px;
+  & p {
+    cursor: pointer;
+    text-align: left;
+    justify-content: flex-start;
+    font-family: ${fonts.family.SFProText};
+    font-weight: ${fonts.weight.normal};
+    font-size: ${fonts.size.h6};
+    color: rgb(${colors.grey});
+  }
   @media (hover: hover) {
-    &:hover {
+    &:hover p {
+      opacity: 0.7;
+    }
+  }
+`;
+
+const StyledShowMoreTransactions = styled(StyledEthereum)`
+  grid-template-columns: auto;
+  box-shadow: none;
+  & p {
+    cursor: pointer;
+    text-align: left;
+    justify-content: flex-start;
+    font-family: ${fonts.family.SFProText};
+    font-weight: ${fonts.weight.semibold};
+    font-size: ${fonts.size.h6};
+    color: rgb(${colors.grey});
+  }
+  @media (hover: hover) {
+    &:hover p {
       opacity: 0.7;
     }
   }
@@ -220,18 +230,14 @@ const StyledShowMore = styled.p`
 class Account extends Component {
   state = {
     openSettings: false,
-    limitBalances: 10,
+    showTokensWithNoValue: false,
     limitTransactions: 10
   };
   toggleSettings = () => {
     this.setState({ openSettings: !this.state.openSettings });
   };
-  toggleSettings = () => {
-    this.setState({ openSettings: !this.state.openSettings });
-  };
-  onShowMoreBalances = () => {
-    if (this.state.limitBalances > this.props.account.crypto.length) return null;
-    this.setState({ limitBalances: this.state.limitBalances + 10 });
+  onShowTokensWithNoValue = () => {
+    this.setState({ showTokensWithNoValue: !this.state.showTokensWithNoValue });
   };
   onShowMoreTransactions = () => {
     if (this.state.limitTransactions > this.props.transactions.length) return null;
@@ -260,14 +266,13 @@ class Account extends Component {
   }
   render() {
     const ethereum = this.props.account.crypto.filter(crypto => crypto.symbol === 'ETH')[0];
-    const tokensWithPrice = this.props.account.crypto.filter(
+    const tokensWithValue = this.props.account.crypto.filter(
       crypto => crypto.symbol !== 'ETH' && (crypto.native && crypto.native.value)
     );
-    const tokensWithoutPrice = this.props.account.crypto.filter(
+    const tokensWithNoValue = this.props.account.crypto.filter(
       crypto =>
         crypto.symbol !== 'ETH' && (!crypto.native || (crypto.native && !crypto.native.value))
     );
-    const tokens = [...tokensWithPrice, ...tokensWithoutPrice];
     return (
       <StyledAccount>
         <Card fetching={this.props.fetching}>
@@ -311,34 +316,47 @@ class Account extends Component {
                 </StyledPercentage>
                 <p>{ethereum.native && ethereum.native.string ? ethereum.native.string : '---'}</p>
               </StyledEthereum>
-              {!!tokens &&
-                tokens.map((token, idx) => {
-                  if (idx > this.state.limitBalances) return null;
-                  return (
-                    <StyledToken key={`${this.props.account.address}-${token.symbol}`}>
-                      <StyledAsset>
-                        <CryptoIcon currency={token.symbol} />
-                        <p>{token.name}</p>
-                      </StyledAsset>
-                      <p>{`${token.balance} ${token.symbol}`}</p>
-                      <p>{token.native && token.native.price ? token.native.price : '---'}</p>
-                      <StyledPercentage
-                        percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
-                      >
-                        {token.native && token.native.change ? token.native.change : '---'}
-                      </StyledPercentage>
-                      <p>{token.native && token.native.string ? token.native.string : '---'}</p>
-                    </StyledToken>
-                  );
-                })}
-              {this.state.limitBalances < this.props.account.crypto.length && (
-                <StyledToken>
-                  <StyledShowMore onClick={this.onShowMoreBalances}>{`Show more`}</StyledShowMore>
-                  <p> </p>
-                  <p> </p>
-                  <p> </p>
-                  <p> </p>{' '}
-                </StyledToken>
+              {!!tokensWithValue &&
+                tokensWithValue.map(token => (
+                  <StyledToken key={`${this.props.account.address}-${token.symbol}`}>
+                    <StyledAsset>
+                      <CryptoIcon currency={token.symbol} />
+                      <p>{token.name}</p>
+                    </StyledAsset>
+                    <p>{`${token.balance} ${token.symbol}`}</p>
+                    <p>{token.native && token.native.price ? token.native.price : '---'}</p>
+                    <StyledPercentage
+                      percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
+                    >
+                      {token.native && token.native.change ? token.native.change : '---'}
+                    </StyledPercentage>
+                    <p>{token.native && token.native.string ? token.native.string : '---'}</p>
+                  </StyledToken>
+                ))}
+              {!!tokensWithNoValue.length &&
+                this.state.showTokensWithNoValue &&
+                tokensWithNoValue.map(token => (
+                  <StyledToken key={`${this.props.account.address}-${token.symbol}`}>
+                    <StyledAsset>
+                      <CryptoIcon currency={token.symbol} />
+                      <p>{token.name}</p>
+                    </StyledAsset>
+                    <p>{`${token.balance} ${token.symbol}`}</p>
+                    <p>{token.native && token.native.price ? token.native.price : '---'}</p>
+                    <StyledPercentage
+                      percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
+                    >
+                      {token.native && token.native.change ? token.native.change : '---'}
+                    </StyledPercentage>
+                    <p>{token.native && token.native.string ? token.native.string : '---'}</p>
+                  </StyledToken>
+                ))}
+              {!!tokensWithNoValue.length && (
+                <StyledShowMoreTokens>
+                  <p onClick={this.onShowTokensWithNoValue}>{`${
+                    this.state.showTokensWithNoValue ? `Hide` : `Show`
+                  } ${tokensWithNoValue.length} tokens with no market value`}</p>
+                </StyledShowMoreTokens>
               )}
               <StyledMiddleRow>
                 <p>{!!this.props.transactions ? `Transactions` : ' '}</p>
@@ -384,15 +402,9 @@ class Account extends Component {
                     );
                   })}
                   {this.state.limitTransactions < this.props.transactions.length && (
-                    <StyledLastRow>
-                      <StyledShowMore onClick={this.onShowMoreTransactions}>
-                        {`Show more`}
-                      </StyledShowMore>
-                      <p> </p>
-                      <p> </p>
-                      <p> </p>
-                      <p> </p>{' '}
-                    </StyledLastRow>
+                    <StyledShowMoreTransactions onClick={this.onShowMoreTransactions}>
+                      <p>{`Show more`}</p>
+                    </StyledShowMoreTransactions>
                   )}
                 </StyledGrid>
               ) : (

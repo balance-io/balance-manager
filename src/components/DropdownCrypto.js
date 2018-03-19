@@ -102,7 +102,9 @@ class DropdownCrypto extends Component {
               <p>{options[this.props.selected].name}</p>
             </StyledAsset>
             <p>{`${options[this.props.selected].balance} ${options[this.props.selected].symbol} ≈ ${
-              options[this.props.selected].native.string
+              options[this.props.selected].native
+                ? options[this.props.selected].native.string
+                : null
             }`}</p>
           </div>
         </StyledSelected>
@@ -119,7 +121,7 @@ class DropdownCrypto extends Component {
                   <p>{options[key].name}</p>
                 </StyledAsset>
                 <p>{`${options[key].balance} ${options[key].symbol} ≈ ${
-                  options[key].native.string
+                  options[key].native ? options[key].native.string : null
                 }`}</p>
               </div>
             ))}

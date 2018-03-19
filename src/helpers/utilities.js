@@ -152,7 +152,7 @@ export const capitalize = string =>
  * @return {Number}
  */
 export const convertFromNativeValue = (nativeValue = '', crypto = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[crypto].price)) return 0;
+  if (!prices || (prices && !prices[crypto])) return 0;
   return Number(Number(Number(nativeValue) / Number(prices[crypto].price)).toFixed(8));
 };
 
@@ -164,7 +164,7 @@ export const convertFromNativeValue = (nativeValue = '', crypto = 'ETH', prices 
  * @return {Number}
  */
 export const convertToNativeValue = (value = '', crypto = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[crypto].price)) return 0;
+  if (!prices || (prices && !prices[crypto])) return 0;
   return Number(Number(Number(value) * Number(prices[crypto].price)).toFixed(8));
 };
 

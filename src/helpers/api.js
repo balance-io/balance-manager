@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { parseEthplorerAddressInfo } from './parsers';
+import { parseEthplorerAddressInfo, parseEtherscanAccountTransactions } from './parsers';
 import { testnetGetAddressInfo } from './testnet';
 import networkList from '../libraries/ethereum-networks';
 
@@ -13,7 +13,7 @@ export const apiGetPrices = (crypto = [], native = []) => {
   const cryptoQuery = JSON.stringify(crypto).replace(/[[\]"]/gi, '');
   const nativeQuery = JSON.stringify(native).replace(/[[\]"]/gi, '');
   return axios.get(
-    `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${cryptoQuery}&tsyms=${nativeQuery}`
+    `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${cryptoQuery}&tsyms=${nativeQuery}`
   );
 };
 
@@ -31,6 +31,14 @@ export const apiGetEthplorerAddressInfo = (address = '', network = 'mainnet') =>
     .get(`https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`)
     .then(({ data }) => parseEthplorerAddressInfo(data));
 };
+
+/**
+ * @desc get ethplorer token info
+ * @param  {String}   [address = '']
+ * @return {Promise}
+ */
+export const apiGetEthplorerTokenInfo = (address = '') =>
+  axios.get(`https://api.ethplorer.io/getTokenInfo/${address}?apiKey=freekey`);
 
 /**
  * @desc get ethereum gas prices
@@ -66,7 +74,16 @@ export const apiGetMetamaskNetwork = () =>
  */
 export const apiGetEtherscanAccountTransactions = (address = '', network = 'mainnet') => {
   const subdomain = network === 'mainnet' ? `api` : `api-${network}`;
-  return axios.get(
-    `http://${subdomain}.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=8KDJ1H41UEGEA6CF4P8NEPUANQ3SE8HZGE`
-  );
+  return new Promise((resolve, reject) => {
+    axios
+      .get(
+        `http://${subdomain}.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=8KDJ1H41UEGEA6CF4P8NEPUANQ3SE8HZGE`
+      )
+      .then(({ data }) =>
+        parseEtherscanAccountTransactions(data)
+          .then(transactions => resolve(transactions))
+          .catch(err => reject(err))
+      )
+      .catch(err => reject(err));
+  });
 };

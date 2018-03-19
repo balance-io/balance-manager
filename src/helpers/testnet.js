@@ -1,8 +1,8 @@
-const BigNumber = require('bignumber.js');
-const { web3Instance, getTokenBalanceOf, getAccountBalance } = require('./web3');
-const ropstenTokens = require('../libraries/ropsten-tokens.json');
-const rinkebyTokens = require('../libraries/rinkeby-tokens.json');
-const kovanTokens = require('../libraries/kovan-tokens.json');
+import { web3Instance, getTokenBalanceOf, getAccountBalance } from './web3';
+import { convertTokenAmountFromUnit } from './utilities';
+import ropstenTokens from '../libraries/ropsten-tokens.json';
+import rinkebyTokens from '../libraries/rinkeby-tokens.json';
+import kovanTokens from '../libraries/kovan-tokens.json';
 
 /**
  * @desc get account tokens
@@ -31,19 +31,13 @@ export const getAccountTokens = async (accountAddress, network) => {
         if (balance === '0') {
           return null;
         }
-        balance = BigNumber(balance)
-          .toFormat(token.decimal, 0)
-          .replace(/0+$/, '')
-          .replace(/\.+$/, '');
-        balance = BigNumber(Number(balance.replace(/[^0-9.]/gi, '')))
-          .times(new BigNumber(10).pow(token.decimal))
-          .toNumber();
+        balance = convertTokenAmountFromUnit(balance, token.decimals);
         return {
           tokenInfo: {
             name: token.name,
             address: token.address,
             symbol: token.symbol,
-            decimals: token.decimal
+            decimals: token.decimals
           },
           balance: Number(balance)
         };

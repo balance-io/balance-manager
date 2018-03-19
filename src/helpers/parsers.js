@@ -1,11 +1,16 @@
-import BigNumber from 'bignumber.js';
 import errors from '../libraries/errors.json';
 import {
   convertToNativeString,
   convertToNativeValue,
   formatNativeString,
-  handleDecimals
+  formatPercentageChange,
+  handleDecimals,
+  hexToNumberString,
+  convertTokenAmountToUnit,
+  fromWei,
+  sha3
 } from './utilities';
+import { apiGetEthplorerTokenInfo } from './api';
 
 /**
  * @desc parse error code message
@@ -30,6 +35,31 @@ export const parseError = error => {
 };
 
 /**
+ * @desc parse prices object from api response
+ * @param  {Object} [data=null]
+ * @param  {Array} [crypto=[]]
+ * @param  {String} [native='USD']
+ * @return {Object}
+ */
+export const parsePricesObject = (data = null, crypto = [], native = 'USD') => {
+  let prices = { native };
+  crypto.map(
+    coin =>
+      (prices[coin] = data.RAW[coin]
+        ? { price: data.RAW[coin][native].PRICE, change: data.RAW[coin][native].CHANGEPCT24HOUR }
+        : null)
+  );
+  // APPEND prices for WETH same as ETH
+  prices['WETH'] = prices['ETH'];
+  // APPEND random prices for testnet tokens
+  prices['💥 PLASMA'] = { price: 1.24, change: 0.124 };
+  prices['STT'] = { price: 0.21, change: 2.2 };
+  prices['GUP'] = { price: 23.21, change: -1.111 };
+  prices['Aeternity'] = { price: 124.32, change: -20.342 };
+  return prices;
+};
+
+/**
  * @desc parse account balances from native prices
  * @param  {Object} [account=null]
  * @param  {Object} [prices=null]
@@ -37,14 +67,17 @@ export const parseError = error => {
  */
 export const parseAccountBalances = (account = null, prices = null) => {
   let totalNative = '---';
-  if (account.crypto) {
+
+  if (account && account.crypto) {
     account.crypto = account.crypto.map(crypto => {
       const price = convertToNativeString('1', crypto.symbol, prices);
+      const change = formatPercentageChange(crypto.symbol, prices);
       const value = convertToNativeValue(crypto.balance, crypto.symbol, prices);
       const string = convertToNativeString(crypto.balance, crypto.symbol, prices);
       crypto.native = {
         currency: prices.native,
         price: price,
+        change: change,
         value: value,
         string: string
       };
@@ -61,38 +94,26 @@ export const parseAccountBalances = (account = null, prices = null) => {
 };
 
 /**
- * @desc parse token balances to specific
- * @param {String|Number} [balance='']
- * @param {Number} [decimals=2]
+ * @desc parse transactions from native prices
+ * @param  {Object} [transactions=null]
+ * @param  {Object} [prices=null]
  * @return {String}
  */
-export const parseTokenBalances = (balance = '', decimals = 18) => {
-  let _balance = Number(balance);
-  let _decimals = Number(decimals);
-  _balance = BigNumber(_balance)
-    .dividedBy(new BigNumber(10).pow(_decimals))
-    .toNumber();
-  return _balance;
-};
-
-/**
- * @desc parse prices object from api response
- * @param  {Object} [data=null]
- * @param  {Array} [crypto=[]]
- * @param  {String} [native='USD']
- * @return {Object}
- */
-export const parsePricesObject = (data = null, crypto = [], native = 'USD') => {
-  let prices = { native };
-  crypto.map(coin => (prices[coin] = data[coin] ? data[coin][native] : null));
-  // APPEND prices for WETH same as ETH
-  prices['WETH'] = prices['ETH'];
-  // APPEND random prices for testnet tokens
-  prices['💥 PLASMA'] = 1.24;
-  prices['STT'] = 0.21;
-  prices['GUP'] = 23.21;
-  prices['Aeternity'] = 124.32;
-  return prices;
+export const parseTransactionsPrices = (transactions = null, prices = null) => {
+  console.log(prices);
+  if (transactions) {
+    transactions = transactions.map(tx => {
+      console.log('tx', tx);
+      const price = convertToNativeString('1', tx.crypto.symbol, prices);
+      console.log('price', price);
+      const total = convertToNativeString(tx.value, tx.crypto.symbol, prices);
+      console.log('total', total);
+      tx.price = price;
+      tx.total = total;
+      return tx;
+    });
+  }
+  return transactions;
 };
 
 /**
@@ -112,7 +133,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
   let crypto = [ethereum];
   if (data && data.tokens) {
     const tokens = data.tokens.map(token => {
-      const balance = parseTokenBalances(token.balance, token.tokenInfo.decimals);
+      const balance = convertTokenAmountToUnit(token.balance, Number(token.tokenInfo.decimals));
       return {
         name: token.tokenInfo.name || 'Unknown Token',
         symbol: token.tokenInfo.symbol || '---',
@@ -127,7 +148,63 @@ export const parseEthplorerAddressInfo = (data = null) => {
   return {
     address: (data && data.address) || '',
     type: 'METAMASK',
+    txCount: (data && data.countTxs) || 0,
     crypto,
     totalNative: '---'
   };
+};
+
+/**
+ * @desc parse etherscan account transactions response
+ * @param  {String}   [data = null]
+ * @return {Promise}
+ */
+export const parseEtherscanAccountTransactions = async (data = null) => {
+  if (!data || !data.result) return null;
+
+  const transactions = await Promise.all(
+    data.result.map(async tx => {
+      const hash = tx.hash;
+      const timestamp = tx.timeStamp;
+      const from = tx.from;
+      let to = tx.to;
+      let crypto = {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        address: null,
+        decimals: 18
+      };
+      let value = Number(fromWei(tx.value));
+
+      const tokenTransfer = sha3('transfer(address,uint256)').slice(0, 10);
+
+      if (tx.input.startsWith(tokenTransfer)) {
+        const response = await apiGetEthplorerTokenInfo(tx.to);
+
+        crypto = {
+          name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
+          symbol: !response.data.error || response.data.symbol ? response.data.symbol : '---',
+          address: !response.data.error ? response.data.address : '',
+          decimals: !response.data.error ? Number(response.data.decimals) : 18
+        };
+
+        const address = `0x${tx.input.slice(34, 74)}`;
+        const amount = hexToNumberString(`${tx.input.slice(74)}`);
+
+        to = address;
+        value = convertTokenAmountToUnit(amount, crypto.decimals);
+      }
+
+      return {
+        hash,
+        timestamp,
+        from,
+        to,
+        crypto,
+        value
+      };
+    })
+  );
+  console.log(transactions);
+  return transactions;
 };

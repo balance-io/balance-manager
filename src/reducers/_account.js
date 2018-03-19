@@ -6,6 +6,7 @@ import {
 } from '../helpers/api';
 import {
   parseError,
+  parseTransactionsPrices,
   parseAccountBalances,
   parsePricesObject,
   parseEthplorerAddressInfo
@@ -43,12 +44,13 @@ const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 let accountInterval = null;
 let getPricesInterval = null;
 
-export const accountGetAccountTransactions = (address, type) => (dispatch, getState) => {
-  const { web3Network } = getState().account;
+export const accountGetAccountTransactions = () => (dispatch, getState) => {
+  const { account, web3Network, prices } = getState().account;
   dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST });
-  apiGetEtherscanAccountTransactions(address, web3Network)
-    .then(account => {
-      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: { type, ...account } });
+  apiGetEtherscanAccountTransactions(account.address, web3Network)
+    .then(transactions => {
+      transactions = parseTransactionsPrices(transactions, prices);
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: transactions });
     })
     .catch(err => {
       console.error(err);
@@ -61,8 +63,9 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
   dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST });
   apiGetEthplorerAddressInfo(address, web3Network)
     .then(account => {
-      dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS, payload: { type, ...account } });
-      dispatch(accountGetNativePrices());
+      account = { type, ...account };
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS, payload: account });
+      dispatch(accountGetNativePrices(account));
     })
     .catch(err => {
       console.error(err);
@@ -88,7 +91,6 @@ export const accountCheckNetworkIsConnected = online => dispatch => {
 };
 
 export const accountConnectMetamask = () => (dispatch, getState) => {
-  dispatch(accountGetNativePrices());
   dispatch({ type: ACCOUNT_METAMASK_GET_NETWORK_REQUEST });
   if (typeof window.web3 !== 'undefined') {
     apiGetMetamaskNetwork()
@@ -109,9 +111,9 @@ export const accountClearIntervals = () => dispatch => {
   clearInterval(getPricesInterval);
 };
 
-export const accountGetNativePrices = () => (dispatch, getState) => {
-  let account = getState().account.account;
-  const cryptoSymbols = account.crypto.map(crypto => crypto.symbol);
+export const accountGetNativePrices = account => (dispatch, getState) => {
+  let _account = account || getState().account.account;
+  const cryptoSymbols = _account.crypto.map(crypto => crypto.symbol);
   const getPrices = () => {
     dispatch({
       type: ACCOUNT_GET_NATIVE_PRICES_REQUEST,
@@ -121,11 +123,13 @@ export const accountGetNativePrices = () => (dispatch, getState) => {
       .then(({ data }) => {
         if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
           const prices = parsePricesObject(data, cryptoSymbols, getState().account.nativeCurrency);
-          account = parseAccountBalances(account, prices);
+          console.log('prices', prices);
+          _account = parseAccountBalances(_account, prices);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
-            payload: { account, prices }
+            payload: { account: _account, prices }
           });
+          if (_account.txCount) dispatch(accountGetAccountTransactions());
         }
       })
       .catch(error => {
@@ -169,6 +173,12 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, metamaskAccount: action.payload };
     case ACCOUNT_CHECK_NETWORK_IS_CONNECTED:
       return { ...state, web3Connected: action.payload };
+    case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST:
+      return { ...state, fetching: true };
+    case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS:
+      return { ...state, fetching: false, transactions: action.payload };
+    case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE:
+      return { ...state, fetching: false, transactions: [] };
     case ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST:
       return { ...state, fetching: true };
     case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:

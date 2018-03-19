@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Card from './Card';
 import Button from './Button';
@@ -7,6 +8,7 @@ import AddressCopy from './AddressCopy';
 import CryptoIcon from './CryptoIcon';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
+import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledAccount = styled.div`
@@ -69,7 +71,7 @@ const StyledRow = styled.div`
   position: relative;
   padding: 20px;
   z-index: 0;
-  grid-template-columns: 150px 150px 150px auto;
+  grid-template-columns: repeat(4, 150px) auto;
   & p {
     display: flex;
     align-items: center;
@@ -77,14 +79,14 @@ const StyledRow = styled.div`
     font-size: ${fonts.size.h6};
   }
   @media screen and (${responsive.sm.max}) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     padding: 16px;
     & p {
       font-size: ${fonts.size.small};
     }
   }
   @media screen and (${responsive.xs.max}) {
-    grid-template-columns: 1fr 3fr 3fr;
+    grid-template-columns: 1fr repeat(3, 3fr);
     & p:nth-child(3) {
       display: none;
     }
@@ -137,8 +139,30 @@ const StyledToken = styled(StyledRow)`
   }
 `;
 
-const StyledTotalBalance = styled(StyledEthereum)`
+const StyledMiddleRow = styled(StyledEthereum)`
   width: 100%;
+  box-shadow: none;
+  & > p:first-child {
+    font-family: ${fonts.family.SFProText};
+    justify-content: flex-start;
+  }
+  & > p {
+    font-size: ${fonts.size.medium};
+  }
+  @media screen and (${responsive.sm.max}) {
+    & p {
+      font-size: ${fonts.size.h6};
+    }
+  }
+`;
+
+const StyledLastRow = styled(StyledEthereum)`
+  width: 100%;
+  box-shadow: none;
+  & > p:first-child {
+    font-family: ${fonts.family.SFProText};
+    justify-content: flex-start;
+  }
   & > p {
     font-size: ${fonts.size.medium};
   }
@@ -168,15 +192,42 @@ const StyledAsset = styled.div`
   }
 `;
 
+const StyledPercentage = styled.p`
+  color: ${({ percentage }) =>
+    percentage
+      ? percentage > 0 ? `rgb(${colors.green})` : percentage < 0 ? `rgb(${colors.red})` : `inherit`
+      : `inherit`};
+`;
+
+const StyledTransactionType = styled.p`
+  font-weight: ${fonts.weight.semibold};
+`;
+
+const StyledShowMore = styled.p`
+  cursor: pointer;
+  font-size: ${fonts.size.h6};
+  color: rgb(${colors.grey});
+  @media (hover: hover) {
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+`;
+
 class Account extends Component {
   state = {
-    openSettings: false
+    openSettings: false,
+    limit: 10
   };
   toggleSettings = () => {
     this.setState({ openSettings: !this.state.openSettings });
   };
   toggleSettings = () => {
     this.setState({ openSettings: !this.state.openSettings });
+  };
+  onShowMore = () => {
+    if (this.state.limit > this.props.transactions.length) return null;
+    this.setState({ limit: this.state.limit + 10 });
   };
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
@@ -221,11 +272,13 @@ class Account extends Component {
                 </Button>
               </StyledActions>
             </StyledTop>
+
             <StyledGrid>
               <StyledLabelsRow>
                 <StyledLabels>Asset</StyledLabels>
                 <StyledLabels>Quantity</StyledLabels>
                 <StyledLabels>Price</StyledLabels>
+                <StyledLabels>24H</StyledLabels>
                 <StyledLabels>Total</StyledLabels>
               </StyledLabelsRow>
 
@@ -236,6 +289,11 @@ class Account extends Component {
                 </StyledAsset>
                 <p>{`${ethereum.balance} ${ethereum.symbol}`}</p>
                 <p>{ethereum.native ? ethereum.native.price : '---'}</p>
+                <StyledPercentage
+                  percentage={ethereum.native ? Number(ethereum.native.change.slice(0, -1)) : 0}
+                >
+                  {ethereum.native ? ethereum.native.change : '---'}
+                </StyledPercentage>
                 <p>{ethereum.native ? ethereum.native.string : '---'}</p>
               </StyledEthereum>
               {!!tokens &&
@@ -247,15 +305,58 @@ class Account extends Component {
                     </StyledAsset>
                     <p>{`${token.balance} ${token.symbol}`}</p>
                     <p>{token.native ? token.native.price : '---'}</p>
+                    <StyledPercentage
+                      percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
+                    >
+                      {token.native ? token.native.change : '---'}
+                    </StyledPercentage>
                     <p>{token.native ? token.native.string : '---'}</p>
                   </StyledToken>
                 ))}
-              <StyledTotalBalance>
+              <StyledMiddleRow>
+                <p>{`Transactions`}</p>
+                <p> </p>
+                <p> </p>
+                <p>{`Balance`}</p>
+                <p>{`${this.props.account.totalNative || '---'}`}</p>
+              </StyledMiddleRow>
+            </StyledGrid>
+
+            <StyledGrid>
+              <StyledLabelsRow>
+                <StyledLabels>Asset</StyledLabels>
+                <StyledLabels>Quantity</StyledLabels>
+                <StyledLabels>Price</StyledLabels>
+                <StyledLabels>Type</StyledLabels>
+                <StyledLabels>Total</StyledLabels>
+              </StyledLabelsRow>
+              {!!this.props.transactions &&
+                this.props.transactions.map((tx, idx) => {
+                  if (idx > this.state.limit) return null;
+                  return (
+                    <StyledToken key={tx.hash}>
+                      <StyledAsset>
+                        <CryptoIcon currency={tx.crypto.symbol} />
+                        <p>{tx.crypto.name}</p>
+                      </StyledAsset>
+                      <p>{`${tx.value} ${tx.crypto.symbol}`}</p>
+                      <p>{tx.price || '---'}</p>
+                      <StyledTransactionType>
+                        {tx.from === this.props.account.address ? 'Received' : 'Sent'}
+                      </StyledTransactionType>
+                      <p>{tx.total || '---'}</p>
+                    </StyledToken>
+                  );
+                })}
+              <StyledLastRow>
+                <StyledShowMore onClick={this.onShowMore}>
+                  {this.state.limit < this.props.transactions.length ? `Show more` : ' '}
+                </StyledShowMore>
                 <p> </p>
                 <p> </p>
                 <p> </p>
-                <p>{`Balance ${this.props.account.totalNative || '---'}`}</p>
-              </StyledTotalBalance>
+                <p> </p>{' '}
+              </StyledLastRow>
             </StyledGrid>
           </StyledFlex>
         </Card>
@@ -265,11 +366,22 @@ class Account extends Component {
 }
 
 Account.propTypes = {
+  modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
   prices: PropTypes.object.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
-  modalOpen: PropTypes.func.isRequired
+  transactions: PropTypes.array.isRequired
 };
 
-export default Account;
+const reduxProps = ({ account }) => ({
+  fetching: account.fetching,
+  account: account.account,
+  prices: account.prices,
+  nativeCurrency: account.nativeCurrency,
+  transactions: account.transactions
+});
+
+export default connect(reduxProps, {
+  modalOpen
+})(Account);

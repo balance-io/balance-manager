@@ -12,7 +12,6 @@ import {
   accountChangeNativeCurrency,
   accountCheckNetworkIsConnected
 } from '../reducers/_account';
-import { modalOpen } from '../reducers/_modal';
 import { fonts, colors } from '../styles';
 
 const StyledWrapper = styled.div`
@@ -47,13 +46,7 @@ class Metamask extends Component {
       <StyledWrapper>
         {this.props.fetching ||
         (this.props.web3Network && this.props.metamaskAccount && this.props.web3Available) ? (
-          <Account
-            account={this.props.account}
-            fetching={this.props.fetching}
-            prices={this.props.prices}
-            nativeCurrency={this.props.nativeCurrency}
-            modalOpen={this.props.modalOpen}
-          />
+          <Account />
         ) : (
           <Card fetching={this.props.fetching}>
             <StyledMessage>{this.renderMessage()}</StyledMessage>
@@ -70,24 +63,17 @@ Metamask.propTypes = {
   accountClearIntervals: PropTypes.func.isRequired,
   accountChangeNativeCurrency: PropTypes.func.isRequired,
   accountCheckNetworkIsConnected: PropTypes.func.isRequired,
-  modalOpen: PropTypes.func.isRequired,
-  prices: PropTypes.object.isRequired,
-  nativeCurrency: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
   web3Network: PropTypes.string.isRequired,
   metamaskAccount: PropTypes.string.isRequired,
-  account: PropTypes.object.isRequired,
   fetching: PropTypes.bool.isRequired,
   error: PropTypes.bool.isRequired
 };
 
 const reduxProps = ({ account }) => ({
-  prices: account.prices,
-  nativeCurrency: account.nativeCurrency,
   web3Available: account.web3Available,
   web3Network: account.web3Network,
   metamaskAccount: account.metamaskAccount,
-  account: account.account,
   fetching: account.fetching,
   error: account.error
 });
@@ -97,6 +83,5 @@ export default connect(reduxProps, {
   accountCheckNetworkIsConnected,
   accountConnectMetamask,
   accountClearIntervals,
-  accountChangeNativeCurrency,
-  modalOpen
+  accountChangeNativeCurrency
 })(Metamask);

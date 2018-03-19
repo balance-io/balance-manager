@@ -152,8 +152,8 @@ export const capitalize = string =>
  * @return {Number}
  */
 export const convertFromNativeValue = (nativeValue = '', crypto = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[crypto])) return 0;
-  return Number(Number(Number(nativeValue) / Number(prices[crypto])).toFixed(8));
+  if (!prices || (prices && !prices[crypto].price)) return 0;
+  return Number(Number(Number(nativeValue) / Number(prices[crypto].price)).toFixed(8));
 };
 
 /**
@@ -164,8 +164,8 @@ export const convertFromNativeValue = (nativeValue = '', crypto = 'ETH', prices 
  * @return {Number}
  */
 export const convertToNativeValue = (value = '', crypto = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[crypto])) return 0;
-  return Number(Number(Number(value) * Number(prices[crypto])).toFixed(8));
+  if (!prices || (prices && !prices[crypto].price)) return 0;
+  return Number(Number(Number(value) * Number(prices[crypto].price)).toFixed(8));
 };
 
 /**
@@ -193,6 +193,28 @@ export const convertToNativeString = (value = '', cryptoSymbol = 'ETH', prices =
 };
 
 /**
+ * @desc convert token amount to unit
+ * @param  {String} [amount='']
+ * @param  {Number} [decimals=18]
+ * @return {Number}
+ */
+export const convertTokenAmountToUnit = (amount = '', decimals = 18) =>
+  BigNumber(Number(amount))
+    .dividedBy(new BigNumber(10).pow(decimals))
+    .toNumber();
+
+/**
+ * @desc convert token amount from unit
+ * @param  {String} [amount='']
+ * @param  {Number} [decimals=8]
+ * @return {Number}
+ */
+export const convertTokenAmountFromUnit = (amount = '', decimals = 18) =>
+  BigNumber(Number(amount))
+    .times(new BigNumber(10).pow(decimals))
+    .toNumber();
+
+/**
  * @desc format native value to string
  * @param  {String} [value='']
  * @param  {Object} [native=null]
@@ -211,6 +233,19 @@ export const formatNativeString = (value = '', native = 'USD') => {
     const formatted = BigNumber(_value).toFormat(decimals);
     return `${nativeSymbol}${formatted}`;
   }
+};
+
+/**
+ * @desc format crypto prices 24hr percentage change
+ * @param  {String} [cryptoSymbol=null]
+ * @param  {Object} [prices=null]
+ * @return {String}
+ */
+export const formatPercentageChange = (cryptoSymbol, prices) => {
+  if (!prices || (prices && !prices[cryptoSymbol])) return '';
+  const percentageChange = Number(prices[cryptoSymbol].change).toFixed(8);
+  const formatted = BigNumber(percentageChange).toFormat(2);
+  return `${formatted}%`;
 };
 
 /**
@@ -300,6 +335,20 @@ export const fromWei = wei => web3Instance.utils.fromWei(String(wei));
  * @return {String}
  */
 export const toWei = ether => web3Instance.utils.toWei(String(ether));
+
+/**
+ * @desc hash string with sha3
+ * @param  {String} string
+ * @return {String}
+ */
+export const sha3 = string => web3Instance.utils.sha3(string);
+
+/**
+ * @desc convert hex to number string
+ * @param  {String} string
+ * @return {String}
+ */
+export const hexToNumberString = string => web3Instance.utils.hexToNumberString(string);
 
 /**
  * @desc returns url parameter value

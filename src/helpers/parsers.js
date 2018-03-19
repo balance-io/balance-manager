@@ -127,15 +127,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
     native: null
   };
 
-  const test = {
-    name: 'FSFASFAS',
-    symbol: '---',
-    address: null,
-    decimals: 18,
-    balance: '0',
-    native: null
-  };
-  let crypto = [ethereum, test];
+  let crypto = [ethereum];
   if (data && data.tokens) {
     const tokens = data.tokens.map(token => {
       const balance = convertTokenAmountToUnit(token.balance, Number(token.tokenInfo.decimals));

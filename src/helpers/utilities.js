@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js';
 import { web3Instance } from './web3';
-import errors from '../libraries/errors.json';
 import nativeCurrencies from '../libraries/native-currencies.js';
 
 /**
@@ -135,28 +134,6 @@ export const deleteSession = () => {
 };
 
 /**
- * @desc parse error code message
- * @param  {Error} error
- * @return {String}
- */
-export const parseError = error => {
-  if (error.message.includes('MetaMask')) {
-    const msgIndex = error.message.indexOf('MetaMask');
-    const msgWhole = error.message.slice(msgIndex);
-    const msgStart = msgWhole.indexOf(':');
-    const msgEnd = msgWhole.indexOf('\n');
-    const message = msgWhole.slice(msgStart + 2, msgEnd);
-    return message;
-  } else if (error.error && error.message) {
-    return errors[error.message];
-  } else if (!error.response || !errors[error.response.data.message]) {
-    console.error(error);
-    return `Something went wrong, please try again`;
-  }
-  return errors[error.response.data.message];
-};
-
-/**
  * @desc capitalize string
  * @param  {String} [string]
  * @return {String}
@@ -170,25 +147,25 @@ export const capitalize = string =>
 /**
  * @desc convert from current native value to crypto value
  * @param  {String} [nativeValue='']
- * @param  {String} [crypto='ETH']
+ * @param  {String} [cryptoSymbol='ETH']
  * @param  {Object} [prices=null]
  * @return {Number}
  */
-export const convertFromNativeValue = (nativeValue = '', crypto = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[crypto])) return 0;
-  return Number(Number(Number(nativeValue) / Number(prices[crypto])).toFixed(8));
+export const convertFromNativeValue = (nativeValue = '', cryptoSymbol = 'ETH', prices = null) => {
+  if (!prices || (prices && !prices[cryptoSymbol])) return null;
+  return Number(Number(Number(nativeValue) / Number(prices[cryptoSymbol].price)).toFixed(8));
 };
 
 /**
- * @desc convert crypto value to current native value
+ * @desc convert cryptoSymbol value to current native value
  * @param  {String} [value='']
- * @param  {String} [crypto='ETH']
+ * @param  {String} [cryptoSymbol='ETH']
  * @param  {Object} [prices=null]
  * @return {Number}
  */
-export const convertToNativeValue = (value = '', crypto = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[crypto])) return 0;
-  return Number(Number(Number(value) * Number(prices[crypto])).toFixed(8));
+export const convertToNativeValue = (value = '', cryptoSymbol = 'ETH', prices = null) => {
+  if (!prices || (prices && !prices[cryptoSymbol])) return null;
+  return Number(Number(Number(value) * Number(prices[cryptoSymbol].price)).toFixed(8));
 };
 
 /**
@@ -205,7 +182,7 @@ export const convertToNativeString = (value = '', cryptoSymbol = 'ETH', prices =
     const decimals = 8;
     const nativeValue = convertToNativeValue(value, cryptoSymbol, prices);
     const formatted = BigNumber(nativeValue).toFormat(decimals);
-    return Number(formatted) ? `${formatted} ${nativeSymbol}` : `--- ${nativeSymbol}`;
+    return `${formatted} ${nativeSymbol}`;
   } else {
     const nativeSymbol = nativeCurrencies[prices.native].symbol;
     const decimals = 2;
@@ -214,6 +191,28 @@ export const convertToNativeString = (value = '', cryptoSymbol = 'ETH', prices =
     return `${nativeSymbol}${formatted}`;
   }
 };
+
+/**
+ * @desc convert token amount to unit
+ * @param  {String} [amount='']
+ * @param  {Number} [decimals=18]
+ * @return {Number}
+ */
+export const convertTokenAmountToUnit = (amount = '', decimals = 18) =>
+  BigNumber(Number(amount))
+    .dividedBy(new BigNumber(10).pow(decimals))
+    .toNumber();
+
+/**
+ * @desc convert token amount from unit
+ * @param  {String} [amount='']
+ * @param  {Number} [decimals=8]
+ * @return {Number}
+ */
+export const convertTokenAmountFromUnit = (amount = '', decimals = 18) =>
+  BigNumber(Number(amount))
+    .times(new BigNumber(10).pow(decimals))
+    .toNumber();
 
 /**
  * @desc format native value to string
@@ -237,54 +236,16 @@ export const formatNativeString = (value = '', native = 'USD') => {
 };
 
 /**
- * @desc parse account balances from native prices
- * @param  {Object} [account=null]
+ * @desc format crypto prices 24hr percentage change
+ * @param  {String} [cryptoSymbol=null]
  * @param  {Object} [prices=null]
  * @return {String}
  */
-export const parseAccountBalances = (account = null, prices = null) => {
-  let totalNative = '---';
-  if (account.crypto) {
-    account.crypto = account.crypto.map(crypto => {
-      const price = convertToNativeString('1', crypto.symbol, prices);
-      const value = convertToNativeValue(crypto.balance, crypto.symbol, prices);
-      const string = convertToNativeString(crypto.balance, crypto.symbol, prices);
-      crypto.native = {
-        currency: prices.native,
-        price: price,
-        value: value,
-        string: string
-      };
-      return crypto;
-    });
-    totalNative = account.crypto.reduce(
-      (total, crypto) => Number(total) + Number(crypto.native.value),
-      0
-    );
-    totalNative = formatNativeString(totalNative, prices.native);
-  }
-  account.totalNative = totalNative;
-  return account;
-};
-
-/**
- * @desc parse prices object from api response
- * @param  {Object} [data=null]
- * @param  {Array} [crypto=[]]
- * @param  {String} [native='USD']
- * @return {Object}
- */
-export const parsePricesObject = (data = null, crypto = [], native = 'USD') => {
-  let prices = { native };
-  crypto.map(coin => (prices[coin] = data[coin] ? data[coin][native] : null));
-  // APPEND prices for WETH same as ETH
-  prices['WETH'] = prices['ETH'];
-  // APPEND random prices for testnet tokens
-  prices['💥 PLASMA'] = 1.24;
-  prices['STT'] = 0.21;
-  prices['GUP'] = 23.21;
-  prices['Aeternity'] = 124.32;
-  return prices;
+export const formatPercentageChange = (cryptoSymbol, prices) => {
+  if (!prices || (prices && !prices[cryptoSymbol])) return '';
+  const percentageChange = Number(prices[cryptoSymbol].change).toFixed(8);
+  const formatted = BigNumber(percentageChange).toFormat(2);
+  return `${formatted}%`;
 };
 
 /**
@@ -376,6 +337,20 @@ export const fromWei = wei => web3Instance.utils.fromWei(String(wei));
 export const toWei = ether => web3Instance.utils.toWei(String(ether));
 
 /**
+ * @desc hash string with sha3
+ * @param  {String} string
+ * @return {String}
+ */
+export const sha3 = string => web3Instance.utils.sha3(string);
+
+/**
+ * @desc convert hex to number string
+ * @param  {String} string
+ * @return {String}
+ */
+export const hexToNumberString = string => web3Instance.utils.hexToNumberString(string);
+
+/**
  * @desc returns url parameter value
  * @param  {String} parameter
  * @param  {String} url
@@ -415,21 +390,6 @@ export const handleDecimals = (value = '', decimals = 8) =>
     .toFixed(decimals)
     .replace(/0+$/, '')
     .replace(/\.+$/, '');
-
-/**
- * @desc parse token balances to specific
- * @param {String|Number} [balance='']
- * @param {Number} [decimals=2]
- * @return {String}
- */
-export const parseTokenBalances = (balance = '', decimals = 18) => {
-  let _balance = Number(balance);
-  let _decimals = Number(decimals);
-  _balance = BigNumber(_balance)
-    .dividedBy(new BigNumber(10).pow(_decimals))
-    .toNumber();
-  return _balance;
-};
 
 /**
  * @desc get time string for minimal unit
@@ -527,41 +487,4 @@ export const getTimeString = (value = '', unit = '', short = false) => {
   } else {
     return `${_value} ${_unit}`;
   }
-};
-
-/**
- * @desc parse ethplorer address info response
- * @param  {String}   [data = null]
- * @return {Promise}
- */
-export const parseEthplorerAddressInfo = (data = null) => {
-  const ethereum = {
-    name: 'Ethereum',
-    symbol: 'ETH',
-    address: null,
-    decimals: 18,
-    balance: data && data.ETH.balance ? handleDecimals(data.ETH.balance) : '0.00000000',
-    native: null
-  };
-  let crypto = [ethereum];
-  if (data && data.tokens) {
-    const tokens = data.tokens.map(token => {
-      const balance = parseTokenBalances(token.balance, token.tokenInfo.decimals);
-      return {
-        name: token.tokenInfo.name || 'Unknown Token',
-        symbol: token.tokenInfo.symbol || '---',
-        address: token.tokenInfo.address,
-        decimals: Number(token.tokenInfo.decimals),
-        balance: handleDecimals(balance),
-        native: null
-      };
-    });
-    crypto = [...crypto, ...tokens];
-  }
-  return {
-    address: (data && data.address) || '',
-    type: 'METAMASK',
-    crypto,
-    totalNative: '---'
-  };
 };

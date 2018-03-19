@@ -12,7 +12,7 @@ import MetamaskLogo from '../components/MetamaskLogo';
 import LedgerLogo from '../components/LedgerLogo';
 import TrezorLogo from '../components/TrezorLogo';
 import metamaskWhite from '../assets/metamask-white.png';
-import { accountsConnectMetamask } from '../reducers/_accounts';
+import { accountConnectMetamask } from '../reducers/_account';
 import { responsive } from '../styles';
 
 const StyledCardContainer = styled.div`
@@ -42,7 +42,7 @@ const StyledHardwareWallets = styled(Column)`
   }
 `;
 
-const Home = ({ accountsConnectMetamask, ...props }) => (
+const Home = ({ accountConnectMetamask, ...props }) => (
   <BaseLayout>
     <Card {...props}>
       <StyledCardContainer>
@@ -55,7 +55,7 @@ const Home = ({ accountsConnectMetamask, ...props }) => (
         <StyledMetamaskConnect>
           <MetamaskLogo />
           <Link to="/metamask">
-            <Button left color="orange" icon={metamaskWhite} onClick={accountsConnectMetamask}>
+            <Button left color="orange" icon={metamaskWhite} onClick={accountConnectMetamask}>
               Connect to Metamask
             </Button>
           </Link>
@@ -66,9 +66,9 @@ const Home = ({ accountsConnectMetamask, ...props }) => (
 );
 
 Home.propTypes = {
-  accountsConnectMetamask: PropTypes.func.isRequired
+  accountConnectMetamask: PropTypes.func.isRequired
 };
 
 export default connect(null, {
-  accountsConnectMetamask
+  accountConnectMetamask
 })(Home);

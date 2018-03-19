@@ -6,13 +6,12 @@ import BaseLayout from '../layouts/base';
 import Account from '../components/Account';
 import Card from '../components/Card';
 import {
-  accountsUpdateMetamaskAccount,
-  accountsConnectMetamask,
-  accountsClearIntervals,
-  accountsChangeNativeCurrency,
-  accountsCheckNetworkIsConnected
-} from '../reducers/_accounts';
-import { modalOpen } from '../reducers/_modal';
+  accountUpdateMetamaskAccount,
+  accountConnectMetamask,
+  accountClearIntervals,
+  accountChangeNativeCurrency,
+  accountCheckNetworkIsConnected
+} from '../reducers/_account';
 import { fonts, colors } from '../styles';
 
 const StyledWrapper = styled.div`
@@ -30,9 +29,9 @@ const StyledMessage = styled.div`
 
 class Metamask extends Component {
   componentDidMount() {
-    this.props.accountsConnectMetamask();
-    window.onoffline = () => this.props.accountsCheckNetworkIsConnected(false);
-    window.ononline = () => this.props.accountsCheckNetworkIsConnected(true);
+    this.props.accountConnectMetamask();
+    window.onoffline = () => this.props.accountCheckNetworkIsConnected(false);
+    window.ononline = () => this.props.accountCheckNetworkIsConnected(true);
   }
   renderMessage() {
     if (!this.props.web3Available) return `Please install Metamask chrome extension`;
@@ -40,20 +39,14 @@ class Metamask extends Component {
     if (!this.props.web3Network) return `Unknown network, please switch to another one`;
   }
   componentWillUnmount() {
-    this.props.accountsClearIntervals();
+    this.props.accountClearIntervals();
   }
   render = () => (
     <BaseLayout>
       <StyledWrapper>
         {this.props.fetching ||
         (this.props.web3Network && this.props.metamaskAccount && this.props.web3Available) ? (
-          <Account
-            account={this.props.account}
-            fetching={this.props.fetching}
-            prices={this.props.prices}
-            nativeCurrency={this.props.nativeCurrency}
-            modalOpen={this.props.modalOpen}
-          />
+          <Account />
         ) : (
           <Card fetching={this.props.fetching}>
             <StyledMessage>{this.renderMessage()}</StyledMessage>
@@ -65,38 +58,30 @@ class Metamask extends Component {
 }
 
 Metamask.propTypes = {
-  accountsUpdateMetamaskAccount: PropTypes.func.isRequired,
-  accountsConnectMetamask: PropTypes.func.isRequired,
-  accountsClearIntervals: PropTypes.func.isRequired,
-  accountsChangeNativeCurrency: PropTypes.func.isRequired,
-  accountsCheckNetworkIsConnected: PropTypes.func.isRequired,
-  modalOpen: PropTypes.func.isRequired,
-  prices: PropTypes.object.isRequired,
-  nativeCurrency: PropTypes.string.isRequired,
+  accountUpdateMetamaskAccount: PropTypes.func.isRequired,
+  accountConnectMetamask: PropTypes.func.isRequired,
+  accountClearIntervals: PropTypes.func.isRequired,
+  accountChangeNativeCurrency: PropTypes.func.isRequired,
+  accountCheckNetworkIsConnected: PropTypes.func.isRequired,
   web3Available: PropTypes.bool.isRequired,
   web3Network: PropTypes.string.isRequired,
   metamaskAccount: PropTypes.string.isRequired,
-  account: PropTypes.object.isRequired,
   fetching: PropTypes.bool.isRequired,
   error: PropTypes.bool.isRequired
 };
 
-const reduxProps = ({ accounts }) => ({
-  prices: accounts.prices,
-  nativeCurrency: accounts.nativeCurrency,
-  web3Available: accounts.web3Available,
-  web3Network: accounts.web3Network,
-  metamaskAccount: accounts.metamaskAccount,
-  account: accounts.account,
-  fetching: accounts.fetching,
-  error: accounts.error
+const reduxProps = ({ account }) => ({
+  web3Available: account.web3Available,
+  web3Network: account.web3Network,
+  metamaskAccount: account.metamaskAccount,
+  fetching: account.fetching,
+  error: account.error
 });
 
 export default connect(reduxProps, {
-  accountsUpdateMetamaskAccount,
-  accountsCheckNetworkIsConnected,
-  accountsConnectMetamask,
-  accountsClearIntervals,
-  accountsChangeNativeCurrency,
-  modalOpen
+  accountUpdateMetamaskAccount,
+  accountCheckNetworkIsConnected,
+  accountConnectMetamask,
+  accountClearIntervals,
+  accountChangeNativeCurrency
 })(Metamask);

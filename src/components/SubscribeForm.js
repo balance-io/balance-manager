@@ -145,7 +145,7 @@ class SubscribeForm extends Component {
         >
           {this.state.status === 'success' && (
             <SSuccess>
-              <a href={`http://${this.getEmailClient()}`} target="_blank">
+              <a href={`https://${this.getEmailClient()}`} target="_blank">
                 {this.props.messages.success}
               </a>
             </SSuccess>

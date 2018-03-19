@@ -43,6 +43,7 @@ const StyledAddress = styled.div`
 
 const StyledInput = styled.input`
   width: 100%;
+  cursor: pointer;
   border: none;
   -webkit-appearance: none;
   outline: none;

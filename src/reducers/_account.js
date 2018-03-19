@@ -79,7 +79,7 @@ export const accountUpdateMetamaskAccount = () => (dispatch, getState) => {
   if (window.web3.eth.defaultAccount !== getState().account.metamaskAccount) {
     const newAccount = window.web3.eth.defaultAccount;
     dispatch({ type: ACCOUNT_UPDATE_METAMASK_ACCOUNT, payload: newAccount });
-    dispatch(accountGetAccountBalances(newAccount, 'METAMASK'));
+    if (newAccount) dispatch(accountGetAccountBalances(newAccount, 'METAMASK'));
   }
 };
 

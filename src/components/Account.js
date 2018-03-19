@@ -369,7 +369,7 @@ class Account extends Component {
                       <p>{`${tx.value} ${tx.crypto.symbol}`}</p>
                       <p>{tx.price || '---'}</p>
                       <StyledTransactionType>
-                        {tx.from === this.props.account.address ? 'Received' : 'Sent'}
+                        {tx.from === this.props.account.address ? 'Sent' : 'Received'}
                       </StyledTransactionType>
                       <p>{tx.total || '---'}</p>
                     </StyledToken>

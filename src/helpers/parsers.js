@@ -159,7 +159,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
 export const parseEtherscanAccountTransactions = async (data = null) => {
   if (!data || !data.result) return null;
 
-  const transactions = await Promise.all(
+  let transactions = await Promise.all(
     data.result.map(async tx => {
       const hash = tx.hash;
       const timestamp = tx.timeStamp;
@@ -202,5 +202,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       };
     })
   );
+
+  transactions = transactions.reverse();
   return transactions;
 };

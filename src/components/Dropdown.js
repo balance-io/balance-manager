@@ -13,6 +13,7 @@ const StyledWrapper = styled.div`
 
 const StyledCaret = styled.img`
   position: absolute;
+  cursor: pointer;
   right: 7px;
   top: calc(50% - 7px);
   width: 14px;

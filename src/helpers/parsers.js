@@ -171,7 +171,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
         const amount = hexToNumberString(`${tx.input.slice(74)}`);
 
         to = address;
-        value = convertTokenAmountToUnit(amount, crypto.decimals);
+        value = handleDecimals(convertTokenAmountToUnit(amount, crypto.decimals));
       }
 
       return {

@@ -40,7 +40,7 @@ const StyledRow = styled.div`
   text-align: center;
   outline: none;
   & > div {
-    cursor: pointer;
+    cursor: ${({ noOptions }) => (noOptions ? 'auto' : 'pointer')};
     padding: ${({ noOptions }) => (noOptions ? `8px` : `8px 26px 8px 8px`)};
     background-size: 8px;
     display: flex;
@@ -119,7 +119,10 @@ class Dropdown extends Component {
           </div>
           <StyledCaret />
         </StyledSelected>
-        <StyledDropdown show={this.state.showDropdown}>
+        <StyledDropdown
+          show={this.state.showDropdown}
+          noOptions={!onChange || Object.keys(options).length < 2}
+        >
           {onChange &&
             Object.keys(options)
               .filter(key => key !== _selected)

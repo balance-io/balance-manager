@@ -49,8 +49,9 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST });
   apiGetEtherscanAccountTransactions(account.address, web3Network)
     .then(transactions => {
-      transactions = parseTransactionsPrices(transactions, prices);
+      transactions = prices ? parseTransactionsPrices(transactions, prices) : transactions;
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: transactions });
+      dispatch(accountGetNativePrices(account));
     })
     .catch(err => {
       console.error(err);
@@ -66,6 +67,7 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
       account = { type, ...account };
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS, payload: account });
       dispatch(accountGetNativePrices(account));
+      if (account.txCount) dispatch(accountGetAccountTransactions());
     })
     .catch(err => {
       console.error(err);
@@ -113,6 +115,7 @@ export const accountClearIntervals = () => dispatch => {
 
 export const accountGetNativePrices = account => (dispatch, getState) => {
   let _account = account || getState().account.account;
+  let transactions = getState().account.transactions;
   const cryptoSymbols = _account.crypto.map(crypto => crypto.symbol);
   const getPrices = () => {
     dispatch({
@@ -125,11 +128,11 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
           const prices = parsePricesObject(data, cryptoSymbols, getState().account.nativeCurrency);
           console.log('prices', prices);
           _account = parseAccountBalances(_account, prices);
+          transactions = parseTransactionsPrices(transactions, prices);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
             payload: { account: _account, prices }
           });
-          if (_account.txCount) dispatch(accountGetAccountTransactions());
         }
       })
       .catch(error => {
@@ -174,11 +177,11 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_CHECK_NETWORK_IS_CONNECTED:
       return { ...state, web3Connected: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST:
-      return { ...state, fetching: true };
+      return { ...state };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS:
-      return { ...state, fetching: false, transactions: action.payload };
+      return { ...state, transactions: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE:
-      return { ...state, fetching: false, transactions: [] };
+      return { ...state, transactions: [] };
     case ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST:
       return { ...state, fetching: true };
     case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:

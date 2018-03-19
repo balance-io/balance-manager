@@ -4,11 +4,14 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Card from './Card';
 import Button from './Button';
+import Dropdown from './Dropdown';
 import AddressCopy from './AddressCopy';
 import AccountViewBalances from './AccountViewBalances';
 import AccountViewTransactions from './AccountViewTransactions';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
+import nativeCurrencies from '../libraries/native-currencies';
+import { accountChangeNativeCurrency } from '../reducers/_account';
 import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
 
@@ -88,6 +91,15 @@ const StyledTab = styled(Button)`
   margin: 0;
   display: flex;
   box-shadow: none;
+  &:hover {
+    box-shadow: none;
+  }
+`;
+
+const StyledDropdownWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `;
 
 class AccountView extends Component {
@@ -180,12 +192,13 @@ class AccountView extends Component {
                   Transactions
                 </StyledTab>
               </StyledTabsWrapper>
-              <div />
-              {/* <Dropdown
-                selected={nativeCurrency}
-                options={nativeCurrencies}
-                onChange={accountChangeNativeCurrency}
-              /> */}
+              <StyledDropdownWrapper>
+                <Dropdown
+                  selected={this.props.nativeCurrency}
+                  options={nativeCurrencies}
+                  onChange={this.props.accountChangeNativeCurrency}
+                />
+              </StyledDropdownWrapper>
             </StyledTabMenu>
             {this.renderTabView()}
           </StyledFlex>
@@ -196,6 +209,7 @@ class AccountView extends Component {
 }
 
 AccountView.propTypes = {
+  accountChangeNativeCurrency: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
@@ -215,5 +229,6 @@ const reduxProps = ({ account }) => ({
 });
 
 export default connect(reduxProps, {
+  accountChangeNativeCurrency,
   modalOpen
 })(AccountView);

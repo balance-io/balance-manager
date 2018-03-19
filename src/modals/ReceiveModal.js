@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Card from '../components/Card';
-import AddressCopy from '../components/AddressCopy';
+import CopyToClipboard from '../components/CopyToClipboard';
 import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import arrowUp from '../assets/arrow-up.svg';
@@ -52,7 +52,7 @@ const StyledJustifyContent = styled.div`
   align-items: center;
 `;
 
-const StyledAddressCopy = styled(AddressCopy)`
+const StyledCopyToClipboard = styled(CopyToClipboard)`
   font-weight: ${fonts.weight.semibold};
   text-align: center;
   letter-spacing: 2px;
@@ -82,7 +82,7 @@ class ReceiveModal extends Component {
           <Button onClick={this.onClose}>Close</Button>
         </StyledJustifyContent>
         <StyledQRCodeDisplay data={this.props.modalProps.address} />
-        <StyledAddressCopy textHover address={this.props.modalProps.address} />
+        <StyledCopyToClipboard text={this.props.modalProps.address} />
       </StyledContainer>
     </Card>
   );

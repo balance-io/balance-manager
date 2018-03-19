@@ -8,19 +8,19 @@ const StyledWrapper = styled.div`
   width: 100%;
   z-index: 2;
   position: relative;
-  -webkit-box-shadow: ${shadows.medium};
-  box-shadow: ${shadows.medium};
+  box-shadow: none;
 `;
 
 const StyledCaret = styled.img`
   position: absolute;
+  cursor: pointer;
   right: 7px;
   top: calc(50% - 7px);
   width: 14px;
   height: 14px;
   mask: url(${caret}) center no-repeat;
   mask-size: 90%;
-  background-color: rgba(${colors.white}, 0.8);
+  background-color: rgb(${colors.darkGrey});
 `;
 
 const StyledIcon = styled.div`
@@ -34,7 +34,8 @@ const StyledIcon = styled.div`
 const StyledRow = styled.div`
   border-radius: 6px;
   position: relative;
-  color: rgba(${colors.white}, 0.8);
+  background: rgb(${colors.white});
+  color: rgb(${colors.darkGrey});
   font-size: ${fonts.size.small};
   font-weight: ${fonts.weight.medium};
   text-align: center;
@@ -59,7 +60,6 @@ const StyledRow = styled.div`
 
 const StyledSelected = styled(StyledRow)`
   outline: none;
-  border: 1px solid rgba(${colors.white}, 0.1);
   border-radius: ${({ show }) => (show ? '6px 6px 0 0' : '6px')};
   & ${StyledCaret} {
     opacity: ${({ noOptions }) => (noOptions ? 0 : 1)};
@@ -71,7 +71,6 @@ const StyledDropdown = styled(StyledRow)`
   background: rgb(${colors.white});
   color: rgb(${colors.grey});
   border-radius: 0 0 6px 6px;
-  border: 1px solid rgba(${colors.white});
   width: 100%;
   top: 100%;
   opacity: ${({ show }) => (show ? 1 : 0)};
@@ -151,7 +150,7 @@ Dropdown.propTypes = {
 Dropdown.defaultProps = {
   selected: null,
   onChange: null,
-  iconColor: 'white'
+  iconColor: 'darkGrey'
 };
 
 export default Dropdown;

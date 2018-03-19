@@ -373,7 +373,13 @@ class Account extends Component {
                         <StyledTransactionType>
                           {tx.from === this.props.account.address ? 'Sent' : 'Received'}
                         </StyledTransactionType>
-                        <p>{tx.total || '---'}</p>
+                        <p>
+                          {tx.total
+                            ? tx.from === this.props.account.address
+                              ? `- ${tx.total}`
+                              : `${tx.total}`
+                            : '---'}
+                        </p>
                       </StyledToken>
                     );
                   })}

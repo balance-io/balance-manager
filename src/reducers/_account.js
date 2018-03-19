@@ -51,7 +51,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
     .then(transactions => {
       transactions = prices ? parseTransactionsPrices(transactions, prices) : transactions;
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: transactions });
-      dispatch(accountGetNativePrices(account));
+      dispatch(accountGetNativePrices(null, transactions));
     })
     .catch(err => {
       console.error(err);
@@ -113,9 +113,9 @@ export const accountClearIntervals = () => dispatch => {
   clearInterval(getPricesInterval);
 };
 
-export const accountGetNativePrices = account => (dispatch, getState) => {
+export const accountGetNativePrices = (account, transactions) => (dispatch, getState) => {
   let _account = account || getState().account.account;
-  let transactions = getState().account.transactions;
+  let _transactions = transactions || getState().account.transactions;
   const cryptoSymbols = _account.crypto.map(crypto => crypto.symbol);
   const getPrices = () => {
     dispatch({
@@ -127,10 +127,10 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
         if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
           const prices = parsePricesObject(data, cryptoSymbols, getState().account.nativeCurrency);
           _account = parseAccountBalances(_account, prices);
-          transactions = parseTransactionsPrices(transactions, prices);
+          _transactions = parseTransactionsPrices(_transactions, prices);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
-            payload: { account: _account, prices }
+            payload: { account: _account, transactions: _transactions, prices }
           });
         }
       })
@@ -142,7 +142,7 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
   };
   getPrices();
   clearInterval(getPricesInterval);
-  getPricesInterval = setInterval(getPrices, 300000); // 5mins
+  getPricesInterval = setInterval(getPrices, 60000); // 1min
 };
 
 export const accountChangeNativeCurrency = nativeCurrency => dispatch => {
@@ -226,7 +226,8 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         nativePriceRequest: '',
         prices: action.payload.prices,
-        account: action.payload.account
+        account: action.payload.account,
+        transactions: action.payload.transactions
       };
     case ACCOUNT_GET_NATIVE_PRICES_FAILURE:
       return {

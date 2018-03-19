@@ -162,7 +162,7 @@ const AccountViewTransactions = ({
               <p>{`${tx.value} ${tx.crypto.symbol}`}</p>
               <p>{tx.price || '---'}</p>
               <StyledTransactionType>
-                {tx.from === accountAddress ? 'Sent' : 'Received'}
+                {!tx.error ? (tx.from === accountAddress ? 'Sent' : 'Received') : 'Failed'}
               </StyledTransactionType>
               <p>
                 {tx.total ? (tx.from === accountAddress ? `- ${tx.total}` : `${tx.total}`) : '---'}

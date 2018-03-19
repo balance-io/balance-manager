@@ -60,78 +60,6 @@ export const parsePricesObject = (data = null, crypto = [], native = 'USD') => {
 };
 
 /**
- * @desc parse account balances from native prices
- * @param  {Object} [account=null]
- * @param  {Object} [prices=null]
- * @return {String}
- */
-export const parseAccountBalances = (account = null, prices = null) => {
-  let totalNative = '---';
-
-  if (account && account.crypto) {
-    account.crypto = account.crypto.map(crypto => {
-      const price = convertToNativeString('1', crypto.symbol, prices);
-      const change = formatPercentageChange(crypto.symbol, prices);
-      const value = convertToNativeValue(crypto.balance, crypto.symbol, prices);
-      const string = convertToNativeString(crypto.balance, crypto.symbol, prices);
-      crypto.native = {
-        currency: prices.native,
-        price: price,
-        change: change,
-        value: value,
-        string: string
-      };
-      return crypto;
-    });
-    totalNative = account.crypto.reduce(
-      (total, crypto) => Number(total) + Number(crypto.native.value),
-      0
-    );
-    totalNative = formatNativeString(totalNative, prices.native);
-  }
-  account.totalNative = totalNative;
-  return account;
-};
-
-/**
- * @desc parse transactions from native prices
- * @param  {Object} [transactions=null]
- * @param  {Object} [nativeCurrency='']
- * @return {String}
- */
-export const parseTransactionsPrices = async (transactions = null, nativeCurrency = '') => {
-  let _transactions = transactions;
-  if (
-    _transactions &&
-    _transactions.length &&
-    nativeCurrency &&
-    typeof nativeCurrency === 'string'
-  ) {
-    _transactions = await Promise.all(
-      _transactions.map(async tx => {
-        const timestamp = tx.timestamp;
-        const cryptoSymbol = tx.crypto.symbol;
-        const native = [nativeCurrency];
-        const response = await apiGetHistoricalPrices(cryptoSymbol, native, timestamp);
-        if (response.data.response) return tx;
-        const prices = {
-          native: nativeCurrency,
-          [cryptoSymbol]: {
-            price: response.data[cryptoSymbol] ? response.data[cryptoSymbol][nativeCurrency] : null
-          }
-        };
-        const price = convertToNativeString('1', tx.crypto.symbol, prices);
-        const total = convertToNativeString(tx.value, tx.crypto.symbol, prices);
-        tx.price = price;
-        tx.total = total;
-        return tx;
-      })
-    );
-  }
-  return _transactions;
-};
-
-/**
  * @desc parse ethplorer address info response
  * @param  {String}   [data = null]
  * @return {Promise}
@@ -171,6 +99,40 @@ export const parseEthplorerAddressInfo = (data = null) => {
 };
 
 /**
+ * @desc parse account balances from native prices
+ * @param  {Object} [account=null]
+ * @param  {Object} [prices=null]
+ * @return {String}
+ */
+export const parseAccountBalances = (account = null, prices = null) => {
+  let totalNative = '---';
+
+  if (account && account.crypto) {
+    account.crypto = account.crypto.map(crypto => {
+      const price = convertToNativeString('1', crypto.symbol, prices);
+      const change = formatPercentageChange(crypto.symbol, prices);
+      const value = convertToNativeValue(crypto.balance, crypto.symbol, prices);
+      const string = convertToNativeString(crypto.balance, crypto.symbol, prices);
+      crypto.native = {
+        currency: prices.native,
+        price: price,
+        change: change,
+        value: value,
+        string: string
+      };
+      return crypto;
+    });
+    totalNative = account.crypto.reduce(
+      (total, crypto) => Number(total) + Number(crypto.native.value),
+      0
+    );
+    totalNative = formatNativeString(totalNative, prices.native);
+  }
+  account.totalNative = totalNative;
+  return account;
+};
+
+/**
  * @desc parse etherscan account transactions response
  * @param  {String}   [data = null]
  * @return {Promise}
@@ -183,6 +145,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       const hash = tx.hash;
       const timestamp = tx.timeStamp;
       const from = tx.from;
+      const error = tx.isError === '1';
       let to = tx.to;
       let crypto = {
         name: 'Ethereum',
@@ -216,6 +179,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
         timestamp,
         from,
         to,
+        error,
         crypto,
         value
       };
@@ -224,4 +188,42 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
 
   transactions = transactions.reverse();
   return transactions;
+};
+
+/**
+ * @desc parse transactions from native prices
+ * @param  {Object} [transactions=null]
+ * @param  {Object} [nativeCurrency='']
+ * @return {String}
+ */
+export const parseTransactionsPrices = async (transactions = null, nativeCurrency = '') => {
+  let _transactions = transactions;
+  if (
+    _transactions &&
+    _transactions.length &&
+    nativeCurrency &&
+    typeof nativeCurrency === 'string'
+  ) {
+    _transactions = await Promise.all(
+      _transactions.map(async tx => {
+        const timestamp = tx.timestamp;
+        const cryptoSymbol = tx.crypto.symbol;
+        const native = [nativeCurrency];
+        const response = await apiGetHistoricalPrices(cryptoSymbol, native, timestamp);
+        if (response.data.response) return tx;
+        const prices = {
+          native: nativeCurrency,
+          [cryptoSymbol]: {
+            price: response.data[cryptoSymbol] ? response.data[cryptoSymbol][nativeCurrency] : null
+          }
+        };
+        const price = convertToNativeString('1', tx.crypto.symbol, prices);
+        const total = !tx.error ? convertToNativeString(tx.value, tx.crypto.symbol, prices) : null;
+        tx.price = price;
+        tx.total = total;
+        return tx;
+      })
+    );
+  }
+  return _transactions;
 };

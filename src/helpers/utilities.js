@@ -182,7 +182,7 @@ export const convertToNativeString = (value = '', cryptoSymbol = 'ETH', prices =
     const decimals = 8;
     const nativeValue = convertToNativeValue(value, cryptoSymbol, prices);
     const formatted = BigNumber(nativeValue).toFormat(decimals);
-    return Number(formatted) ? `${formatted} ${nativeSymbol}` : `--- ${nativeSymbol}`;
+    return `${formatted} ${nativeSymbol}`;
   } else {
     const nativeSymbol = nativeCurrencies[prices.native].symbol;
     const decimals = 2;

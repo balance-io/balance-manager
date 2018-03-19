@@ -147,25 +147,25 @@ export const capitalize = string =>
 /**
  * @desc convert from current native value to crypto value
  * @param  {String} [nativeValue='']
- * @param  {String} [crypto='ETH']
+ * @param  {String} [cryptoSymbol='ETH']
  * @param  {Object} [prices=null]
  * @return {Number}
  */
-export const convertFromNativeValue = (nativeValue = '', crypto = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[crypto])) return 0;
-  return Number(Number(Number(nativeValue) / Number(prices[crypto].price)).toFixed(8));
+export const convertFromNativeValue = (nativeValue = '', cryptoSymbol = 'ETH', prices = null) => {
+  if (!prices || (prices && !prices[cryptoSymbol])) return null;
+  return Number(Number(Number(nativeValue) / Number(prices[cryptoSymbol].price)).toFixed(8));
 };
 
 /**
- * @desc convert crypto value to current native value
+ * @desc convert cryptoSymbol value to current native value
  * @param  {String} [value='']
- * @param  {String} [crypto='ETH']
+ * @param  {String} [cryptoSymbol='ETH']
  * @param  {Object} [prices=null]
  * @return {Number}
  */
-export const convertToNativeValue = (value = '', crypto = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[crypto])) return 0;
-  return Number(Number(Number(value) * Number(prices[crypto].price)).toFixed(8));
+export const convertToNativeValue = (value = '', cryptoSymbol = 'ETH', prices = null) => {
+  if (!prices || (prices && !prices[cryptoSymbol])) return null;
+  return Number(Number(Number(value) * Number(prices[cryptoSymbol].price)).toFixed(8));
 };
 
 /**

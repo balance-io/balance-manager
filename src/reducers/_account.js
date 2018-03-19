@@ -170,7 +170,7 @@ const INITIAL_STATE = {
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ACCOUNT_UPDATE_METAMASK_ACCOUNT:
-      return { ...state, metamaskAccount: action.payload };
+      return { ...state, metamaskAccount: action.payload, transactions: '' };
     case ACCOUNT_CHECK_NETWORK_IS_CONNECTED:
       return { ...state, web3Connected: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST:

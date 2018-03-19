@@ -314,7 +314,7 @@ class Account extends Component {
                   </StyledToken>
                 ))}
               <StyledMiddleRow>
-                <p>{`Transactions`}</p>
+                <p>{!!this.props.transactions ? `Transactions` : ' '}</p>
                 <p> </p>
                 <p> </p>
                 <p>{`Balance`}</p>
@@ -322,16 +322,16 @@ class Account extends Component {
               </StyledMiddleRow>
             </StyledGrid>
 
-            <StyledGrid>
-              <StyledLabelsRow>
-                <StyledLabels>Asset</StyledLabels>
-                <StyledLabels>Quantity</StyledLabels>
-                <StyledLabels>Price</StyledLabels>
-                <StyledLabels>Type</StyledLabels>
-                <StyledLabels>Total</StyledLabels>
-              </StyledLabelsRow>
-              {!!this.props.transactions &&
-                this.props.transactions.map((tx, idx) => {
+            {!!this.props.transactions && (
+              <StyledGrid>
+                <StyledLabelsRow>
+                  <StyledLabels>Asset</StyledLabels>
+                  <StyledLabels>Quantity</StyledLabels>
+                  <StyledLabels>Price</StyledLabels>
+                  <StyledLabels>Type</StyledLabels>
+                  <StyledLabels>Total</StyledLabels>
+                </StyledLabelsRow>
+                {this.props.transactions.map((tx, idx) => {
                   if (idx > this.state.limit) return null;
                   return (
                     <StyledToken key={tx.hash}>
@@ -348,16 +348,17 @@ class Account extends Component {
                     </StyledToken>
                   );
                 })}
-              <StyledLastRow>
-                <StyledShowMore onClick={this.onShowMore}>
-                  {this.state.limit < this.props.transactions.length ? `Show more` : ' '}
-                </StyledShowMore>
-                <p> </p>
-                <p> </p>
-                <p> </p>
-                <p> </p>{' '}
-              </StyledLastRow>
-            </StyledGrid>
+                <StyledLastRow>
+                  <StyledShowMore onClick={this.onShowMore}>
+                    {this.state.limit < this.props.transactions.length ? `Show more` : ' '}
+                  </StyledShowMore>
+                  <p> </p>
+                  <p> </p>
+                  <p> </p>
+                  <p> </p>{' '}
+                </StyledLastRow>
+              </StyledGrid>
+            )}
           </StyledFlex>
         </Card>
       </StyledAccount>

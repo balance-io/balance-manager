@@ -45,11 +45,10 @@ let accountInterval = null;
 let getPricesInterval = null;
 
 export const accountGetAccountTransactions = () => (dispatch, getState) => {
-  const { account, web3Network, prices } = getState().account;
+  const { account, web3Network } = getState().account;
   dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST });
   apiGetEtherscanAccountTransactions(account.address, web3Network)
     .then(transactions => {
-      transactions = parseTransactionsPrices(transactions, prices);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: transactions });
       dispatch(accountGetNativePrices());
     })
@@ -79,7 +78,7 @@ export const accountUpdateMetamaskAccount = () => (dispatch, getState) => {
   if (window.web3.eth.defaultAccount !== getState().account.metamaskAccount) {
     const newAccount = window.web3.eth.defaultAccount;
     dispatch({ type: ACCOUNT_UPDATE_METAMASK_ACCOUNT, payload: newAccount });
-    dispatch(accountGetAccountBalances(newAccount, 'METAMASK'));
+    if (newAccount) dispatch(accountGetAccountBalances(newAccount, 'METAMASK'));
   }
 };
 
@@ -114,9 +113,7 @@ export const accountClearIntervals = () => dispatch => {
 };
 
 export const accountGetNativePrices = account => (dispatch, getState) => {
-  let account = getState().account.account;
-  let transactions = getState().account.transactions;
-  const cryptoSymbols = account.crypto.map(crypto => crypto.symbol);
+  const cryptoSymbols = getState().account.account.crypto.map(crypto => crypto.symbol);
   const getPrices = () => {
     dispatch({
       type: ACCOUNT_GET_NATIVE_PRICES_REQUEST,
@@ -126,12 +123,26 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
       .then(({ data }) => {
         if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
           const prices = parsePricesObject(data, cryptoSymbols, getState().account.nativeCurrency);
-          account = parseAccountBalances(account, prices);
-          transactions = parseTransactionsPrices(transactions, prices);
-          dispatch({
-            type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
-            payload: { account, transactions, prices }
-          });
+          const account = parseAccountBalances(getState().account.account, prices);
+          parseTransactionsPrices(
+            getState().account.transactions,
+            getState().account.nativeCurrency
+          )
+            .then(transactions => {
+              transactions =
+                transactions && transactions.length
+                  ? transactions
+                  : getState().account.transactions;
+              dispatch({
+                type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
+                payload: { account, transactions, prices }
+              });
+            })
+            .catch(error => {
+              dispatch({ type: ACCOUNT_GET_NATIVE_PRICES_FAILURE });
+              const message = parseError(error);
+              dispatch(notificationShow(message, true));
+            });
         }
       })
       .catch(error => {
@@ -165,6 +176,7 @@ const INITIAL_STATE = {
   crypto: ['ETH'],
   account: parseEthplorerAddressInfo(null),
   transactions: [],
+  fetchingTransactions: false,
   fetching: false,
   error: false
 };
@@ -176,11 +188,11 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_CHECK_NETWORK_IS_CONNECTED:
       return { ...state, web3Connected: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST:
-      return { ...state };
+      return { ...state, fetchingTransactions: true };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS:
-      return { ...state, transactions: action.payload };
+      return { ...state, fetchingTransactions: false, transactions: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE:
-      return { ...state, transactions: [] };
+      return { ...state, fetchingTransactions: false, transactions: [] };
     case ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST:
       return { ...state, fetching: true };
     case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:

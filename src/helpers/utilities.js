@@ -198,10 +198,13 @@ export const convertToNativeString = (value = '', cryptoSymbol = 'ETH', prices =
  * @param  {Number} [decimals=18]
  * @return {Number}
  */
-export const convertTokenAmountToUnit = (amount = '', decimals = 18) =>
-  BigNumber(Number(amount))
+export const convertTokenAmountToUnit = (amount = '', decimals = 18) => {
+  const _amount = `${amount}`;
+  if (!Number(_amount)) return null;
+  return BigNumber(_amount)
     .dividedBy(new BigNumber(10).pow(decimals))
     .toNumber();
+};
 
 /**
  * @desc convert token amount from unit
@@ -209,10 +212,13 @@ export const convertTokenAmountToUnit = (amount = '', decimals = 18) =>
  * @param  {Number} [decimals=8]
  * @return {Number}
  */
-export const convertTokenAmountFromUnit = (amount = '', decimals = 18) =>
-  BigNumber(Number(amount))
+export const convertTokenAmountFromUnit = (amount = '', decimals = 18) => {
+  const _amount = `${amount}`;
+  if (!Number(_amount)) return null;
+  return BigNumber(_amount)
     .times(new BigNumber(10).pow(decimals))
     .toNumber();
+};
 
 /**
  * @desc format native value to string

@@ -22,6 +22,7 @@ const StyledCard = styled.div`
 `;
 
 const StyledContent = styled.div`
+  min-height: ${({ minHeight }) => (minHeight ? `${minHeight}px` : '0')};
   transition: ${transitions.base};
   opacity: ${({ fetching }) => (fetching ? 0 : 1)};
   visibility: ${({ fetching }) => (fetching ? 'hidden' : 'visible')};
@@ -43,12 +44,14 @@ const StyledFetching = styled.div`
   pointer-events: ${({ fetching }) => (fetching ? 'auto' : 'none')};
 `;
 
-const Card = ({ fetching, background, maxWidth, children, ...props }) => (
+const Card = ({ fetching, background, maxWidth, minHeight, children, ...props }) => (
   <StyledCard background={background} maxWidth={maxWidth} {...props}>
     <StyledFetching fetching={fetching}>
       <Loader color="darkGrey" background={background} />
     </StyledFetching>
-    <StyledContent fetching={fetching}>{children}</StyledContent>
+    <StyledContent minHeight={minHeight} fetching={fetching}>
+      {children}
+    </StyledContent>
   </StyledCard>
 );
 
@@ -62,7 +65,8 @@ Card.propTypes = {
 Card.defaultProps = {
   fetching: false,
   background: 'white',
-  maxWidth: null
+  maxWidth: null,
+  minHeight: null
 };
 
 export default Card;

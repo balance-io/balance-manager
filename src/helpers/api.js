@@ -18,6 +18,20 @@ export const apiGetPrices = (crypto = [], native = []) => {
 };
 
 /**
+ * @desc get historical prices
+ * @param  {String}  [cryptoSymbol='']
+ * @param  {Array}   [native=[]]
+ * @param  {Number}  [timestamp=Date.now()]
+ * @return {Promise}
+ */
+export const apiGetHistoricalPrices = (cryptoSymbol = '', native = [], timestamp = Date.now()) => {
+  const nativeQuery = JSON.stringify(native).replace(/[[\]"]/gi, '');
+  return axios.get(
+    `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${cryptoSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`
+  );
+};
+
+/**
  * @desc get ethplorer address info
  * @param  {String}   [address = '']
  * @param  {String}   [network = 'mainnet']

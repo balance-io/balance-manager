@@ -349,45 +349,51 @@ class Account extends Component {
               </StyledMiddleRow>
             </StyledGrid>
 
-            {!!this.props.transactions && (
-              <StyledGrid>
-                <StyledLabelsRow>
-                  <StyledLabels>Asset</StyledLabels>
-                  <StyledLabels>Quantity</StyledLabels>
-                  <StyledLabels>Price</StyledLabels>
-                  <StyledLabels>Type</StyledLabels>
-                  <StyledLabels>Total</StyledLabels>
-                </StyledLabelsRow>
-                {this.props.transactions.map((tx, idx) => {
-                  if (idx > this.state.limitTransactions) return null;
-                  return (
-                    <StyledToken key={tx.hash}>
-                      <StyledAsset>
-                        <CryptoIcon currency={tx.crypto.symbol} />
-                        <p>{tx.crypto.name}</p>
-                      </StyledAsset>
-                      <p>{`${tx.value} ${tx.crypto.symbol}`}</p>
-                      <p>{tx.price || '---'}</p>
-                      <StyledTransactionType>
-                        {tx.from === this.props.account.address ? 'Sent' : 'Received'}
-                      </StyledTransactionType>
-                      <p>{tx.total || '---'}</p>
-                    </StyledToken>
-                  );
-                })}
-                <StyledLastRow>
-                  <StyledShowMore onClick={this.onShowMoreTransactions}>
-                    {this.state.limitTransactions < this.props.transactions.length
-                      ? `Show more`
-                      : ' '}
-                  </StyledShowMore>
-                  <p> </p>
-                  <p> </p>
-                  <p> </p>
-                  <p> </p>{' '}
-                </StyledLastRow>
-              </StyledGrid>
-            )}
+            {!!this.props.transactions &&
+              (!this.props.fetchingTransactions ? (
+                <StyledGrid>
+                  <StyledLabelsRow>
+                    <StyledLabels>Asset</StyledLabels>
+                    <StyledLabels>Quantity</StyledLabels>
+                    <StyledLabels>Price</StyledLabels>
+                    <StyledLabels>Type</StyledLabels>
+                    <StyledLabels>Total</StyledLabels>
+                  </StyledLabelsRow>
+
+                  {this.props.transactions.map((tx, idx) => {
+                    if (idx > this.state.limitTransactions) return null;
+                    return (
+                      <StyledToken key={tx.hash}>
+                        <StyledAsset>
+                          <CryptoIcon currency={tx.crypto.symbol} />
+                          <p>{tx.crypto.name}</p>
+                        </StyledAsset>
+                        <p>{`${tx.value} ${tx.crypto.symbol}`}</p>
+                        <p>{tx.price || '---'}</p>
+                        <StyledTransactionType>
+                          {tx.from === this.props.account.address ? 'Sent' : 'Received'}
+                        </StyledTransactionType>
+                        <p>{tx.total || '---'}</p>
+                      </StyledToken>
+                    );
+                  })}
+                  {this.state.limitTransactions < this.props.transactions.length && (
+                    <StyledLastRow>
+                      <StyledShowMore onClick={this.onShowMoreTransactions}>
+                        {`Show more`}
+                      </StyledShowMore>
+                      <p> </p>
+                      <p> </p>
+                      <p> </p>
+                      <p> </p>{' '}
+                    </StyledLastRow>
+                  )}
+                </StyledGrid>
+              ) : (
+                <Card minHeight={100} fetching={this.props.fetchingTransactions}>
+                  <div />
+                </Card>
+              ))}
           </StyledFlex>
         </Card>
       </StyledAccount>
@@ -401,7 +407,8 @@ Account.propTypes = {
   account: PropTypes.object.isRequired,
   prices: PropTypes.object.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
-  transactions: PropTypes.array.isRequired
+  transactions: PropTypes.array.isRequired,
+  fetchingTransactions: PropTypes.bool.isRequired
 };
 
 const reduxProps = ({ account }) => ({
@@ -409,7 +416,8 @@ const reduxProps = ({ account }) => ({
   account: account.account,
   prices: account.prices,
   nativeCurrency: account.nativeCurrency,
-  transactions: account.transactions
+  transactions: account.transactions,
+  fetchingTransactions: account.fetchingTransactions
 });
 
 export default connect(reduxProps, {

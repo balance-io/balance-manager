@@ -10,7 +10,7 @@ import {
   fromWei,
   sha3
 } from './utilities';
-import { apiGetEthplorerTokenInfo } from './api';
+import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
 
 /**
  * @desc parse error code message
@@ -96,20 +96,39 @@ export const parseAccountBalances = (account = null, prices = null) => {
 /**
  * @desc parse transactions from native prices
  * @param  {Object} [transactions=null]
- * @param  {Object} [prices=null]
+ * @param  {Object} [nativeCurrency='']
  * @return {String}
  */
-export const parseTransactionsPrices = (transactions = null, prices = null) => {
-  if (transactions && prices) {
-    transactions = transactions.map(tx => {
-      const price = convertToNativeString('1', tx.crypto.symbol, prices);
-      const total = convertToNativeString(tx.value, tx.crypto.symbol, prices);
-      tx.price = price;
-      tx.total = total;
-      return tx;
-    });
+export const parseTransactionsPrices = async (transactions = null, nativeCurrency = '') => {
+  let _transactions = transactions;
+  if (
+    _transactions &&
+    _transactions.length &&
+    nativeCurrency &&
+    typeof nativeCurrency === 'string'
+  ) {
+    _transactions = await Promise.all(
+      _transactions.map(async tx => {
+        const timestamp = tx.timestamp;
+        const cryptoSymbol = tx.crypto.symbol;
+        const native = [nativeCurrency];
+        const response = await apiGetHistoricalPrices(cryptoSymbol, native, timestamp);
+        if (response.data.response) return tx;
+        const prices = {
+          native: nativeCurrency,
+          [cryptoSymbol]: {
+            price: response.data[cryptoSymbol] ? response.data[cryptoSymbol][nativeCurrency] : null
+          }
+        };
+        const price = convertToNativeString('1', tx.crypto.symbol, prices);
+        const total = convertToNativeString(tx.value, tx.crypto.symbol, prices);
+        tx.price = price;
+        tx.total = total;
+        return tx;
+      })
+    );
   }
-  return transactions;
+  return _transactions;
 };
 
 /**

@@ -1,0 +1,18 @@
+{
+  "balance_wallet": {
+    "color": "white",
+    "value": "Balance Wallet"
+  },
+  "metamask": {
+    "color": "orange",
+    "value": "Metamask"
+  },
+  "ledger": {
+    "color": "blue",
+    "value": "Ledger"
+  },
+  "trezor": {
+    "color": "grey",
+    "value": "Trezor"
+  }
+}

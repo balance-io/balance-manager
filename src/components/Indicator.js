@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import circle from '../assets/circle.svg';
 import { fonts, colors, responsive } from '../styles';
 
 const StyledWrapper = styled.div`
@@ -12,7 +13,7 @@ const StyledWrapper = styled.div`
 const StyledIcon = styled.div`
   height: 15px;
   width: 15px;
-  mask: ${({ icon }) => (icon ? `url(${icon}) center no-repeat` : 'none')};
+  mask: url(${circle}) center no-repeat;
   mask-size: 60%;
   background-color: ${({ iconColor }) => `rgb(${colors[iconColor]})`};
 `;
@@ -47,14 +48,14 @@ const StyledSelected = styled(StyledRow)`
   border-radius: 6px;
 `;
 
-const Dropdown = ({ options, iconColor, selected, onChange, ...props }) => {
+const Indicator = ({ options, iconColor, selected, onChange, ...props }) => {
   const _selected = selected || options[Object.keys(options)[0]].value;
   if (!options[_selected]) return null;
   return (
     <StyledWrapper {...props}>
       <StyledSelected>
         <div>
-          <StyledIcon iconColor={iconColor} icon={options[_selected].icon} />
+          <StyledIcon iconColor={options[_selected].color || iconColor} />
           <p>{options[_selected].value}</p>
         </div>
       </StyledSelected>
@@ -62,15 +63,15 @@ const Dropdown = ({ options, iconColor, selected, onChange, ...props }) => {
   );
 };
 
-Dropdown.propTypes = {
+Indicator.propTypes = {
   options: PropTypes.object.isRequired,
   selected: PropTypes.string,
   iconColor: PropTypes.string
 };
 
-Dropdown.defaultProps = {
+Indicator.defaultProps = {
   selected: null,
   iconColor: 'white'
 };
 
-export default Dropdown;
+export default Indicator;

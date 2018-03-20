@@ -19,7 +19,7 @@ const StyledRow = styled.div`
   position: relative;
   padding: 20px;
   z-index: 0;
-  grid-template-columns: repeat(4, 150px) auto;
+  grid-template-columns: repeat(5, 1fr);
   & p {
     display: flex;
     align-items: center;

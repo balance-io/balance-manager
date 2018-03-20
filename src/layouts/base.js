@@ -95,7 +95,7 @@ const BaseLayout = ({
     <StyledLayout>
       <Background />
       <IconPreload />
-      <Column spanHeight maxWidth={800}>
+      <Column spanHeight maxWidth={900}>
         <StyledHeader>
           <Link to="/">
             <StyledBranding>

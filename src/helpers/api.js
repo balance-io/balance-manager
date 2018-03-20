@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { parseEthplorerAddressInfo, parseEtherscanAccountTransactions } from './parsers';
 import { testnetGetAddressInfo } from './testnet';
-import networkList from '../libraries/ethereum-networks';
+import networkList from '../libraries/ethereum-networks.json';
 
 /**
  * @desc get prices

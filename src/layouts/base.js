@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import Link from '../components/Link';
 import Modal from '../components/Modal';
-import NetworkStatus from '../components/NetworkStatus';
+import Indicator from '../components/Indicator';
 import Background from '../components/Background';
 import IconPreload from '../components/IconPreload';
 import Wrapper from '../components/Wrapper';
@@ -12,8 +12,9 @@ import Column from '../components/Column';
 import Notification from '../components/Notification';
 import Warning from '../components/Warning';
 import logo from '../assets/logo-light.png';
-import ethereumNetworks from '../libraries/ethereum-networks';
-import { fonts, responsive } from '../styles';
+import ethereumNetworks from '../libraries/ethereum-networks.json';
+import supportedWallets from '../libraries/supported-wallets.json';
+import { colors, fonts, responsive } from '../styles';
 
 const StyledLayout = styled.div`
   position: relative;
@@ -70,7 +71,7 @@ const StyledLogo = styled.img`
   }
 `;
 
-const StyledToolbar = styled.div`
+const StyledIndicators = styled.div`
   opacity: ${({ show }) => (show ? 1 : 0)};
   visibility: ${({ show }) => (show ? 'visible' : 'hidden')};
   pointer-events: ${({ show }) => (show ? 'auto' : 'none')};
@@ -78,13 +79,22 @@ const StyledToolbar = styled.div`
   align-items: center;
   justify-content: flex-end;
   & > div {
-    margin-left: 10px;
+    margin-left: 2px;
   }
+`;
+
+const StyledNetworkStatus = styled(Indicator)``;
+const StyledActiveWallet = styled(Indicator)``;
+
+const StyledVerticalLine = styled.div`
+  height: 17px;
+  border-left: 2px solid rgba(${colors.lightGrey}, 0.1);
 `;
 
 const BaseLayout = ({
   children,
   fetching,
+  account,
   web3Network,
   web3Available,
   web3Connected,
@@ -106,13 +116,15 @@ const BaseLayout = ({
               </StyledHero>
             </StyledBranding>
           </Link>
-          <StyledToolbar show={showToolbar}>
-            <NetworkStatus
+          <StyledIndicators show={showToolbar}>
+            <StyledNetworkStatus
               selected={web3Network}
               iconColor={web3Connected ? 'green' : 'red'}
               options={ethereumNetworks}
             />
-          </StyledToolbar>
+            <StyledVerticalLine />
+            <StyledActiveWallet selected={account.type.toLowerCase()} options={supportedWallets} />
+          </StyledIndicators>
         </StyledHeader>
         <StyledContent>{children}</StyledContent>
       </Column>
@@ -126,6 +138,7 @@ const BaseLayout = ({
 BaseLayout.propTypes = {
   children: PropTypes.node.isRequired,
   fetching: PropTypes.bool.isRequired,
+  account: PropTypes.object.isRequired,
   web3Network: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
   web3Connected: PropTypes.bool.isRequired
@@ -133,6 +146,7 @@ BaseLayout.propTypes = {
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
+  account: account.account,
   web3Network: account.web3Network,
   web3Available: account.web3Available,
   web3Connected: account.web3Connected

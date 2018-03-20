@@ -3,6 +3,7 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import lang from '../languages';
 import Link from './Link';
 import Card from './Card';
 import Button from './Button';
@@ -133,7 +134,8 @@ class AccountView extends Component {
   };
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
-      name: this.props.account.name || `${this.props.account.type} Wallet`,
+      name:
+        this.props.account.name || `${this.props.account.type}${lang.t('modal.default_wallet')}`,
       address: this.props.account.address,
       type: this.props.account.type,
       crypto: this.props.account.crypto,
@@ -141,7 +143,8 @@ class AccountView extends Component {
     });
   openReceiveModal = () =>
     this.props.modalOpen('RECEIVE_MODAL', {
-      name: this.props.account.name || `${this.props.account.type} Wallet`,
+      name:
+        this.props.account.name || `${this.props.account.type}${lang.t('modal.default_wallet')}`,
       address: this.props.account.address
     });
   shouldComponentUpdate(nextProps) {
@@ -159,26 +162,26 @@ class AccountView extends Component {
           <StyledFlex>
             <StyledTop>
               <StyledAddressWrapper>
-                <h6>{'Your wallet address'} </h6>
+                <h6>{lang.t('account.your_wallet_address')} </h6>
                 <CopyToClipboard iconOnHover text={this.props.account.address} />
               </StyledAddressWrapper>
 
               <StyledActions>
                 <Button left color="blue" icon={qrCode} onClick={this.openReceiveModal}>
-                  Receive
+                  {lang.t('button.receive')}
                 </Button>
                 <Button left color="blue" icon={arrowUp} onClick={this.openSendModal}>
-                  Send
+                  {lang.t('button.send')}
                 </Button>
               </StyledActions>
             </StyledTop>
             <StyledTabMenu>
               <StyledTabsWrapper>
                 <Link to={this.props.match.url}>
-                  <StyledTab>Balances</StyledTab>
+                  <StyledTab>{lang.t('account.tab_balances')}</StyledTab>
                 </Link>
                 <Link to={`${this.props.match.url}/transactions`}>
-                  <StyledTab>Transactions</StyledTab>
+                  <StyledTab>{lang.t('account.tab_transactions')}</StyledTab>
                 </Link>
               </StyledTabsWrapper>
               <StyledDropdownWrapper>

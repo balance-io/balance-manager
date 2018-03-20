@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import lang from '../languages';
 import Card from '../components/Card';
 import CopyToClipboard from '../components/CopyToClipboard';
 import QRCodeDisplay from '../components/QRCodeDisplay';
@@ -77,9 +78,9 @@ class ReceiveModal extends Component {
         <StyledJustifyContent>
           <StyledSubTitle>
             <StyledIcon color="grey" icon={arrowUp} rotation={180} />
-            {`Receive to ${capitalize(this.props.modalProps.name)}`}
+            {lang.t('modal.receive_title', { walletName: capitalize(this.props.modalProps.name) })}
           </StyledSubTitle>
-          <Button onClick={this.onClose}>Close</Button>
+          <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
         </StyledJustifyContent>
         <StyledQRCodeDisplay data={this.props.modalProps.address} />
         <StyledCopyToClipboard text={this.props.modalProps.address} />

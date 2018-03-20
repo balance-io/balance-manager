@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { web3Instance } from './web3';
+import lang from '../languages';
 import nativeCurrencies from '../libraries/native-currencies.js';
 
 /**
@@ -411,80 +412,80 @@ export const getTimeString = (value = '', unit = '', short = false) => {
   if (_value) {
     if (unit === 'seconds') {
       if (_value === 1) {
-        _unit = 'second';
-        _unitShort = 'sec';
+        _unit = lang.t('time.second');
+        _unitShort = lang.t('time.sec');
       } else if (_value < 1) {
         _value = handleDecimals(value * 100, 2);
         if (_value === 1) {
-          _unit = 'milisecond';
-          _unitShort = 'ms';
+          _unit = lang.t('time.milisecond');
+          _unitShort = lang.t('time.ms');
         } else {
-          _unit = 'miliseconds';
-          _unitShort = 'ms';
+          _unit = lang.t('time.miliseconds');
+          _unitShort = lang.t('time.ms');
         }
       } else if (_value >= 60 && _value < 3600) {
         _value = handleDecimals(value / 60, 2);
         if (_value === 1) {
-          _unit = 'minute';
-          _unitShort = 'min';
+          _unit = lang.t('time.minute');
+          _unitShort = lang.t('time.min');
         } else {
-          _unit = 'minutes';
-          _unitShort = 'mins';
+          _unit = lang.t('time.minutes');
+          _unitShort = lang.t('time.mins');
         }
       } else if (_value >= 3600 && _value < 86400) {
         _value = handleDecimals(value / 3600, 2);
         if (_value === 1) {
-          _unit = 'hour';
-          _unitShort = ' hr';
+          _unit = lang.t('time.hour');
+          _unitShort = lang.t('time.hr');
         } else {
-          _unit = 'hours';
-          _unitShort = 'hrs';
+          _unit = lang.t('time.hours');
+          _unitShort = lang.t('time.hrs');
         }
       } else if (_value >= 86400) {
         _value = handleDecimals(value / 86400, 2);
         if (_value === 1) {
-          _unit = 'day';
-          _unitShort = ' day';
+          _unit = lang.t('time.day');
+          _unitShort = lang.t('time.day');
         } else {
-          _unit = 'days';
-          _unitShort = 'days';
+          _unit = lang.t('time.days');
+          _unitShort = lang.t('time.days');
         }
       } else {
-        _unitShort = 'secs';
+        _unitShort = lang.t('time.secs');
       }
     } else if (unit === 'minutes') {
       if (_value === 1) {
-        _unit = 'minute';
-        _unitShort = 'min';
+        _unit = lang.t('time.minute');
+        _unitShort = lang.t('time.min');
       } else if (_value < 1) {
         _value = handleDecimals(value * 60, 2);
         if (_value === 1) {
-          _unit = 'second';
-          _unitShort = 'sec';
+          _unit = lang.t('time.second');
+          _unitShort = lang.t('time.sec');
         } else {
-          _unit = 'seconds';
-          _unitShort = 'secs';
+          _unit = lang.t('time.seconds');
+          _unitShort = lang.t('time.secs');
         }
       } else if (_value > 60 && _value < 1440) {
         _value = handleDecimals(value / 60, 2);
         if (_value === 1) {
-          _unit = 'hour';
-          _unitShort = ' hr';
+          _unit = lang.t('time.hour');
+          _unitShort = lang.t('time.hr');
         } else {
-          _unit = 'hours';
-          _unitShort = 'hrs';
+          _unit = lang.t('time.hours');
+          _unitShort = lang.t('time.hrs');
         }
       } else if (_value >= 1440) {
         _value = handleDecimals(value / 1440, 2);
         if (_value === 1) {
-          _unit = 'day';
-          _unitShort = ' day';
+          _unit = lang.t('time.day');
+          _unitShort = lang.t('time.day');
         } else {
-          _unit = 'days';
-          _unitShort = 'days';
+          _unit = lang.t('time.days');
+          _unitShort = lang.t('time.days');
         }
       } else {
-        _unitShort = 'mins';
+        _unitShort = lang.t('time.mins');
       }
     }
   }

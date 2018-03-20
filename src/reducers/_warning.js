@@ -1,3 +1,5 @@
+import lang from '../languages';
+
 // -- Constants ------------------------------------------------------------- //
 const WARNING_PARSE = 'warning/WARNING_PARSE';
 const WARNING_SHOW = 'warning/WARNING_SHOW';
@@ -28,7 +30,7 @@ export const warningOffline = () => dispatch => {
     warningShow({
       key: 'USER_IS_OFFLINE',
       color: 'red',
-      message: 'Connection offline, please check your internet connection',
+      message: lang.t('warning.user_is_online'),
       action: () => {}
     })
   );
@@ -43,7 +45,7 @@ export const warningOnline = () => dispatch => {
     warningShow({
       key: 'USER_IS_ONLINE',
       color: 'green',
-      message: `Connected! You're back online`,
+      message: lang.t('warning.user_is_online'),
       action: () => {}
     })
   );

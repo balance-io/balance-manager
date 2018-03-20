@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import lang from '../languages';
 import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
 import Column from '../components/Column';
@@ -47,7 +48,7 @@ const Wallet = ({ ...props }) => (
       <StyledCardContainer>
         <StyledColumn>
           <StyledBalanceWallet>
-            <h1>Coming soon..</h1>
+            <h1>{lang.t('message.coming_soon')}</h1>
           </StyledBalanceWallet>
           <SubscribeForm />
         </StyledColumn>

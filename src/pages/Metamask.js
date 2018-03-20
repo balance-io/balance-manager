@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import lang from '../languages';
 import BaseLayout from '../layouts/base';
 import AccountView from '../components/AccountView';
 import Card from '../components/Card';
@@ -34,9 +35,9 @@ class Metamask extends Component {
     window.ononline = () => this.props.accountCheckNetworkIsConnected(true);
   }
   renderMessage() {
-    if (!this.props.web3Available) return `Please install Metamask chrome extension`;
-    if (!this.props.metamaskAccount) return `Please unlock your Metamask`;
-    if (!this.props.web3Network) return `Unknown network, please switch to another one`;
+    if (!this.props.web3Available) return lang.t('message.web3_not_available');
+    if (!this.props.metamaskAccount) return lang.t('message.web3_not_unlocked');
+    if (!this.props.web3Network) return lang.t('message.web3_unknown_network');
   }
   componentWillUnmount() {
     this.props.accountClearIntervals();
@@ -65,10 +66,14 @@ Metamask.propTypes = {
   accountCheckNetworkIsConnected: PropTypes.func.isRequired,
   web3Available: PropTypes.bool.isRequired,
   web3Network: PropTypes.string.isRequired,
-  metamaskAccount: PropTypes.string.isRequired,
   fetching: PropTypes.bool.isRequired,
   error: PropTypes.bool.isRequired,
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
+  metamaskAccount: PropTypes.string
+};
+
+Metamask.defaultProps = {
+  metamaskAccount: null
 };
 
 const reduxProps = ({ account }) => ({

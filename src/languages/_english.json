@@ -1,0 +1,120 @@
+{
+  "translation": {
+    "account": {
+      "your_wallet_address": "Your wallet address",
+      "tab_balances": "Balances",
+      "tab_transactions": "Transactions",
+      "label_asset": "Asset",
+      "label_quantity": "Quantity",
+      "label_price": "Price",
+      "label_24h": "24h",
+      "label_status": "Status",
+      "label_total": "Total",
+      "show": "Show",
+      "hide": "Hide",
+      "total_balance": "Balance",
+      "no_market_value": "tokens with no market value",
+      "tx_sent": "Sent",
+      "tx_received": "Received",
+      "tx_failed": "Failed",
+      "tx_pending": "Pending",
+      "show_more": "Show more",
+      "unknown_token": "Unknown Token"
+    },
+    "button": {
+      "connect_metamask": "Connect to Metamask",
+      "send": "Send",
+      "receive": "Receive",
+      "close": "Close",
+      "cancel": "Cancel",
+      "go_back": "Go Back",
+      "send_another": "Send Another",
+      "notify_me": "Notify me"
+    },
+    "input": {
+      "recipient_address": "Recipient Address",
+      "private_key": "Private Key",
+      "crypto_amount": "Amount",
+      "email": "Email",
+      "password": "Password",
+      "input_text": "Input",
+      "email_placeholder": "your@email.com",
+      "password_placeholder": "••••••••••",
+      "input_placeholder": "Type here"
+    },
+    "modal": {
+      "receive_title": "Receive to {{walletName}}",
+      "send_title": "Send from {{walletName}}",
+      "approve_tx": "Approve transaction on {{walletType}}",
+      "confirm_tx": "Confirm transaction from {{walletName}}",
+      "invalid_address": "Invalid Address",
+      "maximum_balance": "Send max",
+      "default_wallet": " Wallet",
+      "gas_slow": "Slow",
+      "gas_average": "Average",
+      "gas_fast": "Fast",
+      "gas_fee": "Fee",
+      "tx_confirm_sender": "Sender",
+      "tx_confirm_recipient": "Recipient",
+      "tx_confirm_amount": "Amount",
+      "tx_confirm_fee": "Transaction Fee",
+      "tx_hash": "Transaction Hash",
+      "tx_verify": "Verify your transaction here"
+    },
+    "time": {
+      "ms": "ms",
+      "milisecond": "milisecond",
+      "miliseconds": "miliseconds",
+      "s": "s",
+      "sec": "sec",
+      "secs": "secs",
+      "second": "second",
+      "seconds": "seconds",
+      "min": "min",
+      "mins": "mins",
+      "minute": "minute",
+      "minutes": "minutes",
+      "hr": "hr",
+      "hrs": "hrs",
+      "hour": "hour",
+      "hours": "hours",
+      "day": "day",
+      "days": "days"
+    },
+    "message": {
+      "web3_not_available": "Please install Metamask chrome extension",
+      "web3_not_unlocked": "Please unlock your Metamask",
+      "web3_unknown_network": "Unknown network, please switch to another one",
+      "page_not_found": "404 Page Not Found",
+      "coming_soon": "Coming soon..",
+      "click_to_copy_to_clipboard": "Click to copy to clipboard"
+    },
+    "notification": {
+      "error": {
+        "invalid_address": "Address is invalid, please check again",
+        "insufficient_balance": "Insufficient balance in this account",
+        "insufficient_for_fees": "Insufficient balance to cover transaction fees",
+        "invalid_address_scanned": "Invalid Address Scanned, please try again",
+        "invalid_private_key_scanned": "Invalid Private Key Scanned, please try again",
+        "failed_scanning_qr_code": "Failed to scan QR code, please try again",
+        "failed_get_gas_prices": "Failed to get Ethereum Gas prices",
+        "failed_get_tx_fee": "Failed to estimate Transaction fee",
+        "generic_error": "Something went wrong, please try again"
+      },
+      "info": {
+        "address_copied_to_clipboard": "Address copied to clipboard"
+      }
+    },
+    "warning": {
+      "user_is_offline": "Connection offline, please check your internet connection",
+      "user_is_online": "Connected! You're back online"
+    },
+    "subscribe_form": {
+      "email_already_subscribed": "Sorry, you've already signed up with this email",
+      "too_many_signup_request": "Too many signup requests, please try again later",
+      "successful": "Check your email",
+      "sending": "Sending...",
+      "generic_error": "Oops, something went wrong"
+    }
+  }
+}

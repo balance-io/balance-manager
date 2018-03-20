@@ -1,5 +1,6 @@
 import { apiGetGasPrices } from '../helpers/api';
 import { notificationShow } from './_notification';
+import lang from '../languages';
 import { fromWei, convertFromNativeValue, convertToNativeValue } from '../helpers/utilities';
 import { parseError } from '../helpers/parsers';
 import {
@@ -65,7 +66,7 @@ export const sendGetGasPrices = () => (dispatch, getState) => {
     })
     .catch(error => {
       console.error(error);
-      dispatch(notificationShow(`Failed to get Ethereum Gas prices`, true));
+      dispatch(notificationShow(lang.t('notification.error.failed_get_gas_prices'), true));
       dispatch({ type: SEND_GET_GAS_PRICES_FAILURE });
     });
 };
@@ -85,7 +86,7 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     )
     .catch(error => {
       console.error(error);
-      dispatch(notificationShow(`Failed to estimate Transaction fee`, true));
+      dispatch(notificationShow(lang.t('notification.error.failed_get_tx_fee'), true));
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_FAILURE,
         payload: { txFee: '', gasPrice: _gasPrice, gasPriceOption: _gasPriceOption }

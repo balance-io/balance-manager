@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import jsonp from 'jsonp';
+import lang from '../languages';
 import Button from './Button';
 import arrowLeft from '../assets/arrow-left.svg';
 import { fonts, colors, responsive, shadows, transitions } from '../styles';
@@ -104,16 +105,16 @@ class SubscribeForm extends Component {
             });
           } else if (data.result !== 'success') {
             if (data.msg.includes('already subscribed')) {
-              error = { message: 'EMAIL_ALREADY_SUBCRIBED' };
+              error = { message: 'EMAIL_ALREADY_SUBSCRIBED' };
               this.setState({
                 status: 'error',
-                message: `Sorry, you've already signed up with this email`
+                message: lang.t('subscribe_form.email_already_subscribed')
               });
             } else if (data.msg.includes('too many recent signup requests')) {
               error = { message: 'TOO_MANY_SIGNUP_REQUESTS' };
               this.setState({
                 status: 'error',
-                message: `Too many signup requests, please try again later`
+                message: lang.t('subscribe_form.email_already_subscribed')
               });
             } else {
               error = { message: 'UNKNOWN_ERROR' };
@@ -133,7 +134,6 @@ class SubscribeForm extends Component {
   };
   getEmailClient = () => this.state.input.match(/@(\w|.)+/gi)[0].replace('@', '');
   render() {
-    const { messages, ...props } = this.props;
     return (
       <SFormWrapper success={this.state.status === 'success'}>
         <SForm
@@ -141,12 +141,11 @@ class SubscribeForm extends Component {
           onSubmit={this.onSubmit}
           method="POST"
           noValidate
-          {...props}
         >
           {this.state.status === 'success' && (
             <SSuccess>
               <a href={`https://${this.getEmailClient()}`} target="_blank">
-                {this.props.messages.success}
+                {lang.t('subscribe_form.successful')}
               </a>
             </SSuccess>
           )}
@@ -155,19 +154,19 @@ class SubscribeForm extends Component {
             onChange={e => this.setState({ status: null, input: e.target.value })}
             type="email"
             required
-            placeholder={messages.inputPlaceholder}
+            placeholder={lang.t('input.email_placeholder')}
           />
           {this.state.status !== 'success' && (
             <StyledSubmit color="blue" icon={arrowLeft} type="submit">
-              {this.props.messages.buttonText}
+              {lang.t('button.notify_me')}
             </StyledSubmit>
           )}
           {this.state.status === 'sending' && (
-            <SMessage color={colors.white}>{messages.sending}</SMessage>
+            <SMessage color={colors.white}>{lang.t('subscribe_form.sending')}</SMessage>
           )}
           {this.state.status === 'error' && (
             <SMessage color={colors.red}>
-              {this.state.message ? this.state.message : messages.error}
+              {this.state.message ? this.state.message : lang.t('subscribe_form.generic_error')}
             </SMessage>
           )}
         </SForm>
@@ -178,7 +177,6 @@ class SubscribeForm extends Component {
 
 SubscribeForm.propTypes = {
   options: PropTypes.objectOf(PropTypes.string),
-  messages: PropTypes.objectOf(PropTypes.string),
   callback: PropTypes.func
 };
 
@@ -188,13 +186,6 @@ SubscribeForm.defaultProps = {
     userId: 'a3f87e208a9f9896949b4f336',
     listId: 'fba5aad751',
     origin: ''
-  },
-  messages: {
-    buttonText: `Notify me`,
-    inputPlaceholder: 'your@email.com',
-    sending: 'Sending...',
-    success: 'Check your email',
-    error: 'Oops, something went wrong'
   },
   callback: () => {}
 };

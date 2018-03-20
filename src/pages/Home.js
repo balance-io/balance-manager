@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
+import lang from '../languages';
 import Link from '../components/Link';
 import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
@@ -56,7 +57,7 @@ const Home = ({ accountConnectMetamask, ...props }) => (
           <MetamaskLogo />
           <Link to="/metamask">
             <Button left color="orange" icon={metamaskWhite} onClick={accountConnectMetamask}>
-              Connect to Metamask
+              {lang.t('button.connect_metamask')}
             </Button>
           </Link>
         </StyledMetamaskConnect>

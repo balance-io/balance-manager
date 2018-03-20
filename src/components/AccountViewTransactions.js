@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import lang from '../languages';
 import Card from './Card';
 import CryptoIcon from './CryptoIcon';
 import { colors, fonts, shadows, responsive } from '../styles';
@@ -144,11 +145,11 @@ const AccountViewTransactions = ({
     (!fetchingTransactions ? (
       <StyledGrid>
         <StyledLabelsRow>
-          <StyledLabels>Asset</StyledLabels>
-          <StyledLabels>Quantity</StyledLabels>
-          <StyledLabels>Price</StyledLabels>
-          <StyledLabels>Status</StyledLabels>
-          <StyledLabels>Total</StyledLabels>
+          <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
+          <StyledLabels>{lang.t('account.label_quantity')}</StyledLabels>
+          <StyledLabels>{lang.t('account.label_price')}</StyledLabels>
+          <StyledLabels>{lang.t('account.label_status')}</StyledLabels>
+          <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
         </StyledLabelsRow>
 
         {transactions.map((tx, idx) => {
@@ -162,7 +163,11 @@ const AccountViewTransactions = ({
               <p>{`${tx.value} ${tx.crypto.symbol}`}</p>
               <p>{tx.price || '---'}</p>
               <StyledTransactionType>
-                {!tx.error ? (tx.from === accountAddress ? 'Sent' : 'Received') : 'Failed'}
+                {!tx.error
+                  ? tx.from === accountAddress
+                    ? lang.t('account.tx_sent')
+                    : lang.t('account.tx_received')
+                  : lang.t('account.tx_failed')}
               </StyledTransactionType>
               <p>
                 {tx.total ? (tx.from === accountAddress ? `- ${tx.total}` : `${tx.total}`) : '---'}
@@ -172,7 +177,7 @@ const AccountViewTransactions = ({
         })}
         {limitTransactions < transactions.length && (
           <StyledShowMoreTransactions onClick={onShowMoreTransactions}>
-            <p>{`Show more`}</p>
+            <p>{lang.t('account.show_more')}</p>
           </StyledShowMoreTransactions>
         )}
       </StyledGrid>

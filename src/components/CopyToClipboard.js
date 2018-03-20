@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import lang from '../languages';
 import clipboardIcon from '../assets/clipboard.png';
 import { notificationShow } from '../reducers/_notification';
 import { fonts, colors, transitions, responsive } from '../styles';
@@ -104,7 +105,7 @@ class CopyToClipboard extends Component {
     target.select();
     document.execCommand('Copy');
     target.blur();
-    this.props.notificationShow(`Address copied to clipboard`);
+    this.props.notificationShow(lang.t('notification.info.address_copied_to_clipboard'));
   };
   render() {
     const { notificationShow, iconOnHover, text, ...props } = this.props;
@@ -113,7 +114,7 @@ class CopyToClipboard extends Component {
         <StyledContainer>
           <StyledInvisible>{text}</StyledInvisible>
           <StyledInput value={text} onChange={() => {}} onClick={this.copyToCopyToClipboard} />
-          <StyledText>Click to copy to clipboard</StyledText>
+          <StyledText>{lang.t('message.click_to_copy_to_clipboard')}</StyledText>
           <StyledIcon src={clipboardIcon} alt="copy" />
         </StyledContainer>
       </StyledCopyToClipboard>

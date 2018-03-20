@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import lang, { resources } from './languages';
 import Home from './pages/Home';
 import Wallet from './pages/Wallet';
 import Metamask from './pages/Metamask';
@@ -9,6 +10,13 @@ import Trezor from './pages/Trezor';
 import NotFound from './pages/NotFound';
 
 class Router extends Component {
+  componentWillMount() {
+    lang.init({
+      lng: 'en',
+      debug: process.env.NODE_ENV === 'development',
+      resources
+    });
+  }
   componentDidMount() {
     window.browserHistory = this.context.router.history;
   }

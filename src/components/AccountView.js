@@ -118,7 +118,6 @@ class AccountView extends Component {
   };
   componentWillMount() {
     const tabName = this.nestedRouter({ tabName: null });
-    console.log(tabName);
     this.setState({ tabName });
   }
   nestedRouter = ({ tabName }) => {

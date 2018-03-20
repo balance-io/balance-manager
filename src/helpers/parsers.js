@@ -1,4 +1,4 @@
-import errors from '../libraries/errors.json';
+import lang from '../languages';
 import {
   convertToNativeString,
   convertToNativeValue,
@@ -25,13 +25,8 @@ export const parseError = error => {
     const msgEnd = msgWhole.indexOf('\n');
     const message = msgWhole.slice(msgStart + 2, msgEnd);
     return message;
-  } else if (error.error && error.message) {
-    return errors[error.message];
-  } else if (!error.response || !errors[error.response.data.message]) {
-    console.error(error);
-    return `Something went wrong, please try again`;
   }
-  return errors[error.response.data.message];
+  return lang.t('notification.generic_error');
 };
 
 /**
@@ -79,7 +74,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
     const tokens = data.tokens.map(token => {
       const balance = convertTokenAmountToUnit(token.balance, Number(token.tokenInfo.decimals));
       return {
-        name: token.tokenInfo.name || 'Unknown Token',
+        name: token.tokenInfo.name || lang.t('account.unknown_token'),
         symbol: token.tokenInfo.symbol || '---',
         address: token.tokenInfo.address,
         decimals: Number(token.tokenInfo.decimals),

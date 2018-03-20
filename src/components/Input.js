@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import lang from '../languages';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledInputWrapper = styled.div`
@@ -49,22 +50,22 @@ const Input = ({ label, type, placeholder, monospace, ...props }) => {
   let _placeholder = placeholder;
   if (!label) {
     if (type === 'email') {
-      _label = 'Email';
-      _placeholder = 'your@email.com';
+      _label = lang.t('input.email');
+      _placeholder = lang.t('input.email_placeholder');
     } else if (type === 'password') {
-      _label = 'Password';
-      _placeholder = 'your@email.com';
+      _label = lang.t('input.password');
+      _placeholder = lang.t('input.password_placeholder');
     } else if (type === 'text') {
-      _label = 'Input';
+      _label = lang.t('input.input_text');
     }
   }
   if (!placeholder) {
     if (type === 'email') {
-      _placeholder = 'your@email.com';
+      _placeholder = lang.t('input.email_placeholder');
     } else if (type === 'password') {
-      _placeholder = '••••••••••';
+      _placeholder = lang.t('input.password_placeholder');
     } else if (type === 'text') {
-      _placeholder = 'Type here';
+      _placeholder = lang.t('input.input_placeholder');
     }
   }
   return (

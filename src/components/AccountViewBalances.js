@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import lang from '../languages';
 import CryptoIcon from './CryptoIcon';
-
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
@@ -18,7 +18,7 @@ const StyledRow = styled.div`
   position: relative;
   padding: 20px;
   z-index: 0;
-  grid-template-columns: repeat(4, 150px) auto;
+  grid-template-columns: repeat(5, 1fr);
   & p {
     display: flex;
     align-items: center;
@@ -167,17 +167,17 @@ const AccountViewBalances = ({
   return (
     <StyledGrid {...props}>
       <StyledLabelsRow>
-        <StyledLabels>Asset</StyledLabels>
-        <StyledLabels>Quantity</StyledLabels>
-        <StyledLabels>Price</StyledLabels>
-        <StyledLabels>24H</StyledLabels>
-        <StyledLabels>Total</StyledLabels>
+        <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
+        <StyledLabels>{lang.t('account.label_quantity')}</StyledLabels>
+        <StyledLabels>{lang.t('account.label_price')}</StyledLabels>
+        <StyledLabels>{lang.t('account.label_24h')}</StyledLabels>
+        <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
       </StyledLabelsRow>
 
       <StyledEthereum>
         <StyledAsset>
           <CryptoIcon currency={ethereum.symbol} />
-          <p>{'Ethereum'}</p>
+          <p>{ethereum.name}</p>
         </StyledAsset>
         <p>{`${ethereum.balance} ${ethereum.symbol}`}</p>
         <p>{ethereum.native && ethereum.native.price ? ethereum.native.price : '---'}</p>
@@ -225,16 +225,16 @@ const AccountViewBalances = ({
         ))}
       {!!tokensWithNoValue.length && (
         <StyledShowMoreTokens>
-          <p onClick={onShowTokensWithNoValue}>{`${showTokensWithNoValue ? `Hide` : `Show`} ${
-            tokensWithNoValue.length
-          } tokens with no market value`}</p>
+          <p onClick={onShowTokensWithNoValue}>{`${
+            showTokensWithNoValue ? lang.t('account.hide') : lang.t('account.show')
+          } ${tokensWithNoValue.length} ${lang.t('account.no_market_value')}`}</p>
         </StyledShowMoreTokens>
       )}
       <StyledMiddleRow>
         <p> </p>
         <p> </p>
         <p> </p>
-        <p>{`Balance`}</p>
+        <p>{lang.t('account.total_balance')}</p>
         <p>{`${account.totalNative || '---'}`}</p>
       </StyledMiddleRow>
     </StyledGrid>

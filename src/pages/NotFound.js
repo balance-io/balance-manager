@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import lang from '../languages';
 import BaseLayout from '../layouts/base';
 import Link from '../components/Link';
 
@@ -18,7 +19,7 @@ const NotFound = () => (
   <BaseLayout>
     <StyledWrapper>
       <Link to="/">
-        <h3>404 Page Not Found</h3>
+        <h3>{lang.t('message.page_not_found')}</h3>
       </Link>
     </StyledWrapper>
   </BaseLayout>

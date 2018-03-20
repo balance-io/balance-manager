@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
+import lang from '../languages';
 import QRCodeReader from '../components/QRCodeReader';
 import Card from '../components/Card';
 import Input from '../components/Input';
@@ -315,17 +316,17 @@ class SendModal extends Component {
       this.props.sendToggleConfirmationView(true);
     } else if (!this.props.confirm) {
       if (!isValidAddress(this.props.recipient)) {
-        this.props.notificationShow(`Address is invalid, please check again`, true);
+        this.props.notificationShow(lang.t('notification.error.invalid_address'), true);
         return;
       } else if (this.props.selected.symbol === 'ETH') {
         const balance = Number(this.props.modalProps.balance);
         const requestedAmount = Number(this.props.cryptoAmount);
         const includingFees = requestedAmount + Number(this.props.txFee);
         if (requestedAmount > balance) {
-          this.props.notificationShow(`Insufficient balance in this account`, true);
+          this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
         } else if (includingFees > balance) {
-          this.props.notificationShow(`Insufficient balance to cover transaction fees`, true);
+          this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
       } else {
@@ -334,10 +335,10 @@ class SendModal extends Component {
         const requestedAmount = Number(this.props.cryptoAmount);
         const includingFees = Number(this.props.txFee);
         if (requestedAmount > tokenBalance) {
-          this.props.notificationShow(`Insufficient balance in this account`, true);
+          this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
         } else if (includingFees > etherBalance) {
-          this.props.notificationShow(`Insufficient balance to cover transaction fees`, true);
+          this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
       }
@@ -357,13 +358,13 @@ class SendModal extends Component {
       const data = rawData.match(/0x\w{40}/g) ? rawData.match(/0x\w{40}/g)[0] : null;
       const result = data ? isValidAddress(data) : false;
       const onError = () =>
-        this.props.notificationShow(`Invalid Address Scanned, please try again`, true);
+        this.props.notificationShow(lang.t('notification.error.invalid_address_scanned'), true);
       return { data, result, onError };
     } else if (this.state.QRCodeReaderTarget === 'privateKey') {
       const data = rawData.match(/0x\w{64}/g) ? rawData.match(/0x\w{64}/g)[0] : null;
       const result = !!data;
       const onError = () =>
-        this.props.notificationShow(`Invalid Private Key Scanned, please try again`, true);
+        this.props.notificationShow(lang.t('notification.error.invalid_private_key_scanned'), true);
       return { data, result, onError };
     }
   };
@@ -376,7 +377,7 @@ class SendModal extends Component {
     this.setState({ showQRCodeReader: false, QRCodeReaderTarget: '' });
   };
   onQRCodeError = () => {
-    this.props.notificationShow(`Failed to scan QR code, please try again`, true);
+    this.props.notificationShow(lang.t('notification.error.failed_scanning_qr_code'), true);
   };
   onClose = () => {
     this.props.sendClearFields();
@@ -390,7 +391,9 @@ class SendModal extends Component {
             <Form onSubmit={this.onSubmit}>
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
-                {`Send from ${capitalize(this.props.modalProps.name)}`}
+                {lang.t('modal.receive_title', {
+                  walletName: capitalize(this.props.modalProps.name)
+                })}
               </StyledSubTitle>
 
               <div>
@@ -404,7 +407,7 @@ class SendModal extends Component {
               <StyledFlex>
                 <Input
                   monospace
-                  label="Recipient Address"
+                  label={lang.t('input.recipient_address')}
                   spellCheck="false"
                   placeholder="0x..."
                   type="text"
@@ -417,7 +420,7 @@ class SendModal extends Component {
                 />
                 {this.props.recipient &&
                   !this.state.isValidAddress && (
-                    <StyledInvalidAddress>Invalid Address</StyledInvalidAddress>
+                    <StyledInvalidAddress>{lang.t('modal.invalid_address')}</StyledInvalidAddress>
                   )}
                 <StyledQRIcon onClick={() => this.toggleQRCodeReader('recipient')}>
                   <img src={qrIcon} alt="recipient" />
@@ -428,7 +431,7 @@ class SendModal extends Component {
                 <StyledFlex>
                   <Input
                     monospace
-                    label="Amount"
+                    label={lang.t('input.crypto_amount')}
                     placeholder="0.0"
                     type="text"
                     value={this.props.cryptoAmount}
@@ -440,7 +443,9 @@ class SendModal extends Component {
                       )
                     }
                   />
-                  <StyledMaxBalance onClick={this.onSendEntireBalance}>Send max</StyledMaxBalance>
+                  <StyledMaxBalance onClick={this.onSendEntireBalance}>
+                    {lang.t('modal.maximum_balance')}
+                  </StyledMaxBalance>
                   <StyledAmountCurrency>{this.props.selected.symbol}</StyledAmountCurrency>
                 </StyledFlex>
                 <StyledFlex>
@@ -470,7 +475,7 @@ class SendModal extends Component {
                 <StyledFlex>
                   <Input
                     monospace
-                    placeholder="Private Key"
+                    placeholder={lang.t('input.private_key')}
                     type="text"
                     value={this.props.privateKey}
                     onChange={({ target }) => this.props.sendUpdatePrivateKey(target.value)}
@@ -494,7 +499,7 @@ class SendModal extends Component {
               />
               <StyledGasOptions>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('safeLow')}>
-                  <p>{`Slow: ${convertToNativeString(
+                  <p>{`${lang.t('modal.gas_slow')}: ${convertToNativeString(
                     fromWei((this.props.gasPrices.safeLow || 0) * 21000 * 10 ** 9),
                     'ETH',
                     this.props.modalProps.prices
@@ -502,7 +507,7 @@ class SendModal extends Component {
                   <p>{`~ ${getTimeString(this.props.gasPrices.safeLowWait || 0, 'minutes')}`}</p>
                 </StyledGasButton>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('average')}>
-                  <p>{`Average: ${convertToNativeString(
+                  <p>{`${lang.t('modal.gas_average')}: ${convertToNativeString(
                     fromWei((this.props.gasPrices.average || 0) * 21000 * 10 ** 9),
                     'ETH',
                     this.props.modalProps.prices
@@ -510,7 +515,7 @@ class SendModal extends Component {
                   <p>{`~ ${getTimeString(this.props.gasPrices.avgWait || 0, 'minutes')}`}</p>
                 </StyledGasButton>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('fast')}>
-                  <p>{`Fast: ${convertToNativeString(
+                  <p>{`${lang.t('modal.gas_fast')}: ${convertToNativeString(
                     fromWei((this.props.gasPrices.fast || 0) * 21000 * 10 ** 9),
                     'ETH',
                     this.props.modalProps.prices
@@ -521,9 +526,9 @@ class SendModal extends Component {
               <LineBreak noMargin />
               <StyledBottomModal>
                 <StyledActions>
-                  <Button onClick={this.onClose}>Cancel</Button>
+                  <Button onClick={this.onClose}>{lang.t('button.cancel')}</Button>
                   <StyledParagraph>
-                    {`Fee:`}
+                    {`${lang.t('modal.gas_fee')}:`}
                     {this.props.txFee
                       ? ` ${BigNumber(this.props.txFee).toFormat(6)} ETH (${convertToNativeString(
                           this.props.txFee,
@@ -543,7 +548,7 @@ class SendModal extends Component {
                     }
                     type="submit"
                   >
-                    Send
+                    {lang.t('button.send')}
                   </Button>
                 </StyledActions>
               </StyledBottomModal>
@@ -571,29 +576,29 @@ class SendModal extends Component {
                 }
               })()}
               <StyledParagraph>
-                {`Approve transaction on ${capitalize(this.props.modalProps.type)}`}
+                {lang.t('modal.approve_tx', { walletType: capitalize(this.props.modalProps.type) })}
               </StyledParagraph>
               <StyledActions single>
-                <Button onClick={this.onClose}>Close</Button>
+                <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
               </StyledActions>
             </StyledApproveTransaction>
           ) : (
             <Form onSubmit={this.onSubmit}>
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
-                {`Confirm transaction from ${capitalize(this.props.modalProps.name)}`}
+                {lang.t('modal.confirm_tx', { walletName: capitalize(this.props.modalProps.name) })}
               </StyledSubTitle>
               <div>
                 <StyledParagraph>
-                  <strong>Sender:</strong>
+                  <strong>{`${lang.t('modal.tx_confirm_sender')}:`}</strong>
                   {` ${this.props.modalProps.address}`}
                 </StyledParagraph>
                 <StyledParagraph>
-                  <strong>Recipient:</strong>
+                  <strong>{`${lang.t('modal.tx_confirm_recipient')}:`}</strong>
                   {` ${this.props.recipient}`}
                 </StyledParagraph>
                 <StyledParagraph>
-                  <strong>Amount:</strong>
+                  <strong>{`${lang.t('modal.tx_confirm_amount')}:`}</strong>
                   {this.props.cryptoAmount &&
                     ` ${BigNumber(this.props.cryptoAmount).toFormat(6)} ${
                       this.props.selected.symbol
@@ -612,7 +617,7 @@ class SendModal extends Component {
                     }`}
                 </StyledParagraph>
                 <StyledParagraph>
-                  <strong>Transaction Fee:</strong>
+                  <strong>{`${lang.t('modal.tx_confirm_fee')}:`}</strong>
                   {this.props.txFee &&
                     ` ${BigNumber(this.props.txFee).toFormat(6)} ETH (${convertToNativeString(
                       this.props.txFee,
@@ -623,9 +628,9 @@ class SendModal extends Component {
               </div>
 
               <StyledActions>
-                <Button onClick={this.onGoBack}>Go Back</Button>
+                <Button onClick={this.onGoBack}>{lang.t('button.go_back')}</Button>
                 <Button left color="blue" icon={arrowUp} type="submit">
-                  Send
+                  {lang.t('button.send')}
                 </Button>
               </StyledActions>
             </Form>
@@ -638,25 +643,24 @@ class SendModal extends Component {
             </StyledSubTitle>
             <div>
               <StyledParagraph>
-                <strong>Transaction Hash:</strong>
+                <strong>{`${lang.t('modal.tx_hash')}:`}</strong>
               </StyledParagraph>
               <StyledHash>{` ${this.props.transaction}`}</StyledHash>
             </div>
             <StyledParagraph>
-              You can verify your transaction{' '}
               <a
                 href={`https://${
                   this.props.web3Network !== 'mainnet' ? `${this.props.web3Network}.` : ''
                 }etherscan.io/tx/${this.props.transaction}`}
                 target="_blank"
               >
-                here
+                {lang.t('modal.tx_verify')}
               </a>
             </StyledParagraph>
             <StyledActions>
-              <Button onClick={this.onSendAnother}>Send another</Button>
+              <Button onClick={this.onSendAnother}>{lang.t('button.send_another')}</Button>
               <Button color="red" onClick={this.onClose}>
-                Close
+                {lang.t('button.close')}
               </Button>
             </StyledActions>
           </StyledSuccessMessage>

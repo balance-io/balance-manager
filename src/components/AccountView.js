@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import Link from './Link';
 import Card from './Card';
 import Button from './Button';
 import Dropdown from './Dropdown';
@@ -111,7 +113,6 @@ const StyledDropdownWrapper = styled.div`
 
 class AccountView extends Component {
   state = {
-    activeTab: 'BALANCES_TAB',
     openSettings: false,
     showTokensWithNoValue: false,
     limitTransactions: 10
@@ -126,7 +127,10 @@ class AccountView extends Component {
     if (this.state.limitTransactions > this.props.transactions.length) return null;
     this.setState({ limitTransactions: this.state.limitTransactions + 10 });
   };
-  onChangeTabs = tabName => this.setState({ activeTab: tabName });
+  onChangeTabs = tabName => {
+    this.nestedRouter({ tabName });
+    this.setState({ activeTab: tabName });
+  };
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
       name: this.props.account.name || `${this.props.account.type} Wallet`,
@@ -140,30 +144,6 @@ class AccountView extends Component {
       name: this.props.account.name || `${this.props.account.type} Wallet`,
       address: this.props.account.address
     });
-  renderTabView = () => {
-    switch (this.state.activeTab) {
-      case 'BALANCES_TAB':
-        return (
-          <AccountViewBalances
-            onShowTokensWithNoValue={this.onShowTokensWithNoValue}
-            showTokensWithNoValue={this.state.showTokensWithNoValue}
-            account={this.props.account}
-          />
-        );
-      case 'TRANSACTIONS_TAB':
-        return (
-          <AccountViewTransactions
-            onShowMoreTransactions={this.onShowMoreTransactions}
-            fetchingTransactions={this.props.fetchingTransactions}
-            limitTransactions={this.state.limitTransactions}
-            accountAddress={this.props.account.address}
-            transactions={this.props.transactions}
-          />
-        );
-      default:
-        return <div />;
-    }
-  };
   shouldComponentUpdate(nextProps) {
     if (
       nextProps.nativeCurrency !== this.props.nativeCurrency &&
@@ -194,10 +174,12 @@ class AccountView extends Component {
             </StyledTop>
             <StyledTabMenu>
               <StyledTabsWrapper>
-                <StyledTab onClick={() => this.onChangeTabs('BALANCES_TAB')}>Balances</StyledTab>
-                <StyledTab onClick={() => this.onChangeTabs('TRANSACTIONS_TAB')}>
-                  Transactions
-                </StyledTab>
+                <Link to={this.props.match.url}>
+                  <StyledTab>Balances</StyledTab>
+                </Link>
+                <Link to={`${this.props.match.url}/transactions`}>
+                  <StyledTab>Transactions</StyledTab>
+                </Link>
               </StyledTabsWrapper>
               <StyledDropdownWrapper>
                 <Dropdown
@@ -207,7 +189,33 @@ class AccountView extends Component {
                 />
               </StyledDropdownWrapper>
             </StyledTabMenu>
-            {this.renderTabView()}
+            <Switch>
+              <Route
+                exact
+                path={this.props.match.url}
+                render={routerProps => (
+                  <AccountViewBalances
+                    onShowTokensWithNoValue={this.onShowTokensWithNoValue}
+                    showTokensWithNoValue={this.state.showTokensWithNoValue}
+                    account={this.props.account}
+                  />
+                )}
+              />
+              <Route
+                exact
+                path={`${this.props.match.url}/transactions`}
+                render={routerProps => (
+                  <AccountViewTransactions
+                    onShowMoreTransactions={this.onShowMoreTransactions}
+                    fetchingTransactions={this.props.fetchingTransactions}
+                    limitTransactions={this.state.limitTransactions}
+                    accountAddress={this.props.account.address}
+                    transactions={this.props.transactions}
+                  />
+                )}
+              />
+              <Route render={() => <Redirect to={this.props.match.url} />} />
+            </Switch>
           </StyledFlex>
         </Card>
       </StyledAccountView>
@@ -223,7 +231,8 @@ AccountView.propTypes = {
   prices: PropTypes.object.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
   transactions: PropTypes.array.isRequired,
-  fetchingTransactions: PropTypes.bool.isRequired
+  fetchingTransactions: PropTypes.bool.isRequired,
+  match: PropTypes.object.isRequired
 };
 
 const reduxProps = ({ account }) => ({

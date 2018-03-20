@@ -46,7 +46,7 @@ class Metamask extends Component {
       <StyledWrapper>
         {this.props.fetching ||
         (this.props.web3Network && this.props.metamaskAccount && this.props.web3Available) ? (
-          <AccountView />
+          <AccountView match={this.props.match} />
         ) : (
           <Card fetching={this.props.fetching}>
             <StyledMessage>{this.renderMessage()}</StyledMessage>
@@ -67,7 +67,8 @@ Metamask.propTypes = {
   web3Network: PropTypes.string.isRequired,
   metamaskAccount: PropTypes.string.isRequired,
   fetching: PropTypes.bool.isRequired,
-  error: PropTypes.bool.isRequired
+  error: PropTypes.bool.isRequired,
+  match: PropTypes.object.isRequired
 };
 
 const reduxProps = ({ account }) => ({

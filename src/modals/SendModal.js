@@ -245,7 +245,7 @@ class SendModal extends Component {
     this.props.sendGetGasPrices();
   }
   state = {
-    isValidAddress: false,
+    isValidAddress: true,
     showQRCodeReader: false,
     QRCodeReaderTarget: ''
   };

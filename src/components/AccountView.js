@@ -11,12 +11,13 @@ import Dropdown from './Dropdown';
 import CopyToClipboard from './CopyToClipboard';
 import AccountViewBalances from './AccountViewBalances';
 import AccountViewTransactions from './AccountViewTransactions';
+import LineBreak from '../components/LineBreak';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
 import nativeCurrencies from '../libraries/native-currencies';
 import { accountChangeNativeCurrency } from '../reducers/_account';
 import { modalOpen } from '../reducers/_modal';
-import { colors, fonts, responsive } from '../styles';
+import { colors, fonts, responsive, shadows } from '../styles';
 
 const StyledAccountView = styled.div`
   width: 100%;
@@ -33,9 +34,10 @@ const StyledTop = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 15px 20px;
+  padding: 15px 20px 12px;
   & h6 {
     color: rgba(${colors.darkGrey}, 0.7);
+    font-size: ${fonts.size.small};
     font-weight: ${fonts.weight.semibold};
     margin-bottom: 4px;
   }
@@ -69,7 +71,7 @@ const StyledTabMenu = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 12px 20px 0;
 `;
 
 const StyledTabsWrapper = styled.div`
@@ -85,11 +87,10 @@ const StyledTab = styled(Button)`
   height: 100%;
   border-radius: 0;
   border: none;
-  background-color: transparent;
-  color: rgb(${colors.darkGrey});
-  border-width: 1px 1px 0 1px;
-  border-color: rgba(${colors.grey}, 0.7);
-  border-style: solid;
+  background-color: ${({ active }) => (active ? `rgB(${colors.white})` : 'transparent')};
+  color: ${({ active }) => (active ? `rgB(${colors.fadedBlue})` : `rgB(${colors.darkGrey})`)};
+  -webkit-box-shadow: ${shadows.medium};
+  box-shadow: ${shadows.medium};
   border-radius: 6px 6px 0 0;
   margin: 0;
   display: flex;
@@ -114,10 +115,24 @@ const StyledDropdownWrapper = styled.div`
 
 class AccountView extends Component {
   state = {
+    activeTab: 'BALANCES_TAB',
     openSettings: false,
     showTokensWithNoValue: false,
     limitTransactions: 10
   };
+  componentWillReceiveProps(newProps) {
+    const tabRoute = window.browserHistory.location.pathname.replace(newProps.match.url, '') || '/';
+    switch (tabRoute) {
+      case '/':
+        this.setState({ activeTab: 'BALANCES_TAB' });
+        break;
+      case '/transactions':
+        this.setState({ activeTab: 'TRANSACTIONS_TAB' });
+        break;
+      default:
+        break;
+    }
+  }
   toggleSettings = () => {
     this.setState({ openSettings: !this.state.openSettings });
   };
@@ -127,10 +142,6 @@ class AccountView extends Component {
   onShowMoreTransactions = () => {
     if (this.state.limitTransactions > this.props.transactions.length) return null;
     this.setState({ limitTransactions: this.state.limitTransactions + 10 });
-  };
-  onChangeTabs = tabName => {
-    this.nestedRouter({ tabName });
-    this.setState({ activeTab: tabName });
   };
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
@@ -158,7 +169,7 @@ class AccountView extends Component {
   render() {
     return (
       <StyledAccountView>
-        <Card fetching={this.props.fetching}>
+        <Card fetching={this.props.fetching} background={'lightGrey'}>
           <StyledFlex>
             <StyledTop>
               <StyledAddressWrapper>
@@ -175,13 +186,18 @@ class AccountView extends Component {
                 </Button>
               </StyledActions>
             </StyledTop>
+            <LineBreak noMargin />
             <StyledTabMenu>
               <StyledTabsWrapper>
                 <Link to={this.props.match.url}>
-                  <StyledTab>{lang.t('account.tab_balances')}</StyledTab>
+                  <StyledTab active={this.state.activeTab === 'BALANCES_TAB'}>
+                    {lang.t('account.tab_balances')}
+                  </StyledTab>
                 </Link>
                 <Link to={`${this.props.match.url}/transactions`}>
-                  <StyledTab>{lang.t('account.tab_transactions')}</StyledTab>
+                  <StyledTab active={this.state.activeTab === 'TRANSACTIONS_TAB'}>
+                    {lang.t('account.tab_transactions')}
+                  </StyledTab>
                 </Link>
               </StyledTabsWrapper>
               <StyledDropdownWrapper>

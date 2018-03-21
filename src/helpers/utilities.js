@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { web3Instance } from './web3';
 import lang from '../languages';
-import nativeCurrencies from '../libraries/native-currencies.js';
+import nativeCurrencies from '../libraries/native-currencies.json';
 
 /**
  * @desc save to local storage

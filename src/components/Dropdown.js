@@ -20,7 +20,7 @@ const StyledCaret = styled.img`
   height: 14px;
   mask: url(${caret}) center no-repeat;
   mask-size: 90%;
-  background-color: rgb(${colors.darkGrey});
+  background-color: rgb(${colors.dark});
 `;
 
 const StyledIcon = styled.div`
@@ -28,21 +28,21 @@ const StyledIcon = styled.div`
   width: 15px;
   mask: ${({ icon }) => (icon ? `url(${icon}) center no-repeat` : 'none')};
   mask-size: 60%;
-  background-color: ${({ iconColor }) => `rgb(${colors[iconColor]})`};
+  background-color: ${({ icon, iconColor }) =>
+    icon && iconColor ? `rgb(${colors[iconColor]})` : 'none'};
 `;
 
 const StyledRow = styled.div`
   border-radius: 6px;
   position: relative;
-  background: rgb(${colors.white});
-  color: rgb(${colors.darkGrey});
+  color: rgb(${colors.dark});
   font-size: ${fonts.size.small};
   font-weight: ${fonts.weight.medium};
   text-align: center;
   outline: none;
   & > div {
     cursor: ${({ noOptions }) => (noOptions ? 'auto' : 'pointer')};
-    padding: ${({ noOptions }) => (noOptions ? `8px` : `8px 26px 8px 8px`)};
+    padding: ${({ noOptions, icon }) => (noOptions ? `8px` : `8px 26px 8px 8px`)};
     background-size: 8px;
     display: flex;
     align-items: center;
@@ -60,6 +60,7 @@ const StyledRow = styled.div`
 
 const StyledSelected = styled(StyledRow)`
   outline: none;
+  background: transparent;
   border-radius: ${({ show }) => (show ? '6px 6px 0 0' : '6px')};
   & ${StyledCaret} {
     opacity: ${({ noOptions }) => (noOptions ? 0 : 1)};
@@ -69,7 +70,7 @@ const StyledSelected = styled(StyledRow)`
 const StyledDropdown = styled(StyledRow)`
   position: absolute;
   background: rgb(${colors.white});
-  color: rgb(${colors.grey});
+  color: rgb(${colors.darkGrey});
   border-radius: 0 0 6px 6px;
   width: 100%;
   top: 100%;
@@ -82,7 +83,7 @@ const StyledDropdown = styled(StyledRow)`
     border-top: 1px solid rgba(${colors.lightGrey}, 0.7);
   }
   & ${StyledIcon} {
-    background-color: rgb(${colors.grey});
+    background-color: ${({ icon }) => (icon ? `rgb(${colors.darkGrey})` : 'none')};
   }
 `;
 
@@ -150,7 +151,7 @@ Dropdown.propTypes = {
 Dropdown.defaultProps = {
   selected: null,
   onChange: null,
-  iconColor: 'darkGrey'
+  iconColor: 'dark'
 };
 
 export default Dropdown;

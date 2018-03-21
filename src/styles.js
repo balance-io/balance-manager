@@ -7,6 +7,7 @@ export const colors = {
   lightGrey: '245, 246, 250',
   blue: '89, 131, 255',
   lightBlue: '197, 242, 255',
+  fadedBlue: '103, 129, 230',
   gold: '250, 188, 45',
   orange: '246, 133, 27',
   green: '79, 180, 128',

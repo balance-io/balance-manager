@@ -20,7 +20,7 @@ const StyledCaret = styled.img`
   height: 14px;
   mask: url(${caret}) center no-repeat;
   mask-size: 90%;
-  background-color: rgb(${colors.dark});
+  background-color: ${({ dark }) => (dark ? `rgb(${colors.dark})` : `rgba(${colors.white}, 0.8)`)};
 `;
 
 const StyledIcon = styled.div`
@@ -28,11 +28,13 @@ const StyledIcon = styled.div`
   width: 15px;
   mask: ${({ icon }) => (icon ? `url(${icon}) center no-repeat` : 'none')};
   mask-size: 60%;
+  display: ${({ icon }) => (icon ? 'block' : 'none')};
   background-color: ${({ icon, iconColor }) =>
     icon && iconColor ? `rgb(${colors[iconColor]})` : 'none'};
 `;
 
 const StyledRow = styled.div`
+  min-width: 70px;
   border-radius: 6px;
   position: relative;
   color: rgb(${colors.dark});
@@ -61,6 +63,7 @@ const StyledRow = styled.div`
 const StyledSelected = styled(StyledRow)`
   outline: none;
   background: transparent;
+  color: ${({ dark }) => (dark ? `rgb(${colors.dark})` : `rgba(${colors.white}, 0.8)`)};
   border-radius: ${({ show }) => (show ? '6px 6px 0 0' : '6px')};
   & ${StyledCaret} {
     opacity: ${({ noOptions }) => (noOptions ? 0 : 1)};
@@ -86,6 +89,13 @@ const StyledDropdown = styled(StyledRow)`
   & > div {
     transition: ${transitions.base};
     border-top: 1px solid rgba(${colors.lightGrey}, 0.7);
+
+    padding: 6px;
+    width: auto;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+
     &:hover {
       opacity: 0.6;
     }
@@ -95,7 +105,7 @@ const StyledDropdown = styled(StyledRow)`
   }
 `;
 
-class Dropdown extends Component {
+class DropdownNative extends Component {
   state = {
     showDropdown: false
   };
@@ -111,12 +121,13 @@ class Dropdown extends Component {
     }
   };
   render() {
-    const { options, iconColor, selected, onChange, ...props } = this.props;
+    const { options, dark, iconColor, selected, onChange, ...props } = this.props;
     const _selected = selected || options[Object.keys(options)[0]].value;
     if (!options[_selected]) return null;
     return (
       <StyledWrapper {...props}>
         <StyledSelected
+          dark={dark}
           show={this.state.showDropdown}
           noOptions={!onChange || Object.keys(options).length < 2}
           onClick={this.toggleDropdown}
@@ -125,7 +136,7 @@ class Dropdown extends Component {
             <StyledIcon iconColor={iconColor} icon={options[_selected].icon} />
             <p>{options[_selected].value}</p>
           </div>
-          <StyledCaret />
+          <StyledCaret dark={dark} />
         </StyledSelected>
         <StyledDropdown
           show={this.state.showDropdown}
@@ -149,17 +160,19 @@ class Dropdown extends Component {
   }
 }
 
-Dropdown.propTypes = {
+DropdownNative.propTypes = {
   options: PropTypes.object.isRequired,
+  dark: PropTypes.bool,
   selected: PropTypes.string,
   onChange: PropTypes.func,
   iconColor: PropTypes.string
 };
 
-Dropdown.defaultProps = {
+DropdownNative.defaultProps = {
+  dark: false,
   selected: null,
   onChange: null,
   iconColor: 'dark'
 };
 
-export default Dropdown;
+export default DropdownNative;

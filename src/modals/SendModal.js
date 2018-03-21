@@ -264,9 +264,9 @@ class SendModal extends Component {
     }
   }
   onChangeSelected = value => {
-    let selected = this.props.modalProps.asset.filter(asset => asset.symbol === 'ETH')[0];
+    let selected = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
     if (value !== 'ETH') {
-      selected = this.props.modalProps.asset.filter(asset => asset.symbol === value)[0];
+      selected = this.props.modalProps.assets.filter(asset => asset.symbol === value)[0];
     }
     this.props.sendUpdateSelected(selected);
   };
@@ -281,7 +281,7 @@ class SendModal extends Component {
   };
   onSendEntireBalance = () => {
     if (this.props.selected.symbol === 'ETH') {
-      const ethereum = this.props.modalProps.asset.filter(asset => asset.symbol === 'ETH')[0];
+      const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
       const balanceWei = toWei(ethereum.balance);
       const txFeeWei = toWei(this.props.txFee);
       const remaining = balanceWei - txFeeWei;
@@ -403,7 +403,7 @@ class SendModal extends Component {
               <div>
                 <DropdownAsset
                   selected={this.props.selected.symbol}
-                  asset={this.props.modalProps.asset}
+                  assets={this.props.modalProps.assets}
                   onChange={this.onChangeSelected}
                 />
               </div>

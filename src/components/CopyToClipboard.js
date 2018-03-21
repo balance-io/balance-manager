@@ -32,6 +32,11 @@ const StyledText = styled.p`
 const StyledCopyToClipboard = styled.div`
   width: 100%;
   position: relative;
+`;
+
+const StyledContainer = styled.div`
+  position: relative;
+  display: inline;
   @media (hover: hover) {
     &:hover ${StyledIcon} {
       opacity: ${({ iconOnHover }) => (iconOnHover ? '1' : '0')};
@@ -42,15 +47,10 @@ const StyledCopyToClipboard = styled.div`
   }
 `;
 
-const StyledContainer = styled.div`
-  position: relative;
-  display: inline;
-`;
-
 const StyledInputText = styled.input`
   background-color: transparent;
   color: transparent;
-  text-shadow: 0 0 0 rgba(${colors.darkGrey}, 0.6);
+  text-shadow: 0 0 0 rgba(${colors.darkGrey}, 0.8);
 
   font-style: normal;
   font-stretch: normal;
@@ -58,9 +58,9 @@ const StyledInputText = styled.input`
   letter-spacing: normal;
   text-align: left;
 
-  font-weight: ${fonts.weight.normal};
-  font-size: ${fonts.size.h6};
-  font-family: ${fonts.family.SFProText};
+  font-weight: ${fonts.weight.medium};
+  font-size: ${fonts.size.medium};
+  font-family: ${fonts.family.SFMono};
   line-height: 1.25;
   @media screen and (${responsive.sm.max}) {
     font-size: ${fonts.size.small};
@@ -74,7 +74,7 @@ const StyledInput = styled(StyledInputText)`
   width: 100%;
   position: absolute;
   left: 0;
-  top: 0;
+  top: calc((100% - 1.25em) / 2)
   margin: 0;
   cursor: pointer;
   border: none;
@@ -104,8 +104,8 @@ class CopyToClipboard extends Component {
   render() {
     const { notificationShow, iconOnHover, text, ...props } = this.props;
     return (
-      <StyledCopyToClipboard iconOnHover={iconOnHover} {...props}>
-        <StyledContainer>
+      <StyledCopyToClipboard {...props}>
+        <StyledContainer iconOnHover={iconOnHover}>
           <StyledInvisible>{text}</StyledInvisible>
           <StyledInput value={text} onChange={() => {}} onClick={this.copyToCopyToClipboard} />
           <StyledText>{lang.t('message.click_to_copy_to_clipboard')}</StyledText>

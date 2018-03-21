@@ -7,17 +7,17 @@ import lang from '../languages';
 import Link from './Link';
 import Card from './Card';
 import Button from './Button';
-import Dropdown from './Dropdown';
 import CopyToClipboard from './CopyToClipboard';
 import AccountViewBalances from './AccountViewBalances';
 import AccountViewTransactions from './AccountViewTransactions';
+import balancesTabIcon from '../assets/balances-tab.svg';
+import transactionsTabIcon from '../assets/transactions-tab.svg';
 import LineBreak from '../components/LineBreak';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
-import nativeCurrencies from '../libraries/native-currencies';
-import { accountChangeNativeCurrency } from '../reducers/_account';
 import { modalOpen } from '../reducers/_modal';
-import { colors, fonts, responsive, shadows } from '../styles';
+import { capitalize } from '../helpers/utilities';
+import { colors, fonts, responsive, shadows, transitions } from '../styles';
 
 const StyledAccountView = styled.div`
   width: 100%;
@@ -36,10 +36,9 @@ const StyledTop = styled.div`
   justify-content: space-between;
   padding: 15px 20px 12px;
   & h6 {
-    color: rgba(${colors.darkGrey}, 0.7);
+    color: rgba(${colors.darkGrey}, 0.5);
     font-size: ${fonts.size.small};
     font-weight: ${fonts.weight.semibold};
-    margin-bottom: 4px;
   }
   @media screen and (${responsive.sm.max}) {
     padding: 16px;
@@ -106,18 +105,24 @@ const StyledTab = styled(Button)`
     box-shadow: none !important;
   }
 
+  & > div {
+    transition: ${transitions.base};
+    -webkit-mask-size: auto !important;
+    mask-size: auto !important;
+    background-color: ${({ active }) =>
+      active ? `rgb(${colors.fadedBlue})` : `rgb(${colors.darkGrey})`} !important;
+  }
+
   @media (hover: hover) {
     &:hover {
       color: ${({ active }) =>
         active ? `rgb(${colors.fadedBlue}, 0.7)` : `rgb(${colors.darkGrey}, 0.7)`};
+      & > div {
+        background-color: ${({ active }) =>
+          active ? `rgba(${colors.fadedBlue}, 0.7)` : `rgba(${colors.darkGrey}, 0.7)`} !important;
+      }
     }
   }
-`;
-
-const StyledDropdownWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
 `;
 
 class AccountView extends Component {
@@ -156,7 +161,7 @@ class AccountView extends Component {
         this.props.account.name || `${this.props.account.type}${lang.t('modal.default_wallet')}`,
       address: this.props.account.address,
       type: this.props.account.type,
-      asset: this.props.account.asset,
+      assets: this.props.account.assets,
       prices: this.props.prices
     });
   openReceiveModal = () =>
@@ -180,7 +185,7 @@ class AccountView extends Component {
           <StyledFlex>
             <StyledTop>
               <StyledAddressWrapper>
-                <h6>{lang.t('account.your_wallet_address')} </h6>
+                <h6>{capitalize(this.props.account.type)} </h6>
                 <CopyToClipboard iconOnHover text={this.props.account.address} />
               </StyledAddressWrapper>
 
@@ -197,23 +202,24 @@ class AccountView extends Component {
             <StyledTabMenu>
               <StyledTabsWrapper>
                 <Link to={this.props.match.url}>
-                  <StyledTab active={this.state.activeTab === 'BALANCES_TAB'}>
+                  <StyledTab
+                    active={this.state.activeTab === 'BALANCES_TAB'}
+                    icon={balancesTabIcon}
+                    left
+                  >
                     {lang.t('account.tab_balances')}
                   </StyledTab>
                 </Link>
                 <Link to={`${this.props.match.url}/transactions`}>
-                  <StyledTab active={this.state.activeTab === 'TRANSACTIONS_TAB'}>
+                  <StyledTab
+                    active={this.state.activeTab === 'TRANSACTIONS_TAB'}
+                    icon={transactionsTabIcon}
+                    left
+                  >
                     {lang.t('account.tab_transactions')}
                   </StyledTab>
                 </Link>
               </StyledTabsWrapper>
-              <StyledDropdownWrapper>
-                <Dropdown
-                  selected={this.props.nativeCurrency}
-                  options={nativeCurrencies}
-                  onChange={this.props.accountChangeNativeCurrency}
-                />
-              </StyledDropdownWrapper>
             </StyledTabMenu>
             <Switch>
               <Route
@@ -250,7 +256,6 @@ class AccountView extends Component {
 }
 
 AccountView.propTypes = {
-  accountChangeNativeCurrency: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
@@ -271,6 +276,7 @@ const reduxProps = ({ account }) => ({
 });
 
 export default connect(reduxProps, {
-  accountChangeNativeCurrency,
   modalOpen
 })(AccountView);
+
+connect({}, {})(AccountView);

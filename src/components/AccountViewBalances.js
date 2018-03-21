@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
 import AssetIcon from './AssetIcon';
+import balancesTabIcon from '../assets/balances-tab.svg';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
@@ -118,16 +119,19 @@ const StyledPercentage = styled.p`
       : `inherit`};
 `;
 
-const StyledMiddleRow = styled(StyledEthereum)`
+const StyledLastRow = styled(StyledRow)`
   width: 100%;
-  box-shadow: none;
+  z-index: 2;
   grid-template-columns: 1fr 1fr;
+  border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
+  & > p {
+    font-size: ${fonts.size.medium};
+    font-weight: ${fonts.weight.semibold};
+    font-family: ${fonts.family.SFMono};
+  }
   & > p:first-child {
     font-family: ${fonts.family.SFProText};
     justify-content: flex-start;
-  }
-  & > p {
-    font-size: ${fonts.size.medium};
   }
   @media screen and (${responsive.sm.max}) {
     & p {
@@ -139,6 +143,7 @@ const StyledMiddleRow = styled(StyledEthereum)`
 const StyledShowMoreTokens = styled(StyledToken)`
   grid-template-columns: auto;
   padding: 0;
+  position: relative;
   cursor: pointer;
   text-align: left;
   justify-content: flex-start;
@@ -146,6 +151,18 @@ const StyledShowMoreTokens = styled(StyledToken)`
   font-weight: ${fonts.weight.normal};
   font-size: ${fonts.size.h6};
   color: rgb(${colors.grey});
+  padding-left: 18px;
+
+  & div {
+    position: absolute;
+    position: absolute;
+    height: 14px;
+    width: 14px;
+    left: 0;
+    top: calc((100% - 16px) / 2);
+    mask: url(${balancesTabIcon}) center no-repeat;
+    background-color: rgb(${colors.grey});
+  }
   @media (hover: hover) {
     &:hover p {
       opacity: 0.7;
@@ -159,11 +176,11 @@ const AccountViewBalances = ({
   account,
   ...props
 }) => {
-  const ethereum = account.asset.filter(asset => asset.symbol === 'ETH')[0];
-  const tokensWithValue = account.asset.filter(
+  const ethereum = account.assets.filter(asset => asset.symbol === 'ETH')[0];
+  const tokensWithValue = account.assets.filter(
     asset => asset.symbol !== 'ETH' && (asset.native && asset.native.value)
   );
-  const tokensWithNoValue = account.asset.filter(
+  const tokensWithNoValue = account.assets.filter(
     asset => asset.symbol !== 'ETH' && (!asset.native || (asset.native && !asset.native.value))
   );
   return (
@@ -225,9 +242,10 @@ const AccountViewBalances = ({
             <p>{token.native && token.native.string ? token.native.string : '———'}</p>
           </StyledToken>
         ))}
-      <StyledMiddleRow>
+      <StyledLastRow>
         {!!tokensWithNoValue.length ? (
           <StyledShowMoreTokens onClick={onShowTokensWithNoValue}>
+            <div />
             {`${showTokensWithNoValue ? lang.t('account.hide') : lang.t('account.show')} ${
               tokensWithNoValue.length
             } ${lang.t('account.no_market_value')}`}
@@ -235,8 +253,8 @@ const AccountViewBalances = ({
         ) : (
           <div />
         )}
-        <p>{`${lang.t('account.total_balance')} ${account.totalNative || '———'}`}</p>
-      </StyledMiddleRow>
+        <p>{`${account.totalNative || '———'}`}</p>
+      </StyledLastRow>
     </StyledGrid>
   );
 };

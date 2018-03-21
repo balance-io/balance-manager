@@ -51,9 +51,9 @@ class QRCodeReader extends Component {
       }
     }
   };
-  handleError = err => {
-    console.error(err);
-    this.props.onError(err);
+  handleError = error => {
+    console.error(error);
+    this.props.onError(error);
   };
   onClose = () => {
     this.stopRecording();

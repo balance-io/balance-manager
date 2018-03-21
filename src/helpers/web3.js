@@ -1,6 +1,8 @@
 import Web3 from 'web3';
 import Tx from 'ethereumjs-tx';
 import BigNumber from 'bignumber.js';
+import lang from '../languages';
+import ethUnits from '../libraries/ethereum-units.json';
 import { isValidAddress } from './validators';
 import { getDataString, getNakedAddress, toWei, fromWei } from './utilities';
 
@@ -206,25 +208,36 @@ export const metamaskTransferToken = transaction =>
  * @param {Object} [{selected, address, recipient, amount, gasPrice}]
  * @return {String}
  */
-export const getTransactionFee = async ({ tokenObject, recipient, amount, gasPrice }) => {
+export const getTransactionFee = async ({ tokenObject, address, recipient, amount, gasPrice }) => {
+  let gasLimit = ethUnits.basic_tx;
+  let _gasPrice = gasPrice * ethUnits.gwei;
   let data = '0x';
-  let _amount = amount && Number(amount) ? amount : '100';
+  let _amount =
+    amount && Number(amount)
+      ? amount
+      : Number(Number(tokenObject.balance) / 2).toFixed(tokenObject.decimals);
   let _recipient =
     recipient && isValidAddress(recipient)
       ? recipient
       : '0x737e583620f4ac1842d4e354789ca0c5e0651fbb';
   let estimateGasData = { to: _recipient, data };
+  let tokenBalance =
+    tokenObject.symbol !== 'ETH' ? await getTokenBalanceOf(address, tokenObject.address) : null;
   if (tokenObject.symbol !== 'ETH') {
+    if (!Number.isNaN(Number(tokenBalance)) && Number(tokenBalance) === 0) {
+      throw new Error(lang.t('notification.error.insufficient_balance'));
+    } else if (tokenBalance) {
+      _amount = tokenBalance;
+    }
     const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
     const value = new BigNumber(_amount)
       .times(new BigNumber(10).pow(tokenObject.decimals))
       .toString(16);
     data = getDataString(transferHexMethod, [getNakedAddress(_recipient), value]);
-    estimateGasData = { to: tokenObject.address, data };
+    estimateGasData = { from: address, to: tokenObject.address, data, value: '0x0' };
+    gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
   }
-  const gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
-  const _gasPrice = gasPrice * 10 ** 9;
   const wei = String(gasLimit * _gasPrice);
   const txFee = fromWei(wei);
-  return txFee;
+  return { txFee, gasLimit };
 };

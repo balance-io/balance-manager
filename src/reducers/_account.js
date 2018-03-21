@@ -11,8 +11,9 @@ import {
   parsePricesObject,
   parseEthplorerAddressInfo
 } from '../helpers/parsers';
-import { warningOffline, warningOnline } from './_warning';
+import { saveLocal, getLocal } from '../helpers/utilities';
 import { web3SetProvider } from '../helpers/web3';
+import { warningOffline, warningOnline } from './_warning';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //
@@ -159,6 +160,7 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
 };
 
 export const accountChangeNativeCurrency = nativeCurrency => dispatch => {
+  saveLocal('native_currency', nativeCurrency);
   dispatch({
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
     payload: nativeCurrency
@@ -168,8 +170,8 @@ export const accountChangeNativeCurrency = nativeCurrency => dispatch => {
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
-  nativePriceRequest: 'USD',
-  nativeCurrency: 'USD',
+  nativePriceRequest: getLocal('native_currency') || 'USD',
+  nativeCurrency: getLocal('native_currency') || 'USD',
   prices: {},
   web3Connected: true,
   web3Available: false,

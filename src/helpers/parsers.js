@@ -169,6 +169,16 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
           decimals: !response.data.error ? Number(response.data.decimals) : 18
         };
 
+        /* STT token on Ropsten */
+        if (tx.to === '0xc55cf4b03948d7ebc8b9e8bad92643703811d162') {
+          asset = {
+            name: 'Status Test Token',
+            symbol: 'STT',
+            address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
+            decimals: 18
+          };
+        }
+
         const address = `0x${tx.input.slice(34, 74)}`;
         const amount = hexToNumberString(`${tx.input.slice(74)}`);
 

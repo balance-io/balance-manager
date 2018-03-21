@@ -248,6 +248,8 @@ const AccountViewBalances = ({
             <div />
             {`${showTokensWithNoValue ? lang.t('account.hide') : lang.t('account.show')} ${
               tokensWithNoValue.length
+            } ${
+              tokensWithNoValue.length === 1 ? lang.t('account.token') : lang.t('account.tokens')
             } ${lang.t('account.no_market_value')}`}
           </StyledShowMoreTokens>
         ) : (

@@ -64,7 +64,7 @@ const StyledSelected = styled(StyledRow)`
   outline: none;
   background: transparent;
   color: ${({ dark }) => (dark ? `rgb(${colors.dark})` : `rgba(${colors.white}, 0.8)`)};
-  border-radius: ${({ show }) => (show ? '6px 6px 0 0' : '6px')};
+  border-radius: 6px;
   & ${StyledCaret} {
     opacity: ${({ noOptions }) => (noOptions ? 0 : 1)};
   }
@@ -74,7 +74,7 @@ const StyledDropdown = styled(StyledRow)`
   position: absolute;
   background: rgb(${colors.white});
   color: rgb(${colors.darkGrey});
-  border-radius: 0 0 6px 6px;
+  border-radius: 6px;
   width: 100%;
   top: 100%;
   opacity: ${({ show }) => (show ? 1 : 0)};

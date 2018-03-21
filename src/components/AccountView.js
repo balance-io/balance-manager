@@ -87,8 +87,8 @@ const StyledTab = styled(Button)`
   height: 100%;
   border-radius: 0;
   border: none;
-  background-color: ${({ active }) => (active ? `rgB(${colors.white})` : 'transparent')};
-  color: ${({ active }) => (active ? `rgB(${colors.fadedBlue})` : `rgB(${colors.darkGrey})`)};
+  background-color: ${({ active }) => (active ? `rgb(${colors.white})` : 'transparent')};
+  color: ${({ active }) => (active ? `rgb(${colors.fadedBlue})` : `rgb(${colors.darkGrey})`)};
   -webkit-box-shadow: ${shadows.medium};
   box-shadow: ${shadows.medium};
   border-radius: 6px 6px 0 0;
@@ -104,6 +104,13 @@ const StyledTab = styled(Button)`
     opacity: 1 !important;
     outline: none !important;
     box-shadow: none !important;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      color: ${({ active }) =>
+        active ? `rgb(${colors.fadedBlue}, 0.7)` : `rgb(${colors.darkGrey}, 0.7)`};
+    }
   }
 `;
 

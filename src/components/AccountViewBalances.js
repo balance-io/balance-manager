@@ -182,13 +182,13 @@ const AccountViewBalances = ({
           <p>{ethereum.name}</p>
         </StyledAsset>
         <p>{`${ethereum.balance} ${ethereum.symbol}`}</p>
-        <p>{ethereum.native && ethereum.native.price ? ethereum.native.price : '---'}</p>
+        <p>{ethereum.native && ethereum.native.price ? ethereum.native.price : '———'}</p>
         <StyledPercentage
           percentage={ethereum.native ? Number(ethereum.native.change.slice(0, -1)) : 0}
         >
-          {ethereum.native && ethereum.native.change ? ethereum.native.change : '---'}
+          {ethereum.native && ethereum.native.change ? ethereum.native.change : '———'}
         </StyledPercentage>
-        <p>{ethereum.native && ethereum.native.string ? ethereum.native.string : '---'}</p>
+        <p>{ethereum.native && ethereum.native.string ? ethereum.native.string : '———'}</p>
       </StyledEthereum>
       {!!tokensWithValue &&
         tokensWithValue.map(token => (
@@ -198,13 +198,13 @@ const AccountViewBalances = ({
               <p>{token.name}</p>
             </StyledAsset>
             <p>{`${token.balance} ${token.symbol}`}</p>
-            <p>{token.native && token.native.price ? token.native.price : '---'}</p>
+            <p>{token.native && token.native.price ? token.native.price : '———'}</p>
             <StyledPercentage
               percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
             >
-              {token.native && token.native.change ? token.native.change : '---'}
+              {token.native && token.native.change ? token.native.change : '———'}
             </StyledPercentage>
-            <p>{token.native && token.native.string ? token.native.string : '---'}</p>
+            <p>{token.native && token.native.string ? token.native.string : '———'}</p>
           </StyledToken>
         ))}
       {!!tokensWithNoValue.length &&
@@ -216,13 +216,13 @@ const AccountViewBalances = ({
               <p>{token.name}</p>
             </StyledAsset>
             <p>{`${token.balance} ${token.symbol}`}</p>
-            <p>{token.native && token.native.price ? token.native.price : '---'}</p>
+            <p>{token.native && token.native.price ? token.native.price : '———'}</p>
             <StyledPercentage
               percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
             >
-              {token.native && token.native.change ? token.native.change : '---'}
+              {token.native && token.native.change ? token.native.change : '———'}
             </StyledPercentage>
-            <p>{token.native && token.native.string ? token.native.string : '---'}</p>
+            <p>{token.native && token.native.string ? token.native.string : '———'}</p>
           </StyledToken>
         ))}
       <StyledMiddleRow>
@@ -235,7 +235,7 @@ const AccountViewBalances = ({
         ) : (
           <div />
         )}
-        <p>{`${lang.t('account.total_balance')} ${account.totalNative || '---'}`}</p>
+        <p>{`${lang.t('account.total_balance')} ${account.totalNative || '———'}`}</p>
       </StyledMiddleRow>
     </StyledGrid>
   );

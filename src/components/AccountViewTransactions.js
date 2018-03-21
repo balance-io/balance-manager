@@ -181,7 +181,7 @@ const AccountViewTransactions = ({
                 <p>{tx.asset.name}</p>
               </StyledAsset>
               <p>{`${tx.value} ${tx.asset.symbol}`}</p>
-              <p>{tx.price || '---'}</p>
+              <p>{tx.price || '———'}</p>
               <TransactionType
                 color={!tx.error ? (tx.from === accountAddress ? 'gold' : 'green') : 'red'}
               >
@@ -192,7 +192,7 @@ const AccountViewTransactions = ({
                   : lang.t('account.tx_failed')}
               </TransactionType>
               <p>
-                {tx.total ? (tx.from === accountAddress ? `- ${tx.total}` : `${tx.total}`) : '---'}
+                {tx.total ? (tx.from === accountAddress ? `- ${tx.total}` : `${tx.total}`) : '———'}
               </p>
             </StyledTransaction>
           );

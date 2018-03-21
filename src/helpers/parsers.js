@@ -81,7 +81,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
       const balance = convertTokenAmountToUnit(token.balance, Number(token.tokenInfo.decimals));
       return {
         name: token.tokenInfo.name || lang.t('account.unknown_token'),
-        symbol: token.tokenInfo.symbol || '---',
+        symbol: token.tokenInfo.symbol || '———',
         address: token.tokenInfo.address,
         decimals: Number(token.tokenInfo.decimals),
         balance: handleDecimals(balance),
@@ -95,7 +95,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
     type: 'METAMASK',
     txCount: (data && data.countTxs) || 0,
     asset,
-    totalNative: '---'
+    totalNative: '———'
   };
 };
 
@@ -106,7 +106,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
  * @return {String}
  */
 export const parseAccountBalances = (account = null, prices = null) => {
-  let totalNative = '---';
+  let totalNative = '———';
 
   if (account && account.asset) {
     account.asset = account.asset.map(asset => {
@@ -164,7 +164,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
 
         asset = {
           name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
-          symbol: !response.data.error || response.data.symbol ? response.data.symbol : '---',
+          symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
           address: !response.data.error ? response.data.address : '',
           decimals: !response.data.error ? Number(response.data.decimals) : 18
         };

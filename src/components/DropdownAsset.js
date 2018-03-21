@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import CryptoIcon from '../components/CryptoIcon';
+import AssetIcon from '../components/AssetIcon';
 import selector from '../assets/selector-grey.svg';
 import { fonts, colors, shadows, responsive } from '../styles';
 
@@ -78,7 +78,7 @@ const StyledDropdown = styled(StyledRow)`
   }
 `;
 
-class DropdownCrypto extends Component {
+class DropdownAsset extends Component {
   state = {
     showDropdown: false
   };
@@ -88,9 +88,9 @@ class DropdownCrypto extends Component {
   };
   toggleDropdown = () => this.setState({ showDropdown: !this.state.showDropdown });
   render() {
-    const { selected, crypto, ...props } = this.props;
+    const { selected, asset, ...props } = this.props;
     const options = {};
-    crypto.forEach(option => {
+    asset.forEach(option => {
       options[option.symbol] = option;
     });
     return (
@@ -98,7 +98,7 @@ class DropdownCrypto extends Component {
         <StyledSelected noOptions={Object.keys(options).length < 2} onClick={this.toggleDropdown}>
           <div>
             <StyledAsset>
-              <CryptoIcon size={18} currency={options[this.props.selected].symbol} />
+              <AssetIcon size={18} currency={options[this.props.selected].symbol} />
               <p>{options[this.props.selected].name}</p>
             </StyledAsset>
             <p>{`${options[this.props.selected].balance} ${options[this.props.selected].symbol} ≈ ${
@@ -117,7 +117,7 @@ class DropdownCrypto extends Component {
                 onClick={() => this.onChangeSelected(options[key].symbol)}
               >
                 <StyledAsset>
-                  <CryptoIcon size={18} currency={options[key].symbol} />
+                  <AssetIcon size={18} currency={options[key].symbol} />
                   <p>{options[key].name}</p>
                 </StyledAsset>
                 <p>{`${options[key].balance} ${options[key].symbol} ≈ ${
@@ -131,10 +131,10 @@ class DropdownCrypto extends Component {
   }
 }
 
-DropdownCrypto.propTypes = {
+DropdownAsset.propTypes = {
   selected: PropTypes.string.isRequired,
-  crypto: PropTypes.array.isRequired,
+  asset: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired
 };
 
-export default DropdownCrypto;
+export default DropdownAsset;

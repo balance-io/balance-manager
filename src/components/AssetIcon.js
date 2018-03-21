@@ -8,18 +8,18 @@ const StyledIcon = styled.img`
   height: ${({ size }) => `${size}px`};
 `;
 
-const CryptoIcon = ({ currency, size, ...props }) => {
+const AssetIcon = ({ currency, size, ...props }) => {
   const icon = iconIndex[currency.split(' ')[0].toLowerCase()] || iconIndex['erc20'];
   return <StyledIcon size={size} src={icon} />;
 };
 
-CryptoIcon.propTypes = {
+AssetIcon.propTypes = {
   currency: PropTypes.string.isRequired,
   size: PropTypes.number
 };
 
-CryptoIcon.defaultProps = {
+AssetIcon.defaultProps = {
   size: 20
 };
 
-export default CryptoIcon;
+export default AssetIcon;

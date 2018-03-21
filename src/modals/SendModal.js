@@ -8,7 +8,7 @@ import QRCodeReader from '../components/QRCodeReader';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import LineBreak from '../components/LineBreak';
-import DropdownCrypto from '../components/DropdownCrypto';
+import DropdownAsset from '../components/DropdownAsset';
 import Button from '../components/Button';
 import Form from '../components/Form';
 import MetamaskLogo from '../components/MetamaskLogo';
@@ -30,7 +30,7 @@ import {
   sendUpdateAddress,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
-  sendUpdateCryptoAmount,
+  sendUpdateAssetAmount,
   sendUpdatePrivateKey,
   sendUpdateSelected,
   sendToggleConfirmationView
@@ -258,15 +258,15 @@ class SendModal extends Component {
         this.props.sendUpdateGasPrice();
       } else if (newProps.recipient !== this.props.recipient) {
         this.props.sendUpdateGasPrice();
-      } else if (newProps.cryptoAmount !== this.props.cryptoAmount) {
+      } else if (newProps.assetAmount !== this.props.assetAmount) {
         this.props.sendUpdateGasPrice();
       }
     }
   }
   onChangeSelected = value => {
-    let selected = this.props.modalProps.crypto.filter(crypto => crypto.symbol === 'ETH')[0];
+    let selected = this.props.modalProps.asset.filter(asset => asset.symbol === 'ETH')[0];
     if (value !== 'ETH') {
-      selected = this.props.modalProps.crypto.filter(crypto => crypto.symbol === value)[0];
+      selected = this.props.modalProps.asset.filter(asset => asset.symbol === value)[0];
     }
     this.props.sendUpdateSelected(selected);
   };
@@ -281,14 +281,14 @@ class SendModal extends Component {
   };
   onSendEntireBalance = () => {
     if (this.props.selected.symbol === 'ETH') {
-      const ethereum = this.props.modalProps.crypto.filter(crypto => crypto.symbol === 'ETH')[0];
+      const ethereum = this.props.modalProps.asset.filter(asset => asset.symbol === 'ETH')[0];
       const balanceWei = toWei(ethereum.balance);
       const txFeeWei = toWei(this.props.txFee);
       const remaining = balanceWei - txFeeWei;
       const ether = fromWei(remaining < 0 ? 0 : remaining);
-      this.props.sendUpdateCryptoAmount(ether, 'ETH', this.props.modalProps.prices);
+      this.props.sendUpdateAssetAmount(ether, 'ETH', this.props.modalProps.prices);
     } else {
-      this.props.sendUpdateCryptoAmount(
+      this.props.sendUpdateAssetAmount(
         this.props.selected.balance.replace(/[^0-9.]/gi, ''),
         this.props.selected.symbol,
         this.props.modalProps.prices
@@ -305,7 +305,7 @@ class SendModal extends Component {
     const request = {
       address: this.props.modalProps.address,
       recipient: this.props.recipient,
-      amount: this.props.cryptoAmount,
+      amount: this.props.assetAmount,
       privateKey: this.props.privateKey,
       tokenObject: this.props.selected,
       gasPrice: this.props.gasPrice,
@@ -324,7 +324,7 @@ class SendModal extends Component {
         return;
       } else if (this.props.selected.symbol === 'ETH') {
         const balance = Number(this.props.modalProps.balance);
-        const requestedAmount = Number(this.props.cryptoAmount);
+        const requestedAmount = Number(this.props.assetAmount);
         const includingFees = requestedAmount + Number(this.props.txFee);
         if (requestedAmount > balance) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
@@ -336,7 +336,7 @@ class SendModal extends Component {
       } else {
         const etherBalance = Number(this.props.modalProps.balance);
         const tokenBalance = this.props.selected.balance;
-        const requestedAmount = Number(this.props.cryptoAmount);
+        const requestedAmount = Number(this.props.assetAmount);
         const includingFees = Number(this.props.txFee);
         if (requestedAmount > tokenBalance) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
@@ -401,9 +401,9 @@ class SendModal extends Component {
               </StyledSubTitle>
 
               <div>
-                <DropdownCrypto
+                <DropdownAsset
                   selected={this.props.selected.symbol}
-                  crypto={this.props.modalProps.crypto}
+                  asset={this.props.modalProps.asset}
                   onChange={this.onChangeSelected}
                 />
               </div>
@@ -435,12 +435,12 @@ class SendModal extends Component {
                 <StyledFlex>
                   <Input
                     monospace
-                    label={lang.t('input.crypto_amount')}
+                    label={lang.t('input.asset_amount')}
                     placeholder="0.0"
                     type="text"
-                    value={this.props.cryptoAmount}
+                    value={this.props.assetAmount}
                     onChange={({ target }) =>
-                      this.props.sendUpdateCryptoAmount(
+                      this.props.sendUpdateAssetAmount(
                         target.value,
                         this.props.selected.symbol,
                         this.props.modalProps.prices
@@ -551,7 +551,7 @@ class SendModal extends Component {
                     icon={arrowUp}
                     disabled={
                       this.props.recipient.length !== 42 ||
-                      (this.props.selected.symbol !== 'ETH' && !Number(this.props.cryptoAmount)) ||
+                      (this.props.selected.symbol !== 'ETH' && !Number(this.props.assetAmount)) ||
                       (this.props.modalProps.type === 'COLD' && this.props.privateKey.length < 64)
                     }
                     type="submit"
@@ -607,17 +607,17 @@ class SendModal extends Component {
                 </StyledParagraph>
                 <StyledParagraph>
                   <strong>{`${lang.t('modal.tx_confirm_amount')}:`}</strong>
-                  {this.props.cryptoAmount &&
-                    ` ${BigNumber(this.props.cryptoAmount).toFormat(6)} ${
+                  {this.props.assetAmount &&
+                    ` ${BigNumber(this.props.assetAmount).toFormat(6)} ${
                       this.props.selected.symbol
                     } ${
                       convertToNativeString(
-                        this.props.cryptoAmount,
+                        this.props.assetAmount,
                         this.props.selected.symbol,
                         this.props.modalProps.prices
                       )
                         ? `(${convertToNativeString(
-                            this.props.cryptoAmount,
+                            this.props.assetAmount,
                             this.props.selected.symbol,
                             this.props.modalProps.prices
                           )})`
@@ -689,7 +689,7 @@ SendModal.propTypes = {
   sendUpdateAddress: PropTypes.func.isRequired,
   sendUpdateRecipient: PropTypes.func.isRequired,
   sendUpdateNativeAmount: PropTypes.func.isRequired,
-  sendUpdateCryptoAmount: PropTypes.func.isRequired,
+  sendUpdateAssetAmount: PropTypes.func.isRequired,
   sendUpdatePrivateKey: PropTypes.func.isRequired,
   sendUpdateSelected: PropTypes.func.isRequired,
   sendToggleConfirmationView: PropTypes.func.isRequired,
@@ -699,7 +699,7 @@ SendModal.propTypes = {
   fetching: PropTypes.bool.isRequired,
   recipient: PropTypes.string.isRequired,
   nativeAmount: PropTypes.string.isRequired,
-  cryptoAmount: PropTypes.string.isRequired,
+  assetAmount: PropTypes.string.isRequired,
   transaction: PropTypes.string.isRequired,
   privateKey: PropTypes.string.isRequired,
   address: PropTypes.string.isRequired,
@@ -719,7 +719,7 @@ const reduxProps = ({ modal, send, account }) => ({
   fetching: send.fetching,
   recipient: send.recipient,
   nativeAmount: send.nativeAmount,
-  cryptoAmount: send.cryptoAmount,
+  assetAmount: send.assetAmount,
   transaction: send.transaction,
   privateKey: send.privateKey,
   address: send.address,
@@ -746,7 +746,7 @@ export default connect(reduxProps, {
   sendUpdateAddress,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
-  sendUpdateCryptoAmount,
+  sendUpdateAssetAmount,
   sendUpdatePrivateKey,
   sendUpdateSelected,
   sendToggleConfirmationView,

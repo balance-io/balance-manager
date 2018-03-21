@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
-import CryptoIcon from './CryptoIcon';
+import AssetIcon from './AssetIcon';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
@@ -159,12 +159,12 @@ const AccountViewBalances = ({
   account,
   ...props
 }) => {
-  const ethereum = account.crypto.filter(crypto => crypto.symbol === 'ETH')[0];
-  const tokensWithValue = account.crypto.filter(
-    crypto => crypto.symbol !== 'ETH' && (crypto.native && crypto.native.value)
+  const ethereum = account.asset.filter(asset => asset.symbol === 'ETH')[0];
+  const tokensWithValue = account.asset.filter(
+    asset => asset.symbol !== 'ETH' && (asset.native && asset.native.value)
   );
-  const tokensWithNoValue = account.crypto.filter(
-    crypto => crypto.symbol !== 'ETH' && (!crypto.native || (crypto.native && !crypto.native.value))
+  const tokensWithNoValue = account.asset.filter(
+    asset => asset.symbol !== 'ETH' && (!asset.native || (asset.native && !asset.native.value))
   );
   return (
     <StyledGrid {...props}>
@@ -178,7 +178,7 @@ const AccountViewBalances = ({
 
       <StyledEthereum>
         <StyledAsset>
-          <CryptoIcon currency={ethereum.symbol} />
+          <AssetIcon currency={ethereum.symbol} />
           <p>{ethereum.name}</p>
         </StyledAsset>
         <p>{`${ethereum.balance} ${ethereum.symbol}`}</p>
@@ -194,7 +194,7 @@ const AccountViewBalances = ({
         tokensWithValue.map(token => (
           <StyledToken key={`${account.address}-${token.symbol}`}>
             <StyledAsset>
-              <CryptoIcon currency={token.symbol} />
+              <AssetIcon currency={token.symbol} />
               <p>{token.name}</p>
             </StyledAsset>
             <p>{`${token.balance} ${token.symbol}`}</p>
@@ -212,7 +212,7 @@ const AccountViewBalances = ({
         tokensWithNoValue.map(token => (
           <StyledToken key={`${account.address}-${token.symbol}`}>
             <StyledAsset>
-              <CryptoIcon currency={token.symbol} />
+              <AssetIcon currency={token.symbol} />
               <p>{token.name}</p>
             </StyledAsset>
             <p>{`${token.balance} ${token.symbol}`}</p>
@@ -226,13 +226,15 @@ const AccountViewBalances = ({
           </StyledToken>
         ))}
       <StyledMiddleRow>
-        <StyledShowMoreTokens onClick={onShowTokensWithNoValue}>
-          {!!tokensWithNoValue.length
-            ? `${showTokensWithNoValue ? lang.t('account.hide') : lang.t('account.show')} ${
-                tokensWithNoValue.length
-              } ${lang.t('account.no_market_value')}`
-            : ' '}
-        </StyledShowMoreTokens>
+        {!!tokensWithNoValue.length ? (
+          <StyledShowMoreTokens onClick={onShowTokensWithNoValue}>
+            {`${showTokensWithNoValue ? lang.t('account.hide') : lang.t('account.show')} ${
+              tokensWithNoValue.length
+            } ${lang.t('account.no_market_value')}`}
+          </StyledShowMoreTokens>
+        ) : (
+          <div />
+        )}
         <p>{`${lang.t('account.total_balance')} ${account.totalNative || '---'}`}</p>
       </StyledMiddleRow>
     </StyledGrid>

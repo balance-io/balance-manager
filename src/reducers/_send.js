@@ -74,7 +74,7 @@ export const sendGetGasPrices = () => (dispatch, getState) => {
 
 export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
   const { send } = getState();
-  const { selected, address, recipient, cryptoAmount, gasPrice, gasPriceOption, gasPrices } = send;
+  const { selected, address, recipient, assetAmount, gasPrice, gasPriceOption, gasPrices } = send;
   const _gasPriceOption = newGasPriceOption || gasPriceOption;
   const _gasPrice = gasPriceOption ? gasPrices[_gasPriceOption] : gasPrice;
   dispatch({ type: SEND_UPDATE_GAS_PRICE_REQUEST });
@@ -82,7 +82,7 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     tokenObject: selected,
     address,
     recipient,
-    amount: cryptoAmount,
+    amount: assetAmount,
     gasPrice: _gasPrice
   })
     .then(({ txFee, gasLimit }) =>
@@ -244,21 +244,21 @@ export const sendUpdateRecipient = recipient => dispatch => {
 
 export const sendUpdateNativeAmount = (nativeAmount, selected, prices) => dispatch => {
   const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
-  const cryptoAmount =
+  const assetAmount =
     String(convertFromNativeValue(_nativeAmount, selected, prices)) || _nativeAmount;
   dispatch({
     type: SEND_UPDATE_CRYPTO_AMOUNT,
-    payload: { cryptoAmount, nativeAmount: _nativeAmount }
+    payload: { assetAmount, nativeAmount: _nativeAmount }
   });
 };
 
-export const sendUpdateCryptoAmount = (cryptoAmount, selected, prices) => dispatch => {
-  const _cryptoAmount = cryptoAmount.replace(/[^0-9.]/g, '');
+export const sendUpdateAssetAmount = (assetAmount, selected, prices) => dispatch => {
+  const _assetAmount = assetAmount.replace(/[^0-9.]/g, '');
   const nativeAmount =
-    String(convertToNativeValue(_cryptoAmount, selected, prices)) || _cryptoAmount;
+    String(convertToNativeValue(_assetAmount, selected, prices)) || _assetAmount;
   dispatch({
     type: SEND_UPDATE_CRYPTO_AMOUNT,
-    payload: { cryptoAmount: _cryptoAmount, nativeAmount }
+    payload: { assetAmount: _assetAmount, nativeAmount }
   });
 };
 
@@ -286,7 +286,7 @@ const INITIAL_STATE = {
   address: '',
   recipient: '',
   nativeAmount: '',
-  cryptoAmount: '',
+  assetAmount: '',
   transaction: '',
   privateKey: '',
   confirm: false,
@@ -376,7 +376,7 @@ export default (state = INITIAL_STATE, action) => {
     case SEND_UPDATE_CRYPTO_AMOUNT:
       return {
         ...state,
-        cryptoAmount: action.payload.cryptoAmount,
+        assetAmount: action.payload.assetAmount,
         nativeAmount: action.payload.nativeAmount
       };
     case SEND_UPDATE_SELECTED:

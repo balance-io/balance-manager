@@ -149,7 +149,7 @@ class AccountView extends Component {
         this.props.account.name || `${this.props.account.type}${lang.t('modal.default_wallet')}`,
       address: this.props.account.address,
       type: this.props.account.type,
-      crypto: this.props.account.crypto,
+      asset: this.props.account.asset,
       prices: this.props.prices
     });
   openReceiveModal = () =>

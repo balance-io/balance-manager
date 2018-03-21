@@ -5,29 +5,29 @@ import networkList from '../libraries/ethereum-networks.json';
 
 /**
  * @desc get prices
- * @param  {Array}   [crypto=[]]
+ * @param  {Array}   [asset=[]]
  * @param  {Array}   [native=[]]
  * @return {Promise}
  */
-export const apiGetPrices = (crypto = [], native = []) => {
-  const cryptoQuery = JSON.stringify(crypto).replace(/[[\]"]/gi, '');
+export const apiGetPrices = (asset = [], native = []) => {
+  const assetQuery = JSON.stringify(asset).replace(/[[\]"]/gi, '');
   const nativeQuery = JSON.stringify(native).replace(/[[\]"]/gi, '');
   return axios.get(
-    `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${cryptoQuery}&tsyms=${nativeQuery}`
+    `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${assetQuery}&tsyms=${nativeQuery}`
   );
 };
 
 /**
  * @desc get historical prices
- * @param  {String}  [cryptoSymbol='']
+ * @param  {String}  [assetSymbol='']
  * @param  {Array}   [native=[]]
  * @param  {Number}  [timestamp=Date.now()]
  * @return {Promise}
  */
-export const apiGetHistoricalPrices = (cryptoSymbol = '', native = [], timestamp = Date.now()) => {
+export const apiGetHistoricalPrices = (assetSymbol = '', native = [], timestamp = Date.now()) => {
   const nativeQuery = JSON.stringify(native).replace(/[[\]"]/gi, '');
   return axios.get(
-    `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${cryptoSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`
+    `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`
   );
 };
 

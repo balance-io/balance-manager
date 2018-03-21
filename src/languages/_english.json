@@ -34,7 +34,7 @@
     "input": {
       "recipient_address": "Recipient Address",
       "private_key": "Private Key",
-      "crypto_amount": "Amount",
+      "asset_amount": "Amount",
       "email": "Email",
       "password": "Password",
       "input_text": "Input",

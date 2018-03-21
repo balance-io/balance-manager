@@ -116,16 +116,16 @@ export const accountClearIntervals = () => dispatch => {
 };
 
 export const accountGetNativePrices = account => (dispatch, getState) => {
-  const cryptoSymbols = getState().account.account.crypto.map(crypto => crypto.symbol);
+  const assetSymbols = getState().account.account.asset.map(asset => asset.symbol);
   const getPrices = () => {
     dispatch({
       type: ACCOUNT_GET_NATIVE_PRICES_REQUEST,
       payload: getState().account.nativeCurrency
     });
-    apiGetPrices(cryptoSymbols, getState().account.nativeCurrency)
+    apiGetPrices(assetSymbols, getState().account.nativeCurrency)
       .then(({ data }) => {
         if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
-          const prices = parsePricesObject(data, cryptoSymbols, getState().account.nativeCurrency);
+          const prices = parsePricesObject(data, assetSymbols, getState().account.nativeCurrency);
           const account = parseAccountBalances(getState().account.account, prices);
           parseTransactionsPrices(
             getState().account.transactions,
@@ -177,7 +177,7 @@ const INITIAL_STATE = {
   web3Available: false,
   web3Network: 'mainnet',
   metamaskAccount: '',
-  crypto: ['ETH'],
+  asset: ['ETH'],
   account: parseEthplorerAddressInfo(null),
   transactions: [],
   fetchingTransactions: false,

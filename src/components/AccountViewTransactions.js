@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
 import Card from './Card';
-import CryptoIcon from './CryptoIcon';
+import AssetIcon from './AssetIcon';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
@@ -177,10 +177,10 @@ const AccountViewTransactions = ({
           return (
             <StyledTransaction key={tx.hash}>
               <StyledAsset>
-                <CryptoIcon currency={tx.crypto.symbol} />
-                <p>{tx.crypto.name}</p>
+                <AssetIcon currency={tx.asset.symbol} />
+                <p>{tx.asset.name}</p>
               </StyledAsset>
-              <p>{`${tx.value} ${tx.crypto.symbol}`}</p>
+              <p>{`${tx.value} ${tx.asset.symbol}`}</p>
               <p>{tx.price || '---'}</p>
               <TransactionType
                 color={!tx.error ? (tx.from === accountAddress ? 'gold' : 'green') : 'red'}

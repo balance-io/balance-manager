@@ -17,16 +17,22 @@ import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
  * @param  {Error} error
  * @return {String}
  */
+
 export const parseError = error => {
-  if (error.message.includes('MetaMask')) {
-    const msgIndex = error.message.indexOf('MetaMask');
-    const msgWhole = error.message.slice(msgIndex);
-    const msgStart = msgWhole.indexOf(':');
-    const msgEnd = msgWhole.indexOf('\n');
-    const message = msgWhole.slice(msgStart + 2, msgEnd);
+  const msgEnd =
+    error.message.indexOf('\n') !== -1 ? error.message.indexOf('\n') : error.message.length;
+  let message = error.message.slice(0, msgEnd);
+  if (error.message.includes('MetaMask') || error.message.includes('Returned error:')) {
+    message = message
+      .replace('Error: ', '')
+      .replace('MetaMask ', '')
+      .replace('Returned error: ', '');
+    message = message.slice(0, 1).toUpperCase() + message.slice(1).toLowerCase();
+    console.error(new Error(message));
     return message;
   }
-  return lang.t('notification.generic_error');
+  console.error(error);
+  return message;
 };
 
 /**

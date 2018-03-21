@@ -1,6 +1,7 @@
 import { apiGetGasPrices } from '../helpers/api';
 import { notificationShow } from './_notification';
 import lang from '../languages';
+import ethUnits from '../libraries/ethereum-units.json';
 import { fromWei, convertFromNativeValue, convertToNativeValue } from '../helpers/utilities';
 import { parseError } from '../helpers/parsers';
 import {
@@ -41,6 +42,7 @@ const SEND_TOGGLE_CONFIRMATION_VIEW = 'send/SEND_TOGGLE_CONFIRMATION_VIEW';
 
 const SEND_UPDATE_NATIVE_AMOUNT = 'send/SEND_UPDATE_NATIVE_AMOUNT';
 
+const SEND_UPDATE_ADDRESS = 'send/SEND_UPDATE_ADDRESS';
 const SEND_UPDATE_RECIPIENT = 'send/SEND_UPDATE_RECIPIENT';
 const SEND_UPDATE_CRYPTO_AMOUNT = 'send/SEND_UPDATE_CRYPTO_AMOUNT';
 const SEND_UPDATE_SELECTED = 'send/SEND_UPDATE_SELECTED';
@@ -58,14 +60,13 @@ export const sendGetGasPrices = () => (dispatch, getState) => {
       data.fast = parseInt(data.fast, 10) / 10;
       data.average = parseInt(data.average, 10) / 10;
       data.safeLow = parseInt(data.safeLow, 10) / 10;
-      const txFee = fromWei(21000 * data.average * 10 ** 9);
+      const txFee = fromWei(ethUnits.basic_tx * data.average * ethUnits.gwei);
       dispatch({
         type: SEND_GET_GAS_PRICES_SUCCESS,
         payload: { gasPrices: data, txFee }
       });
     })
     .catch(error => {
-      console.error(error);
       dispatch(notificationShow(lang.t('notification.error.failed_get_gas_prices'), true));
       dispatch({ type: SEND_GET_GAS_PRICES_FAILURE });
     });
@@ -73,23 +74,34 @@ export const sendGetGasPrices = () => (dispatch, getState) => {
 
 export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
   const { send } = getState();
-  const { selected, recipient, cryptoAmount, gasPrice, gasPriceOption, gasPrices } = send;
+  const { selected, address, recipient, cryptoAmount, gasPrice, gasPriceOption, gasPrices } = send;
   const _gasPriceOption = newGasPriceOption || gasPriceOption;
   const _gasPrice = gasPriceOption ? gasPrices[_gasPriceOption] : gasPrice;
   dispatch({ type: SEND_UPDATE_GAS_PRICE_REQUEST });
-  getTransactionFee({ tokenObject: selected, recipient, amount: cryptoAmount, gasPrice: _gasPrice })
-    .then(txFee =>
+  getTransactionFee({
+    tokenObject: selected,
+    address,
+    recipient,
+    amount: cryptoAmount,
+    gasPrice: _gasPrice
+  })
+    .then(({ txFee, gasLimit }) =>
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_SUCCESS,
-        payload: { txFee, gasPrice: _gasPrice, gasPriceOption: _gasPriceOption }
+        payload: { txFee, gasLimit, gasPrice: _gasPrice, gasPriceOption: _gasPriceOption }
       })
     )
     .catch(error => {
-      console.error(error);
-      dispatch(notificationShow(lang.t('notification.error.failed_get_tx_fee'), true));
+      const message = parseError(error);
+      dispatch(notificationShow(message || lang.t('notification.error.failed_get_tx_fee'), true));
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_FAILURE,
-        payload: { txFee: '', gasPrice: _gasPrice, gasPriceOption: _gasPriceOption }
+        payload: {
+          txFee: '',
+          gasLimit: 21000,
+          gasPrice: _gasPrice,
+          gasPriceOption: _gasPriceOption
+        }
       });
     });
 };
@@ -101,7 +113,7 @@ export const sendUpdateSelected = selected => (dispatch, getState) => {
 
 export const sendEtherMetamask = ({ address, recipient, amount, gasPrice }) => dispatch => {
   dispatch({ type: SEND_ETHER_METAMASK_REQUEST });
-  const _gasPrice = String(parseInt(gasPrice, 10) * 10 ** 9);
+  const _gasPrice = String(parseInt(gasPrice, 10) * ethUnits.gwei);
   metamaskSendTransaction({
     from: address,
     to: recipient,
@@ -115,7 +127,6 @@ export const sendEtherMetamask = ({ address, recipient, amount, gasPrice }) => d
       })
     )
     .catch(error => {
-      console.error(error);
       const message = parseError(error);
       dispatch(notificationShow(message, true));
       dispatch({ type: SEND_ETHER_METAMASK_FAILURE });
@@ -130,7 +141,7 @@ export const sendTokenMetamask = ({
   gasPrice
 }) => dispatch => {
   dispatch({ type: SEND_TOKEN_METAMASK_REQUEST });
-  const _gasPrice = String(parseInt(gasPrice, 10) * 10 ** 9);
+  const _gasPrice = String(parseInt(gasPrice, 10) * ethUnits.gwei);
   metamaskTransferToken({
     tokenObject,
     from: address,
@@ -145,7 +156,6 @@ export const sendTokenMetamask = ({
       })
     )
     .catch(error => {
-      console.error(error);
       const message = parseError(error);
       dispatch(notificationShow(message, true));
       dispatch({ type: SEND_TOKEN_METAMASK_FAILURE });
@@ -159,7 +169,7 @@ export const sendEtherClient = ({
   privateKey,
   gasPrice
 }) => dispatch => {
-  const _gasPrice = String(parseInt(gasPrice, 10) * 10 ** 9);
+  const _gasPrice = String(parseInt(gasPrice, 10) * ethUnits.gwei);
   dispatch({ type: SEND_ETHER_CLIENT_REQUEST });
   sendSignedTransaction({
     from: address,
@@ -175,7 +185,6 @@ export const sendEtherClient = ({
       })
     )
     .catch(error => {
-      console.error(error);
       const message = parseError(error);
       dispatch(notificationShow(message, true));
       dispatch({ type: SEND_ETHER_CLIENT_FAILURE });
@@ -190,7 +199,7 @@ export const sendTokenClient = ({
   privateKey,
   gasPrice
 }) => dispatch => {
-  const _gasPrice = String(parseInt(gasPrice, 10) * 10 ** 9);
+  const _gasPrice = String(parseInt(gasPrice, 10) * ethUnits.gwei);
   dispatch({ type: SEND_TOKEN_CLIENT_REQUEST });
   transferToken({
     tokenObject,
@@ -207,7 +216,6 @@ export const sendTokenClient = ({
       })
     )
     .catch(error => {
-      console.error(error);
       const message = parseError(error);
       dispatch(notificationShow(message, true));
       dispatch({ type: SEND_TOKEN_CLIENT_FAILURE });
@@ -221,6 +229,8 @@ export const sendToggleConfirmationView = boolean => (dispatch, getState) => {
   }
   dispatch({ type: SEND_TOGGLE_CONFIRMATION_VIEW, payload: confirm });
 };
+
+export const sendUpdateAddress = address => ({ type: SEND_UPDATE_ADDRESS, payload: address });
 
 export const sendUpdateRecipient = recipient => dispatch => {
   const input = recipient.replace(/[^\w.]/g, '');
@@ -270,8 +280,10 @@ const INITIAL_STATE = {
   txFee: '',
   gasPrices: {},
   gasPrice: 0,
+  gasLimit: 21000,
   gasPriceOption: 'average',
   fetching: false,
+  address: '',
   recipient: '',
   nativeAmount: '',
   cryptoAmount: '',
@@ -307,6 +319,7 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetchingGasPrices: false,
+        gasLimit: action.payload.gasLimit,
         gasPrice: action.payload.gasPrice,
         gasPriceOption: action.payload.gasPriceOption,
         txFee: action.payload.txFee
@@ -355,6 +368,8 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         confirm: action.payload
       };
+    case SEND_UPDATE_ADDRESS:
+      return { ...state, address: action.payload };
     case SEND_UPDATE_RECIPIENT:
       return { ...state, recipient: action.payload };
     case SEND_UPDATE_NATIVE_AMOUNT:

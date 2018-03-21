@@ -17,6 +17,7 @@ import TrezorLogo from '../components/TrezorLogo';
 import convertSymbol from '../assets/convert-symbol.svg';
 import arrowUp from '../assets/arrow-up.svg';
 import qrIcon from '../assets/qr-code-bnw.png';
+import ethUnits from '../libraries/ethereum-units.json';
 import { modalClose } from '../reducers/_modal';
 import {
   sendGetGasPrices,
@@ -26,6 +27,7 @@ import {
   sendTokenMetamask,
   sendTokenClient,
   sendClearFields,
+  sendUpdateAddress,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
   sendUpdateCryptoAmount,
@@ -242,10 +244,11 @@ const StyledActions = styled.div`
 
 class SendModal extends Component {
   componentDidMount() {
+    this.props.sendUpdateAddress(this.props.modalProps.address);
     this.props.sendGetGasPrices();
   }
   state = {
-    isValidAddress: false,
+    isValidAddress: true,
     showQRCodeReader: false,
     QRCodeReaderTarget: ''
   };
@@ -305,7 +308,8 @@ class SendModal extends Component {
       amount: this.props.cryptoAmount,
       privateKey: this.props.privateKey,
       tokenObject: this.props.selected,
-      gasPrice: this.props.gasPrice
+      gasPrice: this.props.gasPrice,
+      gasLimit: this.props.gasLimit
     };
     if (this.props.modalProps.type === 'METAMASK') {
       if (this.props.selected.symbol === 'ETH') {
@@ -500,7 +504,9 @@ class SendModal extends Component {
               <StyledGasOptions>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('safeLow')}>
                   <p>{`${lang.t('modal.gas_slow')}: ${convertToNativeString(
-                    fromWei((this.props.gasPrices.safeLow || 0) * 21000 * 10 ** 9),
+                    fromWei(
+                      (this.props.gasPrices.safeLow || 0) * ethUnits.basic_tx * ethUnits.gwei
+                    ),
                     'ETH',
                     this.props.modalProps.prices
                   )}`}</p>
@@ -508,7 +514,9 @@ class SendModal extends Component {
                 </StyledGasButton>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('average')}>
                   <p>{`${lang.t('modal.gas_average')}: ${convertToNativeString(
-                    fromWei((this.props.gasPrices.average || 0) * 21000 * 10 ** 9),
+                    fromWei(
+                      (this.props.gasPrices.average || 0) * ethUnits.basic_tx * ethUnits.gwei
+                    ),
                     'ETH',
                     this.props.modalProps.prices
                   )}`}</p>
@@ -516,7 +524,7 @@ class SendModal extends Component {
                 </StyledGasButton>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('fast')}>
                   <p>{`${lang.t('modal.gas_fast')}: ${convertToNativeString(
-                    fromWei((this.props.gasPrices.fast || 0) * 21000 * 10 ** 9),
+                    fromWei((this.props.gasPrices.fast || 0) * ethUnits.basic_tx * ethUnits.gwei),
                     'ETH',
                     this.props.modalProps.prices
                   )}`}</p>
@@ -678,6 +686,7 @@ SendModal.propTypes = {
   sendTokenMetamask: PropTypes.func.isRequired,
   sendTokenClient: PropTypes.func.isRequired,
   sendClearFields: PropTypes.func.isRequired,
+  sendUpdateAddress: PropTypes.func.isRequired,
   sendUpdateRecipient: PropTypes.func.isRequired,
   sendUpdateNativeAmount: PropTypes.func.isRequired,
   sendUpdateCryptoAmount: PropTypes.func.isRequired,
@@ -693,10 +702,12 @@ SendModal.propTypes = {
   cryptoAmount: PropTypes.string.isRequired,
   transaction: PropTypes.string.isRequired,
   privateKey: PropTypes.string.isRequired,
+  address: PropTypes.string.isRequired,
   selected: PropTypes.object.isRequired,
   fetchingGasPrices: PropTypes.bool.isRequired,
   gasPrices: PropTypes.object.isRequired,
   gasPrice: PropTypes.number.isRequired,
+  gasLimit: PropTypes.number.isRequired,
   gasPriceOption: PropTypes.string.isRequired,
   txFee: PropTypes.string.isRequired,
   confirm: PropTypes.bool.isRequired,
@@ -711,10 +722,12 @@ const reduxProps = ({ modal, send, account }) => ({
   cryptoAmount: send.cryptoAmount,
   transaction: send.transaction,
   privateKey: send.privateKey,
+  address: send.address,
   selected: send.selected,
   fetchingGasPrices: send.fetchingGasPrices,
   gasPrices: send.gasPrices,
   gasPrice: send.gasPrice,
+  gasLimit: send.gasLimit,
   gasPriceOption: send.gasPriceOption,
   txFee: send.txFee,
   confirm: send.confirm,
@@ -730,6 +743,7 @@ export default connect(reduxProps, {
   sendTokenMetamask,
   sendTokenClient,
   sendClearFields,
+  sendUpdateAddress,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
   sendUpdateCryptoAmount,

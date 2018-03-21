@@ -52,8 +52,9 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: transactions });
       dispatch(accountGetNativePrices());
     })
-    .catch(err => {
-      console.error(err);
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE });
     });
 };
@@ -68,8 +69,9 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
       dispatch(accountGetNativePrices());
       if (account.txCount) dispatch(accountGetAccountTransactions());
     })
-    .catch(err => {
-      console.error(err);
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE });
     });
 };

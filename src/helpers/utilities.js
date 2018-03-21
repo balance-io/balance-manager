@@ -289,7 +289,7 @@ export const getDataString = (func, arrVals) => {
 export const getNakedAddress = address => address.toLowerCase().replace('0x', '');
 
 /**
- * @desc convert to checksum addres
+ * @desc convert to checksum address
  * @param  {String} address
  * @return {String}
  */

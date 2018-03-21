@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { web3Instance } from './web3';
 import lang from '../languages';
-import nativeCurrencies from '../libraries/native-currencies.js';
+import nativeCurrencies from '../libraries/native-currencies.json';
 
 /**
  * @desc save to local storage
@@ -33,7 +33,7 @@ export const removeLocal = (key = '') => localStorage.removeItem(key);
  * @param  {Boolean}  [twoFactor=false]
  * @param  {Date}     [expires=Date.now() + 180000]
  * @param  {Array}    [accounts=[]]
- * @param  {Array}    [crypto=[]]
+ * @param  {Array}    [asset=[]]
  * @param
  * @return {Session}
  */
@@ -44,7 +44,7 @@ export const setSession = ({
   twoFactor = false,
   expires = Date.now() + 1800000, // 30mins
   accounts = [],
-  crypto = []
+  asset = []
 }) => {
   const session = {
     token,
@@ -53,7 +53,7 @@ export const setSession = ({
     twoFactor,
     expires,
     accounts,
-    crypto
+    asset
   };
   setTimeout(() => window.browserHistory.push('/signout'), 1800000); // 30mins
   localStorage.setItem('USER_SESSION', JSON.stringify(session));
@@ -84,17 +84,17 @@ export const updateSession = updatedSession => {
  * @return {String}
  */
 export const flattenTokens = accounts => {
-  const crypto = ['ETH'];
+  const asset = ['ETH'];
   for (let i = 0; i < accounts.length; i++) {
     if (accounts[i].tokens) {
       for (let j = 0; j < accounts[i].tokens.length; j++) {
-        if (!crypto.includes(accounts[i].tokens[j].symbol)) {
-          crypto.push(accounts[i].tokens[j].symbol);
+        if (!asset.includes(accounts[i].tokens[j].symbol)) {
+          asset.push(accounts[i].tokens[j].symbol);
         }
       }
     }
   }
-  return crypto;
+  return asset;
 };
 
 /**
@@ -121,9 +121,9 @@ export const updateAccounts = (account = null, address = '') => {
   if (account && isNew) {
     accounts.push(account);
   }
-  const crypto = flattenTokens(accounts);
-  updateSession({ accounts, crypto });
-  return { accounts, crypto };
+  const asset = flattenTokens(accounts);
+  updateSession({ accounts, asset });
+  return { accounts, asset };
 };
 
 /**
@@ -146,48 +146,48 @@ export const capitalize = string =>
     .join(' ');
 
 /**
- * @desc convert from current native value to crypto value
+ * @desc convert from current native value to asset value
  * @param  {String} [nativeValue='']
- * @param  {String} [cryptoSymbol='ETH']
+ * @param  {String} [assetSymbol='ETH']
  * @param  {Object} [prices=null]
  * @return {Number}
  */
-export const convertFromNativeValue = (nativeValue = '', cryptoSymbol = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[cryptoSymbol])) return null;
-  return Number(Number(Number(nativeValue) / Number(prices[cryptoSymbol].price)).toFixed(8));
+export const convertFromNativeValue = (nativeValue = '', assetSymbol = 'ETH', prices = null) => {
+  if (!prices || (prices && !prices[assetSymbol])) return null;
+  return Number(Number(Number(nativeValue) / Number(prices[assetSymbol].price)).toFixed(8));
 };
 
 /**
- * @desc convert cryptoSymbol value to current native value
+ * @desc convert assetSymbol value to current native value
  * @param  {String} [value='']
- * @param  {String} [cryptoSymbol='ETH']
+ * @param  {String} [assetSymbol='ETH']
  * @param  {Object} [prices=null]
  * @return {Number}
  */
-export const convertToNativeValue = (value = '', cryptoSymbol = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[cryptoSymbol])) return null;
-  return Number(Number(Number(value) * Number(prices[cryptoSymbol].price)).toFixed(8));
+export const convertToNativeValue = (value = '', assetSymbol = 'ETH', prices = null) => {
+  if (!prices || (prices && !prices[assetSymbol])) return null;
+  return Number(Number(Number(value) * Number(prices[assetSymbol].price)).toFixed(8));
 };
 
 /**
- * @desc convert crypto value to current native string
+ * @desc convert asset value to current native string
  * @param  {String} [value='']
- * @param  {String} [crypto='ETH']
+ * @param  {String} [asset='ETH']
  * @param  {Object} [prices=null]
  * @return {String}
  */
-export const convertToNativeString = (value = '', cryptoSymbol = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[cryptoSymbol])) return '';
+export const convertToNativeString = (value = '', assetSymbol = 'ETH', prices = null) => {
+  if (!prices || (prices && !prices[assetSymbol])) return '';
   if (prices.native === 'ETH' || prices.native === 'BTC') {
     const nativeSymbol = prices.native;
     const decimals = 8;
-    const nativeValue = convertToNativeValue(value, cryptoSymbol, prices);
+    const nativeValue = convertToNativeValue(value, assetSymbol, prices);
     const formatted = BigNumber(nativeValue).toFormat(decimals);
     return `${formatted} ${nativeSymbol}`;
   } else {
     const nativeSymbol = nativeCurrencies[prices.native].symbol;
     const decimals = 2;
-    const nativeValue = convertToNativeValue(value, cryptoSymbol, prices);
+    const nativeValue = convertToNativeValue(value, assetSymbol, prices);
     const formatted = BigNumber(nativeValue).toFormat(decimals);
     return `${nativeSymbol}${formatted}`;
   }
@@ -243,14 +243,14 @@ export const formatNativeString = (value = '', native = 'USD') => {
 };
 
 /**
- * @desc format crypto prices 24hr percentage change
- * @param  {String} [cryptoSymbol=null]
+ * @desc format asset prices 24hr percentage change
+ * @param  {String} [assetSymbol=null]
  * @param  {Object} [prices=null]
  * @return {String}
  */
-export const formatPercentageChange = (cryptoSymbol, prices) => {
-  if (!prices || (prices && !prices[cryptoSymbol])) return '';
-  const percentageChange = Number(prices[cryptoSymbol].change).toFixed(8);
+export const formatPercentageChange = (assetSymbol, prices) => {
+  if (!prices || (prices && !prices[assetSymbol])) return '';
+  const percentageChange = Number(prices[assetSymbol].change).toFixed(8);
   const formatted = BigNumber(percentageChange).toFormat(2);
   return `${formatted}%`;
 };

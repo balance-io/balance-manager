@@ -38,13 +38,13 @@ export const parseError = error => {
 /**
  * @desc parse prices object from api response
  * @param  {Object} [data=null]
- * @param  {Array} [crypto=[]]
+ * @param  {Array} [asset=[]]
  * @param  {String} [native='USD']
  * @return {Object}
  */
-export const parsePricesObject = (data = null, crypto = [], native = 'USD') => {
+export const parsePricesObject = (data = null, asset = [], native = 'USD') => {
   let prices = { native };
-  crypto.map(
+  asset.map(
     coin =>
       (prices[coin] = data.RAW[coin]
         ? { price: data.RAW[coin][native].PRICE, change: data.RAW[coin][native].CHANGEPCT24HOUR }
@@ -75,7 +75,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
     native: null
   };
 
-  let crypto = [ethereum];
+  let asset = [ethereum];
   if (data && data.tokens) {
     const tokens = data.tokens.map(token => {
       const balance = convertTokenAmountToUnit(token.balance, Number(token.tokenInfo.decimals));
@@ -88,13 +88,13 @@ export const parseEthplorerAddressInfo = (data = null) => {
         native: null
       };
     });
-    crypto = [...crypto, ...tokens];
+    asset = [...asset, ...tokens];
   }
   return {
     address: (data && data.address) || '',
     type: 'METAMASK',
     txCount: (data && data.countTxs) || 0,
-    crypto,
+    asset,
     totalNative: '---'
   };
 };
@@ -108,23 +108,23 @@ export const parseEthplorerAddressInfo = (data = null) => {
 export const parseAccountBalances = (account = null, prices = null) => {
   let totalNative = '---';
 
-  if (account && account.crypto) {
-    account.crypto = account.crypto.map(crypto => {
-      const price = convertToNativeString('1', crypto.symbol, prices);
-      const change = formatPercentageChange(crypto.symbol, prices);
-      const value = convertToNativeValue(crypto.balance, crypto.symbol, prices);
-      const string = convertToNativeString(crypto.balance, crypto.symbol, prices);
-      crypto.native = {
+  if (account && account.asset) {
+    account.asset = account.asset.map(asset => {
+      const price = convertToNativeString('1', asset.symbol, prices);
+      const change = formatPercentageChange(asset.symbol, prices);
+      const value = convertToNativeValue(asset.balance, asset.symbol, prices);
+      const string = convertToNativeString(asset.balance, asset.symbol, prices);
+      asset.native = {
         currency: prices.native,
         price: price,
         change: change,
         value: value,
         string: string
       };
-      return crypto;
+      return asset;
     });
-    totalNative = account.crypto.reduce(
-      (total, crypto) => Number(total) + Number(crypto.native.value),
+    totalNative = account.asset.reduce(
+      (total, asset) => Number(total) + Number(asset.native.value),
       0
     );
     totalNative = formatNativeString(totalNative, prices.native);
@@ -149,7 +149,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       const error = tx.isError === '1';
       let interaction = false;
       let to = tx.to;
-      let crypto = {
+      let asset = {
         name: 'Ethereum',
         symbol: 'ETH',
         address: null,
@@ -162,18 +162,28 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       if (tx.input.startsWith(tokenTransfer)) {
         const response = await apiGetEthplorerTokenInfo(tx.to);
 
-        crypto = {
+        asset = {
           name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
           symbol: !response.data.error || response.data.symbol ? response.data.symbol : '---',
           address: !response.data.error ? response.data.address : '',
           decimals: !response.data.error ? Number(response.data.decimals) : 18
         };
 
+        /* STT token on Ropsten */
+        if (tx.to === '0xc55cf4b03948d7ebc8b9e8bad92643703811d162') {
+          asset = {
+            name: 'Status Test Token',
+            symbol: 'STT',
+            address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
+            decimals: 18
+          };
+        }
+
         const address = `0x${tx.input.slice(34, 74)}`;
         const amount = hexToNumberString(`${tx.input.slice(74)}`);
 
         to = address;
-        value = handleDecimals(convertTokenAmountToUnit(amount, crypto.decimals));
+        value = handleDecimals(convertTokenAmountToUnit(amount, asset.decimals));
       } else if (tx.input !== '0x') {
         interaction = true;
       }
@@ -184,7 +194,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
         from,
         to,
         error,
-        crypto,
+        asset,
         interaction,
         value
       };
@@ -212,18 +222,18 @@ export const parseTransactionsPrices = async (transactions = null, nativeCurrenc
     _transactions = await Promise.all(
       _transactions.map(async tx => {
         const timestamp = tx.timestamp;
-        const cryptoSymbol = tx.crypto.symbol;
+        const assetSymbol = tx.asset.symbol;
         const native = [nativeCurrency];
-        const response = await apiGetHistoricalPrices(cryptoSymbol, native, timestamp);
+        const response = await apiGetHistoricalPrices(assetSymbol, native, timestamp);
         if (response.data.response) return tx;
         const prices = {
           native: nativeCurrency,
-          [cryptoSymbol]: {
-            price: response.data[cryptoSymbol] ? response.data[cryptoSymbol][nativeCurrency] : null
+          [assetSymbol]: {
+            price: response.data[assetSymbol] ? response.data[assetSymbol][nativeCurrency] : null
           }
         };
-        const price = convertToNativeString('1', tx.crypto.symbol, prices);
-        const total = !tx.error ? convertToNativeString(tx.value, tx.crypto.symbol, prices) : null;
+        const price = convertToNativeString('1', tx.asset.symbol, prices);
+        const total = !tx.error ? convertToNativeString(tx.value, tx.asset.symbol, prices) : null;
         tx.price = price;
         tx.total = total;
         return tx;

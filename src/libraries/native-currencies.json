@@ -1,0 +1,22 @@
+{
+  "USD": {
+    "symbol": "$",
+    "value": "USD"
+  },
+  "GBP": {
+    "symbol": "£",
+    "value": "GBP"
+  },
+  "EUR": {
+    "symbol": "€",
+    "value": "EUR"
+  },
+  "BTC": {
+    "symbol": "₿",
+    "value": "BTC"
+  },
+  "ETH": {
+    "symbol": "Ξ",
+    "value": "ETH"
+  }
+}

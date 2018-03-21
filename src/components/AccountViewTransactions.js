@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
 import Card from './Card';
-import CryptoIcon from './CryptoIcon';
+import AssetIcon from './AssetIcon';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
@@ -19,12 +19,16 @@ const StyledRow = styled.div`
   position: relative;
   padding: 20px;
   z-index: 0;
+  background-color: rgb(${colors.white});
   grid-template-columns: repeat(5, 1fr);
   & p {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     font-size: ${fonts.size.h6};
+  }
+  &:last-child {
+    border-radius: 0 0 8px 8px;
   }
   @media screen and (${responsive.sm.max}) {
     grid-template-columns: repeat(5, 1fr);
@@ -43,10 +47,10 @@ const StyledRow = styled.div`
 
 const StyledLabelsRow = styled(StyledRow)`
   width: 100%;
-  border-width: 2px 0 2px 0;
+  border-width: 0 0 2px 0;
   border-color: rgba(${colors.lightGrey}, 0.4);
   border-style: solid;
-  padding: 10px 20px;
+  padding: 12px 20px;
   & p:first-child {
     justify-content: flex-start;
   }
@@ -72,11 +76,10 @@ const StyledEthereum = styled(StyledRow)`
   }
 `;
 
-const StyledToken = styled(StyledRow)`
+const StyledTransaction = styled(StyledRow)`
   width: 100%;
-  border-radius: 0 0 8px 8px;
-  background-color: rgb(${colors.lightGrey});
   & > * {
+    font-weight: ${fonts.weight.medium};
     color: rgba(${colors.dark}, 0.6);
   }
   & > p:first-child {
@@ -85,7 +88,7 @@ const StyledToken = styled(StyledRow)`
   & > p {
     font-family: ${fonts.family.SFMono};
   }
-  &:nth-child(n + 2) {
+  &:nth-child(n + 3) {
     border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
   }
 `;
@@ -109,10 +112,6 @@ const StyledAsset = styled.div`
   }
 `;
 
-const StyledTransactionType = styled.p`
-  font-weight: ${fonts.weight.semibold};
-`;
-
 const StyledShowMoreTransactions = styled(StyledEthereum)`
   grid-template-columns: auto;
   box-shadow: none;
@@ -132,6 +131,26 @@ const StyledShowMoreTransactions = styled(StyledEthereum)`
   }
 `;
 
+const StyledTransactionType = styled.p`
+  font-weight: ${fonts.weight.semibold};
+  position: relative;
+  & span {
+    position: absolute;
+    color: transparent;
+    background: ${({ color }) => (color ? `rgba(${colors[color]}, 0.1)` : 'transparent')};
+    padding: 4px 8px;
+    right: -8px;
+    border-radius: 8px;
+  }
+`;
+
+const TransactionType = ({ children, color, ...props }) => (
+  <StyledTransactionType color={color} {...props}>
+    <span>{children}</span>
+    {children}
+  </StyledTransactionType>
+);
+
 const AccountViewTransactions = ({
   onShowMoreTransactions,
   fetchingTransactions,
@@ -140,8 +159,9 @@ const AccountViewTransactions = ({
   transactions,
   ...props
 }) => {
+  const _transactions = transactions.filter(tx => !tx.interaction);
   return (
-    !!transactions &&
+    !!_transactions &&
     (!fetchingTransactions ? (
       <StyledGrid>
         <StyledLabelsRow>
@@ -152,30 +172,32 @@ const AccountViewTransactions = ({
           <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
         </StyledLabelsRow>
 
-        {transactions.map((tx, idx) => {
+        {_transactions.map((tx, idx) => {
           if (idx > limitTransactions) return null;
           return (
-            <StyledToken key={tx.hash}>
+            <StyledTransaction key={tx.hash}>
               <StyledAsset>
-                <CryptoIcon currency={tx.crypto.symbol} />
-                <p>{tx.crypto.name}</p>
+                <AssetIcon currency={tx.asset.symbol} />
+                <p>{tx.asset.name}</p>
               </StyledAsset>
-              <p>{`${tx.value} ${tx.crypto.symbol}`}</p>
+              <p>{`${tx.value} ${tx.asset.symbol}`}</p>
               <p>{tx.price || '---'}</p>
-              <StyledTransactionType>
+              <TransactionType
+                color={!tx.error ? (tx.from === accountAddress ? 'gold' : 'green') : 'red'}
+              >
                 {!tx.error
                   ? tx.from === accountAddress
                     ? lang.t('account.tx_sent')
                     : lang.t('account.tx_received')
                   : lang.t('account.tx_failed')}
-              </StyledTransactionType>
+              </TransactionType>
               <p>
                 {tx.total ? (tx.from === accountAddress ? `- ${tx.total}` : `${tx.total}`) : '---'}
               </p>
-            </StyledToken>
+            </StyledTransaction>
           );
         })}
-        {limitTransactions < transactions.length && (
+        {limitTransactions < _transactions.length && (
           <StyledShowMoreTransactions onClick={onShowMoreTransactions}>
             <p>{lang.t('account.show_more')}</p>
           </StyledShowMoreTransactions>

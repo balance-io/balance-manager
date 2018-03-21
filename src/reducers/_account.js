@@ -11,8 +11,9 @@ import {
   parsePricesObject,
   parseEthplorerAddressInfo
 } from '../helpers/parsers';
-import { warningOffline, warningOnline } from './_warning';
+import { saveLocal, getLocal } from '../helpers/utilities';
 import { web3SetProvider } from '../helpers/web3';
+import { warningOffline, warningOnline } from './_warning';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //
@@ -115,16 +116,16 @@ export const accountClearIntervals = () => dispatch => {
 };
 
 export const accountGetNativePrices = account => (dispatch, getState) => {
-  const cryptoSymbols = getState().account.account.crypto.map(crypto => crypto.symbol);
+  const assetSymbols = getState().account.account.asset.map(asset => asset.symbol);
   const getPrices = () => {
     dispatch({
       type: ACCOUNT_GET_NATIVE_PRICES_REQUEST,
       payload: getState().account.nativeCurrency
     });
-    apiGetPrices(cryptoSymbols, getState().account.nativeCurrency)
+    apiGetPrices(assetSymbols, getState().account.nativeCurrency)
       .then(({ data }) => {
         if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
-          const prices = parsePricesObject(data, cryptoSymbols, getState().account.nativeCurrency);
+          const prices = parsePricesObject(data, assetSymbols, getState().account.nativeCurrency);
           const account = parseAccountBalances(getState().account.account, prices);
           parseTransactionsPrices(
             getState().account.transactions,
@@ -159,6 +160,7 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
 };
 
 export const accountChangeNativeCurrency = nativeCurrency => dispatch => {
+  saveLocal('native_currency', nativeCurrency);
   dispatch({
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
     payload: nativeCurrency
@@ -168,14 +170,14 @@ export const accountChangeNativeCurrency = nativeCurrency => dispatch => {
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
-  nativePriceRequest: 'USD',
-  nativeCurrency: 'USD',
+  nativePriceRequest: getLocal('native_currency') || 'USD',
+  nativeCurrency: getLocal('native_currency') || 'USD',
   prices: {},
   web3Connected: true,
   web3Available: false,
   web3Network: 'mainnet',
   metamaskAccount: '',
-  crypto: ['ETH'],
+  asset: ['ETH'],
   account: parseEthplorerAddressInfo(null),
   transactions: [],
   fetchingTransactions: false,

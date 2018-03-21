@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
-import CryptoIcon from './CryptoIcon';
+import AssetIcon from './AssetIcon';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
@@ -18,12 +18,16 @@ const StyledRow = styled.div`
   position: relative;
   padding: 20px;
   z-index: 0;
+  background-color: rgb(${colors.white});
   grid-template-columns: repeat(5, 1fr);
   & p {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     font-size: ${fonts.size.h6};
+  }
+  &:last-child {
+    border-radius: 0 0 8px 8px;
   }
   @media screen and (${responsive.sm.max}) {
     grid-template-columns: repeat(5, 1fr);
@@ -42,10 +46,10 @@ const StyledRow = styled.div`
 
 const StyledLabelsRow = styled(StyledRow)`
   width: 100%;
-  border-width: 2px 0 2px 0;
+  border-width: 0 0 2px 0;
   border-color: rgba(${colors.lightGrey}, 0.4);
   border-style: solid;
-  padding: 10px 20px;
+  padding: 12px 20px;
   & p:first-child {
     justify-content: flex-start;
   }
@@ -73,9 +77,8 @@ const StyledEthereum = styled(StyledRow)`
 
 const StyledToken = styled(StyledRow)`
   width: 100%;
-  border-radius: 0 0 8px 8px;
-  background-color: rgb(${colors.lightGrey});
   & > * {
+    font-weight: ${fonts.weight.medium};
     color: rgba(${colors.dark}, 0.6);
   }
   & > p:first-child {
@@ -84,25 +87,8 @@ const StyledToken = styled(StyledRow)`
   & > p {
     font-family: ${fonts.family.SFMono};
   }
-  &:nth-child(n + 2) {
+  &:nth-child(n + 3) {
     border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
-  }
-`;
-
-const StyledMiddleRow = styled(StyledEthereum)`
-  width: 100%;
-  box-shadow: none;
-  & > p:first-child {
-    font-family: ${fonts.family.SFProText};
-    justify-content: flex-start;
-  }
-  & > p {
-    font-size: ${fonts.size.medium};
-  }
-  @media screen and (${responsive.sm.max}) {
-    & p {
-      font-size: ${fonts.size.h6};
-    }
   }
 `;
 
@@ -132,18 +118,34 @@ const StyledPercentage = styled.p`
       : `inherit`};
 `;
 
+const StyledMiddleRow = styled(StyledEthereum)`
+  width: 100%;
+  box-shadow: none;
+  grid-template-columns: 1fr 1fr;
+  & > p:first-child {
+    font-family: ${fonts.family.SFProText};
+    justify-content: flex-start;
+  }
+  & > p {
+    font-size: ${fonts.size.medium};
+  }
+  @media screen and (${responsive.sm.max}) {
+    & p {
+      font-size: ${fonts.size.h6};
+    }
+  }
+`;
+
 const StyledShowMoreTokens = styled(StyledToken)`
   grid-template-columns: auto;
-  padding: 8px 20px;
-  & p {
-    cursor: pointer;
-    text-align: left;
-    justify-content: flex-start;
-    font-family: ${fonts.family.SFProText};
-    font-weight: ${fonts.weight.normal};
-    font-size: ${fonts.size.h6};
-    color: rgb(${colors.grey});
-  }
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  justify-content: flex-start;
+  font-family: ${fonts.family.SFProText};
+  font-weight: ${fonts.weight.normal};
+  font-size: ${fonts.size.h6};
+  color: rgb(${colors.grey});
   @media (hover: hover) {
     &:hover p {
       opacity: 0.7;
@@ -157,12 +159,12 @@ const AccountViewBalances = ({
   account,
   ...props
 }) => {
-  const ethereum = account.crypto.filter(crypto => crypto.symbol === 'ETH')[0];
-  const tokensWithValue = account.crypto.filter(
-    crypto => crypto.symbol !== 'ETH' && (crypto.native && crypto.native.value)
+  const ethereum = account.asset.filter(asset => asset.symbol === 'ETH')[0];
+  const tokensWithValue = account.asset.filter(
+    asset => asset.symbol !== 'ETH' && (asset.native && asset.native.value)
   );
-  const tokensWithNoValue = account.crypto.filter(
-    crypto => crypto.symbol !== 'ETH' && (!crypto.native || (crypto.native && !crypto.native.value))
+  const tokensWithNoValue = account.asset.filter(
+    asset => asset.symbol !== 'ETH' && (!asset.native || (asset.native && !asset.native.value))
   );
   return (
     <StyledGrid {...props}>
@@ -176,7 +178,7 @@ const AccountViewBalances = ({
 
       <StyledEthereum>
         <StyledAsset>
-          <CryptoIcon currency={ethereum.symbol} />
+          <AssetIcon currency={ethereum.symbol} />
           <p>{ethereum.name}</p>
         </StyledAsset>
         <p>{`${ethereum.balance} ${ethereum.symbol}`}</p>
@@ -192,7 +194,7 @@ const AccountViewBalances = ({
         tokensWithValue.map(token => (
           <StyledToken key={`${account.address}-${token.symbol}`}>
             <StyledAsset>
-              <CryptoIcon currency={token.symbol} />
+              <AssetIcon currency={token.symbol} />
               <p>{token.name}</p>
             </StyledAsset>
             <p>{`${token.balance} ${token.symbol}`}</p>
@@ -210,7 +212,7 @@ const AccountViewBalances = ({
         tokensWithNoValue.map(token => (
           <StyledToken key={`${account.address}-${token.symbol}`}>
             <StyledAsset>
-              <CryptoIcon currency={token.symbol} />
+              <AssetIcon currency={token.symbol} />
               <p>{token.name}</p>
             </StyledAsset>
             <p>{`${token.balance} ${token.symbol}`}</p>
@@ -223,19 +225,17 @@ const AccountViewBalances = ({
             <p>{token.native && token.native.string ? token.native.string : '---'}</p>
           </StyledToken>
         ))}
-      {!!tokensWithNoValue.length && (
-        <StyledShowMoreTokens>
-          <p onClick={onShowTokensWithNoValue}>{`${
-            showTokensWithNoValue ? lang.t('account.hide') : lang.t('account.show')
-          } ${tokensWithNoValue.length} ${lang.t('account.no_market_value')}`}</p>
-        </StyledShowMoreTokens>
-      )}
       <StyledMiddleRow>
-        <p> </p>
-        <p> </p>
-        <p> </p>
-        <p>{lang.t('account.total_balance')}</p>
-        <p>{`${account.totalNative || '---'}`}</p>
+        {!!tokensWithNoValue.length ? (
+          <StyledShowMoreTokens onClick={onShowTokensWithNoValue}>
+            {`${showTokensWithNoValue ? lang.t('account.hide') : lang.t('account.show')} ${
+              tokensWithNoValue.length
+            } ${lang.t('account.no_market_value')}`}
+          </StyledShowMoreTokens>
+        ) : (
+          <div />
+        )}
+        <p>{`${lang.t('account.total_balance')} ${account.totalNative || '---'}`}</p>
       </StyledMiddleRow>
     </StyledGrid>
   );

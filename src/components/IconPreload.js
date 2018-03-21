@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import cryptoIcons from '../cryptocurrency-icons';
+import assetIcons from '../cryptocurrency-icons';
 
 const StyledPreload = styled.div`
   position: absolute;
@@ -13,7 +13,7 @@ const StyledPreload = styled.div`
 
 const IconPreload = () => (
   <StyledPreload>
-    {Object.keys(cryptoIcons).map(key => <img key={key} src={cryptoIcons[key]} alt={key} />)}
+    {Object.keys(assetIcons).map(key => <img key={key} src={assetIcons[key]} alt={key} />)}
   </StyledPreload>
 );
 

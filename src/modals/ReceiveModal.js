@@ -61,6 +61,10 @@ const StyledCopyToClipboard = styled(CopyToClipboard)`
   border-radius: 8px;
   margin: 15px auto;
   padding: 12px 18px;
+  & input {
+    color: transparent;
+    text-shadow: 0 0 0 rgba(${colors.darkGrey});
+  }
   @media screen and (${responsive.sm.max}) {
     font-size: 3vw;
     letter-spacing: 0;

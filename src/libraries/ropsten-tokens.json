@@ -7,7 +7,7 @@
   },
   {
     "address": "0xc55cF4B03948D7EBc8b9E8BAD92643703811d162",
-    "name": "Status",
+    "name": "Status Test Token",
     "symbol": "STT",
     "decimals": 18,
     "type": "default"

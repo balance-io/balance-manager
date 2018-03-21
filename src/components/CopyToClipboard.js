@@ -45,33 +45,23 @@ const StyledCopyToClipboard = styled.div`
 const StyledContainer = styled.div`
   position: relative;
   display: inline;
-  padding: 6px 6px 6px 0;
 `;
 
-const StyledInput = styled.input`
-  width: 100%;
-  position: absolute;
-  left: 0;
-  top: 3px;
-  margin: 0;
-  cursor: pointer;
-  border: none;
-  -webkit-appearance: none;
-  outline: none;
-  border-style: none;
+const StyledInputText = styled.input`
+  background-color: transparent;
+  color: transparent;
+  text-shadow: 0 0 0 rgba(${colors.darkGrey}, 0.6);
+
   font-style: normal;
   font-stretch: normal;
   line-height: normal;
   letter-spacing: normal;
   text-align: left;
-  opacity: 0.7;
-  color: transparent;
-  text-shadow: 0 0 0 rgb(${colors.dark});
-  font-weight: ${fonts.weight.semibold};
-  font-size: ${fonts.size.medium};
+
+  font-weight: ${fonts.weight.normal};
+  font-size: ${fonts.size.h6};
   font-family: ${fonts.family.SFProText};
   line-height: 1.25;
-  letter-spacing: -0.2px;
   @media screen and (${responsive.sm.max}) {
     font-size: ${fonts.size.small};
   }
@@ -80,21 +70,25 @@ const StyledInput = styled.input`
   }
 `;
 
-const StyledInvisible = styled.p`
+const StyledInput = styled(StyledInputText)`
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  cursor: pointer;
+  border: none;
+  -webkit-appearance: none;
+  outline: none;
+`;
+
+const StyledInputParagraph = StyledInputText.withComponent('p');
+
+const StyledInvisible = styled(StyledInputParagraph)`
   width: auto;
   display: inline;
-  border-style: none;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: normal;
-  letter-spacing: normal;
-  text-align: left;
-  font-weight: ${fonts.weight.semibold};
-  font-size: ${fonts.size.medium};
-  font-family: ${fonts.family.SFProText};
-  line-height: 1.25;
-  letter-spacing: -0.2px;
   opacity: 0;
+  margin-left: 4px;
 `;
 
 let timeout = null;

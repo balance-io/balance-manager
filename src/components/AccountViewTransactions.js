@@ -4,7 +4,8 @@ import styled from 'styled-components';
 import lang from '../languages';
 import Card from './Card';
 import AssetIcon from './AssetIcon';
-import { colors, fonts, shadows, responsive } from '../styles';
+import TransactionStatus from './TransactionStatus';
+import { colors, fonts, shadows, responsive, transitions } from '../styles';
 
 const StyledGrid = styled.div`
   width: 100%;
@@ -20,7 +21,7 @@ const StyledRow = styled.div`
   padding: 20px;
   z-index: 0;
   background-color: rgb(${colors.white});
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: 2fr 1fr 2fr 2fr 2fr;
   & p {
     display: flex;
     align-items: center;
@@ -54,6 +55,9 @@ const StyledLabelsRow = styled(StyledRow)`
   & p:first-child {
     justify-content: flex-start;
   }
+  & p:nth-child(2) {
+    margin-right: -20px;
+  }
 `;
 
 const StyledLabels = styled.p`
@@ -63,24 +67,14 @@ const StyledLabels = styled.p`
   color: rgba(${colors.darkGrey}, 0.7);
 `;
 
-const StyledEthereum = styled(StyledRow)`
-  width: 100%;
-  z-index: 2;
-  box-shadow: ${shadows.medium};
-  & div p {
-    font-weight: ${fonts.weight.medium};
-  }
-  & > p {
-    font-weight: ${fonts.weight.semibold};
-    font-family: ${fonts.family.SFMono};
-  }
-`;
-
 const StyledTransaction = styled(StyledRow)`
+  transition: ${transitions.base};
   width: 100%;
+  z-index: 0;
+  box-shadow: none;
   & > * {
     font-weight: ${fonts.weight.medium};
-    color: rgba(${colors.dark}, 0.6);
+    color: ${({ failed }) => (failed ? `rgba(${colors.dark}, 0.3)` : `rgba(${colors.dark}, 0.6)`)};
   }
   & > p:first-child {
     justify-content: flex-start;
@@ -90,6 +84,12 @@ const StyledTransaction = styled(StyledRow)`
   }
   &:nth-child(n + 3) {
     border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
+  }
+  @media (hover: hover) {
+    &:hover {
+      z-index: 10;
+      box-shadow: ${shadows.soft};
+    }
   }
 `;
 
@@ -112,9 +112,18 @@ const StyledAsset = styled.div`
   }
 `;
 
-const StyledShowMoreTransactions = styled(StyledEthereum)`
+const StyledShowMoreTransactions = styled(StyledRow)`
   grid-template-columns: auto;
-  box-shadow: none;
+  width: 100%;
+  z-index: 2;
+  border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
+  & div p {
+    font-weight: ${fonts.weight.medium};
+  }
+  & > p {
+    font-weight: ${fonts.weight.semibold};
+    font-family: ${fonts.family.SFMono};
+  }
   & p {
     cursor: pointer;
     text-align: left;
@@ -131,25 +140,9 @@ const StyledShowMoreTransactions = styled(StyledEthereum)`
   }
 `;
 
-const StyledTransactionType = styled.p`
-  font-weight: ${fonts.weight.semibold};
-  position: relative;
-  & span {
-    position: absolute;
-    color: transparent;
-    background: ${({ color }) => (color ? `rgba(${colors[color]}, 0.1)` : 'transparent')};
-    padding: 4px 8px;
-    right: -8px;
-    border-radius: 8px;
-  }
+const StyledCard = styled(Card)`
+  box-shadow: none;
 `;
-
-const TransactionType = ({ children, color, ...props }) => (
-  <StyledTransactionType color={color} {...props}>
-    <span>{children}</span>
-    {children}
-  </StyledTransactionType>
-);
 
 const AccountViewTransactions = ({
   onShowMoreTransactions,
@@ -166,31 +159,24 @@ const AccountViewTransactions = ({
       <StyledGrid>
         <StyledLabelsRow>
           <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
+          <StyledLabels>{lang.t('account.label_status')}</StyledLabels>
           <StyledLabels>{lang.t('account.label_quantity')}</StyledLabels>
           <StyledLabels>{lang.t('account.label_price')}</StyledLabels>
-          <StyledLabels>{lang.t('account.label_status')}</StyledLabels>
           <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
         </StyledLabelsRow>
 
         {_transactions.map((tx, idx) => {
           if (idx > limitTransactions) return null;
           return (
-            <StyledTransaction key={tx.hash}>
+            <StyledTransaction failed={tx.error} key={tx.hash}>
               <StyledAsset>
                 <AssetIcon currency={tx.asset.symbol} />
                 <p>{tx.asset.name}</p>
               </StyledAsset>
+              <TransactionStatus tx={tx} accountAddress={accountAddress} />
+
               <p>{`${tx.value} ${tx.asset.symbol}`}</p>
               <p>{tx.price || '———'}</p>
-              <TransactionType
-                color={!tx.error ? (tx.from === accountAddress ? 'gold' : 'green') : 'red'}
-              >
-                {!tx.error
-                  ? tx.from === accountAddress
-                    ? lang.t('account.tx_sent')
-                    : lang.t('account.tx_received')
-                  : lang.t('account.tx_failed')}
-              </TransactionType>
               <p>
                 {tx.total ? (tx.from === accountAddress ? `- ${tx.total}` : `${tx.total}`) : '———'}
               </p>
@@ -204,9 +190,9 @@ const AccountViewTransactions = ({
         )}
       </StyledGrid>
     ) : (
-      <Card minHeight={100} fetching={fetchingTransactions}>
+      <StyledCard minHeight={280} fetching={fetchingTransactions}>
         <div />
-      </Card>
+      </StyledCard>
     ))
   );
 };

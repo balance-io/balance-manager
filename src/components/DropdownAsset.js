@@ -96,9 +96,17 @@ class DropdownAsset extends Component {
   };
   toggleDropdown = () => this.setState({ showDropdown: !this.state.showDropdown });
   render() {
-    const { selected, asset, ...props } = this.props;
+    const { selected, assets, ...props } = this.props;
+    const ethereum = assets.filter(asset => asset.symbol === 'ETH')[0];
+    const tokensWithValue = assets.filter(
+      asset => asset.symbol !== 'ETH' && (asset.native && asset.native.value)
+    );
+    const tokensWithNoValue = assets.filter(
+      asset => asset.symbol !== 'ETH' && (!asset.native || (asset.native && !asset.native.value))
+    );
+    const _assets = [ethereum, ...tokensWithValue, ...tokensWithNoValue];
     const options = {};
-    asset.forEach(option => {
+    _assets.forEach(option => {
       options[option.symbol] = option;
     });
     return (
@@ -109,10 +117,10 @@ class DropdownAsset extends Component {
               <AssetIcon size={18} currency={options[this.props.selected].symbol} />
               <p>{options[this.props.selected].name}</p>
             </StyledAsset>
-            <p>{`${options[this.props.selected].balance} ${options[this.props.selected].symbol} ≈ ${
-              options[this.props.selected].native
-                ? options[this.props.selected].native.string
-                : null
+            <p>{`${options[this.props.selected].balance} ${options[this.props.selected].symbol}${
+              options[this.props.selected].native && options[this.props.selected].native.string
+                ? ` ≈ ${options[this.props.selected].native.string}`
+                : ''
             }`}</p>
           </div>
         </StyledSelected>
@@ -128,8 +136,10 @@ class DropdownAsset extends Component {
                   <AssetIcon size={18} currency={options[key].symbol} />
                   <p>{options[key].name}</p>
                 </StyledAsset>
-                <p>{`${options[key].balance} ${options[key].symbol} ≈ ${
-                  options[key].native ? options[key].native.string : null
+                <p>{`${options[key].balance} ${options[key].symbol}${
+                  options[key].native && options[key].native.string
+                    ? ` ≈ ${options[key].native.string}`
+                    : ''
                 }`}</p>
               </div>
             ))}
@@ -141,7 +151,7 @@ class DropdownAsset extends Component {
 
 DropdownAsset.propTypes = {
   selected: PropTypes.string.isRequired,
-  asset: PropTypes.array.isRequired,
+  assets: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired
 };
 

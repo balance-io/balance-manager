@@ -275,6 +275,7 @@ export const padLeft = (n, width, z) => {
  * @return {String}
  */
 export const getDataString = (func, arrVals) => {
+  console.log(arrVals);
   let val = '';
   for (let i = 0; i < arrVals.length; i++) val += padLeft(arrVals[i], 64);
   const data = func + val;

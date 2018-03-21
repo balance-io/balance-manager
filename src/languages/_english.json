@@ -1,7 +1,6 @@
 {
   "translation": {
     "account": {
-      "your_wallet_address": "Your wallet address",
       "tab_balances": "Balances",
       "tab_transactions": "Transactions",
       "label_asset": "Asset",
@@ -12,7 +11,6 @@
       "label_total": "Total",
       "show": "Show",
       "hide": "Hide",
-      "total_balance": "Balance",
       "no_market_value": "tokens with no market value",
       "tx_sent": "Sent",
       "tx_received": "Received",

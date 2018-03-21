@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import Link from '../components/Link';
 import Modal from '../components/Modal';
 import Indicator from '../components/Indicator';
+import DropdownNative from '../components/DropdownNative';
 import Background from '../components/Background';
 import IconPreload from '../components/IconPreload';
 import Wrapper from '../components/Wrapper';
@@ -13,7 +14,8 @@ import Notification from '../components/Notification';
 import Warning from '../components/Warning';
 import logo from '../assets/logo-light.png';
 import ethereumNetworks from '../libraries/ethereum-networks.json';
-import supportedWallets from '../libraries/supported-wallets.json';
+import nativeCurrencies from '../libraries/native-currencies.json';
+import { accountChangeNativeCurrency } from '../reducers/_account';
 import { colors, fonts, responsive } from '../styles';
 
 const StyledLayout = styled.div`
@@ -84,7 +86,6 @@ const StyledIndicators = styled.div`
 `;
 
 const StyledNetworkStatus = styled(Indicator)``;
-const StyledActiveWallet = styled(Indicator)``;
 
 const StyledVerticalLine = styled.div`
   height: 17px;
@@ -95,6 +96,8 @@ const BaseLayout = ({
   children,
   fetching,
   account,
+  accountChangeNativeCurrency,
+  nativeCurrency,
   web3Network,
   web3Available,
   web3Connected,
@@ -123,7 +126,11 @@ const BaseLayout = ({
               options={ethereumNetworks}
             />
             <StyledVerticalLine />
-            <StyledActiveWallet selected={account.type.toLowerCase()} options={supportedWallets} />
+            <DropdownNative
+              selected={nativeCurrency}
+              options={nativeCurrencies}
+              onChange={accountChangeNativeCurrency}
+            />
           </StyledIndicators>
         </StyledHeader>
         <StyledContent>{children}</StyledContent>
@@ -139,6 +146,7 @@ BaseLayout.propTypes = {
   children: PropTypes.node.isRequired,
   fetching: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
+  nativeCurrency: PropTypes.string.isRequired,
   web3Network: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
   web3Connected: PropTypes.bool.isRequired
@@ -147,9 +155,10 @@ BaseLayout.propTypes = {
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
   account: account.account,
+  nativeCurrency: account.nativeCurrency,
   web3Network: account.web3Network,
   web3Available: account.web3Available,
   web3Connected: account.web3Connected
 });
 
-export default connect(reduxProps, null)(BaseLayout);
+export default connect(reduxProps, { accountChangeNativeCurrency })(BaseLayout);

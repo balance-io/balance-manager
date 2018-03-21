@@ -116,7 +116,7 @@ export const accountClearIntervals = () => dispatch => {
 };
 
 export const accountGetNativePrices = account => (dispatch, getState) => {
-  const assetSymbols = getState().account.account.asset.map(asset => asset.symbol);
+  const assetSymbols = getState().account.account.assets.map(asset => asset.symbol);
   const getPrices = () => {
     dispatch({
       type: ACCOUNT_GET_NATIVE_PRICES_REQUEST,

@@ -38,13 +38,13 @@ export const parseError = error => {
 /**
  * @desc parse prices object from api response
  * @param  {Object} [data=null]
- * @param  {Array} [asset=[]]
+ * @param  {Array} [assets=[]]
  * @param  {String} [native='USD']
  * @return {Object}
  */
-export const parsePricesObject = (data = null, asset = [], native = 'USD') => {
+export const parsePricesObject = (data = null, assets = [], native = 'USD') => {
   let prices = { native };
-  asset.map(
+  assets.map(
     coin =>
       (prices[coin] = data.RAW[coin]
         ? { price: data.RAW[coin][native].PRICE, change: data.RAW[coin][native].CHANGEPCT24HOUR }
@@ -75,7 +75,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
     native: null
   };
 
-  let asset = [ethereum];
+  let assets = [ethereum];
   if (data && data.tokens) {
     const tokens = data.tokens.map(token => {
       const balance = convertTokenAmountToUnit(token.balance, Number(token.tokenInfo.decimals));
@@ -88,13 +88,13 @@ export const parseEthplorerAddressInfo = (data = null) => {
         native: null
       };
     });
-    asset = [...asset, ...tokens];
+    assets = [...assets, ...tokens];
   }
   return {
     address: (data && data.address) || '',
     type: 'METAMASK',
     txCount: (data && data.countTxs) || 0,
-    asset,
+    assets,
     totalNative: '———'
   };
 };
@@ -108,8 +108,8 @@ export const parseEthplorerAddressInfo = (data = null) => {
 export const parseAccountBalances = (account = null, prices = null) => {
   let totalNative = '———';
 
-  if (account && account.asset) {
-    account.asset = account.asset.map(asset => {
+  if (account && account.assets) {
+    account.assets = account.assets.map(asset => {
       const price = convertToNativeString('1', asset.symbol, prices);
       const change = formatPercentageChange(asset.symbol, prices);
       const value = convertToNativeValue(asset.balance, asset.symbol, prices);
@@ -123,7 +123,7 @@ export const parseAccountBalances = (account = null, prices = null) => {
       };
       return asset;
     });
-    totalNative = account.asset.reduce(
+    totalNative = account.assets.reduce(
       (total, asset) => Number(total) + Number(asset.native.value),
       0
     );

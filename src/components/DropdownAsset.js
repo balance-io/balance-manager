@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import AssetIcon from '../components/AssetIcon';
 import selector from '../assets/selector-grey.svg';
-import { fonts, colors, shadows, responsive } from '../styles';
+import { fonts, colors, shadows, responsive, transitions } from '../styles';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -73,8 +73,16 @@ const StyledDropdown = styled(StyledRow)`
   pointer-events: ${({ show }) => (show ? 'auto' : 'none')};
   -webkit-box-shadow: ${shadows.medium};
   box-shadow: ${shadows.medium};
+
+  max-height: 280px;
+  overflow: scroll;
+
   & > div {
+    transition: ${transitions.base};
     border-top: 1px solid rgba(${colors.lightGrey}, 0.7);
+    &:hover {
+      opacity: 0.6;
+    }
   }
 `;
 

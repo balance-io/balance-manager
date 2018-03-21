@@ -10,7 +10,8 @@ export const resources = {
 export const updateLanguage = code => i18next.changeLanguage(code);
 
 i18next.on('languageChanged', () => {
-  console.log('language has changed');
+  /* eslint-disable-next-line */
+  () => {};
 });
 
 export default i18next;

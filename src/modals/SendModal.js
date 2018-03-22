@@ -395,7 +395,7 @@ class SendModal extends Component {
             <Form onSubmit={this.onSubmit}>
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
-                {lang.t('modal.receive_title', {
+                {lang.t('modal.send_title', {
                   walletName: capitalize(this.props.modalProps.name)
                 })}
               </StyledSubTitle>

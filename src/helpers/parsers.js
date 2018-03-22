@@ -141,8 +141,19 @@ export const parseAccountBalances = (account = null, prices = null) => {
 export const parseEtherscanAccountTransactions = async (data = null) => {
   if (!data || !data.result) return null;
 
+  const debounceApiGetEthplorerTokenInfo = (address, timeout) =>
+    new Promise((resolve, reject) =>
+      setTimeout(
+        () =>
+          apiGetEthplorerTokenInfo(address)
+            .then(res => resolve(res))
+            .catch(err => reject(err)),
+        timeout
+      )
+    );
+
   let transactions = await Promise.all(
-    data.result.map(async tx => {
+    data.result.map(async (tx, idx) => {
       const hash = tx.hash;
       const timestamp = tx.timeStamp;
       const from = tx.from;
@@ -160,7 +171,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       const tokenTransfer = sha3('transfer(address,uint256)').slice(0, 10);
 
       if (tx.input.startsWith(tokenTransfer)) {
-        const response = await apiGetEthplorerTokenInfo(tx.to);
+        const response = await debounceApiGetEthplorerTokenInfo(tx.to, 100 * idx);
 
         asset = {
           name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
@@ -213,6 +224,18 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
  */
 export const parseTransactionsPrices = async (transactions = null, nativeCurrency = '') => {
   let _transactions = transactions;
+
+  const debounceApiGetHistoricalPrice = (assetSymbol, native, timestamp, timeout) =>
+    new Promise((resolve, reject) =>
+      setTimeout(
+        () =>
+          apiGetHistoricalPrices(assetSymbol, native, timestamp)
+            .then(res => resolve(res))
+            .catch(err => reject(err)),
+        timeout
+      )
+    );
+
   if (
     _transactions &&
     _transactions.length &&
@@ -220,11 +243,16 @@ export const parseTransactionsPrices = async (transactions = null, nativeCurrenc
     typeof nativeCurrency === 'string'
   ) {
     _transactions = await Promise.all(
-      _transactions.map(async tx => {
+      _transactions.map(async (tx, idx) => {
         const timestamp = tx.timestamp;
         const assetSymbol = tx.asset.symbol;
         const native = [nativeCurrency];
-        const response = await apiGetHistoricalPrices(assetSymbol, native, timestamp);
+        const response = await debounceApiGetHistoricalPrice(
+          assetSymbol,
+          native,
+          timestamp,
+          50 * idx
+        );
         if (response.data.response) return tx;
         const prices = {
           native: nativeCurrency,

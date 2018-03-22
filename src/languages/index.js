@@ -9,9 +9,6 @@ export const resources = {
 
 export const updateLanguage = code => i18next.changeLanguage(code);
 
-i18next.on('languageChanged', () => {
-  /* eslint-disable-next-line */
-  () => {};
-});
+i18next.on('languageChanged', () => {});
 
 export default i18next;

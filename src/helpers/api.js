@@ -9,11 +9,11 @@ import networkList from '../libraries/ethereum-networks.json';
  * @param  {Array}   [native=[]]
  * @return {Promise}
  */
-export const apiGetPrices = (asset = [], native = []) => {
-  const assetQuery = JSON.stringify(asset).replace(/[[\]"]/gi, '');
+export const apiGetPrices = (assets = [], native = []) => {
+  const assetsQuery = JSON.stringify(assets).replace(/[[\]"]/gi, '');
   const nativeQuery = JSON.stringify(native).replace(/[[\]"]/gi, '');
   return axios.get(
-    `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${assetQuery}&tsyms=${nativeQuery}`
+    `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}`
   );
 };
 

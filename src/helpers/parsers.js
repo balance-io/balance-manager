@@ -1,10 +1,10 @@
+import BigNumber from 'bignumber.js';
 import lang from '../languages';
 import {
   convertToNativeString,
   convertToNativeValue,
   formatNativeString,
   formatPercentageChange,
-  handleDecimals,
   hexToNumberString,
   convertTokenAmountToUnit,
   fromWei,
@@ -71,7 +71,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
     symbol: 'ETH',
     address: null,
     decimals: 18,
-    balance: data && data.ETH.balance ? handleDecimals(data.ETH.balance) : '0.00000000',
+    balance: data && data.ETH.balance ? BigNumber(data.ETH.balance) : BigNumber('0'),
     native: null
   };
 
@@ -84,7 +84,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
         symbol: token.tokenInfo.symbol || '———',
         address: token.tokenInfo.address,
         decimals: Number(token.tokenInfo.decimals),
-        balance: handleDecimals(balance),
+        balance: BigNumber(balance),
         native: null
       };
     });
@@ -164,9 +164,9 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
         name: 'Ethereum',
         symbol: 'ETH',
         address: null,
-        decimals: 18
+        decimals: BigNumber(18)
       };
-      let value = Number(fromWei(tx.value));
+      let value = fromWei(tx.value);
 
       const tokenTransfer = sha3('transfer(address,uint256)').slice(0, 10);
 
@@ -177,7 +177,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
           name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
           symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
           address: !response.data.error ? response.data.address : '',
-          decimals: !response.data.error ? Number(response.data.decimals) : 18
+          decimals: !response.data.error ? BigNumber(response.data.decimals) : BigNumber(18)
         };
 
         /* STT token on Ropsten */
@@ -186,7 +186,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
             name: 'Status Test Token',
             symbol: 'STT',
             address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
-            decimals: 18
+            decimals: BigNumber(18)
           };
         }
 
@@ -194,7 +194,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
         const amount = hexToNumberString(`${tx.input.slice(74)}`);
 
         to = address;
-        value = handleDecimals(convertTokenAmountToUnit(amount, asset.decimals));
+        value = convertTokenAmountToUnit(amount, asset.decimals);
       } else if (tx.input !== '0x') {
         interaction = true;
       }

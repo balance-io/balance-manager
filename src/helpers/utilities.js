@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 import { web3Instance } from './web3';
 import lang from '../languages';
 import nativeCurrencies from '../libraries/native-currencies.json';
+import ethUnits from '../libraries/ethereum-units.json';
 
 /**
  * @desc save to local storage
@@ -195,31 +196,25 @@ export const convertToNativeString = (value = '', assetSymbol = 'ETH', prices = 
 
 /**
  * @desc convert token amount to unit
- * @param  {String} [amount='']
+ * @param  {BigNumber} [amount=0]
  * @param  {Number} [decimals=18]
  * @return {Number}
  */
-export const convertTokenAmountToUnit = (amount = '', decimals = 18) => {
-  const _amount = `${amount}`;
-  if (!Number(_amount)) return null;
-  return BigNumber(_amount)
+export const convertTokenAmountToUnit = (amount = 0, decimals = 18) =>
+  BigNumber(amount)
     .dividedBy(new BigNumber(10).pow(decimals))
     .toNumber();
-};
 
 /**
  * @desc convert token amount from unit
- * @param  {String} [amount='']
+ * @param  {BigNumber} [amount=0]
  * @param  {Number} [decimals=8]
  * @return {Number}
  */
-export const convertTokenAmountFromUnit = (amount = '', decimals = 18) => {
-  const _amount = `${amount}`;
-  if (!Number(_amount)) return null;
-  return BigNumber(_amount)
+export const convertTokenAmountFromUnit = (amount = 0, decimals = 18) =>
+  BigNumber(amount)
     .times(new BigNumber(10).pow(decimals))
     .toNumber();
-};
 
 /**
  * @desc format native value to string
@@ -332,16 +327,16 @@ export const sanitizeHex = hex => {
 /**
  * @desc convert from wei to ether
  * @param  {Number} wei
- * @return {String}
+ * @return {BigNumber}
  */
-export const fromWei = wei => web3Instance.utils.fromWei(String(wei));
+export const fromWei = wei => BigNumber(wei).dividedBy(ethUnits.wei);
 
 /**
  * @desc convert from ether to wei
  * @param  {Number} ether
- * @return {String}
+ * @return {BigNumber}
  */
-export const toWei = ether => web3Instance.utils.toWei(String(ether));
+export const toWei = ether => BigNumber(ether).times(ethUnits.wei);
 
 /**
  * @desc hash string with sha3
@@ -387,18 +382,6 @@ export const bootIntercom = () => {
 };
 
 /**
- * @desc handle decimals to maximum decimals parameter
- * @param {String|Number} [value='']
- * @param {Number} [decimals=8]
- * @return {String}
- */
-export const handleDecimals = (value = '', decimals = 8) =>
-  Number(value)
-    .toFixed(decimals)
-    .replace(/0+$/, '')
-    .replace(/\.+$/, '');
-
-/**
  * @desc get time string for minimal unit
  * @param {String|Number} [value='']
  * @param {String} [unit='']
@@ -415,7 +398,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _unit = lang.t('time.second');
         _unitShort = lang.t('time.sec');
       } else if (_value < 1) {
-        _value = handleDecimals(value * 100, 2);
+        _value = BigNumber(value * 100).toFixed(2);
         if (_value === 1) {
           _unit = lang.t('time.milisecond');
           _unitShort = lang.t('time.ms');
@@ -424,7 +407,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
           _unitShort = lang.t('time.ms');
         }
       } else if (_value >= 60 && _value < 3600) {
-        _value = handleDecimals(value / 60, 2);
+        _value = BigNumber(value / 60).toFixed(2);
         if (_value === 1) {
           _unit = lang.t('time.minute');
           _unitShort = lang.t('time.min');
@@ -433,7 +416,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
           _unitShort = lang.t('time.mins');
         }
       } else if (_value >= 3600 && _value < 86400) {
-        _value = handleDecimals(value / 3600, 2);
+        _value = BigNumber(value / 3600).toFixed(2);
         if (_value === 1) {
           _unit = lang.t('time.hour');
           _unitShort = lang.t('time.hr');
@@ -442,7 +425,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
           _unitShort = lang.t('time.hrs');
         }
       } else if (_value >= 86400) {
-        _value = handleDecimals(value / 86400, 2);
+        _value = BigNumber(value / 86400).toFixed(2);
         if (_value === 1) {
           _unit = lang.t('time.day');
           _unitShort = lang.t('time.day');
@@ -458,7 +441,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _unit = lang.t('time.minute');
         _unitShort = lang.t('time.min');
       } else if (_value < 1) {
-        _value = handleDecimals(value * 60, 2);
+        _value = BigNumber(value * 60).toFixed(2);
         if (_value === 1) {
           _unit = lang.t('time.second');
           _unitShort = lang.t('time.sec');
@@ -467,7 +450,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
           _unitShort = lang.t('time.secs');
         }
       } else if (_value > 60 && _value < 1440) {
-        _value = handleDecimals(value / 60, 2);
+        _value = BigNumber(value / 60).toFixed(2);
         if (_value === 1) {
           _unit = lang.t('time.hour');
           _unitShort = lang.t('time.hr');
@@ -476,7 +459,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
           _unitShort = lang.t('time.hrs');
         }
       } else if (_value >= 1440) {
-        _value = handleDecimals(value / 1440, 2);
+        _value = BigNumber(value / 1440).toFixed(2);
         if (_value === 1) {
           _unit = lang.t('time.day');
           _unitShort = lang.t('time.day');

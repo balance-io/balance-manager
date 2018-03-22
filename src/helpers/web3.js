@@ -211,7 +211,8 @@ export const getTransactionFee = async ({ tokenObject, address, recipient, amoun
   let gasLimit = ethUnits.basic_tx;
   let _gasPrice = gasPrice * ethUnits.gwei;
   let data = '0x';
-  let _amount = amount && Number(amount) ? amount : Number(tokenObject.balance);
+  let _amount =
+    amount && Number(amount) ? amount : Number(Number(Number(tokenObject.balance) / 2).toFixed(8));
   let _recipient =
     recipient && isValidAddress(recipient)
       ? recipient

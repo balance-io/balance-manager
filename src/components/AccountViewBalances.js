@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import lang from '../languages';
 import AssetIcon from './AssetIcon';
 import balancesTabIcon from '../assets/balances-tab.svg';
+import { convertStringToNumber } from '../helpers/utilities';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
@@ -21,6 +22,8 @@ const StyledRow = styled.div`
   z-index: 0;
   background-color: rgb(${colors.white});
   grid-template-columns: repeat(5, 1fr);
+  min-height: 0;
+  min-width: 0;
   & p {
     display: flex;
     align-items: center;
@@ -98,6 +101,8 @@ const StyledAsset = styled.div`
   align-items: center;
   justify-content: flex-start;
   text-align: left;
+  min-height: 0;
+  min-width: 0;
   & p {
     font-size: ${fonts.size.medium};
     margin-left: 10px;
@@ -123,6 +128,8 @@ const StyledLastRow = styled(StyledRow)`
   width: 100%;
   z-index: 2;
   grid-template-columns: 1fr 1fr;
+  min-height: 0;
+  min-width: 0;
   border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
   & > p {
     font-size: ${fonts.size.medium};
@@ -142,6 +149,8 @@ const StyledLastRow = styled(StyledRow)`
 
 const StyledShowMoreTokens = styled(StyledToken)`
   grid-template-columns: auto;
+  min-height: 0;
+  min-width: 0;
   padding: 0;
   position: relative;
   cursor: pointer;
@@ -177,12 +186,8 @@ const AccountViewBalances = ({
   ...props
 }) => {
   const ethereum = account.assets.filter(asset => asset.symbol === 'ETH')[0];
-  const tokensWithValue = account.assets.filter(
-    asset => asset.symbol !== 'ETH' && (asset.native && asset.native.value)
-  );
-  const tokensWithNoValue = account.assets.filter(
-    asset => asset.symbol !== 'ETH' && (!asset.native || (asset.native && !asset.native.value))
-  );
+  const tokensWithValue = account.assets.filter(asset => asset.symbol !== 'ETH' && asset.native);
+  const tokensWithNoValue = account.assets.filter(asset => asset.symbol !== 'ETH' && !asset.native);
   return (
     <StyledGrid {...props}>
       <StyledLabelsRow>
@@ -198,14 +203,14 @@ const AccountViewBalances = ({
           <AssetIcon currency={ethereum.symbol} />
           <p>{ethereum.name}</p>
         </StyledAsset>
-        <p>{`${ethereum.balance} ${ethereum.symbol}`}</p>
-        <p>{ethereum.native && ethereum.native.price ? ethereum.native.price : '———'}</p>
+        <p>{ethereum.balance.display}</p>
+        <p>{ethereum.native ? ethereum.native.price.display : '———'}</p>
         <StyledPercentage
-          percentage={ethereum.native ? Number(ethereum.native.change.slice(0, -1)) : 0}
+          percentage={ethereum.native ? convertStringToNumber(ethereum.native.change.amount) : 0}
         >
-          {ethereum.native && ethereum.native.change ? ethereum.native.change : '———'}
+          {ethereum.native ? ethereum.native.change.display : '———'}
         </StyledPercentage>
-        <p>{ethereum.native && ethereum.native.string ? ethereum.native.string : '———'}</p>
+        <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
       </StyledEthereum>
       {!!tokensWithValue &&
         tokensWithValue.map(token => (
@@ -214,14 +219,14 @@ const AccountViewBalances = ({
               <AssetIcon currency={token.symbol} />
               <p>{token.name}</p>
             </StyledAsset>
-            <p>{`${token.balance} ${token.symbol}`}</p>
-            <p>{token.native && token.native.price ? token.native.price : '———'}</p>
+            <p>{token.balance.display}</p>
+            <p>{token.native ? token.native.price.display : '———'}</p>
             <StyledPercentage
-              percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
+              percentage={token.native ? convertStringToNumber(token.native.change.amount) : 0}
             >
-              {token.native && token.native.change ? token.native.change : '———'}
+              {token.native ? token.native.change.display : '———'}
             </StyledPercentage>
-            <p>{token.native && token.native.string ? token.native.string : '———'}</p>
+            <p>{token.native ? token.native.balance.display : '———'}</p>
           </StyledToken>
         ))}
       {!!tokensWithNoValue.length &&
@@ -232,14 +237,14 @@ const AccountViewBalances = ({
               <AssetIcon currency={token.symbol} />
               <p>{token.name}</p>
             </StyledAsset>
-            <p>{`${token.balance} ${token.symbol}`}</p>
-            <p>{token.native && token.native.price ? token.native.price : '———'}</p>
+            <p>{token.balance.display}</p>
+            <p>{token.native ? token.native.price.display : '———'}</p>
             <StyledPercentage
-              percentage={token.native ? Number(token.native.change.slice(0, -1)) : 0}
+              percentage={token.native ? convertStringToNumber(token.native.change.amount) : 0}
             >
-              {token.native && token.native.change ? token.native.change : '———'}
+              {token.native ? token.native.change.display : '———'}
             </StyledPercentage>
-            <p>{token.native && token.native.string ? token.native.string : '———'}</p>
+            <p>{token.native ? token.native.balance.display : '———'}</p>
           </StyledToken>
         ))}
       <StyledLastRow>
@@ -255,7 +260,7 @@ const AccountViewBalances = ({
         ) : (
           <div />
         )}
-        <p>{`${account.totalNative || '———'}`}</p>
+        <p>{`${account.total.display || '———'}`}</p>
       </StyledLastRow>
     </StyledGrid>
   );

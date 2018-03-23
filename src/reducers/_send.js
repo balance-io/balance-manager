@@ -2,7 +2,11 @@ import { apiGetGasPrices } from '../helpers/api';
 import { notificationShow } from './_notification';
 import lang from '../languages';
 import ethUnits from '../libraries/ethereum-units.json';
-import { fromWei, convertFromNativeValue, convertToNativeValue } from '../helpers/utilities';
+import {
+  convertAmountFromBigNumber,
+  convertAssetAmountFromNativePrice,
+  convertAssetAmountToNativePrice
+} from '../helpers/utilities';
 import { parseError } from '../helpers/parsers';
 import {
   metamaskSendTransaction,
@@ -60,7 +64,7 @@ export const sendGetGasPrices = () => (dispatch, getState) => {
       data.fast = parseInt(data.fast, 10) / 10;
       data.average = parseInt(data.average, 10) / 10;
       data.safeLow = parseInt(data.safeLow, 10) / 10;
-      const txFee = fromWei(ethUnits.basic_tx * data.average * ethUnits.gwei);
+      const txFee = convertAmountFromBigNumber(ethUnits.basic_tx * data.average * ethUnits.gwei);
       dispatch({
         type: SEND_GET_GAS_PRICES_SUCCESS,
         payload: { gasPrices: data, txFee }
@@ -245,7 +249,7 @@ export const sendUpdateRecipient = recipient => dispatch => {
 export const sendUpdateNativeAmount = (nativeAmount, selected, prices) => dispatch => {
   const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
   const assetAmount =
-    String(convertFromNativeValue(_nativeAmount, selected, prices)) || _nativeAmount;
+    String(convertAssetAmountFromNativePrice(_nativeAmount, selected, prices)) || _nativeAmount;
   dispatch({
     type: SEND_UPDATE_CRYPTO_AMOUNT,
     payload: { assetAmount, nativeAmount: _nativeAmount }
@@ -255,7 +259,7 @@ export const sendUpdateNativeAmount = (nativeAmount, selected, prices) => dispat
 export const sendUpdateAssetAmount = (assetAmount, selected, prices) => dispatch => {
   const _assetAmount = assetAmount.replace(/[^0-9.]/g, '');
   const nativeAmount =
-    String(convertToNativeValue(_assetAmount, selected, prices)) || _assetAmount;
+    String(convertAssetAmountToNativePrice(_assetAmount, selected, prices)) || _assetAmount;
   dispatch({
     type: SEND_UPDATE_CRYPTO_AMOUNT,
     payload: { assetAmount: _assetAmount, nativeAmount }

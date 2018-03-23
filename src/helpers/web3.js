@@ -135,8 +135,8 @@ export const sendSignedTransaction = transaction =>
 export const transferToken = transaction =>
   new Promise((resolve, reject) => {
     const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
-    const value = new BigNumber(transaction.amount)
-      .times(new BigNumber(10).pow(transaction.tokenObject.decimals))
+    const value = BigNumber(transaction.amount)
+      .times(BigNumber(10).pow(transaction.tokenObject.decimals))
       .toString(16);
     const recipient = getNakedAddress(transaction.to);
     const dataString = getDataString(transferHexMethod, [recipient, value]);
@@ -187,8 +187,8 @@ export const metamaskSendTransaction = transaction =>
 export const metamaskTransferToken = transaction =>
   new Promise((resolve, reject) => {
     const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
-    const value = new BigNumber(transaction.amount)
-      .times(new BigNumber(10).pow(transaction.tokenObject.decimals))
+    const value = BigNumber(transaction.amount)
+      .times(BigNumber(10).pow(transaction.tokenObject.decimals))
       .toString(16);
     const recipient = getNakedAddress(transaction.to);
     const dataString = getDataString(transferHexMethod, [recipient, value]);
@@ -219,8 +219,8 @@ export const getTransactionFee = async ({ tokenObject, address, recipient, amoun
   let estimateGasData = { to: _recipient, data };
   if (tokenObject.symbol !== 'ETH') {
     const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
-    const value = new BigNumber(_amount)
-      .times(new BigNumber(10).pow(tokenObject.decimals))
+    const value = BigNumber(_amount)
+      .times(BigNumber(10).pow(tokenObject.decimals))
       .toString(16);
     data = getDataString(transferHexMethod, [getNakedAddress(_recipient), value]);
     estimateGasData = { from: address, to: tokenObject.address, data, value: '0x0' };

@@ -65,7 +65,7 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
   dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST });
   apiGetEthplorerAddressInfo(address, web3Network)
     .then(account => {
-      account = { type, ...account };
+      account = { ...account, type };
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS, payload: account });
       dispatch(accountGetNativePrices());
       if (account.txCount) dispatch(accountGetAccountTransactions());

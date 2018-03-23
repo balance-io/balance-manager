@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import BigNumber from 'bignumber.js';
 import lang, { resources } from './languages';
 import Home from './pages/Home';
 import Wallet from './pages/Wallet';
@@ -18,6 +19,9 @@ class Router extends Component {
     });
   }
   componentDidMount() {
+    if (process.env.NODE_ENV === 'development') {
+      window.BigNumber = BigNumber;
+    }
     window.browserHistory = this.context.router.history;
   }
   render = () => (

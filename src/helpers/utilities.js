@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { web3Instance } from './web3';
 import lang from '../languages';
-import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
 
 /**
@@ -147,107 +146,157 @@ export const capitalize = string =>
     .join(' ');
 
 /**
- * @desc convert from current native value to asset value
- * @param  {String} [nativeValue='']
- * @param  {String} [assetSymbol='ETH']
- * @param  {Object} [prices=null]
- * @return {Number}
- */
-export const convertFromNativeValue = (nativeValue = '', assetSymbol = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[assetSymbol])) return null;
-  return Number(Number(Number(nativeValue) / Number(prices[assetSymbol].price)).toFixed(8));
-};
-
-/**
- * @desc convert assetSymbol value to current native value
- * @param  {String} [value='']
- * @param  {String} [assetSymbol='ETH']
- * @param  {Object} [prices=null]
- * @return {Number}
- */
-export const convertToNativeValue = (value = '', assetSymbol = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[assetSymbol])) return null;
-  return Number(Number(Number(value) * Number(prices[assetSymbol].price)).toFixed(8));
-};
-
-/**
- * @desc convert asset value to current native string
- * @param  {String} [value='']
- * @param  {String} [asset='ETH']
- * @param  {Object} [prices=null]
+ * @desc convert from number to string
+ * @param  {Number}  value
  * @return {String}
  */
-export const convertToNativeString = (value = '', assetSymbol = 'ETH', prices = null) => {
-  if (!prices || (prices && !prices[assetSymbol])) return '';
-  if (prices.native === 'ETH' || prices.native === 'BTC') {
-    const nativeSymbol = prices.native;
-    const decimals = 8;
-    const nativeValue = convertToNativeValue(value, assetSymbol, prices);
-    const formatted = BigNumber(nativeValue).toFormat(decimals);
-    return `${formatted} ${nativeSymbol}`;
+export const convertNumberToString = value => BigNumber(`${value}`).toString();
+
+/**
+ * @desc convert from string to number
+ * @param  {String}  value
+ * @return {Number}
+ */
+export const convertStringToNumber = value => BigNumber(`${value}`).toNumber();
+
+/**
+ * @desc convert from amount value to BigNumber format
+ * @param  {String|Number}  value
+ * @return {BigNumber}
+ */
+export const convertAmountToBigNumber = value =>
+  BigNumber(`${value}`)
+    .times(ethUnits.ether)
+    .toString();
+
+/**
+ * @desc convert to amount value from BigNumber format
+ * @param  {BigNumber}  value
+ * @return {String}
+ */
+export const convertAmountFromBigNumber = value =>
+  BigNumber(`${value}`)
+    .dividedBy(ethUnits.ether)
+    .toString();
+
+/**
+ * @desc handle signficant decimals in display format
+ * @param  {String}   value
+ * @param  {Number}     decimals
+ * @return {String}
+ */
+export const handleSignificantDecimals = (value, decimals) => {
+  if (!BigNumber(`${decimals}`).isInteger()) return null;
+  decimals = BigNumber(`${decimals}`).toNumber();
+  if (
+    BigNumber(`${value}`)
+      .abs()
+      .comparedTo(1) === -1
+  ) {
+    decimals =
+      value
+        .slice(2)
+        .slice('')
+        .search(/[^0]/g) + 3;
+    decimals = decimals < 8 ? decimals : 8;
   } else {
-    const nativeSymbol = nativeCurrencies[prices.native].symbol;
-    const decimals = 2;
-    const nativeValue = convertToNativeValue(value, assetSymbol, prices);
-    const formatted = BigNumber(nativeValue).toFormat(decimals);
-    return `${nativeSymbol}${formatted}`;
+    decimals = decimals < 3 ? decimals : 3;
   }
+  let result = BigNumber(`${value}`).toFixed(decimals);
+  result = BigNumber(`${result}`).toString();
+  return BigNumber(`${result}`).toFormat();
 };
 
 /**
- * @desc convert token amount to unit
- * @param  {BigNumber} [amount=0]
- * @param  {Number} [decimals=18]
- * @return {Number}
- */
-export const convertTokenAmountToUnit = (amount = 0, decimals = 18) =>
-  BigNumber(amount)
-    .dividedBy(new BigNumber(10).pow(decimals))
-    .toNumber();
-
-/**
- * @desc convert token amount from unit
- * @param  {BigNumber} [amount=0]
- * @param  {Number} [decimals=8]
- * @return {Number}
- */
-export const convertTokenAmountFromUnit = (amount = 0, decimals = 18) =>
-  BigNumber(amount)
-    .times(new BigNumber(10).pow(decimals))
-    .toNumber();
-
-/**
- * @desc format native value to string
- * @param  {String} [value='']
- * @param  {Object} [native=null]
+ * @desc convert from amount value to display formatted string
+ * @param  {BigNumber}  value
+ * @param  {Object}     nativePrices
+ * @param  {Object}     asset
  * @return {String}
  */
-export const formatNativeString = (value = '', native = 'USD') => {
-  const _value = Number(value).toFixed(8);
-  if (native === 'ETH' || native === 'BTC') {
-    const nativeSymbol = native;
-    const decimals = 8;
-    const formatted = BigNumber(_value).toFormat(decimals);
-    return `${formatted} ${nativeSymbol}`;
-  } else {
-    const nativeSymbol = nativeCurrencies[native].symbol;
+export const convertAmountToDisplay = (value, nativePrices, asset) => {
+  value = convertAmountFromBigNumber(value);
+  if (!nativePrices && !asset) {
     const decimals = 2;
-    const formatted = BigNumber(_value).toFormat(decimals);
-    return `${nativeSymbol}${formatted}`;
+    const display = handleSignificantDecimals(value, decimals);
+    return `${display}%`;
+  } else if (!nativePrices && asset) {
+    const decimals = asset.decimals;
+    const display = handleSignificantDecimals(value, decimals);
+    return `${display} ${asset.symbol}`;
+  } else if (nativePrices) {
+    const decimals = nativePrices.selected.decimals;
+    const display = handleSignificantDecimals(value, decimals);
+    if (nativePrices.selected.alignment === 'left') {
+      return `${nativePrices.selected.symbol}${display}`;
+    } else {
+      return `${display} ${nativePrices.selected.currency}`;
+    }
   }
+  return value;
 };
 
 /**
- * @desc format asset prices 24hr percentage change
- * @param  {String} [assetSymbol=null]
- * @param  {Object} [prices=null]
+ * @desc convert from asset amount value to BigNumber format
+ * @param  {String|Number}  value
+ * @param  {Number}     decimals
+ * @return {BigNumber}
+ */
+export const convertAssetAmountToBigNumber = (value, decimals) => {
+  if (!BigNumber(`${decimals}`).isInteger()) return null;
+  decimals = BigNumber(`${decimals}`).toNumber();
+  value = BigNumber(`${value}`)
+    .dividedBy(BigNumber(10).pow(decimals))
+    .toString();
+  value = convertAmountToBigNumber(value);
+  return value;
+};
+
+/**
+ * @desc convert to asset amount value from BigNumber format
+ * @param  {BigNumber}  value
+ * @param  {Number}     decimals
  * @return {String}
  */
-export const formatPercentageChange = (assetSymbol, prices) => {
-  if (!prices || (prices && !prices[assetSymbol])) return '';
-  const percentageChange = Number(prices[assetSymbol].change).toFixed(8);
-  const formatted = BigNumber(percentageChange).toFormat(2);
-  return `${formatted}%`;
+export const convertAssetAmountFromBigNumber = (value, decimals) => {
+  if (!BigNumber(`${decimals}`).isInteger()) return null;
+  decimals = BigNumber(`${decimals}`).toNumber();
+  value = convertAmountFromBigNumber(value);
+  value = BigNumber(`${value}`)
+    .times(BigNumber(10).pow(decimals))
+    .toString();
+
+  return value;
+};
+
+/**
+ * @desc convert from asset amount units to native prices
+ * @param  {BigNumber}   value
+ * @param  {Object}   asset
+ * @param  {Object}   nativePrices
+ * @return {String}
+ */
+export const convertAssetAmountToNativePrice = (value, asset, nativePrices) => {
+  const assetPriceUnit = convertAmountFromBigNumber(nativePrices[asset.symbol].price.amount);
+  const assetNativePrice = BigNumber(value)
+    .times(BigNumber(assetPriceUnit))
+    .toString();
+  return assetNativePrice;
+};
+
+/**
+ * @desc convert to asset amount units from native prices
+ * @param  {BigNumber}   value
+ * @param  {Object}   asset
+ * @param  {Object}   nativePrices
+ * @return {String}
+ */
+export const convertAssetAmountFromNativePrice = (value, asset, nativePrices) => {
+  const assetPriceUnit = convertAmountFromBigNumber(nativePrices[asset.symbol].price.amount);
+  const assetAmountUnit = BigNumber(value)
+    .times(BigNumber(assetPriceUnit))
+    .toString();
+  return assetAmountUnit;
 };
 
 /**

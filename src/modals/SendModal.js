@@ -40,7 +40,7 @@ import { isValidAddress } from '../helpers/validators';
 import {
   toWei,
   fromWei,
-  convertToNativeString,
+  convertAssetAmountToNativePrice,
   getTimeString,
   capitalize
 } from '../helpers/utilities';
@@ -503,29 +503,29 @@ class SendModal extends Component {
               />
               <StyledGasOptions>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('safeLow')}>
-                  <p>{`${lang.t('modal.gas_slow')}: ${convertToNativeString(
+                  <p>{`${lang.t('modal.gas_slow')}: ${convertAssetAmountToNativePrice(
                     fromWei(
                       (this.props.gasPrices.safeLow || 0) * ethUnits.basic_tx * ethUnits.gwei
                     ),
-                    'ETH',
+                    { symbol: 'ETH' },
                     this.props.modalProps.prices
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.safeLowWait || 0, 'minutes')}`}</p>
                 </StyledGasButton>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('average')}>
-                  <p>{`${lang.t('modal.gas_average')}: ${convertToNativeString(
+                  <p>{`${lang.t('modal.gas_average')}: ${convertAssetAmountToNativePrice(
                     fromWei(
                       (this.props.gasPrices.average || 0) * ethUnits.basic_tx * ethUnits.gwei
                     ),
-                    'ETH',
+                    { symbol: 'ETH' },
                     this.props.modalProps.prices
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.avgWait || 0, 'minutes')}`}</p>
                 </StyledGasButton>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('fast')}>
-                  <p>{`${lang.t('modal.gas_fast')}: ${convertToNativeString(
+                  <p>{`${lang.t('modal.gas_fast')}: ${convertAssetAmountToNativePrice(
                     fromWei((this.props.gasPrices.fast || 0) * ethUnits.basic_tx * ethUnits.gwei),
-                    'ETH',
+                    { symbol: 'ETH' },
                     this.props.modalProps.prices
                   )}`}</p>
                   <p>{`~ ${getTimeString(this.props.gasPrices.fastWait || 0, 'minutes')}`}</p>
@@ -538,9 +538,11 @@ class SendModal extends Component {
                   <StyledParagraph>
                     {`${lang.t('modal.gas_fee')}:`}
                     {this.props.txFee
-                      ? ` ${BigNumber(this.props.txFee).toFormat(6)} ETH (${convertToNativeString(
+                      ? ` ${BigNumber(this.props.txFee).toFormat(
+                          6
+                        )} ETH (${convertAssetAmountToNativePrice(
                           this.props.txFee,
-                          'ETH',
+                          { symbol: 'ETH' },
                           this.props.modalProps.prices
                         )})`
                       : ` 0.000000 ETH ($0.00)`}
@@ -611,14 +613,14 @@ class SendModal extends Component {
                     ` ${BigNumber(this.props.assetAmount).toFormat(6)} ${
                       this.props.selected.symbol
                     } ${
-                      convertToNativeString(
+                      convertAssetAmountToNativePrice(
                         this.props.assetAmount,
-                        this.props.selected.symbol,
+                        this.props.selected,
                         this.props.modalProps.prices
                       )
-                        ? `(${convertToNativeString(
+                        ? `(${convertAssetAmountToNativePrice(
                             this.props.assetAmount,
-                            this.props.selected.symbol,
+                            this.props.selected,
                             this.props.modalProps.prices
                           )})`
                         : ``
@@ -627,9 +629,11 @@ class SendModal extends Component {
                 <StyledParagraph>
                   <strong>{`${lang.t('modal.tx_confirm_fee')}:`}</strong>
                   {this.props.txFee &&
-                    ` ${BigNumber(this.props.txFee).toFormat(6)} ETH (${convertToNativeString(
+                    ` ${BigNumber(this.props.txFee).toFormat(
+                      6
+                    )} ETH (${convertAssetAmountToNativePrice(
                       this.props.txFee,
-                      'ETH',
+                      { symbol: 'ETH' },
                       this.props.modalProps.prices
                     )})`}
                 </StyledParagraph>

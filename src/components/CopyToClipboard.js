@@ -23,7 +23,7 @@ const StyledText = styled.p`
   font-size: ${fonts.size.small};
   opacity: 0;
   position: absolute;
-  top: 85%;
+  top: 200%;
   right: calc(50% - 91px);
   font-family: ${fonts.family.SFMono};
   letter-spacing: -0.2px;
@@ -51,22 +51,17 @@ const StyledInputText = styled.input`
   background-color: transparent;
   color: transparent;
   text-shadow: 0 0 0 rgba(${colors.darkGrey}, 0.8);
-
   font-style: normal;
   font-stretch: normal;
   line-height: normal;
   letter-spacing: normal;
   text-align: left;
-
   font-weight: ${fonts.weight.medium};
   font-size: ${fonts.size.medium};
   font-family: ${fonts.family.SFMono};
   line-height: 1.25;
   @media screen and (${responsive.sm.max}) {
     font-size: ${fonts.size.small};
-  }
-  @media screen and (${responsive.xs.max}) {
-    font-size: ${fonts.size.tiny};
   }
 `;
 

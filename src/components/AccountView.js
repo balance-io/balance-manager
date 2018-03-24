@@ -129,7 +129,7 @@ class AccountView extends Component {
   state = {
     activeTab: 'BALANCES_TAB',
     openSettings: false,
-    showTokensWithNoValue: false,
+    showTokensWithLowMarketValue: false,
     limitTransactions: 10
   };
   componentWillReceiveProps(newProps) {
@@ -148,8 +148,8 @@ class AccountView extends Component {
   toggleSettings = () => {
     this.setState({ openSettings: !this.state.openSettings });
   };
-  onShowTokensWithNoValue = () => {
-    this.setState({ showTokensWithNoValue: !this.state.showTokensWithNoValue });
+  onShowTokensWithLowMarketvalue = () => {
+    this.setState({ showTokensWithLowMarketValue: !this.state.showTokensWithLowMarketValue });
   };
   onShowMoreTransactions = () => {
     if (this.state.limitTransactions > this.props.transactions.length) return null;
@@ -226,8 +226,8 @@ class AccountView extends Component {
                 path={this.props.match.url}
                 render={routerProps => (
                   <AccountViewBalances
-                    onShowTokensWithNoValue={this.onShowTokensWithNoValue}
-                    showTokensWithNoValue={this.state.showTokensWithNoValue}
+                    onShowTokensWithLowMarketvalue={this.onShowTokensWithLowMarketvalue}
+                    showTokensWithLowMarketValue={this.state.showTokensWithLowMarketValue}
                     account={this.props.account}
                   />
                 )}

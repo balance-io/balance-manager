@@ -208,7 +208,9 @@ export const handleSignificantDecimals = (value, decimals, buffer) => {
   }
   let result = BigNumber(`${value}`).toFixed(decimals);
   result = BigNumber(`${result}`).toString();
-  return BigNumber(`${result}`).toFormat();
+  return BigNumber(`${result}`).dp() <= 2
+    ? BigNumber(`${result}`).toFormat(2)
+    : BigNumber(`${result}`).toFormat();
 };
 
 /**
@@ -348,6 +350,28 @@ export const formatFixedDecimals = (value, decimals) =>
  * @return {String}
  */
 export const countDecimalPlaces = value => BigNumber(`${value}`).dp();
+
+/**
+ * @desc checks if asset has a high market value
+ * @param  {Object}   asset
+ * @return {Boolean}
+ */
+export const hasHighMarketValue = asset =>
+  asset.native &&
+  BigNumber(convertAmountFromBigNumber(asset.native.balance.amount)).comparedTo(
+    BigNumber(`${asset.native.selected.assetLimit}`)
+  ) === 1;
+
+/**
+ * @desc checks if asset has a low market value
+ * @param  {Object}   asset
+ * @return {Boolean}
+ */
+export const hasLowMarketValue = asset =>
+  asset.native &&
+  BigNumber(convertAmountFromBigNumber(asset.native.balance.amount)).comparedTo(
+    BigNumber(`${asset.native.selected.assetLimit}`)
+  ) === -1;
 
 /**
  * @desc pad string to specific width and padding

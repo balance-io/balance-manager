@@ -21,3 +21,6 @@ yarn-debug.log*
 yarn-error.log*
 
 IGNORE_*
+
+# development lambda functions
+/lambda

@@ -78,6 +78,47 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
     });
 };
 
+export const accountUpdateAccountTransactions = data => (dispatch, getState) => {
+  const { account, web3Network } = getState().account;
+  dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST });
+  apiGetEtherscanAccountTransactions(account.address, web3Network)
+    .then(transactions => {
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: transactions });
+      dispatch(accountGetNativePrices());
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE });
+    });
+};
+
+export const accountSubscribeTxWebSocket = address => dispatch => {
+  window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+  const connection = new WebSocket('wss://socket.etherscan.io/wshandler');
+
+  connection.onopen = function() {
+    console.log('connection.onopen');
+    connection.send(`{"event": "txlist", "address": "${address}"}`);
+  };
+
+  connection.onerror = function(error) {
+    console.log('connection.onerror');
+  };
+
+  connection.onmessage = function(message) {
+    console.log('connection.onmessage', message);
+    try {
+      const json = JSON.parse(message.data);
+      accountUpdateAccountTransactions(json);
+    } catch (e) {
+      console.log("This doesn't look like a valid JSON: ", message.data);
+      return;
+    }
+  };
+};
+
 export const accountUpdateMetamaskAccount = () => (dispatch, getState) => {
   if (window.web3.eth.defaultAccount !== getState().account.metamaskAccount) {
     const newAccount = window.web3.eth.defaultAccount;
@@ -183,6 +224,7 @@ const INITIAL_STATE = {
   account: parseEthplorerAddressInfo(null),
   transactions: [],
   fetchingTransactions: false,
+  fetchingNativePrices: false,
   fetching: false,
   error: false
 };
@@ -237,11 +279,13 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_GET_NATIVE_PRICES_REQUEST:
       return {
         ...state,
+        fetchingNativePrices: true,
         nativePriceRequest: action.payload
       };
     case ACCOUNT_GET_NATIVE_PRICES_SUCCESS:
       return {
         ...state,
+        fetchingNativePrices: false,
         nativePriceRequest: '',
         prices: action.payload.prices,
         account: action.payload.account,
@@ -250,6 +294,7 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_GET_NATIVE_PRICES_FAILURE:
       return {
         ...state,
+        fetchingNativePrices: false,
         nativePriceRequest: ''
       };
     case ACCOUNT_CHANGE_NATIVE_CURRENCY:

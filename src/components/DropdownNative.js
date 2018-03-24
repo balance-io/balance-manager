@@ -109,6 +109,16 @@ class DropdownNative extends Component {
   state = {
     showDropdown: false
   };
+  handleClickOutside(event) {
+    console.log('this.dropdownWrapper', this.dropdownWrapper);
+    console.log('handleClickOutside\n', event.target);
+    if (this.dropdownWrapper && !this.dropdownWrapper.contains(event.target)) {
+      this.setState({ showDropdown: false });
+    }
+  }
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
   onChangeSelected = selected => {
     this.setState({ showDropdown: false });
     if (this.props.onChange) {
@@ -120,12 +130,15 @@ class DropdownNative extends Component {
       this.setState({ showDropdown: !this.state.showDropdown });
     }
   };
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
   render() {
     const { options, dark, iconColor, selected, onChange, ...props } = this.props;
     const _selected = selected || options[Object.keys(options)[0]].currency;
     if (!options[_selected]) return null;
     return (
-      <StyledWrapper {...props}>
+      <StyledWrapper innerRef={c => (this.dropdownWrapper = c)} {...props}>
         <StyledSelected
           dark={dark}
           show={this.state.showDropdown}

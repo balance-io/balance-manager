@@ -4,6 +4,14 @@ import { testnetGetAddressInfo } from './testnet';
 import networkList from '../libraries/ethereum-networks.json';
 
 /**
+ * @desc TEST lambda function
+ * @param  {String}   [address='']
+ * @return {Promise}
+ */
+export const apiLambdaGetBalance = (address = '') =>
+  axios.get(`/.netlify/functions/balance/${address}`);
+
+/**
  * @desc get prices
  * @param  {Array}   [asset=[]]
  * @param  {Array}   [native=[]]

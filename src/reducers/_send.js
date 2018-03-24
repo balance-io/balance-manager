@@ -101,13 +101,18 @@ export const sendUpdateSelected = selected => (dispatch, getState) => {
   dispatch(sendUpdateGasPrice());
 };
 
-export const sendEtherMetamask = ({ address, recipient, amount, gasPrice }) => dispatch => {
+export const sendEtherMetamask = ({ address, recipient, amount, gasPrice }) => (
+  dispatch,
+  getState
+) => {
+  const { gasLimit } = getState().send;
   dispatch({ type: SEND_ETHER_METAMASK_REQUEST });
   metamaskSendTransaction({
     from: address,
     to: recipient,
     value: amount,
-    gasPrice: gasPrice.value.amount
+    gasPrice: gasPrice.value.amount,
+    gasLimit: gasLimit
   })
     .then(txHash =>
       dispatch({
@@ -122,20 +127,19 @@ export const sendEtherMetamask = ({ address, recipient, amount, gasPrice }) => d
     });
 };
 
-export const sendTokenMetamask = ({
-  address,
-  recipient,
-  amount,
-  tokenObject,
-  gasPrice
-}) => dispatch => {
+export const sendTokenMetamask = ({ address, recipient, amount, tokenObject, gasPrice }) => (
+  dispatch,
+  getState
+) => {
+  const { gasLimit } = getState().send;
   dispatch({ type: SEND_TOKEN_METAMASK_REQUEST });
   metamaskTransferToken({
     tokenObject,
     from: address,
     to: recipient,
     amount: amount,
-    gasPrice: gasPrice.value.amount
+    gasPrice: gasPrice.value.amount,
+    gasLimit: gasLimit
   })
     .then(txHash =>
       dispatch({

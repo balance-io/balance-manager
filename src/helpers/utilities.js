@@ -368,10 +368,11 @@ export const hasHighMarketValue = asset =>
  * @return {Boolean}
  */
 export const hasLowMarketValue = asset =>
-  asset.native &&
-  BigNumber(convertAmountFromBigNumber(asset.native.balance.amount)).comparedTo(
-    BigNumber(`${asset.native.selected.assetLimit}`)
-  ) === -1;
+  (asset.native &&
+    BigNumber(convertAmountFromBigNumber(asset.native.balance.amount)).comparedTo(
+      BigNumber(`${asset.native.selected.assetLimit}`)
+    ) === -1) ||
+  !asset.native;
 
 /**
  * @desc pad string to specific width and padding

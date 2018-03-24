@@ -98,12 +98,8 @@ class DropdownAsset extends Component {
   render() {
     const { selected, assets, ...props } = this.props;
     const ethereum = assets.filter(asset => asset.symbol === 'ETH')[0];
-    const tokensWithValue = assets.filter(
-      asset => asset.symbol !== 'ETH' && (asset.native && asset.native.value)
-    );
-    const tokensWithNoValue = assets.filter(
-      asset => asset.symbol !== 'ETH' && (!asset.native || (asset.native && !asset.native.value))
-    );
+    const tokensWithValue = assets.filter(asset => asset.symbol !== 'ETH' && asset.native);
+    const tokensWithNoValue = assets.filter(asset => asset.symbol !== 'ETH' && !asset.native);
     const _assets = [ethereum, ...tokensWithValue, ...tokensWithNoValue];
     const options = {};
     _assets.forEach(option => {
@@ -117,9 +113,9 @@ class DropdownAsset extends Component {
               <AssetIcon size={18} currency={options[this.props.selected].symbol} />
               <p>{options[this.props.selected].name}</p>
             </StyledAsset>
-            <p>{`${options[this.props.selected].balance} ${options[this.props.selected].symbol}${
-              options[this.props.selected].native && options[this.props.selected].native.string
-                ? ` ≈ ${options[this.props.selected].native.string}`
+            <p>{`${options[this.props.selected].balance.display}${
+              options[this.props.selected].native
+                ? ` ≈ ${options[this.props.selected].native.balance.display}`
                 : ''
             }`}</p>
           </div>
@@ -136,10 +132,8 @@ class DropdownAsset extends Component {
                   <AssetIcon size={18} currency={options[key].symbol} />
                   <p>{options[key].name}</p>
                 </StyledAsset>
-                <p>{`${options[key].balance} ${options[key].symbol}${
-                  options[key].native && options[key].native.string
-                    ? ` ≈ ${options[key].native.string}`
-                    : ''
+                <p>{`${options[key].balance.display}${
+                  options[key].native ? ` ≈ ${options[key].native.balance.display}` : ''
                 }`}</p>
               </div>
             ))}

@@ -3,7 +3,14 @@ import Tx from 'ethereumjs-tx';
 import BigNumber from 'bignumber.js';
 import ethUnits from '../libraries/ethereum-units.json';
 import { isValidAddress } from './validators';
-import { getDataString, getNakedAddress, toWei, fromWei } from './utilities';
+import {
+  getDataString,
+  getNakedAddress,
+  toWei,
+  fromWei,
+  convertAmountToBigNumber,
+  convertAssetAmountFromBigNumber
+} from './utilities';
 
 /**
  * @desc web3 instance
@@ -55,7 +62,7 @@ export const getTokenBalanceOf = (accountAddress, tokenAddress) =>
     web3Instance.eth
       .call({ to: tokenAddress, data: dataString })
       .then(balanceHexResult => {
-        const balance = web3Instance.utils.fromWei(balanceHexResult);
+        const balance = fromWei(balanceHexResult);
         resolve(balance);
       })
       .catch(error => reject(error));
@@ -135,8 +142,8 @@ export const sendSignedTransaction = transaction =>
 export const transferToken = transaction =>
   new Promise((resolve, reject) => {
     const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
-    const value = new BigNumber(transaction.amount)
-      .times(new BigNumber(10).pow(transaction.tokenObject.decimals))
+    const value = BigNumber(transaction.amount)
+      .times(BigNumber(10).pow(transaction.tokenObject.decimals))
       .toString(16);
     const recipient = getNakedAddress(transaction.to);
     const dataString = getDataString(transferHexMethod, [recipient, value]);
@@ -187,8 +194,8 @@ export const metamaskSendTransaction = transaction =>
 export const metamaskTransferToken = transaction =>
   new Promise((resolve, reject) => {
     const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
-    const value = new BigNumber(transaction.amount)
-      .times(new BigNumber(10).pow(transaction.tokenObject.decimals))
+    const value = BigNumber(transaction.amount)
+      .times(BigNumber(10).pow(transaction.tokenObject.decimals))
       .toString(16);
     const recipient = getNakedAddress(transaction.to);
     const dataString = getDataString(transferHexMethod, [recipient, value]);
@@ -203,16 +210,14 @@ export const metamaskTransferToken = transaction =>
   });
 
 /**
- * @desc get transaction fee
+ * @desc estimate gas limit
  * @param {Object} [{selected, address, recipient, amount, gasPrice}]
  * @return {String}
  */
-export const getTransactionFee = async ({ tokenObject, address, recipient, amount, gasPrice }) => {
+export const estimateGasLimit = async ({ tokenObject, address, recipient, amount }) => {
   let gasLimit = ethUnits.basic_tx;
-  let _gasPrice = gasPrice * ethUnits.gwei;
   let data = '0x';
-  let _amount =
-    amount && Number(amount) ? amount : Number(Number(Number(tokenObject.balance) / 2).toFixed(8));
+  let _amount = amount && Number(amount) ? convertAmountToBigNumber(amount) : tokenObject.balance.amount;
   let _recipient =
     recipient && isValidAddress(recipient)
       ? recipient
@@ -220,14 +225,11 @@ export const getTransactionFee = async ({ tokenObject, address, recipient, amoun
   let estimateGasData = { to: _recipient, data };
   if (tokenObject.symbol !== 'ETH') {
     const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
-    const value = new BigNumber(_amount)
-      .times(new BigNumber(10).pow(tokenObject.decimals))
-      .toString(16);
+    let value = convertAssetAmountFromBigNumber(_amount, tokenObject.decimals);
+    value = BigNumber(value).toString(16);
     data = getDataString(transferHexMethod, [getNakedAddress(_recipient), value]);
     estimateGasData = { from: address, to: tokenObject.address, data, value: '0x0' };
     gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
   }
-  const wei = String(gasLimit * _gasPrice);
-  const txFee = fromWei(wei);
-  return { txFee, gasLimit };
+  return gasLimit;
 };

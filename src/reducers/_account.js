@@ -15,6 +15,7 @@ import { saveLocal, getLocal } from '../helpers/utilities';
 import { web3SetProvider } from '../helpers/web3';
 import { warningOffline, warningOnline } from './_warning';
 import { notificationShow } from './_notification';
+import { modalClose } from './_modal';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -65,7 +66,7 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
   dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST });
   apiGetEthplorerAddressInfo(address, web3Network)
     .then(account => {
-      account = { type, ...account };
+      account = { ...account, type };
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS, payload: account });
       dispatch(accountGetNativePrices());
       if (account.txCount) dispatch(accountGetAccountTransactions());
@@ -80,6 +81,7 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
 export const accountUpdateMetamaskAccount = () => (dispatch, getState) => {
   if (window.web3.eth.defaultAccount !== getState().account.metamaskAccount) {
     const newAccount = window.web3.eth.defaultAccount;
+    dispatch(modalClose());
     dispatch({ type: ACCOUNT_UPDATE_METAMASK_ACCOUNT, payload: newAccount });
     if (newAccount) dispatch(accountGetAccountBalances(newAccount, 'METAMASK'));
   }

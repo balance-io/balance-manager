@@ -19,12 +19,11 @@ import arrowUp from '../assets/arrow-up.svg';
 import qrIcon from '../assets/qr-code-bnw.png';
 import { modalClose } from '../reducers/_modal';
 import {
-  sendGetGasPrices,
+  sendModalInit,
   sendUpdateGasPrice,
   sendEtherMetamask,
   sendTokenMetamask,
   sendClearFields,
-  sendUpdateAddress,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
   sendUpdateAssetAmount,
@@ -177,6 +176,13 @@ const StyledGasButton = styled(Button)`
     font-weight: 400;
     font-size: 12px;
   }
+  &:hover,
+  &:active,
+  &:focus,
+  &:disabled {
+    outline: none !important;
+    box-shadow: none !important;
+  }
 `;
 
 const StyledInvalidAddress = styled.p`
@@ -235,8 +241,8 @@ const StyledActions = styled.div`
 
 class SendModal extends Component {
   componentDidMount() {
-    this.props.sendUpdateAddress(this.props.modalProps.address);
-    this.props.sendGetGasPrices();
+    const selected = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+    this.props.sendModalInit(this.props.modalProps.address, selected);
   }
   state = {
     isValidAddress: true,
@@ -283,9 +289,9 @@ class SendModal extends Component {
     }
   };
   onSendAnother = () => {
-    this.props.sendGetGasPrices();
     this.props.sendToggleConfirmationView(false);
     this.props.sendClearFields();
+    this.props.sendModalInit();
   };
   onSubmit = e => {
     e.preventDefault();
@@ -473,7 +479,11 @@ class SendModal extends Component {
                 }
               />
               <StyledGasOptions>
-                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('slow')}>
+                <StyledGasButton
+                  dark
+                  disabled={!this.props.gasPrices.slow}
+                  onClick={() => this.props.sendUpdateGasPrice('slow')}
+                >
                   <p>{`${lang.t('modal.gas_slow')}: ${
                     this.props.gasPrices.slow && this.props.gasPrices.slow.txFee.native
                       ? this.props.gasPrices.slow.txFee.native.value.display
@@ -485,7 +495,11 @@ class SendModal extends Component {
                       : '0 secs'
                   }`}</p>
                 </StyledGasButton>
-                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('average')}>
+                <StyledGasButton
+                  dark
+                  disabled={!this.props.gasPrices.average}
+                  onClick={() => this.props.sendUpdateGasPrice('average')}
+                >
                   <p>{`${lang.t('modal.gas_average')}: ${
                     this.props.gasPrices.average && this.props.gasPrices.average.txFee
                       ? this.props.gasPrices.average.txFee.native.value.display
@@ -497,7 +511,11 @@ class SendModal extends Component {
                       : '0 secs'
                   }`}</p>
                 </StyledGasButton>
-                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('fast')}>
+                <StyledGasButton
+                  dark
+                  disabled={!this.props.gasPrices.fast}
+                  onClick={() => this.props.sendUpdateGasPrice('fast')}
+                >
                   <p>{`${lang.t('modal.gas_fast')}: ${
                     this.props.gasPrices.fast && this.props.gasPrices.fast.txFee.native
                       ? this.props.gasPrices.fast.txFee.native.value.display
@@ -608,12 +626,11 @@ class SendModal extends Component {
 }
 
 SendModal.propTypes = {
-  sendGetGasPrices: PropTypes.func.isRequired,
+  sendModalInit: PropTypes.func.isRequired,
   sendUpdateGasPrice: PropTypes.func.isRequired,
   sendEtherMetamask: PropTypes.func.isRequired,
   sendTokenMetamask: PropTypes.func.isRequired,
   sendClearFields: PropTypes.func.isRequired,
-  sendUpdateAddress: PropTypes.func.isRequired,
   sendUpdateRecipient: PropTypes.func.isRequired,
   sendUpdateNativeAmount: PropTypes.func.isRequired,
   sendUpdateAssetAmount: PropTypes.func.isRequired,
@@ -660,12 +677,11 @@ const reduxProps = ({ modal, send, account }) => ({
 
 export default connect(reduxProps, {
   modalClose,
-  sendGetGasPrices,
+  sendModalInit,
   sendUpdateGasPrice,
   sendEtherMetamask,
   sendTokenMetamask,
   sendClearFields,
-  sendUpdateAddress,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
   sendUpdateAssetAmount,

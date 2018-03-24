@@ -342,7 +342,9 @@ export const convertAssetAmountFromNativeAmount = (value, asset, nativePrices) =
  * @return {String}
  */
 export const formatFixedDecimals = (value, decimals) =>
-  BigNumber(`${value}`).toFixed(BigNumber(`${decimals}`).toNumber());
+  BigNumber(BigNumber(`${value}`).toFixed(BigNumber(`${decimals}`).toNumber()))
+    .toFormat()
+    .replace(',', '');
 
 /**
  * @desc count value's number of decimals places

@@ -33,7 +33,6 @@ const SEND_TOGGLE_CONFIRMATION_VIEW = 'send/SEND_TOGGLE_CONFIRMATION_VIEW';
 
 const SEND_UPDATE_NATIVE_AMOUNT = 'send/SEND_UPDATE_NATIVE_AMOUNT';
 
-const SEND_UPDATE_ADDRESS = 'send/SEND_UPDATE_ADDRESS';
 const SEND_UPDATE_RECIPIENT = 'send/SEND_UPDATE_RECIPIENT';
 const SEND_UPDATE_CRYPTO_AMOUNT = 'send/SEND_UPDATE_CRYPTO_AMOUNT';
 const SEND_UPDATE_SELECTED = 'send/SEND_UPDATE_SELECTED';
@@ -43,8 +42,8 @@ const SEND_CLEAR_FIELDS = 'send/SEND_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
-export const sendGetGasPrices = () => (dispatch, getState) => {
-  dispatch({ type: SEND_GET_GAS_PRICES_REQUEST });
+export const sendModalInit = (address, selected) => (dispatch, getState) => {
+  dispatch({ type: SEND_GET_GAS_PRICES_REQUEST, payload: { address, selected } });
   const { prices } = getState().account;
   const { gasLimit } = getState().send;
   apiGetGasPrices()
@@ -159,8 +158,6 @@ export const sendToggleConfirmationView = boolean => (dispatch, getState) => {
   dispatch({ type: SEND_TOGGLE_CONFIRMATION_VIEW, payload: confirm });
 };
 
-export const sendUpdateAddress = address => ({ type: SEND_UPDATE_ADDRESS, payload: address });
-
 export const sendUpdateRecipient = recipient => dispatch => {
   const input = recipient.replace(/[^\w.]/g, '');
   if (input.length <= 42) {
@@ -227,7 +224,12 @@ const INITIAL_STATE = {
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case SEND_GET_GAS_PRICES_REQUEST:
-      return { ...state, fetchingGasPrices: true };
+      return {
+        ...state,
+        address: action.payload.address,
+        selected: action.payload.selected,
+        fetchingGasPrices: true
+      };
     case SEND_GET_GAS_PRICES_SUCCESS:
       return {
         ...state,
@@ -277,8 +279,6 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         confirm: action.payload
       };
-    case SEND_UPDATE_ADDRESS:
-      return { ...state, address: action.payload };
     case SEND_UPDATE_RECIPIENT:
       return { ...state, recipient: action.payload };
     case SEND_UPDATE_NATIVE_AMOUNT:

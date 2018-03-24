@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import lang from '../languages';
 import AssetIcon from './AssetIcon';
 import balancesTabIcon from '../assets/balances-tab.svg';
-import { convertStringToNumber } from '../helpers/utilities';
+import { convertStringToNumber, hasHighMarketValue, hasLowMarketValue } from '../helpers/utilities';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
@@ -127,7 +127,7 @@ const StyledPercentage = styled.p`
 const StyledLastRow = styled(StyledRow)`
   width: 100%;
   z-index: 2;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 3fr 1fr;
   min-height: 0;
   min-width: 0;
   border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
@@ -148,7 +148,7 @@ const StyledLastRow = styled(StyledRow)`
 `;
 
 const StyledShowMoreTokens = styled(StyledToken)`
-  grid-template-columns: auto;
+  grid-template-columns: 100%;
   min-height: 0;
   min-width: 0;
   padding: 0;
@@ -180,14 +180,21 @@ const StyledShowMoreTokens = styled(StyledToken)`
 `;
 
 const AccountViewBalances = ({
-  onShowTokensWithNoValue,
-  showTokensWithNoValue,
+  onShowTokensWithLowMarketvalue,
+  showTokensWithLowMarketValue,
   account,
   ...props
 }) => {
   const ethereum = account.assets.filter(asset => asset.symbol === 'ETH')[0];
-  const tokensWithValue = account.assets.filter(asset => asset.symbol !== 'ETH' && asset.native);
-  const tokensWithNoValue = account.assets.filter(asset => asset.symbol !== 'ETH' && !asset.native);
+  const tokensWithHighMarketValue = account.assets.filter(
+    asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
+  );
+  const tokensWithLowMarketValue = account.assets.filter(
+    asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
+  );
+  const allLowMarketTokensHaveNoValue =
+    tokensWithLowMarketValue.filter(asset => !asset.native).length ===
+    tokensWithLowMarketValue.length;
   return (
     <StyledGrid {...props}>
       <StyledLabelsRow>
@@ -212,8 +219,8 @@ const AccountViewBalances = ({
         </StyledPercentage>
         <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
       </StyledEthereum>
-      {!!tokensWithValue &&
-        tokensWithValue.map(token => (
+      {!!tokensWithHighMarketValue &&
+        tokensWithHighMarketValue.map(token => (
           <StyledToken key={`${account.address}-${token.symbol}`}>
             <StyledAsset>
               <AssetIcon currency={token.symbol} />
@@ -229,9 +236,9 @@ const AccountViewBalances = ({
             <p>{token.native ? token.native.balance.display : '———'}</p>
           </StyledToken>
         ))}
-      {!!tokensWithNoValue.length &&
-        showTokensWithNoValue &&
-        tokensWithNoValue.map(token => (
+      {!!tokensWithLowMarketValue.length &&
+        showTokensWithLowMarketValue &&
+        tokensWithLowMarketValue.map(token => (
           <StyledToken key={`${account.address}-${token.symbol}`}>
             <StyledAsset>
               <AssetIcon currency={token.symbol} />
@@ -248,14 +255,20 @@ const AccountViewBalances = ({
           </StyledToken>
         ))}
       <StyledLastRow>
-        {!!tokensWithNoValue.length ? (
-          <StyledShowMoreTokens onClick={onShowTokensWithNoValue}>
+        {!!tokensWithLowMarketValue.length ? (
+          <StyledShowMoreTokens onClick={onShowTokensWithLowMarketvalue}>
             <div />
-            {`${showTokensWithNoValue ? lang.t('account.hide') : lang.t('account.show')} ${
-              tokensWithNoValue.length
+            {`${showTokensWithLowMarketValue ? lang.t('account.hide') : lang.t('account.show')} ${
+              tokensWithLowMarketValue.length
             } ${
-              tokensWithNoValue.length === 1 ? lang.t('account.token') : lang.t('account.tokens')
-            } ${lang.t('account.no_market_value')}`}
+              tokensWithLowMarketValue.length === 1
+                ? lang.t('account.token')
+                : lang.t('account.tokens')
+            } ${
+              allLowMarketTokensHaveNoValue
+                ? lang.t('account.no_market_value')
+                : lang.t('account.low_market_value')
+            }`}
           </StyledShowMoreTokens>
         ) : (
           <div />
@@ -267,8 +280,8 @@ const AccountViewBalances = ({
 };
 
 AccountViewBalances.propTypes = {
-  onShowTokensWithNoValue: PropTypes.func.isRequired,
-  showTokensWithNoValue: PropTypes.bool.isRequired,
+  onShowTokensWithLowMarketvalue: PropTypes.func.isRequired,
+  showTokensWithLowMarketValue: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired
 };
 

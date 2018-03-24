@@ -1,5 +1,5 @@
 import { web3Instance, getTokenBalanceOf, getAccountBalance } from './web3';
-import { convertAssetAmountToBigNumber } from './utilities';
+import { convertAssetAmountToBigNumber, convertStringToNumber } from './utilities';
 import ropstenTokens from '../libraries/ropsten-tokens.json';
 import rinkebyTokens from '../libraries/rinkeby-tokens.json';
 import kovanTokens from '../libraries/kovan-tokens.json';
@@ -28,7 +28,7 @@ export const getAccountTokens = async (accountAddress, network) => {
     tokenList.map(async token => {
       if (tokenList) {
         let balance = await getTokenBalanceOf(accountAddress, token.address);
-        if (balance === '0') {
+        if (convertStringToNumber(balance) === 0) {
           return null;
         }
         balance = convertAssetAmountToBigNumber(balance, token.decimals);
@@ -39,7 +39,7 @@ export const getAccountTokens = async (accountAddress, network) => {
             symbol: token.symbol,
             decimals: token.decimals
           },
-          balance: Number(balance)
+          balance: balance
         };
       }
       return null;

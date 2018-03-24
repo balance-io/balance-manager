@@ -14,6 +14,7 @@
       "token": "token",
       "tokens": "tokens",
       "no_market_value": "with no market value",
+      "low_market_value": "with low market value",
       "tx_sent": "Sent",
       "tx_received": "Received",
       "tx_failed": "Failed",

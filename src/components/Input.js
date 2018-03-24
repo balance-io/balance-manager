@@ -6,6 +6,7 @@ import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledInputWrapper = styled.div`
   width: 100%;
+  opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
 `;
 
 const StyledLabel = styled.label`
@@ -45,7 +46,7 @@ const StyledInput = styled.input`
   }
 `;
 
-const Input = ({ label, type, placeholder, monospace, ...props }) => {
+const Input = ({ label, type, disabled, value, placeholder, monospace, ...props }) => {
   let _label = label;
   let _placeholder = placeholder;
   if (!label) {
@@ -69,9 +70,16 @@ const Input = ({ label, type, placeholder, monospace, ...props }) => {
     }
   }
   return (
-    <StyledInputWrapper>
+    <StyledInputWrapper disabled={disabled}>
       <StyledLabel hide={_label === 'Input'}>{_label}</StyledLabel>
-      <StyledInput type={type} placeholder={_placeholder} monospace={monospace} {...props} />
+      <StyledInput
+        disabled={disabled}
+        type={type}
+        value={!disabled ? value : ''}
+        placeholder={_placeholder}
+        monospace={monospace}
+        {...props}
+      />
     </StyledInputWrapper>
   );
 };
@@ -80,13 +88,15 @@ Input.propTypes = {
   type: PropTypes.string.isRequired,
   label: PropTypes.string,
   placeholder: PropTypes.string,
-  monospace: PropTypes.bool
+  monospace: PropTypes.bool,
+  disabled: PropTypes.bool
 };
 
 Input.defaultProps = {
   label: '',
   placeholder: '',
-  monospace: false
+  monospace: false,
+  disabled: false
 };
 
 export default Input;

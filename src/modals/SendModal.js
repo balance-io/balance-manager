@@ -291,7 +291,8 @@ class SendModal extends Component {
   onSendAnother = () => {
     this.props.sendToggleConfirmationView(false);
     this.props.sendClearFields();
-    this.props.sendModalInit();
+    const selected = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+    this.props.sendModalInit(this.props.modalProps.address, selected);
   };
   onSubmit = e => {
     e.preventDefault();

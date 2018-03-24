@@ -370,11 +370,10 @@ export const hasHighMarketValue = asset =>
  * @return {Boolean}
  */
 export const hasLowMarketValue = asset =>
-  (asset.native &&
-    BigNumber(convertAmountFromBigNumber(asset.native.balance.amount)).comparedTo(
-      BigNumber(`${asset.native.selected.assetLimit}`)
-    ) === -1) ||
-  !asset.native;
+  asset.native &&
+  BigNumber(convertAmountFromBigNumber(asset.native.balance.amount)).comparedTo(
+    BigNumber(`${asset.native.selected.assetLimit}`)
+  ) === -1;
 
 /**
  * @desc pad string to specific width and padding
@@ -455,14 +454,20 @@ export const sanitizeHex = hex => {
  * @param  {Number} wei
  * @return {BigNumber}
  */
-export const fromWei = wei => BigNumber(wei).dividedBy(ethUnits.ether).toString();
+export const fromWei = wei =>
+  BigNumber(wei)
+    .dividedBy(ethUnits.ether)
+    .toString();
 
 /**
  * @desc convert from ether to wei
  * @param  {Number} ether
  * @return {BigNumber}
  */
-export const toWei = ether => BigNumber(ether).times(ethUnits.ether).toString();
+export const toWei = ether =>
+  BigNumber(ether)
+    .times(ethUnits.ether)
+    .toString();
 
 /**
  * @desc hash string with sha3

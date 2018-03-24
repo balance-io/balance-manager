@@ -189,12 +189,13 @@ const AccountViewBalances = ({
   const tokensWithHighMarketValue = account.assets.filter(
     asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
   );
-  const tokensWithLowMarketValue = account.assets.filter(
+  let tokensWithLowMarketValue = account.assets.filter(
     asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
   );
+  const tokensWithNoMarketValue = account.assets.filter(asset => !asset.native);
+  tokensWithLowMarketValue = [...tokensWithLowMarketValue, ...tokensWithNoMarketValue];
   const allLowMarketTokensHaveNoValue =
-    tokensWithLowMarketValue.filter(asset => !asset.native).length ===
-    tokensWithLowMarketValue.length;
+    tokensWithNoMarketValue.length === tokensWithLowMarketValue.length;
   return (
     <StyledGrid {...props}>
       <StyledLabelsRow>

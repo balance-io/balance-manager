@@ -217,8 +217,7 @@ export const metamaskTransferToken = transaction =>
 export const estimateGasLimit = async ({ tokenObject, address, recipient, amount }) => {
   let gasLimit = ethUnits.basic_tx;
   let data = '0x';
-  let _amount =
-    amount && Number(amount) ? convertAmountToBigNumber(amount) : tokenObject.balance.amount;
+  let _amount = amount && Number(amount) ? convertAmountToBigNumber(amount) : tokenObject.balance.amount;
   let _recipient =
     recipient && isValidAddress(recipient)
       ? recipient

@@ -101,11 +101,10 @@ export const sendUpdateSelected = selected => (dispatch, getState) => {
   dispatch(sendUpdateGasPrice());
 };
 
-export const sendEtherMetamask = ({ address, recipient, amount, gasPrice }) => (
+export const sendEtherMetamask = ({ address, recipient, amount, gasPrice, gasLimit }) => (
   dispatch,
   getState
 ) => {
-  const { gasLimit } = getState().send;
   dispatch({ type: SEND_ETHER_METAMASK_REQUEST });
   metamaskSendTransaction({
     from: address,

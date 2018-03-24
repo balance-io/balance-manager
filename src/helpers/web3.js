@@ -97,6 +97,7 @@ export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }
     nonce: web3Instance.utils.toHex(nonce),
     gasPrice: web3Instance.utils.toHex(_gasPrice),
     gasLimit: web3Instance.utils.toHex(_gasLimit),
+    gas: web3Instance.utils.toHex(_gasLimit),
     value: web3Instance.utils.toHex(value),
     data: data,
     to

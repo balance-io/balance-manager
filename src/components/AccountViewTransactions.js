@@ -22,6 +22,8 @@ const StyledRow = styled.div`
   z-index: 0;
   background-color: rgb(${colors.white});
   grid-template-columns: 2fr 1fr 2fr 2fr 2fr;
+  min-height: 0;
+  min-width: 0;
   & p {
     display: flex;
     align-items: center;
@@ -98,6 +100,8 @@ const StyledAsset = styled.div`
   align-items: center;
   justify-content: flex-start;
   text-align: left;
+  min-height: 0;
+  min-width: 0;
   & p {
     font-size: ${fonts.size.medium};
     margin-left: 10px;
@@ -114,6 +118,8 @@ const StyledAsset = styled.div`
 
 const StyledShowMoreTransactions = styled(StyledRow)`
   grid-template-columns: auto;
+  min-height: 0;
+  min-width: 0;
   width: 100%;
   z-index: 2;
   border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
@@ -175,10 +181,14 @@ const AccountViewTransactions = ({
               </StyledAsset>
               <TransactionStatus tx={tx} accountAddress={accountAddress} />
 
-              <p>{`${tx.value} ${tx.asset.symbol}`}</p>
-              <p>{tx.price || '———'}</p>
+              <p>{`${tx.value.display}`}</p>
+              <p>{tx.native ? tx.native.price.display : '———'}</p>
               <p>
-                {tx.total ? (tx.from === accountAddress ? `- ${tx.total}` : `${tx.total}`) : '———'}
+                {tx.native
+                  ? tx.from === accountAddress
+                    ? tx.native.value.display ? `- ${tx.native.value.display}` : '———'
+                    : `${tx.native.value.display || '———'}`
+                  : '———'}
               </p>
             </StyledTransaction>
           );

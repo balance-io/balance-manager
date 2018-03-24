@@ -122,7 +122,7 @@ class DropdownNative extends Component {
   };
   render() {
     const { options, dark, iconColor, selected, onChange, ...props } = this.props;
-    const _selected = selected || options[Object.keys(options)[0]].value;
+    const _selected = selected || options[Object.keys(options)[0]].currency;
     if (!options[_selected]) return null;
     return (
       <StyledWrapper {...props}>
@@ -134,7 +134,7 @@ class DropdownNative extends Component {
         >
           <div>
             <StyledIcon iconColor={iconColor} icon={options[_selected].icon} />
-            <p>{options[_selected].value}</p>
+            <p>{options[_selected].currency}</p>
           </div>
           <StyledCaret dark={dark} />
         </StyledSelected>
@@ -147,11 +147,11 @@ class DropdownNative extends Component {
               .filter(key => key !== _selected)
               .map(key => (
                 <div
-                  key={options[key].value}
-                  onClick={() => this.onChangeSelected(options[key].value)}
+                  key={options[key].currency}
+                  onClick={() => this.onChangeSelected(options[key].currency)}
                 >
                   <StyledIcon iconColor={iconColor} icon={options[key].icon} />
-                  <p>{options[key].value}</p>
+                  <p>{options[key].currency}</p>
                 </div>
               ))}
         </StyledDropdown>

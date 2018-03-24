@@ -1,15 +1,20 @@
+import BigNumber from 'bignumber.js';
 import lang from '../languages';
 import {
-  convertToNativeString,
-  convertToNativeValue,
-  formatNativeString,
-  formatPercentageChange,
-  handleDecimals,
   hexToNumberString,
-  convertTokenAmountToUnit,
-  fromWei,
+  convertStringToNumber,
+  convertAmountToBigNumber,
+  convertAmountFromBigNumber,
+  convertAmountToDisplay,
+  convertAssetAmountToBigNumber,
+  convertAssetAmountToNativeValue,
+  convertAssetAmountToNativeAmount,
+  getTimeString,
   sha3
 } from './utilities';
+import nativeCurrencies from '../libraries/native-currencies.json';
+import ethUnits from '../libraries/ethereum-units.json';
+import timeUnits from '../libraries/time-units.json';
 import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
 
 /**
@@ -36,6 +41,310 @@ export const parseError = error => {
 };
 
 /**
+ * @desc parse ether gas prices
+ * @param {Object} data
+ * @param {Object} prices
+ * @param {Number} gasLimit
+ */
+export const parseGasPrices = (data, prices, gasLimit) => {
+  let gasPrices = {
+    slow: null,
+    average: null,
+    fast: null
+  };
+  gasPrices.fast = {
+    option: 'fast',
+    estimatedTime: {
+      amount: BigNumber(`${data.fastWait}`)
+        .times(BigNumber(`${timeUnits.ms.minute}`))
+        .toString(),
+      display: getTimeString(
+        BigNumber(`${data.fastWait}`)
+          .times(BigNumber(`${timeUnits.ms.minute}`))
+          .toString(),
+        'ms'
+      )
+    },
+    value: {
+      amount: `${BigNumber(`${data.fast}`)
+        .dividedBy(10)
+        .times(`${ethUnits.gwei}`)
+        .toString()}`,
+      display: `${BigNumber(`${data.fast}`).dividedBy(10)} Gwei`
+    }
+  };
+  gasPrices.fast.txFee = {
+    value: {
+      amount: BigNumber(gasPrices.fast.value.amount)
+        .times(BigNumber(`${gasLimit}`))
+        .toString(),
+      display: convertAmountToDisplay(
+        BigNumber(gasPrices.fast.value.amount)
+          .times(BigNumber(`${gasLimit}`))
+          .toString(),
+        null,
+        { symbol: 'ETH', decimals: 18 }
+      )
+    },
+    native: null
+  };
+  gasPrices.average = {
+    option: 'average',
+    estimatedTime: {
+      amount: BigNumber(`${data.avgWait}`)
+        .times(BigNumber(`${timeUnits.ms.minute}`))
+        .toString(),
+      display: getTimeString(
+        BigNumber(`${data.avgWait}`)
+          .times(BigNumber(`${timeUnits.ms.minute}`))
+          .toString(),
+        'ms'
+      )
+    },
+    value: {
+      amount: `${BigNumber(`${data.average}`)
+        .dividedBy(10)
+        .times(`${ethUnits.gwei}`)
+        .toString()}`,
+      display: `${BigNumber(`${data.average}`).dividedBy(10)} Gwei`
+    }
+  };
+  gasPrices.average.txFee = {
+    value: {
+      amount: BigNumber(gasPrices.average.value.amount)
+        .times(BigNumber(`${gasLimit}`))
+        .toString(),
+      display: convertAmountToDisplay(
+        BigNumber(gasPrices.average.value.amount)
+          .times(BigNumber(`${gasLimit}`))
+          .toString(),
+        null,
+        { symbol: 'ETH', decimals: 18 }
+      )
+    },
+    native: null
+  };
+
+  gasPrices.slow = {
+    option: 'slow',
+    estimatedTime: {
+      amount: BigNumber(`${data.safeLowWait}`)
+        .times(BigNumber(`${timeUnits.ms.minute}`))
+        .toString(),
+      display: getTimeString(
+        BigNumber(`${data.safeLowWait}`)
+          .times(BigNumber(`${timeUnits.ms.minute}`))
+          .toString(),
+        'ms'
+      )
+    },
+    value: {
+      amount: `${BigNumber(`${data.safeLow}`)
+        .dividedBy(10)
+        .times(`${ethUnits.gwei}`)
+        .toString()}`,
+      display: `${BigNumber(`${data.safeLow}`).dividedBy(10)} Gwei`
+    }
+  };
+  gasPrices.slow.txFee = {
+    value: {
+      amount: BigNumber(gasPrices.slow.value.amount)
+        .times(BigNumber(`${gasLimit}`))
+        .toString(),
+      display: convertAmountToDisplay(
+        BigNumber(gasPrices.slow.value.amount)
+          .times(BigNumber(`${gasLimit}`))
+          .toString(),
+        null,
+        { symbol: 'ETH', decimals: 18 }
+      )
+    },
+    native: null
+  };
+  if (prices) {
+    gasPrices.fast.txFee.native = {
+      selected: prices.selected,
+      value: {
+        amount: convertAssetAmountToNativeAmount(
+          gasPrices.fast.txFee.value.amount,
+          { symbol: 'ETH' },
+          prices
+        ),
+        display: convertAmountToDisplay(
+          convertAssetAmountToNativeAmount(
+            gasPrices.fast.txFee.value.amount,
+            { symbol: 'ETH' },
+            prices
+          ),
+          prices,
+          null,
+          2
+        )
+      }
+    };
+    gasPrices.average.txFee.native = {
+      selected: prices.selected,
+      value: {
+        amount: convertAssetAmountToNativeAmount(
+          gasPrices.average.txFee.value.amount,
+          { symbol: 'ETH' },
+          prices
+        ),
+        display: convertAmountToDisplay(
+          convertAssetAmountToNativeAmount(
+            gasPrices.average.txFee.value.amount,
+            { symbol: 'ETH' },
+            prices
+          ),
+          prices,
+          null,
+          2
+        )
+      }
+    };
+    gasPrices.slow.txFee.native = {
+      selected: prices.selected,
+      value: {
+        amount: convertAssetAmountToNativeAmount(
+          gasPrices.slow.txFee.value.amount,
+          { symbol: 'ETH' },
+          prices
+        ),
+        display: convertAmountToDisplay(
+          convertAssetAmountToNativeAmount(
+            gasPrices.slow.txFee.value.amount,
+            { symbol: 'ETH' },
+            prices
+          ),
+          prices,
+          null,
+          2
+        )
+      }
+    };
+  }
+  return gasPrices;
+};
+
+/**
+ * @desc parse ether gas prices with updated gas limit
+ * @param {Object} data
+ * @param {Object} prices
+ * @param {Number} gasLimit
+ */
+export const parseGasPricesTxFee = (gasPrices, prices, gasLimit) => {
+  gasPrices.fast.txFee = {
+    value: {
+      amount: BigNumber(gasPrices.fast.value.amount)
+        .times(BigNumber(`${gasLimit}`))
+        .toString(),
+      display: convertAmountToDisplay(
+        BigNumber(gasPrices.fast.value.amount)
+          .times(BigNumber(`${gasLimit}`))
+          .toString(),
+        null,
+        { symbol: 'ETH', decimals: 18 }
+      )
+    },
+    native: null
+  };
+  gasPrices.average.txFee = {
+    value: {
+      amount: BigNumber(gasPrices.average.value.amount)
+        .times(BigNumber(`${gasLimit}`))
+        .toString(),
+      display: convertAmountToDisplay(
+        BigNumber(gasPrices.average.value.amount)
+          .times(BigNumber(`${gasLimit}`))
+          .toString(),
+        null,
+        { symbol: 'ETH', decimals: 18 }
+      )
+    },
+    native: null
+  };
+
+  gasPrices.slow.txFee = {
+    value: {
+      amount: BigNumber(gasPrices.slow.value.amount)
+        .times(BigNumber(`${gasLimit}`))
+        .toString(),
+      display: convertAmountToDisplay(
+        BigNumber(gasPrices.slow.value.amount)
+          .times(BigNumber(`${gasLimit}`))
+          .toString(),
+        null,
+        { symbol: 'ETH', decimals: 18 }
+      )
+    },
+    native: null
+  };
+  if (prices) {
+    gasPrices.fast.txFee.native = {
+      selected: prices.selected,
+      value: {
+        amount: convertAssetAmountToNativeAmount(
+          gasPrices.fast.txFee.value.amount,
+          { symbol: 'ETH' },
+          prices
+        ),
+        display: convertAmountToDisplay(
+          convertAssetAmountToNativeAmount(
+            gasPrices.fast.txFee.value.amount,
+            { symbol: 'ETH' },
+            prices
+          ),
+          prices,
+          null,
+          2
+        )
+      }
+    };
+    gasPrices.average.txFee.native = {
+      selected: prices.selected,
+      value: {
+        amount: convertAssetAmountToNativeAmount(
+          gasPrices.average.txFee.value.amount,
+          { symbol: 'ETH' },
+          prices
+        ),
+        display: convertAmountToDisplay(
+          convertAssetAmountToNativeAmount(
+            gasPrices.average.txFee.value.amount,
+            { symbol: 'ETH' },
+            prices
+          ),
+          prices,
+          null,
+          2
+        )
+      }
+    };
+    gasPrices.slow.txFee.native = {
+      selected: prices.selected,
+      value: {
+        amount: convertAssetAmountToNativeAmount(
+          gasPrices.slow.txFee.value.amount,
+          { symbol: 'ETH' },
+          prices
+        ),
+        display: convertAmountToDisplay(
+          convertAssetAmountToNativeAmount(
+            gasPrices.slow.txFee.value.amount,
+            { symbol: 'ETH' },
+            prices
+          ),
+          prices,
+          null,
+          2
+        )
+      }
+    };
+  }
+  return gasPrices;
+};
+
+/**
  * @desc parse prices object from api response
  * @param  {Object} [data=null]
  * @param  {Array} [assets=[]]
@@ -43,20 +352,29 @@ export const parseError = error => {
  * @return {Object}
  */
 export const parsePricesObject = (data = null, assets = [], native = 'USD') => {
-  let prices = { native };
-  assets.map(
-    coin =>
-      (prices[coin] = data.RAW[coin]
-        ? { price: data.RAW[coin][native].PRICE, change: data.RAW[coin][native].CHANGEPCT24HOUR }
-        : null)
-  );
-  // APPEND prices for WETH same as ETH
+  let prices = { selected: nativeCurrencies[native] };
+  assets.forEach(asset => {
+    let assetPrice = null;
+    if (data.RAW[asset]) {
+      assetPrice = {
+        price: {
+          amount: convertAmountToBigNumber(data.RAW[asset][native].PRICE),
+          display: convertAmountToDisplay(
+            convertAmountToBigNumber(data.RAW[asset][native].PRICE),
+            prices
+          )
+        },
+        change: {
+          amount: convertAmountToBigNumber(data.RAW[asset][native].CHANGEPCT24HOUR),
+          display: convertAmountToDisplay(
+            convertAmountToBigNumber(data.RAW[asset][native].CHANGEPCT24HOUR)
+          )
+        }
+      };
+    }
+    prices[asset] = assetPrice;
+  });
   prices['WETH'] = prices['ETH'];
-  // APPEND random prices for testnet tokens
-  prices['💥 PLASMA'] = { price: 1.24, change: 0.124 };
-  prices['STT'] = { price: 0.21, change: 2.2 };
-  prices['GUP'] = { price: 23.21, change: -1.111 };
-  prices['Aeternity'] = { price: 124.32, change: -20.342 };
   return prices;
 };
 
@@ -66,25 +384,40 @@ export const parsePricesObject = (data = null, assets = [], native = 'USD') => {
  * @return {Promise}
  */
 export const parseEthplorerAddressInfo = (data = null) => {
+  const ethereumBalance =
+    data && data.ETH.balance ? convertAmountToBigNumber(data.ETH.balance) : '0';
   const ethereum = {
     name: 'Ethereum',
     symbol: 'ETH',
     address: null,
     decimals: 18,
-    balance: data && data.ETH.balance ? handleDecimals(data.ETH.balance) : '0.00000000',
+    balance: {
+      amount: ethereumBalance,
+      display: convertAmountToDisplay(ethereumBalance, null, { symbol: 'ETH', decimals: 18 })
+    },
     native: null
   };
 
   let assets = [ethereum];
   if (data && data.tokens) {
     const tokens = data.tokens.map(token => {
-      const balance = convertTokenAmountToUnit(token.balance, Number(token.tokenInfo.decimals));
+      const tokenName = token.tokenInfo.name || lang.t('account.unknown_token');
+      const tokenSymbol = token.tokenInfo.symbol || '———';
+      const tokenAddress = token.tokenInfo.address || null;
+      const tokenDecimals = convertStringToNumber(token.tokenInfo.decimals);
+      const tokenBalance = convertAssetAmountToBigNumber(token.balance, token.tokenInfo.decimals);
       return {
-        name: token.tokenInfo.name || lang.t('account.unknown_token'),
-        symbol: token.tokenInfo.symbol || '———',
-        address: token.tokenInfo.address,
-        decimals: Number(token.tokenInfo.decimals),
-        balance: handleDecimals(balance),
+        name: tokenName,
+        symbol: tokenSymbol,
+        address: tokenAddress,
+        decimals: tokenDecimals,
+        balance: {
+          amount: tokenBalance,
+          display: convertAmountToDisplay(tokenBalance, null, {
+            symbol: tokenSymbol,
+            decimals: tokenDecimals
+          })
+        },
         native: null
       };
     });
@@ -92,10 +425,10 @@ export const parseEthplorerAddressInfo = (data = null) => {
   }
   return {
     address: (data && data.address) || '',
-    type: 'METAMASK',
+    type: '',
     txCount: (data && data.countTxs) || 0,
-    assets,
-    totalNative: '———'
+    assets: assets,
+    total: '———'
   };
 };
 
@@ -105,31 +438,42 @@ export const parseEthplorerAddressInfo = (data = null) => {
  * @param  {Object} [prices=null]
  * @return {String}
  */
-export const parseAccountBalances = (account = null, prices = null) => {
-  let totalNative = '———';
+export const parseAccountBalances = (account = null, nativePrices = null) => {
+  let totalAmount = 0;
 
-  if (account && account.assets) {
+  if (account) {
     account.assets = account.assets.map(asset => {
-      const price = convertToNativeString('1', asset.symbol, prices);
-      const change = formatPercentageChange(asset.symbol, prices);
-      const value = convertToNativeValue(asset.balance, asset.symbol, prices);
-      const string = convertToNativeString(asset.balance, asset.symbol, prices);
-      asset.native = {
-        currency: prices.native,
-        price: price,
-        change: change,
-        value: value,
-        string: string
+      if (!nativePrices || (nativePrices && !nativePrices[asset.symbol])) return asset;
+
+      const balanceAmountUnit = convertAmountFromBigNumber(asset.balance.amount, asset.decimals);
+      const balancePriceUnit = convertAmountFromBigNumber(nativePrices[asset.symbol].price.amount);
+      const balanceRaw = BigNumber(balanceAmountUnit)
+        .times(BigNumber(balancePriceUnit))
+        .toString();
+      const balanceAmount = convertAmountToBigNumber(balanceRaw);
+      const balanceDisplay = convertAmountToDisplay(balanceAmount, nativePrices);
+
+      return {
+        ...asset,
+        native: {
+          selected: nativePrices.selected,
+          balance: { amount: balanceAmount, display: balanceDisplay },
+          price: nativePrices[asset.symbol].price,
+          change: nativePrices[asset.symbol].change
+        }
       };
-      return asset;
     });
-    totalNative = account.assets.reduce(
-      (total, asset) => Number(total) + Number(asset.native.value),
+    totalAmount = account.assets.reduce(
+      (total, asset) =>
+        BigNumber(`${total}`)
+          .plus(BigNumber(asset.native ? asset.native.balance.amount : 0))
+          .toString(),
       0
     );
-    totalNative = formatNativeString(totalNative, prices.native);
+    const totalDisplay = convertAmountToDisplay(totalAmount, nativePrices);
+
+    account.total = { amount: totalAmount, display: totalDisplay };
   }
-  account.totalNative = totalNative;
   return account;
 };
 
@@ -156,9 +500,12 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
     data.result.map(async (tx, idx) => {
       const hash = tx.hash;
       const timestamp = tx.timeStamp;
-      const from = tx.from;
+      const blockNumber = tx.blockNumber;
+      const txIndex = tx.transactionIndex;
       const error = tx.isError === '1';
       let interaction = false;
+      const data = tx.input;
+      const from = tx.from;
       let to = tx.to;
       let asset = {
         name: 'Ethereum',
@@ -166,7 +513,23 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
         address: null,
         decimals: 18
       };
-      let value = Number(fromWei(tx.value));
+      let value = {
+        amount: tx.value,
+        display: convertAmountToDisplay(tx.value, null, {
+          symbol: 'ETH',
+          decimals: 18
+        })
+      };
+      let totalGas = BigNumber(`${tx.gasUsed}`)
+        .times(BigNumber(`${tx.gasPrice}`))
+        .toString();
+      let txFee = {
+        amount: convertAmountFromBigNumber(totalGas),
+        display: convertAmountToDisplay(convertAmountFromBigNumber(totalGas), null, {
+          symbol: 'ETH',
+          decimals: 18
+        })
+      };
 
       const tokenTransfer = sha3('transfer(address,uint256)').slice(0, 10);
 
@@ -177,7 +540,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
           name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
           symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
           address: !response.data.error ? response.data.address : '',
-          decimals: !response.data.error ? Number(response.data.decimals) : 18
+          decimals: !response.data.error ? convertStringToNumber(response.data.decimals) : 18
         };
 
         /* STT token on Ropsten */
@@ -190,25 +553,30 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
           };
         }
 
-        const address = `0x${tx.input.slice(34, 74)}`;
-        const amount = hexToNumberString(`${tx.input.slice(74)}`);
-
-        to = address;
-        value = handleDecimals(convertTokenAmountToUnit(amount, asset.decimals));
+        to = `0x${tx.input.slice(34, 74)}`;
+        const hexResult = hexToNumberString(`${tx.input.slice(74)}`);
+        const amount = convertAssetAmountToBigNumber(hexResult, asset.decimals);
+        value = { amount, display: convertAmountToDisplay(amount, null, asset) };
       } else if (tx.input !== '0x') {
         interaction = true;
       }
 
-      return {
+      const result = {
         hash,
         timestamp,
+        blockNumber,
+        txIndex,
         from,
         to,
+        data,
         error,
-        asset,
         interaction,
-        value
+        value,
+        txFee,
+        native: null,
+        asset
       };
+      return result;
     })
   );
 
@@ -246,24 +614,40 @@ export const parseTransactionsPrices = async (transactions = null, nativeCurrenc
       _transactions.map(async (tx, idx) => {
         const timestamp = tx.timestamp;
         const assetSymbol = tx.asset.symbol;
-        const native = [nativeCurrency];
+        const native = nativeCurrencies[nativeCurrency];
         const response = await debounceApiGetHistoricalPrice(
           assetSymbol,
-          native,
+          [nativeCurrency],
           timestamp,
-          50 * idx
+          100 * idx
         );
-        if (response.data.response) return tx;
-        const prices = {
-          native: nativeCurrency,
-          [assetSymbol]: {
-            price: response.data[assetSymbol] ? response.data[assetSymbol][nativeCurrency] : null
-          }
+        if (response.data.response === 'Error' || !response.data[assetSymbol]) {
+          return tx;
+        }
+        let prices = { selected: native };
+        const assetPriceAmount = convertAmountToBigNumber(
+          response.data[assetSymbol][nativeCurrency]
+        );
+        prices[assetSymbol] = { price: { amount: assetPriceAmount, display: null } };
+        const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
+        prices[assetSymbol].price.display = assetPriceDisplay;
+        const assetPrice = prices[assetSymbol].price;
+        const valuePriceAmount = convertAssetAmountToNativeValue(tx.value.amount, tx.asset, prices);
+        const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
+
+        const valuePrice = !tx.error
+          ? { amount: valuePriceAmount, display: valuePriceDisplay }
+          : { amount: '', display: '' };
+        const txFeePriceAmount = convertAssetAmountToNativeValue(tx.txFee.amount, tx.asset, prices);
+        const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
+        const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
+
+        tx.native = {
+          selected: native,
+          price: assetPrice,
+          value: valuePrice,
+          txFee: txFeePrice
         };
-        const price = convertToNativeString('1', tx.asset.symbol, prices);
-        const total = !tx.error ? convertToNativeString(tx.value, tx.asset.symbol, prices) : null;
-        tx.price = price;
-        tx.total = total;
         return tx;
       })
     );

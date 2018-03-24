@@ -1,22 +1,32 @@
 {
   "USD": {
     "symbol": "$",
-    "value": "USD"
+    "currency": "USD",
+    "decimals": 2,
+    "alignment": "left"
   },
   "GBP": {
     "symbol": "£",
-    "value": "GBP"
+    "currency": "GBP",
+    "decimals": 2,
+    "alignment": "left"
   },
   "EUR": {
     "symbol": "€",
-    "value": "EUR"
+    "currency": "EUR",
+    "decimals": 2,
+    "alignment": "left"
   },
   "BTC": {
     "symbol": "₿",
-    "value": "BTC"
+    "currency": "BTC",
+    "decimals": 8,
+    "alignment": "right"
   },
   "ETH": {
     "symbol": "Ξ",
-    "value": "ETH"
+    "currency": "ETH",
+    "decimals": 8,
+    "alignment": "right"
   }
 }

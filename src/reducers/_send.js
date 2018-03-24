@@ -2,15 +2,14 @@ import { apiGetGasPrices } from '../helpers/api';
 import { notificationShow } from './_notification';
 import lang from '../languages';
 import ethUnits from '../libraries/ethereum-units.json';
-import { fromWei, convertFromNativeValue, convertToNativeValue } from '../helpers/utilities';
-import { parseError } from '../helpers/parsers';
 import {
-  metamaskSendTransaction,
-  metamaskTransferToken,
-  sendSignedTransaction,
-  transferToken,
-  getTransactionFee
-} from '../helpers/web3';
+  convertAssetAmountFromNativeValue,
+  convertAssetAmountToNativeValue,
+  countDecimalPlaces,
+  formatFixedDecimals
+} from '../helpers/utilities';
+import { parseError, parseGasPrices, parseGasPricesTxFee } from '../helpers/parsers';
+import { metamaskSendTransaction, metamaskTransferToken, estimateGasLimit } from '../helpers/web3';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -26,17 +25,9 @@ const SEND_ETHER_METAMASK_REQUEST = 'send/SEND_ETHER_METAMASK_REQUEST';
 const SEND_ETHER_METAMASK_SUCCESS = 'send/SEND_ETHER_METAMASK_SUCCESS';
 const SEND_ETHER_METAMASK_FAILURE = 'send/SEND_ETHER_METAMASK_FAILURE';
 
-const SEND_ETHER_CLIENT_REQUEST = 'send/SEND_ETHER_CLIENT_REQUEST';
-const SEND_ETHER_CLIENT_SUCCESS = 'send/SEND_ETHER_CLIENT_SUCCESS';
-const SEND_ETHER_CLIENT_FAILURE = 'send/SEND_ETHER_CLIENT_FAILURE';
-
 const SEND_TOKEN_METAMASK_REQUEST = 'send/SEND_TOKEN_METAMASK_REQUEST';
 const SEND_TOKEN_METAMASK_SUCCESS = 'send/SEND_TOKEN_METAMASK_SUCCESS';
 const SEND_TOKEN_METAMASK_FAILURE = 'send/SEND_TOKEN_METAMASK_FAILURE';
-
-const SEND_TOKEN_CLIENT_REQUEST = 'send/SEND_TOKEN_CLIENT_REQUEST';
-const SEND_TOKEN_CLIENT_SUCCESS = 'send/SEND_TOKEN_CLIENT_SUCCESS';
-const SEND_TOKEN_CLIENT_FAILURE = 'send/SEND_TOKEN_CLIENT_FAILURE';
 
 const SEND_TOGGLE_CONFIRMATION_VIEW = 'send/SEND_TOGGLE_CONFIRMATION_VIEW';
 
@@ -54,53 +45,53 @@ const SEND_CLEAR_FIELDS = 'send/SEND_CLEAR_FIELDS';
 
 export const sendGetGasPrices = () => (dispatch, getState) => {
   dispatch({ type: SEND_GET_GAS_PRICES_REQUEST });
+  const { prices } = getState().account;
+  const { gasLimit } = getState().send;
   apiGetGasPrices()
     .then(({ data }) => {
-      data.fastest = parseInt(data.fastest, 10) / 10;
-      data.fast = parseInt(data.fast, 10) / 10;
-      data.average = parseInt(data.average, 10) / 10;
-      data.safeLow = parseInt(data.safeLow, 10) / 10;
-      const txFee = fromWei(ethUnits.basic_tx * data.average * ethUnits.gwei);
+      const gasPrices = parseGasPrices(data, prices, gasLimit);
       dispatch({
         type: SEND_GET_GAS_PRICES_SUCCESS,
-        payload: { gasPrices: data, txFee }
+        payload: gasPrices
       });
     })
     .catch(error => {
+      console.error(error);
       dispatch(notificationShow(lang.t('notification.error.failed_get_gas_prices'), true));
       dispatch({ type: SEND_GET_GAS_PRICES_FAILURE });
     });
 };
 
 export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
-  const { send } = getState();
-  const { selected, address, recipient, assetAmount, gasPrice, gasPriceOption, gasPrices } = send;
+  const { selected, address, recipient, assetAmount, gasPrice, gasPriceOption } = getState().send;
+  let { gasPrices } = getState().send;
   const _gasPriceOption = newGasPriceOption || gasPriceOption;
   const _gasPrice = gasPriceOption ? gasPrices[_gasPriceOption] : gasPrice;
   dispatch({ type: SEND_UPDATE_GAS_PRICE_REQUEST });
-  getTransactionFee({
+  estimateGasLimit({
     tokenObject: selected,
     address,
     recipient,
-    amount: assetAmount,
-    gasPrice: _gasPrice
+    amount: assetAmount
   })
-    .then(({ txFee, gasLimit }) =>
+    .then(gasLimit => {
+      const { prices } = getState().account;
+      gasPrices = parseGasPricesTxFee(gasPrices, prices, gasLimit);
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_SUCCESS,
-        payload: { txFee, gasLimit, gasPrice: _gasPrice, gasPriceOption: _gasPriceOption }
-      })
-    )
+        payload: { gasLimit, gasPrice: _gasPrice, gasPriceOption: _gasPriceOption, gasPrices }
+      });
+    })
     .catch(error => {
       const message = parseError(error);
       dispatch(notificationShow(message || lang.t('notification.error.failed_get_tx_fee'), true));
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_FAILURE,
         payload: {
-          txFee: '',
           gasLimit: 21000,
           gasPrice: _gasPrice,
-          gasPriceOption: _gasPriceOption
+          gasPriceOption: _gasPriceOption,
+          gasPrices: gasPrices
         }
       });
     });
@@ -113,12 +104,11 @@ export const sendUpdateSelected = selected => (dispatch, getState) => {
 
 export const sendEtherMetamask = ({ address, recipient, amount, gasPrice }) => dispatch => {
   dispatch({ type: SEND_ETHER_METAMASK_REQUEST });
-  const _gasPrice = String(parseInt(gasPrice, 10) * ethUnits.gwei);
   metamaskSendTransaction({
     from: address,
     to: recipient,
     value: amount,
-    gasPrice: _gasPrice
+    gasPrice: gasPrice.value.amount
   })
     .then(txHash =>
       dispatch({
@@ -141,13 +131,12 @@ export const sendTokenMetamask = ({
   gasPrice
 }) => dispatch => {
   dispatch({ type: SEND_TOKEN_METAMASK_REQUEST });
-  const _gasPrice = String(parseInt(gasPrice, 10) * ethUnits.gwei);
   metamaskTransferToken({
     tokenObject,
     from: address,
     to: recipient,
     amount: amount,
-    gasPrice: _gasPrice
+    gasPrice: gasPrice.value.amount
   })
     .then(txHash =>
       dispatch({
@@ -159,66 +148,6 @@ export const sendTokenMetamask = ({
       const message = parseError(error);
       dispatch(notificationShow(message, true));
       dispatch({ type: SEND_TOKEN_METAMASK_FAILURE });
-    });
-};
-
-export const sendEtherClient = ({
-  address,
-  recipient,
-  amount,
-  privateKey,
-  gasPrice
-}) => dispatch => {
-  const _gasPrice = String(parseInt(gasPrice, 10) * ethUnits.gwei);
-  dispatch({ type: SEND_ETHER_CLIENT_REQUEST });
-  sendSignedTransaction({
-    from: address,
-    to: recipient,
-    value: amount,
-    gasPrice: _gasPrice,
-    privateKey
-  })
-    .then(txHash =>
-      dispatch({
-        type: SEND_ETHER_CLIENT_SUCCESS,
-        payload: txHash
-      })
-    )
-    .catch(error => {
-      const message = parseError(error);
-      dispatch(notificationShow(message, true));
-      dispatch({ type: SEND_ETHER_CLIENT_FAILURE });
-    });
-};
-
-export const sendTokenClient = ({
-  address,
-  recipient,
-  amount,
-  tokenObject,
-  privateKey,
-  gasPrice
-}) => dispatch => {
-  const _gasPrice = String(parseInt(gasPrice, 10) * ethUnits.gwei);
-  dispatch({ type: SEND_TOKEN_CLIENT_REQUEST });
-  transferToken({
-    tokenObject,
-    from: address,
-    to: recipient,
-    amount: amount,
-    gasPrice: _gasPrice,
-    privateKey: privateKey
-  })
-    .then(txHash =>
-      dispatch({
-        type: SEND_TOKEN_CLIENT_SUCCESS,
-        payload: txHash
-      })
-    )
-    .catch(error => {
-      const message = parseError(error);
-      dispatch(notificationShow(message, true));
-      dispatch({ type: SEND_TOKEN_CLIENT_FAILURE });
     });
 };
 
@@ -242,34 +171,38 @@ export const sendUpdateRecipient = recipient => dispatch => {
   }
 };
 
-export const sendUpdateNativeAmount = (nativeAmount, selected, prices) => dispatch => {
-  const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
-  const assetAmount =
-    String(convertFromNativeValue(_nativeAmount, selected, prices)) || _nativeAmount;
-  dispatch({
-    type: SEND_UPDATE_CRYPTO_AMOUNT,
-    payload: { assetAmount, nativeAmount: _nativeAmount }
-  });
-};
-
-export const sendUpdateAssetAmount = (assetAmount, selected, prices) => dispatch => {
+export const sendUpdateAssetAmount = (assetAmount, selected, prices) => (dispatch, getState) => {
+  const { prices } = getState().account;
   const _assetAmount = assetAmount.replace(/[^0-9.]/g, '');
-  const nativeAmount =
-    String(convertToNativeValue(_assetAmount, selected, prices)) || _assetAmount;
+  let _nativeAmount = '';
+  if (_assetAmount.length) {
+    const _assetAmountDecimalPlaces = countDecimalPlaces(_assetAmount);
+    const nativeAmount = convertAssetAmountToNativeValue(_assetAmount, selected, prices);
+    const _nativeAmountDecimalPlaces =
+      _assetAmountDecimalPlaces > 8 ? _assetAmountDecimalPlaces : 8;
+    _nativeAmount = formatFixedDecimals(nativeAmount, _nativeAmountDecimalPlaces);
+  }
   dispatch({
     type: SEND_UPDATE_CRYPTO_AMOUNT,
-    payload: { assetAmount: _assetAmount, nativeAmount }
+    payload: { assetAmount: _assetAmount, nativeAmount: _nativeAmount }
   });
 };
 
-export const sendUpdatePrivateKey = privateKey => dispatch => {
-  const input = privateKey.replace(/[^\w]/g, '');
-  if (input.length <= 66) {
-    dispatch({
-      type: SEND_UPDATE_PRIVATE_KEY,
-      payload: input
-    });
+export const sendUpdateNativeAmount = (nativeAmount, selected, prices) => (dispatch, getState) => {
+  const { prices } = getState().account;
+  const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
+  let _assetAmount = '';
+  if (_nativeAmount.length) {
+    const _nativeAmountDecimalPlaces = countDecimalPlaces(_nativeAmount);
+    const assetAmount = convertAssetAmountFromNativeValue(_nativeAmount, selected, prices);
+    const _assetAmountDecimalPlaces =
+      _nativeAmountDecimalPlaces > 8 ? _nativeAmountDecimalPlaces : 8;
+    _assetAmount = formatFixedDecimals(assetAmount, _assetAmountDecimalPlaces);
   }
+  dispatch({
+    type: SEND_UPDATE_CRYPTO_AMOUNT,
+    payload: { assetAmount: _assetAmount, nativeAmount: _nativeAmount }
+  });
 };
 
 export const sendClearFields = () => ({ type: SEND_CLEAR_FIELDS });
@@ -277,10 +210,9 @@ export const sendClearFields = () => ({ type: SEND_CLEAR_FIELDS });
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
   fetchingGasPrices: false,
-  txFee: '',
+  gasPrice: {},
   gasPrices: {},
-  gasPrice: 0,
-  gasLimit: 21000,
+  gasLimit: ethUnits.basic_tx,
   gasPriceOption: 'average',
   fetching: false,
   address: '',
@@ -288,7 +220,6 @@ const INITIAL_STATE = {
   nativeAmount: '',
   assetAmount: '',
   transaction: '',
-  privateKey: '',
   confirm: false,
   selected: { symbol: 'ETH' }
 };
@@ -301,16 +232,14 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetchingGasPrices: false,
-        gasPrices: action.payload.gasPrices,
-        gasPrice: action.payload.gasPrices.average,
-        gasPriceOption: 'average',
-        txFee: action.payload.txFee
+        gasPrice: action.payload.average,
+        gasPrices: action.payload,
+        gasPriceOption: action.payload.average.option
       };
     case SEND_GET_GAS_PRICES_FAILURE:
       return {
         ...state,
-        fetchingGasPrices: false,
-        txFee: ''
+        fetchingGasPrices: false
       };
     case SEND_UPDATE_GAS_PRICE_REQUEST:
       return { ...state, fetchingGasPrices: true };
@@ -321,13 +250,11 @@ export default (state = INITIAL_STATE, action) => {
         fetchingGasPrices: false,
         gasLimit: action.payload.gasLimit,
         gasPrice: action.payload.gasPrice,
-        gasPriceOption: action.payload.gasPriceOption,
-        txFee: action.payload.txFee
+        gasPrices: action.payload.gasPrices,
+        gasPriceOption: action.payload.gasPriceOption
       };
     case SEND_ETHER_METAMASK_REQUEST:
-    case SEND_ETHER_CLIENT_REQUEST:
     case SEND_TOKEN_METAMASK_REQUEST:
-    case SEND_TOKEN_CLIENT_REQUEST:
       return { ...state, fetching: true };
     case SEND_ETHER_METAMASK_SUCCESS:
     case SEND_TOKEN_METAMASK_SUCCESS:
@@ -337,30 +264,12 @@ export default (state = INITIAL_STATE, action) => {
         gasPrices: {},
         transaction: action.payload
       };
-    case SEND_ETHER_CLIENT_SUCCESS:
-    case SEND_TOKEN_CLIENT_SUCCESS:
-      return {
-        ...state,
-        fetching: false,
-        gasPrices: {},
-        transaction: action.payload,
-        privateKey: ''
-      };
     case SEND_ETHER_METAMASK_FAILURE:
     case SEND_TOKEN_METAMASK_FAILURE:
       return {
         ...state,
         fetching: false,
         transaction: '',
-        confirm: false
-      };
-    case SEND_ETHER_CLIENT_FAILURE:
-    case SEND_TOKEN_CLIENT_FAILURE:
-      return {
-        ...state,
-        fetching: false,
-        transaction: '',
-        privateKey: '',
         confirm: false
       };
     case SEND_TOGGLE_CONFIRMATION_VIEW:

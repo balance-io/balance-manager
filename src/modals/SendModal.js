@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
+import BigNumber from 'bignumber.js';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import BigNumber from 'bignumber.js';
 import lang from '../languages';
 import QRCodeReader from '../components/QRCodeReader';
 import Card from '../components/Card';
@@ -17,33 +17,23 @@ import TrezorLogo from '../components/TrezorLogo';
 import convertSymbol from '../assets/convert-symbol.svg';
 import arrowUp from '../assets/arrow-up.svg';
 import qrIcon from '../assets/qr-code-bnw.png';
-import ethUnits from '../libraries/ethereum-units.json';
 import { modalClose } from '../reducers/_modal';
 import {
   sendGetGasPrices,
   sendUpdateGasPrice,
   sendEtherMetamask,
-  sendEtherClient,
   sendTokenMetamask,
-  sendTokenClient,
   sendClearFields,
   sendUpdateAddress,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
   sendUpdateAssetAmount,
-  sendUpdatePrivateKey,
   sendUpdateSelected,
   sendToggleConfirmationView
 } from '../reducers/_send';
 import { notificationShow } from '../reducers/_notification';
 import { isValidAddress } from '../helpers/validators';
-import {
-  toWei,
-  fromWei,
-  convertAssetAmountToNativePrice,
-  getTimeString,
-  capitalize
-} from '../helpers/utilities';
+import { convertAmountFromBigNumber, capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
 const StyledSuccessMessage = styled.div`
@@ -273,25 +263,21 @@ class SendModal extends Component {
   onAddressInputFocus = () => this.setState({ isValidAddress: true });
   onAddressInputBlur = () =>
     this.setState({ isValidAddress: isValidAddress(this.props.recipient) });
-  onGoBack = () => {
-    if (this.props.modalProps.type === 'COLD') {
-      this.props.sendUpdatePrivateKey('');
-    }
-    this.props.sendToggleConfirmationView(false);
-  };
+  onGoBack = () => this.props.sendToggleConfirmationView(false);
   onSendEntireBalance = () => {
     if (this.props.selected.symbol === 'ETH') {
       const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
-      const balanceWei = toWei(ethereum.balance);
-      const txFeeWei = toWei(this.props.txFee);
-      const remaining = balanceWei - txFeeWei;
-      const ether = fromWei(remaining < 0 ? 0 : remaining);
-      this.props.sendUpdateAssetAmount(ether, 'ETH', this.props.modalProps.prices);
+      const balanceAmount = ethereum.balance.amount;
+      const txFeeAmount = this.props.gasPrice.txFee.value.amount;
+      const remaining = BigNumber(balanceAmount)
+        .minus(BigNumber(txFeeAmount))
+        .toNumber();
+      const ether = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
+      this.props.sendUpdateAssetAmount(ether, { symbol: 'ETH' });
     } else {
       this.props.sendUpdateAssetAmount(
-        this.props.selected.balance.replace(/[^0-9.]/gi, ''),
-        this.props.selected.symbol,
-        this.props.modalProps.prices
+        convertAmountFromBigNumber(this.props.selected.balance.amount),
+        this.props.selected
       );
     }
   };
@@ -323,36 +309,39 @@ class SendModal extends Component {
         this.props.notificationShow(lang.t('notification.error.invalid_address'), true);
         return;
       } else if (this.props.selected.symbol === 'ETH') {
-        const balance = Number(this.props.modalProps.balance);
-        const requestedAmount = Number(this.props.assetAmount);
-        const includingFees = requestedAmount + Number(this.props.txFee);
-        if (requestedAmount > balance) {
+        const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+        const balanceAmount = ethereum.balance.amount;
+        const balance = convertAmountFromBigNumber(balanceAmount);
+        const requestedAmount = BigNumber(`${this.props.assetAmount}`).toString();
+        const txFeeAmount = this.props.gasPrice.txFee.value.amount;
+        const txFee = convertAmountFromBigNumber(txFeeAmount);
+        const includingFees = BigNumber(requestedAmount)
+          .plus(BigNumber(txFee))
+          .toString();
+        if (BigNumber(requestedAmount).comparedTo(BigNumber(balance)) === 1) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
-        } else if (includingFees > balance) {
+        } else if (BigNumber(includingFees).comparedTo(BigNumber(balance)) === 1) {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
       } else {
-        const etherBalance = Number(this.props.modalProps.balance);
-        const tokenBalance = this.props.selected.balance;
-        const requestedAmount = Number(this.props.assetAmount);
-        const includingFees = Number(this.props.txFee);
-        if (requestedAmount > tokenBalance) {
+        const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+        const etherBalanceAmount = ethereum.balance.amount;
+        const etherBalance = convertAmountFromBigNumber(etherBalanceAmount);
+        const tokenBalanceAmount = this.props.selected.balance.amount;
+        const tokenBalance = convertAmountFromBigNumber(tokenBalanceAmount);
+        const requestedAmount = BigNumber(`${this.props.assetAmount}`).toString();
+        const includingFees = convertAmountFromBigNumber(this.props.gasPrice.txFee.value.amount);
+        if (BigNumber(requestedAmount).comparedTo(BigNumber(tokenBalance)) === 1) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
-        } else if (includingFees > etherBalance) {
+        } else if (BigNumber(includingFees).comparedTo(BigNumber(etherBalance)) === 1) {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
       }
       this.props.sendToggleConfirmationView(true);
-    } else {
-      if (this.props.selected.symbol === 'ETH') {
-        this.props.sendEtherClient(request);
-      } else {
-        this.props.sendTokenClient(request);
-      }
     }
   };
   toggleQRCodeReader = target =>
@@ -440,11 +429,7 @@ class SendModal extends Component {
                     type="text"
                     value={this.props.assetAmount}
                     onChange={({ target }) =>
-                      this.props.sendUpdateAssetAmount(
-                        target.value,
-                        this.props.selected.symbol,
-                        this.props.modalProps.prices
-                      )
+                      this.props.sendUpdateAssetAmount(target.value, this.props.selected)
                     }
                   />
                   <StyledMaxBalance onClick={this.onSendEntireBalance}>
@@ -464,71 +449,61 @@ class SendModal extends Component {
                     type="text"
                     value={this.props.nativeAmount}
                     onChange={({ target }) =>
-                      this.props.sendUpdateNativeAmount(
-                        target.value,
-                        this.props.selected.symbol,
-                        this.props.modalProps.prices
-                      )
+                      this.props.sendUpdateNativeAmount(target.value, this.props.selected)
                     }
                   />
-                  <StyledAmountCurrency>{this.props.modalProps.prices.native}</StyledAmountCurrency>
+                  <StyledAmountCurrency>{this.props.prices.selected.currency}</StyledAmountCurrency>
                 </StyledFlex>
               </StyledFlex>
 
-              {this.props.modalProps.type === 'COLD' && (
-                <StyledFlex>
-                  <Input
-                    monospace
-                    placeholder={lang.t('input.private_key')}
-                    type="text"
-                    value={this.props.privateKey}
-                    onChange={({ target }) => this.props.sendUpdatePrivateKey(target.value)}
-                  />
-                  <StyledQRIcon onClick={() => this.toggleQRCodeReader('privateKey')}>
-                    <img src={qrIcon} alt="privateKey" />
-                  </StyledQRIcon>
-                </StyledFlex>
-              )}
               <LineBreak
                 color={
-                  this.props.gasPriceOption === 'safeLow'
+                  this.props.gasPriceOption === 'slow'
                     ? 'red'
                     : this.props.gasPriceOption === 'average' ? 'gold' : 'lightGreen'
                 }
                 percentage={
-                  this.props.gasPriceOption === 'safeLow'
+                  this.props.gasPriceOption === 'slow'
                     ? 33
                     : this.props.gasPriceOption === 'average' ? 66 : 100
                 }
               />
               <StyledGasOptions>
-                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('safeLow')}>
-                  <p>{`${lang.t('modal.gas_slow')}: ${convertAssetAmountToNativePrice(
-                    fromWei(
-                      (this.props.gasPrices.safeLow || 0) * ethUnits.basic_tx * ethUnits.gwei
-                    ),
-                    { symbol: 'ETH' },
-                    this.props.modalProps.prices
-                  )}`}</p>
-                  <p>{`~ ${getTimeString(this.props.gasPrices.safeLowWait || 0, 'minutes')}`}</p>
+                <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('slow')}>
+                  <p>{`${lang.t('modal.gas_slow')}: ${
+                    this.props.gasPrices.slow && this.props.gasPrices.slow.txFee.native
+                      ? this.props.gasPrices.slow.txFee.native.value.display
+                      : '$0.00'
+                  }`}</p>
+                  <p>{`~ ${
+                    this.props.gasPrices.slow
+                      ? this.props.gasPrices.slow.estimatedTime.display
+                      : '0 secs'
+                  }`}</p>
                 </StyledGasButton>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('average')}>
-                  <p>{`${lang.t('modal.gas_average')}: ${convertAssetAmountToNativePrice(
-                    fromWei(
-                      (this.props.gasPrices.average || 0) * ethUnits.basic_tx * ethUnits.gwei
-                    ),
-                    { symbol: 'ETH' },
-                    this.props.modalProps.prices
-                  )}`}</p>
-                  <p>{`~ ${getTimeString(this.props.gasPrices.avgWait || 0, 'minutes')}`}</p>
+                  <p>{`${lang.t('modal.gas_average')}: ${
+                    this.props.gasPrices.average && this.props.gasPrices.average.txFee
+                      ? this.props.gasPrices.average.txFee.native.value.display
+                      : '$0.00'
+                  }`}</p>
+                  <p>{`~ ${
+                    this.props.gasPrices.average
+                      ? this.props.gasPrices.average.estimatedTime.display
+                      : '0 secs'
+                  }`}</p>
                 </StyledGasButton>
                 <StyledGasButton dark onClick={() => this.props.sendUpdateGasPrice('fast')}>
-                  <p>{`${lang.t('modal.gas_fast')}: ${convertAssetAmountToNativePrice(
-                    fromWei((this.props.gasPrices.fast || 0) * ethUnits.basic_tx * ethUnits.gwei),
-                    { symbol: 'ETH' },
-                    this.props.modalProps.prices
-                  )}`}</p>
-                  <p>{`~ ${getTimeString(this.props.gasPrices.fastWait || 0, 'minutes')}`}</p>
+                  <p>{`${lang.t('modal.gas_fast')}: ${
+                    this.props.gasPrices.fast && this.props.gasPrices.fast.txFee.native
+                      ? this.props.gasPrices.fast.txFee.native.value.display
+                      : '$0.00'
+                  }`}</p>
+                  <p>{`~ ${
+                    this.props.gasPrices.fast
+                      ? this.props.gasPrices.fast.estimatedTime.display
+                      : '0 secs'
+                  }`}</p>
                 </StyledGasButton>
               </StyledGasOptions>
               <LineBreak noMargin />
@@ -536,16 +511,17 @@ class SendModal extends Component {
                 <StyledActions>
                   <Button onClick={this.onClose}>{lang.t('button.cancel')}</Button>
                   <StyledParagraph>
-                    {`${lang.t('modal.gas_fee')}:`}
-                    {this.props.txFee
-                      ? ` ${BigNumber(this.props.txFee).toFormat(
-                          6
-                        )} ETH (${convertAssetAmountToNativePrice(
-                          this.props.txFee,
-                          { symbol: 'ETH' },
-                          this.props.modalProps.prices
-                        )})`
-                      : ` 0.000000 ETH ($0.00)`}
+                    <span>{`${lang.t('modal.gas_fee')}: `}</span>
+                    <span>{`${
+                      this.props.gasPrices[this.props.gasPriceOption]
+                        ? this.props.gasPrices[this.props.gasPriceOption].txFee.value.display
+                        : '0.000 ETH'
+                    } (${
+                      this.props.gasPrices[this.props.gasPriceOption] &&
+                      this.props.gasPrices[this.props.gasPriceOption].txFee.native
+                        ? this.props.gasPrices[this.props.gasPriceOption].txFee.native.value.display
+                        : '$0.00'
+                    })`}</span>
                   </StyledParagraph>
                   <Button
                     left
@@ -553,8 +529,7 @@ class SendModal extends Component {
                     icon={arrowUp}
                     disabled={
                       this.props.recipient.length !== 42 ||
-                      (this.props.selected.symbol !== 'ETH' && !Number(this.props.assetAmount)) ||
-                      (this.props.modalProps.type === 'COLD' && this.props.privateKey.length < 64)
+                      (this.props.selected.symbol !== 'ETH' && !Number(this.props.assetAmount))
                     }
                     type="submit"
                   >
@@ -571,7 +546,7 @@ class SendModal extends Component {
                 />
               )}
             </Form>
-          ) : this.props.modalProps.type !== 'COLD' ? (
+          ) : (
             <StyledApproveTransaction>
               {(() => {
                 switch (this.props.modalProps.type) {
@@ -592,60 +567,6 @@ class SendModal extends Component {
                 <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
               </StyledActions>
             </StyledApproveTransaction>
-          ) : (
-            <Form onSubmit={this.onSubmit}>
-              <StyledSubTitle>
-                <StyledIcon color="grey" icon={arrowUp} />
-                {lang.t('modal.confirm_tx', { walletName: capitalize(this.props.modalProps.name) })}
-              </StyledSubTitle>
-              <div>
-                <StyledParagraph>
-                  <strong>{`${lang.t('modal.tx_confirm_sender')}:`}</strong>
-                  {` ${this.props.modalProps.address}`}
-                </StyledParagraph>
-                <StyledParagraph>
-                  <strong>{`${lang.t('modal.tx_confirm_recipient')}:`}</strong>
-                  {` ${this.props.recipient}`}
-                </StyledParagraph>
-                <StyledParagraph>
-                  <strong>{`${lang.t('modal.tx_confirm_amount')}:`}</strong>
-                  {this.props.assetAmount &&
-                    ` ${BigNumber(this.props.assetAmount).toFormat(6)} ${
-                      this.props.selected.symbol
-                    } ${
-                      convertAssetAmountToNativePrice(
-                        this.props.assetAmount,
-                        this.props.selected,
-                        this.props.modalProps.prices
-                      )
-                        ? `(${convertAssetAmountToNativePrice(
-                            this.props.assetAmount,
-                            this.props.selected,
-                            this.props.modalProps.prices
-                          )})`
-                        : ``
-                    }`}
-                </StyledParagraph>
-                <StyledParagraph>
-                  <strong>{`${lang.t('modal.tx_confirm_fee')}:`}</strong>
-                  {this.props.txFee &&
-                    ` ${BigNumber(this.props.txFee).toFormat(
-                      6
-                    )} ETH (${convertAssetAmountToNativePrice(
-                      this.props.txFee,
-                      { symbol: 'ETH' },
-                      this.props.modalProps.prices
-                    )})`}
-                </StyledParagraph>
-              </div>
-
-              <StyledActions>
-                <Button onClick={this.onGoBack}>{lang.t('button.go_back')}</Button>
-                <Button left color="blue" icon={arrowUp} type="submit">
-                  {lang.t('button.send')}
-                </Button>
-              </StyledActions>
-            </Form>
           )
         ) : (
           <StyledSuccessMessage>
@@ -686,15 +607,12 @@ SendModal.propTypes = {
   sendGetGasPrices: PropTypes.func.isRequired,
   sendUpdateGasPrice: PropTypes.func.isRequired,
   sendEtherMetamask: PropTypes.func.isRequired,
-  sendEtherClient: PropTypes.func.isRequired,
   sendTokenMetamask: PropTypes.func.isRequired,
-  sendTokenClient: PropTypes.func.isRequired,
   sendClearFields: PropTypes.func.isRequired,
   sendUpdateAddress: PropTypes.func.isRequired,
   sendUpdateRecipient: PropTypes.func.isRequired,
   sendUpdateNativeAmount: PropTypes.func.isRequired,
   sendUpdateAssetAmount: PropTypes.func.isRequired,
-  sendUpdatePrivateKey: PropTypes.func.isRequired,
   sendUpdateSelected: PropTypes.func.isRequired,
   sendToggleConfirmationView: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
@@ -705,17 +623,16 @@ SendModal.propTypes = {
   nativeAmount: PropTypes.string.isRequired,
   assetAmount: PropTypes.string.isRequired,
   transaction: PropTypes.string.isRequired,
-  privateKey: PropTypes.string.isRequired,
   address: PropTypes.string.isRequired,
   selected: PropTypes.object.isRequired,
   fetchingGasPrices: PropTypes.bool.isRequired,
+  gasPrice: PropTypes.object.isRequired,
   gasPrices: PropTypes.object.isRequired,
-  gasPrice: PropTypes.number.isRequired,
   gasLimit: PropTypes.number.isRequired,
   gasPriceOption: PropTypes.string.isRequired,
-  txFee: PropTypes.string.isRequired,
   confirm: PropTypes.bool.isRequired,
-  web3Network: PropTypes.string.isRequired
+  web3Network: PropTypes.string.isRequired,
+  prices: PropTypes.object.isRequired
 };
 
 const reduxProps = ({ modal, send, account }) => ({
@@ -725,7 +642,6 @@ const reduxProps = ({ modal, send, account }) => ({
   nativeAmount: send.nativeAmount,
   assetAmount: send.assetAmount,
   transaction: send.transaction,
-  privateKey: send.privateKey,
   address: send.address,
   selected: send.selected,
   fetchingGasPrices: send.fetchingGasPrices,
@@ -733,9 +649,9 @@ const reduxProps = ({ modal, send, account }) => ({
   gasPrice: send.gasPrice,
   gasLimit: send.gasLimit,
   gasPriceOption: send.gasPriceOption,
-  txFee: send.txFee,
   confirm: send.confirm,
-  web3Network: account.web3Network
+  web3Network: account.web3Network,
+  prices: account.prices
 });
 
 export default connect(reduxProps, {
@@ -743,15 +659,12 @@ export default connect(reduxProps, {
   sendGetGasPrices,
   sendUpdateGasPrice,
   sendEtherMetamask,
-  sendEtherClient,
   sendTokenMetamask,
-  sendTokenClient,
   sendClearFields,
   sendUpdateAddress,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
   sendUpdateAssetAmount,
-  sendUpdatePrivateKey,
   sendUpdateSelected,
   sendToggleConfirmationView,
   notificationShow

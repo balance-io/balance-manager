@@ -114,7 +114,7 @@ const BaseLayout = ({
             <StyledBranding>
               <StyledLogo src={logo} alt="Balance" />
               <StyledHero>
-                <strong>Balance.io</strong>
+                <strong>Balance</strong>
                 <span>{` Manager`}</span>
               </StyledHero>
             </StyledBranding>

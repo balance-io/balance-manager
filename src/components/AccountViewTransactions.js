@@ -182,9 +182,13 @@ const AccountViewTransactions = ({
               <TransactionStatus tx={tx} accountAddress={accountAddress} />
 
               <p>{`${tx.value.display}`}</p>
-              <p>{tx.price || '———'}</p>
+              <p>{tx.native ? tx.native.price.display : '———'}</p>
               <p>
-                {tx.total ? (tx.from === accountAddress ? `- ${tx.total}` : `${tx.total}`) : '———'}
+                {tx.native
+                  ? tx.from === accountAddress
+                    ? tx.native.value.display ? `- ${tx.native.value.display}` : '———'
+                    : `${tx.native.value.display || '———'}`
+                  : '———'}
               </p>
             </StyledTransaction>
           );

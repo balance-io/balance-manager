@@ -8,6 +8,7 @@ import {
   getNakedAddress,
   toWei,
   fromWei,
+  hexToNumberString,
   convertAmountToBigNumber,
   convertAssetAmountFromBigNumber
 } from './utilities';
@@ -45,7 +46,7 @@ export const web3SetProvider = provider => {
 export const getAccountBalance = async address => {
   const wei = await web3Instance.eth.getBalance(address);
   const ether = fromWei(wei);
-  const balance = Number(ether) !== 0 ? BigNumber(ether).toFormat(8) : 0;
+  const balance = Number(ether) !== 0 ? BigNumber(`${ether}`).toString() : 0;
   return balance;
 };
 
@@ -62,7 +63,7 @@ export const getTokenBalanceOf = (accountAddress, tokenAddress) =>
     web3Instance.eth
       .call({ to: tokenAddress, data: dataString })
       .then(balanceHexResult => {
-        const balance = fromWei(balanceHexResult);
+        const balance = hexToNumberString(balanceHexResult);
         resolve(balance);
       })
       .catch(error => reject(error));
@@ -217,7 +218,8 @@ export const metamaskTransferToken = transaction =>
 export const estimateGasLimit = async ({ tokenObject, address, recipient, amount }) => {
   let gasLimit = ethUnits.basic_tx;
   let data = '0x';
-  let _amount = amount && Number(amount) ? convertAmountToBigNumber(amount) : tokenObject.balance.amount;
+  let _amount =
+    amount && Number(amount) ? convertAmountToBigNumber(amount) : tokenObject.balance.amount;
   let _recipient =
     recipient && isValidAddress(recipient)
       ? recipient

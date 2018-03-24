@@ -453,14 +453,14 @@ export const sanitizeHex = hex => {
  * @param  {Number} wei
  * @return {BigNumber}
  */
-export const fromWei = wei => BigNumber(wei).dividedBy(ethUnits.wei);
+export const fromWei = wei => BigNumber(wei).dividedBy(ethUnits.ether);
 
 /**
  * @desc convert from ether to wei
  * @param  {Number} ether
  * @return {BigNumber}
  */
-export const toWei = ether => BigNumber(ether).times(ethUnits.wei);
+export const toWei = ether => BigNumber(ether).times(ethUnits.ether);
 
 /**
  * @desc hash string with sha3

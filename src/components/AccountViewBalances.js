@@ -192,6 +192,9 @@ const AccountViewBalances = ({
   const tokensWithLowMarketValue = account.assets.filter(
     asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
   );
+  const allLowMarketTokensHaveNoValue =
+    tokensWithLowMarketValue.filter(asset => !asset.native).length ===
+    tokensWithLowMarketValue.length;
   return (
     <StyledGrid {...props}>
       <StyledLabelsRow>
@@ -261,7 +264,11 @@ const AccountViewBalances = ({
               tokensWithLowMarketValue.length === 1
                 ? lang.t('account.token')
                 : lang.t('account.tokens')
-            } ${lang.t('account.low_market_value')}`}
+            } ${
+              allLowMarketTokensHaveNoValue
+                ? lang.t('account.no_market_value')
+                : lang.t('account.low_market_value')
+            }`}
           </StyledShowMoreTokens>
         ) : (
           <div />

@@ -118,6 +118,7 @@ const StyledAmountCurrency = styled.div`
   right: 12px;
   font-size: ${fonts.size.medium};
   color: rgba(${colors.darkGrey}, 0.7);
+  opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
 `;
 
 const StyledConversionSymbol = styled.div`
@@ -448,11 +449,14 @@ class SendModal extends Component {
                     placeholder="0.0"
                     type="text"
                     value={this.props.nativeAmount}
+                    disabled={!this.props.prices[this.props.selected.symbol]}
                     onChange={({ target }) =>
                       this.props.sendUpdateNativeAmount(target.value, this.props.selected)
                     }
                   />
-                  <StyledAmountCurrency>{this.props.prices.selected.currency}</StyledAmountCurrency>
+                  <StyledAmountCurrency disabled={!this.props.prices[this.props.selected.symbol]}>
+                    {this.props.prices.selected.currency}
+                  </StyledAmountCurrency>
                 </StyledFlex>
               </StyledFlex>
 

@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
 import Card from './Card';
+import ButtonCustom from './ButtonCustom';
+import Blockie from './Blockie';
 import AssetIcon from './AssetIcon';
+import HoverWrapper from './HoverWrapper';
 import TransactionStatus from './TransactionStatus';
+import etherscanLogo from '../assets/etherscan-logo.svg';
+import ethplorerLogo from '../assets/ethplorer-logo.svg';
+import { getLocalTimeDate } from '../helpers/time';
 import { colors, fonts, shadows, responsive, transitions } from '../styles';
 
 const StyledGrid = styled.div`
@@ -69,6 +75,12 @@ const StyledLabels = styled.p`
   color: rgba(${colors.darkGrey}, 0.7);
 `;
 
+const StyledTransactionWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
 const StyledTransaction = styled(StyledRow)`
   transition: ${transitions.base};
   width: 100%;
@@ -84,15 +96,47 @@ const StyledTransaction = styled(StyledRow)`
   & > p {
     font-family: ${fonts.family.SFMono};
   }
+`;
+
+const StyledTransactionMainRow = styled(StyledTransaction)`
   &:nth-child(n + 3) {
     border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
   }
   @media (hover: hover) {
     &:hover {
       z-index: 10;
-      box-shadow: ${shadows.soft};
+      box-shadow: ${({ showTxDetails }) => (showTxDetails ? 'none' : `${shadows.soft}`)};
     }
   }
+`;
+
+const StyledTransactionDetails = styled(StyledTransaction)`
+  transition: ${transitions.long};
+  border-top-color: rgba(${colors.lightGrey}, 0.4);
+  border-top-style: solid;
+  border-top-width: ${({ showTxDetails }) => (showTxDetails ? `2px` : '0')};
+  max-height: ${({ showTxDetails }) => (showTxDetails ? '80px' : '0')};
+  padding: ${({ showTxDetails }) => (showTxDetails ? '20px' : '0 20px')};
+  background-color: rgb(${colors.white});
+  overflow: hidden;
+  & > div {
+    display: flex;
+  }
+  & p {
+    justify-content: flex-start;
+  }
+`;
+
+const StyledTransactionTopDetails = styled(StyledTransactionDetails)`
+  grid-template-columns: 2fr 1fr 1fr;
+`;
+
+const StyledTransactionBottomDetails = styled(StyledTransactionDetails)`
+  grid-template-columns: 3fr 1fr;
+`;
+
+const StyledBlockie = styled(Blockie)`
+  margin-right: 10px;
 `;
 
 const StyledAsset = styled.div`
@@ -150,69 +194,164 @@ const StyledCard = styled(Card)`
   box-shadow: none;
 `;
 
-const AccountViewTransactions = ({
-  onShowMoreTransactions,
-  fetchingTransactions,
-  limitTransactions,
-  accountAddress,
-  transactions,
-  ...props
-}) => {
-  const _transactions = transactions.filter(tx => !tx.interaction);
-  return (
-    !!_transactions &&
-    (!fetchingTransactions ? (
-      <StyledGrid>
-        <StyledLabelsRow>
-          <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
-          <StyledLabels>{lang.t('account.label_status')}</StyledLabels>
-          <StyledLabels>{lang.t('account.label_quantity')}</StyledLabels>
-          <StyledLabels>{lang.t('account.label_price')}</StyledLabels>
-          <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
-        </StyledLabelsRow>
+class AccountViewTransactions extends Component {
+  state = {
+    showTxDetails: null
+  };
+  onShowTxDetails = hash => {
+    if (this.state.showTxDetails === hash) {
+      this.setState({ showTxDetails: null });
+    } else {
+      this.setState({ showTxDetails: hash });
+    }
+  };
+  render = () => {
+    const {
+      onShowMoreTransactions,
+      fetchingTransactions,
+      limitTransactions,
+      accountAddress,
+      transactions,
+      web3Network,
+      ...props
+    } = this.props;
+    const _transactions = transactions.filter(tx => !tx.interaction);
+    return (
+      !!_transactions &&
+      (!fetchingTransactions ? (
+        <StyledGrid {...props}>
+          <StyledLabelsRow>
+            <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
+            <StyledLabels>{lang.t('account.label_status')}</StyledLabels>
+            <StyledLabels>{lang.t('account.label_quantity')}</StyledLabels>
+            <StyledLabels>{lang.t('account.label_price')}</StyledLabels>
+            <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
+          </StyledLabelsRow>
 
-        {_transactions.map((tx, idx) => {
-          if (idx > limitTransactions) return null;
-          return (
-            <StyledTransaction failed={tx.error} key={tx.hash}>
-              <StyledAsset>
-                <AssetIcon currency={tx.asset.symbol} />
-                <p>{tx.asset.name}</p>
-              </StyledAsset>
-              <TransactionStatus tx={tx} accountAddress={accountAddress} />
+          {_transactions.map((tx, idx) => {
+            if (idx > limitTransactions) return null;
+            return (
+              <StyledTransactionWrapper
+                showTxDetails={this.state.showTxDetails === tx.hash}
+                failed={tx.error}
+                key={tx.hash}
+              >
+                <HoverWrapper hover={this.state.showTxDetails === tx.hash}>
+                  <StyledTransactionMainRow
+                    showTxDetails={this.state.showTxDetails === tx.hash}
+                    onClick={() => this.onShowTxDetails(tx.hash)}
+                  >
+                    <StyledAsset>
+                      <AssetIcon currency={tx.asset.symbol} />
+                      <p>{tx.asset.name}</p>
+                    </StyledAsset>
+                    <TransactionStatus tx={tx} accountAddress={accountAddress} />
 
-              <p>{`${tx.value.display}`}</p>
-              <p>{tx.native ? tx.native.price.display : '———'}</p>
-              <p>
-                {tx.native
-                  ? tx.from === accountAddress
-                    ? tx.native.value.display ? `- ${tx.native.value.display}` : '———'
-                    : `${tx.native.value.display || '———'}`
-                  : '———'}
-              </p>
-            </StyledTransaction>
-          );
-        })}
-        {limitTransactions < _transactions.length && (
-          <StyledShowMoreTransactions onClick={onShowMoreTransactions}>
-            <p>{lang.t('account.show_more')}</p>
-          </StyledShowMoreTransactions>
-        )}
-      </StyledGrid>
-    ) : (
-      <StyledCard minHeight={280} fetching={fetchingTransactions}>
-        <div />
-      </StyledCard>
-    ))
-  );
-};
+                    <p>{`${tx.value.display}`}</p>
+                    <p>{tx.native ? tx.native.price.display : '———'}</p>
+                    <p>
+                      {tx.native
+                        ? tx.from === accountAddress
+                          ? tx.native.value.display ? `- ${tx.native.value.display}` : '———'
+                          : `${tx.native.value.display || '———'}`
+                        : '———'}
+                    </p>
+                  </StyledTransactionMainRow>
+                  <StyledTransactionTopDetails showTxDetails={this.state.showTxDetails === tx.hash}>
+                    <div>
+                      <StyledBlockie seed={tx.from === accountAddress ? tx.to : tx.from} />
+                      <div>
+                        <p>
+                          <strong>{tx.from === accountAddress ? 'TO' : 'FROM'}</strong>
+                        </p>
+                        <p>{tx.from === accountAddress ? tx.to : tx.from}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <div>
+                        <p>
+                          <strong>{'FEE'}</strong>
+                        </p>
+                        <p>{`${tx.txFee.display} (${
+                          tx.native ? tx.native.txFee.display : '———'
+                        })`}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <div>
+                        <p>
+                          <strong>{'TIMESTAMP'}</strong>
+                        </p>
+                        <p>{getLocalTimeDate(tx.timestamp.ms)}</p>
+                      </div>
+                    </div>
+                  </StyledTransactionTopDetails>
+                  <StyledTransactionBottomDetails
+                    showTxDetails={this.state.showTxDetails === tx.hash}
+                  >
+                    <div>
+                      <div>
+                        <p>
+                          <strong>{'TRANSACTION HASH'}</strong>
+                        </p>
+                        <p>{tx.hash}</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <a
+                        href={`https://${
+                          web3Network !== 'mainnet' ? `${web3Network}.` : ''
+                        }etherscan.io/tx/${tx.hash}`}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        <ButtonCustom left txtColor="etherscan" img={etherscanLogo}>
+                          {'Etherscan'}
+                        </ButtonCustom>
+                      </a>
+                      <a
+                        href={`https://ethplorer.io/tx/${tx.hash}`}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        <ButtonCustom
+                          left
+                          disabled={this.props.web3Network !== 'mainnet'}
+                          txtColor="ethplorer"
+                          img={ethplorerLogo}
+                        >
+                          {'Ethplorer'}
+                        </ButtonCustom>
+                      </a>
+                    </div>
+                  </StyledTransactionBottomDetails>
+                </HoverWrapper>
+              </StyledTransactionWrapper>
+            );
+          })}
+          {limitTransactions < _transactions.length && (
+            <StyledShowMoreTransactions onClick={onShowMoreTransactions}>
+              <p>{lang.t('account.show_more')}</p>
+            </StyledShowMoreTransactions>
+          )}
+        </StyledGrid>
+      ) : (
+        <StyledCard minHeight={280} fetching={fetchingTransactions}>
+          <div />
+        </StyledCard>
+      ))
+    );
+  };
+}
 
 AccountViewTransactions.propTypes = {
   onShowMoreTransactions: PropTypes.func.isRequired,
   fetchingTransactions: PropTypes.bool.isRequired,
   limitTransactions: PropTypes.number.isRequired,
   accountAddress: PropTypes.string.isRequired,
-  transactions: PropTypes.array.isRequired
+  transactions: PropTypes.array.isRequired,
+  web3Network: PropTypes.string.isRequired
 };
 
 export default AccountViewTransactions;

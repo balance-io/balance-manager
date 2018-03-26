@@ -2,16 +2,16 @@ import axios from 'axios';
 import { parseEthplorerAddressInfo, parseEtherscanAccountTransactions } from './parsers';
 import { testnetGetAddressInfo } from './testnet';
 import networkList from '../libraries/ethereum-networks.json';
+import nativeCurrencies from '../libraries/native-currencies.json';
 
 /**
  * @desc get prices
  * @param  {Array}   [asset=[]]
- * @param  {Array}   [native=[]]
  * @return {Promise}
  */
-export const apiGetPrices = (assets = [], native = []) => {
+export const apiGetPrices = (assets = []) => {
   const assetsQuery = JSON.stringify(assets).replace(/[[\]"]/gi, '');
-  const nativeQuery = JSON.stringify(native).replace(/[[\]"]/gi, '');
+  const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(/[[\]"]/gi, '');
   return axios.get(
     `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}`
   );
@@ -20,12 +20,11 @@ export const apiGetPrices = (assets = [], native = []) => {
 /**
  * @desc get historical prices
  * @param  {String}  [assetSymbol='']
- * @param  {Array}   [native=[]]
  * @param  {Number}  [timestamp=Date.now()]
  * @return {Promise}
  */
-export const apiGetHistoricalPrices = (assetSymbol = '', native = [], timestamp = Date.now()) => {
-  const nativeQuery = JSON.stringify(native).replace(/[[\]"]/gi, '');
+export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now()) => {
+  const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(/[[\]"]/gi, '');
   return axios.get(
     `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`
   );

@@ -124,7 +124,7 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
       type: ACCOUNT_GET_NATIVE_PRICES_REQUEST,
       payload: getState().account.nativeCurrency
     });
-    apiGetPrices(assetSymbols, getState().account.nativeCurrency)
+    apiGetPrices(assetSymbols)
       .then(({ data }) => {
         if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
           const prices = parsePricesObject(data, assetSymbols, getState().account.nativeCurrency);
@@ -161,13 +161,15 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
   getPricesInterval = setInterval(getPrices, 60000); // 1min
 };
 
-export const accountChangeNativeCurrency = nativeCurrency => dispatch => {
+export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState) => {
   saveLocal('native_currency', nativeCurrency);
+  const prices = getState().account.prices || getLocal('native_prices');
+  const account = parseAccountBalances(getState().account.account, prices);
   dispatch({
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
-    payload: nativeCurrency
+    payload: { nativeCurrency, account }
   });
-  dispatch(accountGetNativePrices());
+  // dispatch(accountGetNativePrices());
 };
 
 // -- Reducer --------------------------------------------------------------- //
@@ -253,7 +255,11 @@ export default (state = INITIAL_STATE, action) => {
         nativePriceRequest: ''
       };
     case ACCOUNT_CHANGE_NATIVE_CURRENCY:
-      return { ...state, nativeCurrency: action.payload };
+      return {
+        ...state,
+        nativeCurrency: action.payload.nativeCurrency,
+        account: action.payload.account
+      };
     default:
       return state;
   }

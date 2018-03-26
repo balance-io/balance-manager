@@ -27,6 +27,24 @@ export const getLocal = (key = '') => JSON.parse(localStorage.getItem(key));
 export const removeLocal = (key = '') => localStorage.removeItem(key);
 
 /**
+ * @desc debounce api request
+ * @param  {Function}  request
+ * @param  {Array}     params
+ * @param  {Number}    timeout
+ * @return {Promise}
+ */
+export const debounceRequest = (request, params, timeout) =>
+  new Promise((resolve, reject) =>
+    setTimeout(
+      () =>
+        request(...params)
+          .then(res => resolve(res))
+          .catch(err => reject(err)),
+      timeout
+    )
+  );
+
+/**
  * @desc create authenticated user session
  * @param  {String}   [token='']
  * @param  {String}   [email='']

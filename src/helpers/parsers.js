@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import lang from '../languages';
 import {
+  debounceRequest,
   hexToNumberString,
   convertStringToNumber,
   convertAmountToBigNumber,
@@ -10,6 +11,8 @@ import {
   convertAssetAmountToNativeValue,
   convertAssetAmountToNativeAmount,
   getTimeString,
+  saveLocal,
+  getLocal,
   sha3
 } from './utilities';
 import nativeCurrencies from '../libraries/native-currencies.json';
@@ -401,21 +404,27 @@ export const parseEthplorerAddressInfo = (data = null) => {
   let assets = [ethereum];
   if (data && data.tokens) {
     const tokens = data.tokens.map(token => {
-      const tokenName = token.tokenInfo.name || lang.t('account.unknown_token');
-      const tokenSymbol = token.tokenInfo.symbol || '———';
-      const tokenAddress = token.tokenInfo.address || null;
-      const tokenDecimals = convertStringToNumber(token.tokenInfo.decimals);
-      const tokenBalance = convertAssetAmountToBigNumber(token.balance, token.tokenInfo.decimals);
+      const asset = {
+        name: token.tokenInfo.name || lang.t('account.unknown_token'),
+        symbol: token.tokenInfo.symbol || '———',
+        address: token.tokenInfo.address || null,
+        decimals: convertStringToNumber(token.tokenInfo.decimals)
+      };
+      let allTokens = getLocal('tokens') || {};
+      if (asset.symbol === '———' && !allTokens[asset.address]) {
+        allTokens[asset.address] = asset;
+      } else if (!allTokens[asset.symbol]) {
+        allTokens[asset.symbol] = asset;
+      }
+      saveLocal('tokens', allTokens);
+      const assetBalance = convertAssetAmountToBigNumber(token.balance, asset.decimals);
       return {
-        name: tokenName,
-        symbol: tokenSymbol,
-        address: tokenAddress,
-        decimals: tokenDecimals,
+        ...asset,
         balance: {
-          amount: tokenBalance,
-          display: convertAmountToDisplay(tokenBalance, null, {
-            symbol: tokenSymbol,
-            decimals: tokenDecimals
+          amount: assetBalance,
+          display: convertAmountToDisplay(assetBalance, null, {
+            symbol: asset.symbol,
+            decimals: asset.decimals
           })
         },
         native: null
@@ -488,21 +497,13 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
 export const parseEtherscanAccountTransactions = async (data = null) => {
   if (!data || !data.result) return null;
 
-  const debounceApiGetEthplorerTokenInfo = (address, timeout) =>
-    new Promise((resolve, reject) =>
-      setTimeout(
-        () =>
-          apiGetEthplorerTokenInfo(address)
-            .then(res => resolve(res))
-            .catch(err => reject(err)),
-        timeout
-      )
-    );
-
   let transactions = await Promise.all(
     data.result.map(async (tx, idx) => {
       const hash = tx.hash;
-      const timestamp = tx.timeStamp;
+      const timestamp = {
+        secs: tx.timeStamp,
+        ms: `${tx.timeStamp}000`
+      };
       const blockNumber = tx.blockNumber;
       const txIndex = tx.transactionIndex;
       const error = tx.isError === '1';
@@ -528,7 +529,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
         .toString();
       let txFee = {
         amount: convertAmountFromBigNumber(totalGas),
-        display: convertAmountToDisplay(convertAmountFromBigNumber(totalGas), null, {
+        display: convertAmountToDisplay(totalGas, null, {
           symbol: 'ETH',
           decimals: 18
         })
@@ -537,23 +538,39 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       const tokenTransfer = sha3('transfer(address,uint256)').slice(0, 10);
 
       if (tx.input.startsWith(tokenTransfer)) {
-        const response = await debounceApiGetEthplorerTokenInfo(tx.to, 100 * idx);
-
-        asset = {
-          name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
-          symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
-          address: !response.data.error ? response.data.address : '',
-          decimals: !response.data.error ? convertStringToNumber(response.data.decimals) : 18
-        };
-
-        /* STT token on Ropsten */
+        const allTokens = getLocal('tokens') || {};
+        let foundToken = null;
+        Object.keys(allTokens).forEach(tokenSymbol => {
+          if (allTokens[tokenSymbol].address === tx.to) {
+            foundToken = allTokens[tokenSymbol];
+          }
+        });
         if (tx.to === '0xc55cf4b03948d7ebc8b9e8bad92643703811d162') {
+          /* STT token on Ropsten */
           asset = {
             name: 'Status Test Token',
             symbol: 'STT',
             address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
             decimals: 18
           };
+        } else if (foundToken) {
+          asset = foundToken;
+        } else {
+          const response = await debounceRequest(apiGetEthplorerTokenInfo, [tx.to], 100 * idx);
+
+          asset = {
+            name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
+            symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
+            address: !response.data.error ? response.data.address : '',
+            decimals: !response.data.error ? convertStringToNumber(response.data.decimals) : 18
+          };
+
+          if (asset.symbol === '———' && !allTokens[asset.address]) {
+            allTokens[asset.address] = asset;
+          } else if (!allTokens[asset.symbol]) {
+            allTokens[asset.symbol] = asset;
+          }
+          saveLocal('tokens', allTokens);
         }
 
         to = `0x${tx.input.slice(34, 74)}`;
@@ -595,33 +612,17 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
  */
 export const parseTransactionsPrices = async (transactions = null, nativeCurrency = '') => {
   let _transactions = transactions;
+  console.log('_transactions', _transactions);
 
-  const debounceApiGetHistoricalPrice = (assetSymbol, native, timestamp, timeout) =>
-    new Promise((resolve, reject) =>
-      setTimeout(
-        () =>
-          apiGetHistoricalPrices(assetSymbol, native, timestamp)
-            .then(res => resolve(res))
-            .catch(err => reject(err)),
-        timeout
-      )
-    );
-
-  if (
-    _transactions &&
-    _transactions.length &&
-    nativeCurrency &&
-    typeof nativeCurrency === 'string'
-  ) {
+  if (_transactions && _transactions.length && nativeCurrency) {
     _transactions = await Promise.all(
       _transactions.map(async (tx, idx) => {
-        const timestamp = tx.timestamp;
+        const timestamp = tx.timestamp.secs;
         const assetSymbol = tx.asset.symbol;
         const native = nativeCurrencies[nativeCurrency];
-        const response = await debounceApiGetHistoricalPrice(
-          assetSymbol,
-          [nativeCurrency],
-          timestamp,
+        const response = await debounceRequest(
+          apiGetHistoricalPrices,
+          [assetSymbol, timestamp],
           100 * idx
         );
         if (response.data.response === 'Error' || !response.data[assetSymbol]) {
@@ -651,6 +652,7 @@ export const parseTransactionsPrices = async (transactions = null, nativeCurrenc
           value: valuePrice,
           txFee: txFeePrice
         };
+        console.log(tx);
         return tx;
       })
     );

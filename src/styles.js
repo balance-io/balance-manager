@@ -12,7 +12,9 @@ export const colors = {
   orange: '246, 133, 27',
   green: '79, 180, 128',
   lightGreen: '84, 209, 146',
-  red: '222, 75, 57'
+  red: '222, 75, 57',
+  ethplorer: '80, 102, 133',
+  etherscan: '2, 92, 144'
 };
 
 export const fonts = {
@@ -46,7 +48,8 @@ export const fonts = {
 export const shadows = {
   soft: '0 2px 6px 0 rgba(2, 2, 3, 0.04), 0 1px 3px 0 rgba(2, 2, 3, 0.06)',
   medium:
-    '0 3px 6px 0 rgba(0, 0, 0, 0.06), 0 0 1px 0 rgba(50, 50, 93, 0.02), 0 5px 10px 0 rgba(59, 59, 92, 0.08)'
+    '0 3px 6px 0 rgba(0, 0, 0, 0.06), 0 0 1px 0 rgba(50, 50, 93, 0.02), 0 5px 10px 0 rgba(59, 59, 92, 0.08)',
+  big: '0 15px 35px 0 rgba(50, 50, 93, 0.06), 0 5px 15px 0 rgba(50, 50, 93, 0.15)'
 };
 
 export const transitions = {

@@ -242,6 +242,7 @@ class AccountView extends Component {
                     limitTransactions={this.state.limitTransactions}
                     accountAddress={this.props.account.address}
                     transactions={this.props.transactions}
+                    web3Network={this.props.web3Network}
                   />
                 )}
               />
@@ -255,6 +256,7 @@ class AccountView extends Component {
 }
 
 AccountView.propTypes = {
+  match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
@@ -262,7 +264,7 @@ AccountView.propTypes = {
   nativeCurrency: PropTypes.string.isRequired,
   transactions: PropTypes.array.isRequired,
   fetchingTransactions: PropTypes.bool.isRequired,
-  match: PropTypes.object.isRequired
+  web3Network: PropTypes.string.isRequired
 };
 
 const reduxProps = ({ account }) => ({
@@ -271,7 +273,8 @@ const reduxProps = ({ account }) => ({
   prices: account.prices,
   nativeCurrency: account.nativeCurrency,
   transactions: account.transactions,
-  fetchingTransactions: account.fetchingTransactions
+  fetchingTransactions: account.fetchingTransactions,
+  web3Network: account.web3Network
 });
 
 export default connect(reduxProps, {

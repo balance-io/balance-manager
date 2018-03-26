@@ -41,10 +41,39 @@ const ACCOUNT_GET_NATIVE_PRICES_FAILURE = 'account/ACCOUNT_GET_NATIVE_PRICES_FAI
 
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 
+const ACCOUNT_PARSE_PRICES_REQUEST = 'account/ACCOUNT_PARSE_PRICES_REQUEST';
+const ACCOUNT_PARSE_PRICES_SUCCESS = 'account/ACCOUNT_PARSE_PRICES_SUCCESS';
+const ACCOUNT_PARSE_PRICES_FAILURE = 'account/ACCOUNT_PARSE_PRICES_FAILURE';
+
 // -- Actions --------------------------------------------------------------- //
 
 let accountInterval = null;
 let getPricesInterval = null;
+
+export const accountParsePrices = () => (dispatch, getState) => {
+  const prices = getState().account.prices;
+  const currentAccount = getState().account.account;
+  const account = parseAccountBalances(currentAccount, prices);
+  console.log('account', account);
+  dispatch({
+    type: ACCOUNT_PARSE_PRICES_REQUEST,
+    payload: account
+  });
+  const currentTransactions = getState().account.transactions;
+  const nativeCurrency = getState().account.nativeCurrency;
+  parseTransactionsPrices(currentTransactions, nativeCurrency)
+    .then(transactions => {
+      dispatch({
+        type: ACCOUNT_PARSE_PRICES_SUCCESS,
+        payload: transactions
+      });
+    })
+    .catch(error => {
+      dispatch({ type: ACCOUNT_PARSE_PRICES_FAILURE });
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+    });
+};
 
 export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { account, web3Network } = getState().account;
@@ -52,7 +81,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   apiGetEtherscanAccountTransactions(account.address, web3Network)
     .then(transactions => {
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: transactions });
-      dispatch(accountGetNativePrices());
+      dispatch(accountParsePrices());
     })
     .catch(error => {
       const message = parseError(error);
@@ -129,25 +158,10 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
         if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
           const prices = parsePricesObject(data, assetSymbols, getState().account.nativeCurrency);
           const account = parseAccountBalances(getState().account.account, prices);
-          parseTransactionsPrices(
-            getState().account.transactions,
-            getState().account.nativeCurrency
-          )
-            .then(transactions => {
-              transactions =
-                transactions && transactions.length
-                  ? transactions
-                  : getState().account.transactions;
-              dispatch({
-                type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
-                payload: { account, transactions, prices }
-              });
-            })
-            .catch(error => {
-              dispatch({ type: ACCOUNT_GET_NATIVE_PRICES_FAILURE });
-              const message = parseError(error);
-              dispatch(notificationShow(message, true));
-            });
+          dispatch({
+            type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
+            payload: { account, prices }
+          });
         }
       })
       .catch(error => {
@@ -167,7 +181,7 @@ export const accountChangeNativeCurrency = nativeCurrency => dispatch => {
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
     payload: nativeCurrency
   });
-  dispatch(accountGetNativePrices());
+  dispatch(accountParsePrices());
 };
 
 // -- Reducer --------------------------------------------------------------- //
@@ -199,6 +213,16 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, fetchingTransactions: false, transactions: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE:
       return { ...state, fetchingTransactions: false, transactions: [] };
+    case ACCOUNT_PARSE_PRICES_REQUEST:
+      return {
+        ...state,
+        account: action.payload
+      };
+    case ACCOUNT_PARSE_PRICES_SUCCESS:
+      return {
+        ...state,
+        transactions: action.payload
+      };
     case ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST:
       return { ...state, fetching: true };
     case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:
@@ -244,8 +268,7 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         nativePriceRequest: '',
         prices: action.payload.prices,
-        account: action.payload.account,
-        transactions: action.payload.transactions
+        account: action.payload.account
       };
     case ACCOUNT_GET_NATIVE_PRICES_FAILURE:
       return {

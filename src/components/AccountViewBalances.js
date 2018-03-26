@@ -36,9 +36,6 @@ const StyledRow = styled.div`
   @media screen and (${responsive.sm.max}) {
     grid-template-columns: repeat(5, 1fr);
     padding: 16px;
-    & p {
-      font-size: ${fonts.size.small};
-    }
   }
   @media screen and (${responsive.xs.max}) {
     grid-template-columns: 1fr repeat(3, 3fr);
@@ -92,7 +89,7 @@ const StyledToken = styled(StyledRow)`
     font-family: ${fonts.family.SFMono};
   }
   &:nth-child(n + 3) {
-    border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
+    border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
   }
 `;
 
@@ -130,7 +127,7 @@ const StyledLastRow = styled(StyledRow)`
   grid-template-columns: 3fr 1fr;
   min-height: 0;
   min-width: 0;
-  border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
+  border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
   & > p {
     font-size: ${fonts.size.medium};
     font-weight: ${fonts.weight.semibold};

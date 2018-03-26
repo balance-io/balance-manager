@@ -126,28 +126,41 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
     });
     apiGetPrices(assetSymbols)
       .then(({ data }) => {
-        if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
-          const prices = parsePricesObject(data, assetSymbols, getState().account.nativeCurrency);
+        const nativePriceRequest = getState().account.nativePriceRequest;
+        const nativeCurrency = getState().account.nativeCurrency;
+        if (nativeCurrency === nativePriceRequest) {
+          const prices = parsePricesObject(data, assetSymbols, nativeCurrency);
           const account = parseAccountBalances(getState().account.account, prices);
-          parseTransactionsPrices(
-            getState().account.transactions,
-            getState().account.nativeCurrency
-          )
-            .then(transactions => {
-              transactions =
-                transactions && transactions.length
-                  ? transactions
-                  : getState().account.transactions;
-              dispatch({
-                type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
-                payload: { account, transactions, prices }
+          const transactions = getState().account.transactions;
+          if (
+            (transactions.length && !transactions[0].native) ||
+            (transactions.length && transactions[0].native.selected.currency !== nativeCurrency)
+          ) {
+            parseTransactionsPrices(transactions, nativeCurrency)
+              .then(transactions => {
+                transactions =
+                  transactions && transactions.length
+                    ? transactions
+                    : getState().account.transactions;
+                dispatch({
+                  type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
+                  payload: { account, transactions, prices }
+                });
+              })
+              .catch(error => {
+                dispatch({ type: ACCOUNT_GET_NATIVE_PRICES_FAILURE });
+                const message = parseError(error);
+                dispatch(notificationShow(message, true));
               });
-            })
-            .catch(error => {
-              dispatch({ type: ACCOUNT_GET_NATIVE_PRICES_FAILURE });
-              const message = parseError(error);
-              dispatch(notificationShow(message, true));
+          } else {
+            const prices = parsePricesObject(data, assetSymbols, nativeCurrency);
+            const account = parseAccountBalances(getState().account.account, prices);
+            const transactions = getState().account.transactions;
+            dispatch({
+              type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
+              payload: { account, transactions, prices }
             });
+          }
         }
       })
       .catch(error => {

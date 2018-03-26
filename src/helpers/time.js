@@ -72,9 +72,7 @@ export const getTimeZone = () => {
  * @return {String}
  */
 export const getLocalTimeDate = (timestamp = null) => {
-  console.log(timestamp);
   timestamp = Number(timestamp) || Date.now();
-  console.log(timestamp);
   const date = new Date(timestamp);
   return `${date.toLocaleDateString()} ${date.toLocaleTimeString()} ${getTimeZone()}`;
 };

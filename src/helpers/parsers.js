@@ -459,8 +459,6 @@ export const parseEthplorerAddressInfo = (data = null) => {
  */
 export const parseAccountBalances = (account = null, nativePrices = null) => {
   let totalAmount = 0;
-  console.log('account', account);
-  console.log('nativePrices', nativePrices);
   let nativeSelected = nativePrices.selected.currency;
 
   if (account) {
@@ -543,9 +541,10 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       let totalGas = BigNumber(`${tx.gasUsed}`)
         .times(BigNumber(`${tx.gasPrice}`))
         .toString();
+      console.log();
       let txFee = {
-        amount: convertAmountFromBigNumber(totalGas),
-        display: convertAmountToDisplay(convertAmountFromBigNumber(totalGas), null, {
+        amount: totalGas,
+        display: convertAmountToDisplay(totalGas, null, {
           symbol: 'ETH',
           decimals: 18
         })
@@ -646,10 +645,13 @@ export const parseTransactionsPrices = async (transactions = null, nativeCurrenc
         const assetPriceAmount = convertAmountToBigNumber(
           response.data[assetSymbol][nativeCurrency]
         );
-        prices[assetSymbol] = { price: { amount: assetPriceAmount, display: null } };
+        prices[nativeCurrency] = {};
+        prices[nativeCurrency][assetSymbol] = {
+          price: { amount: assetPriceAmount, display: null }
+        };
         const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
-        prices[assetSymbol].price.display = assetPriceDisplay;
-        const assetPrice = prices[assetSymbol].price;
+        prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
+        const assetPrice = prices[nativeCurrency][assetSymbol].price;
         const valuePriceAmount = convertAssetAmountToNativeValue(tx.value.amount, tx.asset, prices);
         const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
 
@@ -666,6 +668,7 @@ export const parseTransactionsPrices = async (transactions = null, nativeCurrenc
           value: valuePrice,
           txFee: txFeePrice
         };
+        console.log(tx);
         return tx;
       })
     );

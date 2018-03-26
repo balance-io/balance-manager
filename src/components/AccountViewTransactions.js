@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import lang from '../languages';
 import Card from './Card';
 import ButtonCustom from './ButtonCustom';
+import LineBreak from './LineBreak';
 import Blockie from './Blockie';
 import AssetIcon from './AssetIcon';
 import HoverWrapper from './HoverWrapper';
@@ -18,6 +19,8 @@ const StyledGrid = styled.div`
   text-align: right;
   position: relative;
   z-index: 0;
+  background-color: rgb(${colors.white});
+  border-radius: 0 0 8px 8px;
 `;
 
 const StyledRow = styled.div`
@@ -79,6 +82,11 @@ const StyledTransactionWrapper = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+  border-radius: 8px;
+  & > div {
+    border-radius: 8px;
+    ${'' /* border-top: 1px solid rgba(${colors.darkGrey}, 0.2); */};
+  }
 `;
 
 const StyledTransaction = styled(StyledRow)`
@@ -99,6 +107,7 @@ const StyledTransaction = styled(StyledRow)`
 `;
 
 const StyledTransactionMainRow = styled(StyledTransaction)`
+  border-radius: ${({ showTxDetails }) => (showTxDetails ? '8px 8px 0 0' : `8px`)};
   &:nth-child(n + 3) {
     border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
   }
@@ -128,11 +137,17 @@ const StyledTransactionDetails = styled(StyledTransaction)`
 `;
 
 const StyledTransactionTopDetails = styled(StyledTransactionDetails)`
+  border-radius: 0;
   grid-template-columns: 2fr 1fr 1fr;
 `;
 
 const StyledTransactionBottomDetails = styled(StyledTransactionDetails)`
+  border-radius: 0 0 8px 8px;
   grid-template-columns: 3fr 1fr;
+`;
+
+const StyledLineBreak = styled(LineBreak)`
+  opacity: ${({ showTxDetails }) => (showTxDetails ? '0' : '1')};
 `;
 
 const StyledBlockie = styled(Blockie)`
@@ -166,7 +181,6 @@ const StyledShowMoreTransactions = styled(StyledRow)`
   min-width: 0;
   width: 100%;
   z-index: 2;
-  border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
   & div p {
     font-weight: ${fonts.weight.medium};
   }
@@ -228,7 +242,7 @@ class AccountViewTransactions extends Component {
             <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
           </StyledLabelsRow>
 
-          {_transactions.map((tx, idx) => {
+          {_transactions.map((tx, idx, arr) => {
             if (idx > limitTransactions) return null;
             return (
               <StyledTransactionWrapper
@@ -327,6 +341,10 @@ class AccountViewTransactions extends Component {
                     </div>
                   </StyledTransactionBottomDetails>
                 </HoverWrapper>
+                <StyledLineBreak
+                  noMargin
+                  showTxDetails={this.state.showTxDetails === tx.hash || idx + 1 === arr.length}
+                />
               </StyledTransactionWrapper>
             );
           })}

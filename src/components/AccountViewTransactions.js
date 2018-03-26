@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
 import lang from '../languages';
 import Card from './Card';
 import ButtonCustom from './ButtonCustom';
@@ -222,7 +223,8 @@ const StyledMessage = styled.div`
 
 class AccountViewTransactions extends Component {
   state = {
-    showTxDetails: null
+    showTxDetails: null,
+    limitTransactions: 10
   };
   onShowTxDetails = hash => {
     if (this.state.showTxDetails === hash) {
@@ -231,21 +233,17 @@ class AccountViewTransactions extends Component {
       this.setState({ showTxDetails: hash });
     }
   };
+  onShowMoreTransactions = () => {
+    if (this.state.limitTransactions > this.props.transactions.length) return null;
+    this.setState({ limitTransactions: this.state.limitTransactions + 10 });
+  };
+
   render = () => {
-    const {
-      onShowMoreTransactions,
-      fetchingTransactions,
-      limitTransactions,
-      accountAddress,
-      transactions,
-      web3Network,
-      ...props
-    } = this.props;
-    const _transactions = transactions.filter(tx => !tx.interaction);
+    const _transactions = this.props.transactions.filter(tx => !tx.interaction);
     return (
       !!_transactions &&
-      (!fetchingTransactions ? (
-        <StyledGrid {...props}>
+      (!this.props.fetchingTransactions ? (
+        <StyledGrid>
           <StyledLabelsRow>
             <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
             <StyledLabels>{lang.t('account.label_status')}</StyledLabels>
@@ -255,7 +253,7 @@ class AccountViewTransactions extends Component {
           </StyledLabelsRow>
 
           {_transactions.map((tx, idx, arr) => {
-            if (idx > limitTransactions) return null;
+            if (idx > this.state.limitTransactions) return null;
             return (
               <StyledTransactionWrapper
                 showTxDetails={this.state.showTxDetails === tx.hash}
@@ -271,13 +269,13 @@ class AccountViewTransactions extends Component {
                       <AssetIcon currency={tx.asset.symbol} />
                       <p>{tx.asset.name}</p>
                     </StyledAsset>
-                    <TransactionStatus tx={tx} accountAddress={accountAddress} />
+                    <TransactionStatus tx={tx} accountAddress={this.props.account.address} />
 
                     <p>{`${tx.value.display}`}</p>
                     <p>{tx.native ? tx.native.price.display : '———'}</p>
                     <p>
                       {tx.native
-                        ? tx.from === accountAddress
+                        ? tx.from === this.props.account.address
                           ? tx.native.value.display ? `- ${tx.native.value.display}` : '———'
                           : `${tx.native.value.display || '———'}`
                         : '———'}
@@ -285,12 +283,14 @@ class AccountViewTransactions extends Component {
                   </StyledTransactionMainRow>
                   <StyledTransactionTopDetails showTxDetails={this.state.showTxDetails === tx.hash}>
                     <div>
-                      <StyledBlockie seed={tx.from === accountAddress ? tx.to : tx.from} />
+                      <StyledBlockie
+                        seed={tx.from === this.props.account.address ? tx.to : tx.from}
+                      />
                       <div>
                         <p>
-                          <strong>{tx.from === accountAddress ? 'TO' : 'FROM'}</strong>
+                          <strong>{tx.from === this.props.account.address ? 'TO' : 'FROM'}</strong>
                         </p>
-                        <p>{tx.from === accountAddress ? tx.to : tx.from}</p>
+                        <p>{tx.from === this.props.account.address ? tx.to : tx.from}</p>
                       </div>
                     </div>
                     <div>
@@ -327,7 +327,7 @@ class AccountViewTransactions extends Component {
                     <div>
                       <a
                         href={`https://${
-                          web3Network !== 'mainnet' ? `${web3Network}.` : ''
+                          this.props.web3Network !== 'mainnet' ? `${this.props.web3Network}.` : ''
                         }etherscan.io/tx/${tx.hash}`}
                         target="_blank"
                         rel="noreferrer noopener"
@@ -360,14 +360,14 @@ class AccountViewTransactions extends Component {
               </StyledTransactionWrapper>
             );
           })}
-          {limitTransactions < _transactions.length && (
-            <StyledShowMoreTransactions onClick={onShowMoreTransactions}>
+          {this.state.limitTransactions < _transactions.length && (
+            <StyledShowMoreTransactions onClick={this.onShowMoreTransactions}>
               <p>{lang.t('account.show_more')}</p>
             </StyledShowMoreTransactions>
           )}
         </StyledGrid>
       ) : (
-        <StyledCard minHeight={280} fetching={fetchingTransactions}>
+        <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
           <StyledMessage>{`No transactions found or failed request, please refresh`}</StyledMessage>
         </StyledCard>
       ))
@@ -376,12 +376,17 @@ class AccountViewTransactions extends Component {
 }
 
 AccountViewTransactions.propTypes = {
-  onShowMoreTransactions: PropTypes.func.isRequired,
-  fetchingTransactions: PropTypes.bool.isRequired,
-  limitTransactions: PropTypes.number.isRequired,
-  accountAddress: PropTypes.string.isRequired,
   transactions: PropTypes.array.isRequired,
+  fetchingTransactions: PropTypes.bool.isRequired,
+  account: PropTypes.object.isRequired,
   web3Network: PropTypes.string.isRequired
 };
 
-export default AccountViewTransactions;
+const reduxProps = ({ account }) => ({
+  transactions: account.transactions,
+  fetchingTransactions: account.fetchingTransactions,
+  account: account.account,
+  web3Network: account.web3Network
+});
+
+export default connect(reduxProps, null)(AccountViewTransactions);

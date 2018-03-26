@@ -127,10 +127,7 @@ const StyledTab = styled(Button)`
 
 class AccountView extends Component {
   state = {
-    activeTab: 'BALANCES_TAB',
-    openSettings: false,
-    showTokensWithLowMarketValue: false,
-    limitTransactions: 10
+    activeTab: 'BALANCES_TAB'
   };
   componentWillReceiveProps(newProps) {
     const tabRoute = window.browserHistory.location.pathname.replace(newProps.match.url, '') || '/';
@@ -145,16 +142,6 @@ class AccountView extends Component {
         break;
     }
   }
-  toggleSettings = () => {
-    this.setState({ openSettings: !this.state.openSettings });
-  };
-  onShowTokensWithLowMarketvalue = () => {
-    this.setState({ showTokensWithLowMarketValue: !this.state.showTokensWithLowMarketValue });
-  };
-  onShowMoreTransactions = () => {
-    if (this.state.limitTransactions > this.props.transactions.length) return null;
-    this.setState({ limitTransactions: this.state.limitTransactions + 10 });
-  };
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
       name:
@@ -169,14 +156,6 @@ class AccountView extends Component {
         this.props.account.name || `${this.props.account.type}${lang.t('modal.default_wallet')}`,
       address: this.props.account.address
     });
-  shouldComponentUpdate(nextProps) {
-    if (
-      nextProps.nativeCurrency !== this.props.nativeCurrency &&
-      nextProps.prices === this.props.prices
-    )
-      return false;
-    return true;
-  }
   render() {
     return (
       <StyledAccountView>
@@ -224,27 +203,12 @@ class AccountView extends Component {
               <Route
                 exact
                 path={this.props.match.url}
-                render={routerProps => (
-                  <AccountViewBalances
-                    onShowTokensWithLowMarketvalue={this.onShowTokensWithLowMarketvalue}
-                    showTokensWithLowMarketValue={this.state.showTokensWithLowMarketValue}
-                    account={this.props.account}
-                  />
-                )}
+                render={routerProps => <AccountViewBalances {...routerProps} />}
               />
               <Route
                 exact
                 path={`${this.props.match.url}/transactions`}
-                render={routerProps => (
-                  <AccountViewTransactions
-                    onShowMoreTransactions={this.onShowMoreTransactions}
-                    fetchingTransactions={this.props.fetchingTransactions}
-                    limitTransactions={this.state.limitTransactions}
-                    accountAddress={this.props.account.address}
-                    transactions={this.props.transactions}
-                    web3Network={this.props.web3Network}
-                  />
-                )}
+                render={routerProps => <AccountViewTransactions {...routerProps} />}
               />
               <Route render={() => <Redirect to={this.props.match.url} />} />
             </Switch>
@@ -259,26 +223,14 @@ AccountView.propTypes = {
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
-  account: PropTypes.object.isRequired,
-  prices: PropTypes.object.isRequired,
-  nativeCurrency: PropTypes.string.isRequired,
-  transactions: PropTypes.array.isRequired,
-  fetchingTransactions: PropTypes.bool.isRequired,
-  web3Network: PropTypes.string.isRequired
+  account: PropTypes.object.isRequired
 };
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
-  account: account.account,
-  prices: account.prices,
-  nativeCurrency: account.nativeCurrency,
-  transactions: account.transactions,
-  fetchingTransactions: account.fetchingTransactions,
-  web3Network: account.web3Network
+  account: account.account
 });
 
 export default connect(reduxProps, {
   modalOpen
 })(AccountView);
-
-connect({}, {})(AccountView);

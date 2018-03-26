@@ -52,8 +52,11 @@ let getPricesInterval = null;
 
 export const accountParsePrices = () => (dispatch, getState) => {
   const prices = getState().account.prices;
-  const currentAccount = getState().account.account;
-  const account = parseAccountBalances(currentAccount, prices);
+  console.log('prices', prices);
+  let account = getState().account.account;
+  if (prices.selected) {
+    account = parseAccountBalances(account, prices);
+  }
   console.log('account', account);
   dispatch({
     type: ACCOUNT_PARSE_PRICES_REQUEST,

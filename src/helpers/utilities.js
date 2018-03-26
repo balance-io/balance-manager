@@ -1,8 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { web3Instance } from './web3';
-import lang from '../languages';
+import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
-import timeUnits from '../libraries/time-units.json';
 
 /**
  * @desc save to local storage
@@ -236,7 +235,8 @@ export const handleSignificantDecimals = (value, decimals, buffer) => {
  * @param  {BigNumber}  value
  * @param  {Object}     nativePrices
  * @param  {Object}     asset
- * @return {StringconvertAmountToDisplay
+ * @param  {Number}     buffer
+ * @return {String}
  */
 export const convertAmountToDisplay = (value, nativePrices, asset, buffer) => {
   value = convertAmountFromBigNumber(value);
@@ -257,6 +257,24 @@ export const convertAmountToDisplay = (value, nativePrices, asset, buffer) => {
     return `${display} ${nativePrices.selected.currency}`;
   }
   return value;
+};
+
+/**
+ * @desc convert from amount value to display formatted string for specific currency
+ * @param  {BigNumber}  value
+ * @param  {Object}     nativePrices
+ * @param  {Object}     asset
+ * @return {String}
+ */
+export const convertAmountToDisplaySpecific = (value, nativePrices, selected, buffer) => {
+  if (!nativePrices) return null;
+  value = convertAmountFromBigNumber(value);
+  const decimals = nativeCurrencies[selected].decimals;
+  const display = handleSignificantDecimals(value, decimals, buffer);
+  if (nativeCurrencies[selected].alignment === 'left') {
+    return `${nativeCurrencies[selected].symbol}${display}`;
+  }
+  return `${display} ${nativeCurrencies[selected].currency}`;
 };
 
 /**
@@ -299,7 +317,10 @@ export const convertAssetAmountFromBigNumber = (value, decimals) => {
  * @return {String}
  */
 export const convertAssetAmountToNativeValue = (value, asset, nativePrices) => {
-  const assetPriceUnit = convertAmountFromBigNumber(nativePrices[asset.symbol].price.amount);
+  const nativeSelected = nativePrices.selected.currency;
+  const assetPriceUnit = convertAmountFromBigNumber(
+    nativePrices[nativeSelected][asset.symbol].price.amount
+  );
   const assetNativePrice = BigNumber(value)
     .times(BigNumber(assetPriceUnit))
     .toString();
@@ -314,7 +335,10 @@ export const convertAssetAmountToNativeValue = (value, asset, nativePrices) => {
  * @return {String}
  */
 export const convertAssetAmountFromNativeValue = (value, asset, nativePrices) => {
-  const assetPriceUnit = convertAmountFromBigNumber(nativePrices[asset.symbol].price.amount);
+  const nativeSelected = nativePrices.selected.currency;
+  const assetPriceUnit = convertAmountFromBigNumber(
+    nativePrices[nativeSelected][asset.symbol].price.amount
+  );
   const assetAmountUnit = BigNumber(value)
     .dividedBy(BigNumber(assetPriceUnit))
     .toString();
@@ -528,192 +552,4 @@ export const bootIntercom = () => {
   const setup = () => window.Intercom('boot', { app_id: appID });
   if (typeof window.Intercom !== 'undefined') setup();
   else setTimeout(setup, 5000);
-};
-
-/**
- * @desc get time string for minimal unit
- * @param {String} [value='']
- * @param {String} [unit='']
- * @param {Boolean} [short=false]
- * @return {String}
- */
-export const getTimeString = (value = '', unit = '', short = false) => {
-  let _value = BigNumber(`${value}`).toNumber();
-  let _unit = '';
-  let _unitShort = '';
-  if (_value) {
-    if (unit === 'miliseconds' || unit === 'ms') {
-      if (_value === 1) {
-        _unit = lang.t('time.milisecond');
-        _unitShort = lang.t('time.ms');
-      } else if (_value >= timeUnits.ms.second && _value < timeUnits.ms.minute) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .dividedBy(BigNumber(`${timeUnits.ms.second}`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.second');
-          _unitShort = lang.t('time.sec');
-        } else {
-          _unit = lang.t('time.seconds');
-          _unitShort = lang.t('time.secs');
-        }
-      } else if (_value >= timeUnits.ms.minute && _value < timeUnits.ms.hour) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .dividedBy(BigNumber(`${timeUnits.ms.minute}`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.minute');
-          _unitShort = lang.t('time.min');
-        } else {
-          _unit = lang.t('time.minutes');
-          _unitShort = lang.t('time.mins');
-        }
-      } else if (_value >= timeUnits.ms.hour && _value < timeUnits.ms.day) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .dividedBy(BigNumber(`${timeUnits.ms.hour}`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.hour');
-          _unitShort = lang.t('time.hr');
-        } else {
-          _unit = lang.t('time.hours');
-          _unitShort = lang.t('time.hrs');
-        }
-      } else if (_value >= timeUnits.ms.day) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .dividedBy(BigNumber(`${timeUnits.ms.day}`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.day');
-          _unitShort = lang.t('time.day');
-        } else {
-          _unit = lang.t('time.days');
-          _unitShort = lang.t('time.days');
-        }
-      } else {
-        _unit = lang.t('time.miliseconds');
-        _unitShort = lang.t('time.ms');
-      }
-    } else if (unit === 'seconds' || unit === 'secs') {
-      if (_value === 1) {
-        _unit = lang.t('time.second');
-        _unitShort = lang.t('time.sec');
-      } else if (_value < 1) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .times(BigNumber(`${timeUnits.ms.second}`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.milisecond');
-          _unitShort = lang.t('time.ms');
-        } else {
-          _unit = lang.t('time.miliseconds');
-          _unitShort = lang.t('time.ms');
-        }
-      } else if (_value >= timeUnits.secs.minute && _value < timeUnits.secs.hour) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .dividedBy(BigNumber(`${timeUnits.secs.minute}`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.minute');
-          _unitShort = lang.t('time.min');
-        } else {
-          _unit = lang.t('time.minutes');
-          _unitShort = lang.t('time.mins');
-        }
-      } else if (_value >= timeUnits.secs.hour && _value < timeUnits.secs.day) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .dividedBy(BigNumber(`${timeUnits.secs.hour}`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.hour');
-          _unitShort = lang.t('time.hr');
-        } else {
-          _unit = lang.t('time.hours');
-          _unitShort = lang.t('time.hrs');
-        }
-      } else if (_value >= timeUnits.secs.day) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .dividedBy(BigNumber(`timeUnits.secs.day`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.day');
-          _unitShort = lang.t('time.day');
-        } else {
-          _unit = lang.t('time.days');
-          _unitShort = lang.t('time.days');
-        }
-      } else {
-        _unit = lang.t('time.seconds');
-        _unitShort = lang.t('time.secs');
-      }
-    } else if (unit === 'minutes' || unit === 'mins') {
-      if (_value === 1) {
-        _unit = lang.t('time.minute');
-        _unitShort = lang.t('time.min');
-      } else if (_value < 1) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .times(BigNumber(`${timeUnits.secs.minute}`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.second');
-          _unitShort = lang.t('time.sec');
-        } else {
-          _unit = lang.t('time.seconds');
-          _unitShort = lang.t('time.secs');
-        }
-      } else if (_value > timeUnits.mins.hour && _value < timeUnits.mins.day) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .dividedBy(BigNumber(`${timeUnits.mins.hour}`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.hour');
-          _unitShort = lang.t('time.hr');
-        } else {
-          _unit = lang.t('time.hours');
-          _unitShort = lang.t('time.hrs');
-        }
-      } else if (_value >= timeUnits.mins.day) {
-        _value = BigNumber(
-          BigNumber(`${_value}`)
-            .dividedBy(BigNumber(`${timeUnits.mins.day}`))
-            .toFixed(2)
-        ).toString();
-        if (_value === 1) {
-          _unit = lang.t('time.day');
-          _unitShort = lang.t('time.day');
-        } else {
-          _unit = lang.t('time.days');
-          _unitShort = lang.t('time.days');
-        }
-      } else {
-        _unit = lang.t('time.minutes');
-        _unitShort = lang.t('time.mins');
-      }
-    }
-  }
-  if (short) {
-    return `${_value} ${_unitShort}`;
-  } else {
-    return `${_value} ${_unit}`;
-  }
 };

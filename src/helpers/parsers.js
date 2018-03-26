@@ -10,11 +10,11 @@ import {
   convertAssetAmountToBigNumber,
   convertAssetAmountToNativeValue,
   convertAssetAmountToNativeAmount,
-  getTimeString,
   saveLocal,
   getLocal,
   sha3
 } from './utilities';
+import { getTimeString } from './time';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
 import timeUnits from '../libraries/time-units.json';
@@ -354,30 +354,38 @@ export const parseGasPricesTxFee = (gasPrices, prices, gasLimit) => {
  * @param  {String} [native='USD']
  * @return {Object}
  */
-export const parsePricesObject = (data = null, assets = [], native = 'USD') => {
-  let prices = { selected: nativeCurrencies[native] };
-  assets.forEach(asset => {
-    let assetPrice = null;
-    if (data.RAW[asset]) {
-      assetPrice = {
-        price: {
-          amount: convertAmountToBigNumber(data.RAW[asset][native].PRICE),
-          display: convertAmountToDisplay(
-            convertAmountToBigNumber(data.RAW[asset][native].PRICE),
-            prices
-          )
-        },
-        change: {
-          amount: convertAmountToBigNumber(data.RAW[asset][native].CHANGEPCT24HOUR),
-          display: convertAmountToDisplay(
-            convertAmountToBigNumber(data.RAW[asset][native].CHANGEPCT24HOUR)
-          )
-        }
-      };
-    }
-    prices[asset] = assetPrice;
+export const parsePricesObject = (data = null, assets = [], nativeSelected = 'USD') => {
+  let prices = { selected: nativeCurrencies[nativeSelected] };
+  Object.keys(nativeCurrencies).forEach(nativeCurrency => {
+    prices[nativeCurrency] = {};
+    assets.forEach(asset => {
+      let assetPrice = null;
+      if (data.RAW[asset]) {
+        assetPrice = {
+          price: {
+            amount: convertAmountToBigNumber(data.RAW[asset][nativeSelected].PRICE),
+            display: convertAmountToDisplay(
+              convertAmountToBigNumber(data.RAW[asset][nativeSelected].PRICE),
+              prices
+            )
+          },
+          change: {
+            amount: convertAmountToBigNumber(data.RAW[asset][nativeSelected].CHANGEPCT24HOUR),
+            display: convertAmountToDisplay(
+              convertAmountToBigNumber(data.RAW[asset][nativeSelected].CHANGEPCT24HOUR)
+            )
+          }
+        };
+      }
+      if (asset !== 'WETH') {
+        prices[nativeCurrency][asset] = assetPrice;
+      }
+      if (asset === 'ETH') {
+        prices[nativeCurrency]['WETH'] = assetPrice;
+      }
+    });
   });
-  prices['WETH'] = prices['ETH'];
+  saveLocal('native_prices', prices);
   return prices;
 };
 
@@ -449,13 +457,17 @@ export const parseEthplorerAddressInfo = (data = null) => {
  */
 export const parseAccountBalances = (account = null, nativePrices = null) => {
   let totalAmount = 0;
+  let nativeSelected = nativePrices.selected.currency;
 
   if (account) {
     account.assets = account.assets.map(asset => {
-      if (!nativePrices || (nativePrices && !nativePrices[asset.symbol])) return asset;
+      if (!nativePrices || (nativePrices && !nativePrices[nativeSelected][asset.symbol]))
+        return asset;
 
       const balanceAmountUnit = convertAmountFromBigNumber(asset.balance.amount, asset.decimals);
-      const balancePriceUnit = convertAmountFromBigNumber(nativePrices[asset.symbol].price.amount);
+      const balancePriceUnit = convertAmountFromBigNumber(
+        nativePrices[nativeSelected][asset.symbol].price.amount
+      );
       const balanceRaw = BigNumber(balanceAmountUnit)
         .times(BigNumber(balancePriceUnit))
         .toString();
@@ -467,10 +479,10 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
         native: {
           selected: nativePrices.selected,
           balance: { amount: balanceAmount, display: balanceDisplay },
-          price: nativePrices[asset.symbol].price,
+          price: nativePrices[nativeSelected][asset.symbol].price,
           change:
             asset.symbol !== nativePrices.selected.currency
-              ? nativePrices[asset.symbol].change
+              ? nativePrices[nativeSelected][asset.symbol].change
               : { amount: '0', display: '0.00%' }
         }
       };
@@ -527,8 +539,9 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       let totalGas = BigNumber(`${tx.gasUsed}`)
         .times(BigNumber(`${tx.gasPrice}`))
         .toString();
+      console.log();
       let txFee = {
-        amount: convertAmountFromBigNumber(totalGas),
+        amount: totalGas,
         display: convertAmountToDisplay(totalGas, null, {
           symbol: 'ETH',
           decimals: 18
@@ -601,6 +614,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
   );
 
   transactions = transactions.reverse();
+  saveLocal('transactions', transactions);
   return transactions;
 };
 
@@ -632,10 +646,13 @@ export const parseTransactionsPrices = async (transactions = null, nativeCurrenc
         const assetPriceAmount = convertAmountToBigNumber(
           response.data[assetSymbol][nativeCurrency]
         );
-        prices[assetSymbol] = { price: { amount: assetPriceAmount, display: null } };
+        prices[nativeCurrency] = {};
+        prices[nativeCurrency][assetSymbol] = {
+          price: { amount: assetPriceAmount, display: null }
+        };
         const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
-        prices[assetSymbol].price.display = assetPriceDisplay;
-        const assetPrice = prices[assetSymbol].price;
+        prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
+        const assetPrice = prices[nativeCurrency][assetSymbol].price;
         const valuePriceAmount = convertAssetAmountToNativeValue(tx.value.amount, tx.asset, prices);
         const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
 
@@ -657,5 +674,6 @@ export const parseTransactionsPrices = async (transactions = null, nativeCurrenc
       })
     );
   }
+  saveLocal('transactions', _transactions);
   return _transactions;
 };

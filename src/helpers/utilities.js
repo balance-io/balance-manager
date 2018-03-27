@@ -361,8 +361,11 @@ export const convertAssetAmountFromNativeValue = (value, asset, nativePrices) =>
  * @return {BigNumber}
  */
 export const convertAssetAmountToNativeAmount = (value, asset, nativePrices) => {
+  const nativeSelected = nativePrices.selected.currency;
   const _value = convertAmountFromBigNumber(`${value}`);
-  const assetPriceUnit = convertAmountFromBigNumber(nativePrices[asset.symbol].price.amount);
+  const assetPriceUnit = convertAmountFromBigNumber(
+    nativePrices[nativeSelected][asset.symbol].price.amount
+  );
   const assetNativePrice = BigNumber(_value)
     .times(BigNumber(assetPriceUnit))
     .toString();
@@ -377,8 +380,11 @@ export const convertAssetAmountToNativeAmount = (value, asset, nativePrices) => 
  * @return {BigNumber}
  */
 export const convertAssetAmountFromNativeAmount = (value, asset, nativePrices) => {
+  const nativeSelected = nativePrices.selected.currency;
   const _value = convertAmountFromBigNumber(`${value}`);
-  const assetPriceUnit = convertAmountFromBigNumber(nativePrices[asset.symbol].price.amount);
+  const assetPriceUnit = convertAmountFromBigNumber(
+    nativePrices[nativeSelected][asset.symbol].price.amount
+  );
   const assetAmountUnit = BigNumber(_value)
     .dividedBy(BigNumber(assetPriceUnit))
     .toString();

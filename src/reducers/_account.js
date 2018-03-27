@@ -31,6 +31,8 @@ const ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE = 'account/ACCOUNT_GET_ACCOUNT_BALANC
 const ACCOUNT_UPDATE_METAMASK_ACCOUNT = 'account/ACCOUNT_UPDATE_METAMASK_ACCOUNT';
 const ACCOUNT_CHECK_NETWORK_IS_CONNECTED = 'account/ACCOUNT_CHECK_NETWORK_IS_CONNECTED';
 
+const ACCOUNT_CONNECT_WALLET_REQUEST = 'account/ACCOUNT_CONNECT_WALLET_REQUEST';
+
 const ACCOUNT_METAMASK_GET_NETWORK_REQUEST = 'account/ACCOUNT_METAMASK_GET_NETWORK_REQUEST';
 const ACCOUNT_METAMASK_GET_NETWORK_SUCCESS = 'account/ACCOUNT_METAMASK_GET_NETWORK_SUCCESS';
 const ACCOUNT_METAMASK_GET_NETWORK_FAILURE = 'account/ACCOUNT_METAMASK_GET_NETWORK_FAILURE';
@@ -135,6 +137,11 @@ export const accountConnectMetamask = () => (dispatch, getState) => {
   }
 };
 
+export const accountUpdateWalletConnect = address => dispatch => {
+  dispatch({ type: ACCOUNT_CONNECT_WALLET_REQUEST, payload: address });
+  dispatch(accountGetAccountBalances(address, 'WalletConnect'));
+};
+
 export const accountClearIntervals = () => dispatch => {
   clearInterval(accountInterval);
   clearInterval(getPricesInterval);
@@ -192,6 +199,7 @@ const INITIAL_STATE = {
   web3Available: false,
   web3Network: 'mainnet',
   metamaskAccount: '',
+  walletConnectAccount: '',
   accountInfo: parseEthplorerAddressInfo(null),
   transactions: [],
   fetchingTransactions: false,
@@ -274,6 +282,11 @@ export default (state = INITIAL_STATE, action) => {
         nativeCurrency: action.payload.nativeCurrency,
         prices: action.payload.prices,
         accountInfo: action.payload.accountInfo
+      };
+    case ACCOUNT_CONNECT_WALLET_REQUEST:
+      return {
+        ...state,
+        walletConnectAccount: action.payload
       };
     default:
       return state;

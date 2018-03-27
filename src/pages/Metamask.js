@@ -19,14 +19,14 @@ const StyledWrapper = styled.div`
   width: 100%;
 `;
 
-const StyledMessage = styled.div`
-  height: 177px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgb(${colors.grey});
-  font-weight: ${fonts.weight.medium};
-`;
+// const StyledMessage = styled.div`
+//   height: 177px;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   color: rgb(${colors.grey});
+//   font-weight: ${fonts.weight.medium};
+// `;
 
 class Metamask extends Component {
   componentDidMount() {
@@ -50,7 +50,8 @@ class Metamask extends Component {
           <AccountView match={this.props.match} />
         ) : (
           <Card fetching={this.props.fetching}>
-            <StyledMessage>{this.renderMessage()}</StyledMessage>
+            {/* <StyledMessage>{this.renderMessage()}</StyledMessage> */}
+            <div />
           </Card>
         )}
       </StyledWrapper>

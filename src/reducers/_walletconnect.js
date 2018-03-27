@@ -2,6 +2,8 @@ import { apiWalletConnectInit, apiWalletConnectGetAddress } from '../helpers/api
 import { generateUUID } from '../helpers/utilities';
 import { parseError } from '../helpers/parsers';
 import { notificationShow } from './_notification';
+import { modalClose } from './_modal';
+import { accountUpdateWalletConnect } from './_account';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -18,21 +20,28 @@ const WALLET_CONNECT_CLEAR_FIELDS = 'wallletConnect/WALLET_CONNECT_CLEAR_FIELDS'
 // -- Actions --------------------------------------------------------------- //
 
 export const walletConnectGetAddress = newGasPriceOption => (dispatch, getState) => {
-  const uuid = getState().walletconnect;
+  const uuid = getState().walletconnect.uuid;
   dispatch({ type: WALLET_CONNECT_GET_ADDRESS_REQUEST, payload: uuid });
   apiWalletConnectGetAddress(uuid)
     .then(({ data }) => {
-      console.log(data);
-      dispatch({
-        type: WALLET_CONNECT_GET_ADDRESS_SUCCESS,
-        payload: data.addresses[0]
-      });
+      const address = data ? JSON.parse(data.encryptedPayload).addresses[0] : '';
+      if (address) {
+        dispatch({
+          type: WALLET_CONNECT_GET_ADDRESS_SUCCESS,
+          payload: address
+        });
+        dispatch(modalClose());
+        dispatch(accountUpdateWalletConnect(address));
+        window.browserHistory.push('/wallet');
+      } else if (!getState().walletconnect.address) {
+        setTimeout(() => dispatch(walletConnectGetAddress()), 500);
+      }
     })
     .catch(error => {
       const message = parseError(error);
       dispatch(notificationShow(message), true);
       dispatch({ type: WALLET_CONNECT_GET_ADDRESS_FAILURE });
-      dispatch(walletConnectGetAddress());
+      setTimeout(() => dispatch(walletConnectGetAddress()), 500);
     });
 };
 
@@ -41,13 +50,13 @@ export const wallletConnectModalInit = (address, selected) => (dispatch, getStat
   dispatch({ type: WALLET_CONNECT_SEND_TOKEN_REQUEST, payload: uuid });
   apiWalletConnectInit(uuid)
     .then(({ data }) => {
-      console.log(data);
       dispatch({
         type: WALLET_CONNECT_SEND_TOKEN_SUCCESS
       });
       dispatch(walletConnectGetAddress());
     })
     .catch(error => {
+      console.error(error);
       const message = parseError(error);
       dispatch(notificationShow(message), true);
       dispatch({ type: WALLET_CONNECT_SEND_TOKEN_FAILURE });

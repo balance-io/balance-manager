@@ -106,7 +106,7 @@ export const apiGetEtherscanAccountTransactions = (address = '', network = 'main
  * @type axios instance
  */
 const walletConnect = axios.create({
-  baseURL: 'http://bridge.balance.io/',
+  baseURL: 'http://bridge.balance.io',
   timeout: 30000, // 30 secs
   headers: {
     'Content-Type': 'application/json',
@@ -120,7 +120,18 @@ const walletConnect = axios.create({
  * @return {Promise}
  */
 export const apiWalletConnectInit = (token = '') =>
-  walletConnect.put('/create_shared_connection', { token });
+  walletConnect.post('/create-shared-connection', { token });
+// axios.post(
+//   'http://bridge.balance.io/create-shared-connection',
+//   { token },
+//   {
+//     headers: {
+//       'Content-Type': 'application/json',
+//       Authorization: '&xFvdofLFGDPzk9LwWQEEpoqP^YFJ8ReGREe2VPWZsKKYcwnBndAA8xWncYgJDqm'
+//     }
+//   }
+// );
+//
 
 /**
  * @desc wallet connect get address
@@ -128,4 +139,4 @@ export const apiWalletConnectInit = (token = '') =>
  * @return {Promise}
  */
 export const apiWalletConnectGetAddress = (token = '') =>
-  walletConnect.post('/pop_connection_details', { token });
+  walletConnect.post('/pop-connection-details', { token });

@@ -100,3 +100,32 @@ export const apiGetEtherscanAccountTransactions = (address = '', network = 'main
       .catch(err => reject(err));
   });
 };
+
+/**
+ * Configuration for WalletConnect api instance
+ * @type axios instance
+ */
+const walletConnect = axios.create({
+  baseURL: 'http://bridge.balance.io/',
+  timeout: 30000, // 30 secs
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: '&xFvdofLFGDPzk9LwWQEEpoqP^YFJ8ReGREe2VPWZsKKYcwnBndAA8xWncYgJDqm'
+  }
+});
+
+/**
+ * @desc wallet connect init connection
+ * @param  {String}   [token = '']
+ * @return {Promise}
+ */
+export const apiWalletConnectInit = (token = '') =>
+  walletConnect.put('/create_shared_connection', { token });
+
+/**
+ * @desc wallet connect get address
+ * @param  {String}   [token = '']
+ * @return {Promise}
+ */
+export const apiWalletConnectGetAddress = (token = '') =>
+  walletConnect.post('/pop_connection_details', { token });

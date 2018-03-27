@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import uuidv4 from 'uuid/v4';
 import { web3Instance } from './web3';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
@@ -24,6 +25,12 @@ export const getLocal = (key = '') => JSON.parse(localStorage.getItem(key));
  * @return {Object}
  */
 export const removeLocal = (key = '') => localStorage.removeItem(key);
+
+/**
+ * @desc generate random uuid
+ * @return {String}
+ */
+export const generateUUID = () => uuidv4();
 
 /**
  * @desc debounce api request

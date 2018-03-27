@@ -14,7 +14,8 @@ export const colors = {
   lightGreen: '84, 209, 146',
   red: '222, 75, 57',
   ethplorer: '80, 102, 133',
-  etherscan: '2, 92, 144'
+  etherscan: '2, 92, 144',
+  walletconnect: '64, 153, 255'
 };
 
 export const fonts = {

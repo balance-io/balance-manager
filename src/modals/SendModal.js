@@ -304,14 +304,15 @@ class SendModal extends Component {
       gasPrice: this.props.gasPrice,
       gasLimit: this.props.gasLimit
     };
-    if (this.props.modalProps.type === 'METAMASK') {
-      if (this.props.selected.symbol === 'ETH') {
-        this.props.sendEtherMetamask(request);
-      } else {
-        this.props.sendTokenMetamask(request);
-      }
-      this.props.sendToggleConfirmationView(true);
-    } else if (!this.props.confirm) {
+    // if (this.props.modalProps.type === 'METAMASK') {
+    //   if (this.props.selected.symbol === 'ETH') {
+    //     this.props.sendEtherMetamask(request);
+    //   } else {
+    //     this.props.sendTokenMetamask(request);
+    //   }
+    //   this.props.sendToggleConfirmationView(true);
+    // }
+    if (!this.props.confirm) {
       if (!isValidAddress(this.props.recipient)) {
         this.props.notificationShow(lang.t('notification.error.invalid_address'), true);
         return;
@@ -332,6 +333,7 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
+        this.props.sendEtherMetamask(request);
       } else {
         const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
         const etherBalanceAmount = ethereum.balance.amount;
@@ -340,6 +342,8 @@ class SendModal extends Component {
         const tokenBalance = convertAmountFromBigNumber(tokenBalanceAmount);
         const requestedAmount = BigNumber(`${this.props.assetAmount}`).toString();
         const includingFees = convertAmountFromBigNumber(this.props.gasPrice.txFee.value.amount);
+        console.log('requestedAmount', requestedAmount);
+        console.log('tokenBalance', tokenBalance);
         if (BigNumber(requestedAmount).comparedTo(BigNumber(tokenBalance)) === 1) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
@@ -347,7 +351,9 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
+        this.props.sendTokenMetamask(request);
       }
+
       this.props.sendToggleConfirmationView(true);
     }
   };

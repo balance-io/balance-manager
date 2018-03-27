@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js';
 import lang from '../languages';
 import {
-  debounceRequest,
   hexToNumberString,
   convertStringToNumber,
   convertAmountToBigNumber,
@@ -362,7 +361,6 @@ export const parsePricesObject = (data = null, assets = [], nativeSelected = 'US
     assets.forEach(asset => {
       let assetPrice = null;
       if (data.RAW[asset]) {
-        console.log(nativeCurrency);
         assetPrice = {
           price: {
             amount: convertAmountToBigNumber(data.RAW[asset][nativeCurrency].PRICE),
@@ -478,10 +476,7 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
         .toString();
       const balanceAmount = convertAmountToBigNumber(balanceRaw);
       const balanceDisplay = convertAmountToDisplay(balanceAmount, nativePrices);
-      console.log('nativeSelected', nativeSelected);
-      console.log('nativePrices', nativePrices);
       const assetPrice = nativePrices[nativeSelected][asset.symbol].price;
-      console.log('assetPrice', assetPrice);
       return {
         ...asset,
         native: {
@@ -503,13 +498,11 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
       0
     );
     const totalDisplay = convertAmountToDisplay(totalAmount, nativePrices);
-    console.log('totalDisplay', totalDisplay);
     newAccount = {
       ...newAccount,
       assets: newAssets,
       total: { amount: totalAmount, display: totalDisplay }
     };
-    console.log(newAccount);
   }
   return newAccount;
 };
@@ -582,7 +575,7 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         } else if (foundToken) {
           asset = foundToken;
         } else {
-          const response = await debounceRequest(apiGetEthplorerTokenInfo, [tx.to], 100 * idx);
+          const response = await apiGetEthplorerTokenInfo(tx.to);
 
           asset = {
             name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
@@ -628,7 +621,6 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
 
   transactions = transactions.reverse();
 
-  console.log('address', address);
   const accountLocal = getLocal(address) || {};
   accountLocal.transactions = transactions;
   saveLocal(address, accountLocal);
@@ -657,11 +649,9 @@ export const parseTransactionsPrices = async (
         const assetSymbol = tx.asset.symbol;
         if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
           tx.native = { selected: nativeCurrencies[nativeSelected] };
-          const response = await debounceRequest(
-            apiGetHistoricalPrices,
-            [assetSymbol, timestamp],
-            100 * idx
-          );
+
+          const response = await apiGetHistoricalPrices(assetSymbol, timestamp);
+
           if (response.data.response === 'Error' || !response.data[assetSymbol]) {
             return tx;
           }
@@ -710,7 +700,6 @@ export const parseTransactionsPrices = async (
     );
   }
 
-  console.log('address', address);
   const accountLocal = getLocal(address) || {};
   accountLocal.transactions = _transactions;
   saveLocal(address, accountLocal);

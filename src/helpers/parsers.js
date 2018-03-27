@@ -457,9 +457,13 @@ export const parseEthplorerAddressInfo = (data = null) => {
  */
 export const parseAccountBalances = (account = null, nativePrices = null) => {
   let totalAmount = 0;
+  let newAccount = {
+    ...account
+  };
   let nativeSelected = nativePrices.selected.currency;
+  console.log(nativeSelected);
   if (account) {
-    account.assets = account.assets.map(asset => {
+    const newAssets = account.assets.map(asset => {
       if (!nativePrices || (nativePrices && !nativePrices[nativeSelected][asset.symbol]))
         return asset;
 
@@ -485,7 +489,7 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
         }
       };
     });
-    totalAmount = account.assets.reduce(
+    totalAmount = newAssets.reduce(
       (total, asset) =>
         BigNumber(`${total}`)
           .plus(BigNumber(asset.native ? asset.native.balance.amount : 0))
@@ -493,10 +497,13 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
       0
     );
     const totalDisplay = convertAmountToDisplay(totalAmount, nativePrices);
-
-    account.total = { amount: totalAmount, display: totalDisplay };
+    newAccount = {
+      ...newAccount,
+      assets: newAssets,
+      total: { amount: totalAmount, display: totalDisplay }
+    };
   }
-  return account;
+  return newAccount;
 };
 
 /**

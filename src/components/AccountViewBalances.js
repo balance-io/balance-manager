@@ -179,10 +179,10 @@ const StyledShowMoreTokens = styled(StyledToken)`
 
 class AccountViewBalances extends Component {
   state = {
-    showTokensWithLowMarketValue: false
+    showMoreTokens: false
   };
-  onShowTokensWithLowMarketvalue = () => {
-    this.setState({ showTokensWithLowMarketValue: !this.state.showTokensWithLowMarketValue });
+  onShowMoreTokens = () => {
+    this.setState({ showMoreTokens: !this.state.showMoreTokens });
   };
   render() {
     const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
@@ -238,7 +238,7 @@ class AccountViewBalances extends Component {
             </StyledToken>
           ))}
         {!!tokensWithLowMarketValue.length &&
-          this.state.showTokensWithLowMarketValue &&
+          this.state.showMoreTokens &&
           tokensWithLowMarketValue.map(token => (
             <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
               <StyledAsset>
@@ -257,13 +257,11 @@ class AccountViewBalances extends Component {
           ))}
         <StyledLastRow>
           {!!tokensWithLowMarketValue.length ? (
-            <StyledShowMoreTokens onClick={this.onShowTokensWithLowMarketvalue}>
+            <StyledShowMoreTokens onClick={this.onShowMoreTokens}>
               <div />
-              {`${
-                this.state.showTokensWithLowMarketValue
-                  ? lang.t('account.hide')
-                  : lang.t('account.show')
-              } ${tokensWithLowMarketValue.length} ${
+              {`${this.state.showMoreTokens ? lang.t('account.hide') : lang.t('account.show')} ${
+                tokensWithLowMarketValue.length
+              } ${
                 tokensWithLowMarketValue.length === 1
                   ? lang.t('account.token')
                   : lang.t('account.tokens')
@@ -286,7 +284,6 @@ class AccountViewBalances extends Component {
 AccountViewBalances.propTypes = {
   accountInfo: PropTypes.object.isRequired
 };
-
 const reduxProps = ({ account }) => ({
   accountInfo: account.accountInfo
 });

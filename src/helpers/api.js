@@ -121,17 +121,6 @@ const walletConnect = axios.create({
  */
 export const apiWalletConnectInit = (token = '') =>
   walletConnect.post('/create-shared-connection', { token });
-// axios.post(
-//   'http://bridge.balance.io/create-shared-connection',
-//   { token },
-//   {
-//     headers: {
-//       'Content-Type': 'application/json',
-//       Authorization: '&xFvdofLFGDPzk9LwWQEEpoqP^YFJ8ReGREe2VPWZsKKYcwnBndAA8xWncYgJDqm'
-//     }
-//   }
-// );
-//
 
 /**
  * @desc wallet connect get address

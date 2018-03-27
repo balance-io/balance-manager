@@ -140,6 +140,7 @@ export const accountConnectMetamask = () => (dispatch, getState) => {
 };
 
 export const accountUpdateWalletConnect = address => dispatch => {
+  web3SetProvider(`https://mainnet.infura.io/`);
   dispatch({ type: ACCOUNT_CONNECT_WALLET_REQUEST, payload: address });
   if (address) dispatch(accountGetAccountBalances(address, 'WalletConnect'));
 };
@@ -177,17 +178,20 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
   };
   getPrices();
   clearInterval(getPricesInterval);
-  getPricesInterval = setInterval(getPrices, 30000); // 30secs
+  getPricesInterval = setInterval(getPrices, 10000); // 10secs
 };
 
 export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState) => {
   saveLocal('native_currency', nativeCurrency);
   let prices = getState().account.prices || getLocal('native_prices');
-  prices.selected = nativeCurrencies[nativeCurrency];
-  const accountInfo = parseAccountBalances(getState().account.accountInfo, prices);
+  const selected = nativeCurrencies[nativeCurrency];
+  let newPrices = { ...prices, selected };
+  let oldAccountInfo = getState().account.accountInfo;
+  const newAccountInfo = parseAccountBalances(oldAccountInfo, newPrices);
+  const accountInfo = { ...oldAccountInfo, ...newAccountInfo };
   dispatch({
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
-    payload: { nativeCurrency, prices, accountInfo }
+    payload: { nativeCurrency, prices: newPrices, accountInfo }
   });
   dispatch(accountParseTransactionPrices());
 };
@@ -290,7 +294,9 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_CONNECT_WALLET_REQUEST:
       return {
         ...state,
-        walletConnectAccount: action.payload
+        walletConnectAccount: action.payload,
+        web3Network: 'mainnet',
+        web3Available: true
       };
     case ACCOUNT_CLEAR_STATE:
       return {

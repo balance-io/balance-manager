@@ -363,16 +363,16 @@ export const parsePricesObject = (data = null, assets = [], nativeSelected = 'US
       if (data.RAW[asset]) {
         assetPrice = {
           price: {
-            amount: convertAmountToBigNumber(data.RAW[asset][nativeSelected].PRICE),
+            amount: convertAmountToBigNumber(data.RAW[asset][nativeCurrency].PRICE),
             display: convertAmountToDisplay(
-              convertAmountToBigNumber(data.RAW[asset][nativeSelected].PRICE),
+              convertAmountToBigNumber(data.RAW[asset][nativeCurrency].PRICE),
               prices
             )
           },
           change: {
-            amount: convertAmountToBigNumber(data.RAW[asset][nativeSelected].CHANGEPCT24HOUR),
+            amount: convertAmountToBigNumber(data.RAW[asset][nativeCurrency].CHANGEPCT24HOUR),
             display: convertAmountToDisplay(
-              convertAmountToBigNumber(data.RAW[asset][nativeSelected].CHANGEPCT24HOUR)
+              convertAmountToBigNumber(data.RAW[asset][nativeCurrency].CHANGEPCT24HOUR)
             )
           }
         };
@@ -458,7 +458,6 @@ export const parseEthplorerAddressInfo = (data = null) => {
 export const parseAccountBalances = (account = null, nativePrices = null) => {
   let totalAmount = 0;
   let nativeSelected = nativePrices.selected.currency;
-
   if (account) {
     account.assets = account.assets.map(asset => {
       if (!nativePrices || (nativePrices && !nativePrices[nativeSelected][asset.symbol]))
@@ -473,7 +472,6 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
         .toString();
       const balanceAmount = convertAmountToBigNumber(balanceRaw);
       const balanceDisplay = convertAmountToDisplay(balanceAmount, nativePrices);
-
       return {
         ...asset,
         native: {
@@ -498,7 +496,6 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
 
     account.total = { amount: totalAmount, display: totalDisplay };
   }
-  console.log(account);
   return account;
 };
 
@@ -540,7 +537,6 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       let totalGas = BigNumber(`${tx.gasUsed}`)
         .times(BigNumber(`${tx.gasPrice}`))
         .toString();
-      console.log();
       let txFee = {
         amount: totalGas,
         display: convertAmountToDisplay(totalGas, null, {
@@ -627,7 +623,6 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
  */
 export const parseTransactionsPrices = async (transactions = null, nativeCurrency = '') => {
   let _transactions = transactions;
-  console.log('_transactions', _transactions);
 
   if (_transactions && _transactions.length && nativeCurrency) {
     _transactions = await Promise.all(
@@ -670,7 +665,6 @@ export const parseTransactionsPrices = async (transactions = null, nativeCurrenc
           value: valuePrice,
           txFee: txFeePrice
         };
-        console.log(tx);
         return tx;
       })
     );

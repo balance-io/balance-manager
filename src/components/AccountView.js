@@ -145,16 +145,18 @@ class AccountView extends Component {
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
       name:
-        this.props.account.name || `${this.props.account.type}${lang.t('modal.default_wallet')}`,
-      address: this.props.account.address,
-      type: this.props.account.type,
-      assets: this.props.account.assets
+        this.props.accountInfo.name ||
+        `${this.props.accountInfo.type}${lang.t('modal.default_wallet')}`,
+      address: this.props.accountInfo.address,
+      type: this.props.accountInfo.type,
+      assets: this.props.accountInfo.assets
     });
   openReceiveModal = () =>
     this.props.modalOpen('RECEIVE_MODAL', {
       name:
-        this.props.account.name || `${this.props.account.type}${lang.t('modal.default_wallet')}`,
-      address: this.props.account.address
+        this.props.accountInfo.name ||
+        `${this.props.accountInfo.type}${lang.t('modal.default_wallet')}`,
+      address: this.props.accountInfo.address
     });
   render() {
     return (
@@ -163,8 +165,8 @@ class AccountView extends Component {
           <StyledFlex>
             <StyledTop>
               <StyledAddressWrapper>
-                <h6>{capitalize(this.props.account.type)} </h6>
-                <CopyToClipboard iconOnHover text={this.props.account.address} />
+                <h6>{capitalize(this.props.accountInfo.type)} </h6>
+                <CopyToClipboard iconOnHover text={this.props.accountInfo.address} />
               </StyledAddressWrapper>
 
               <StyledActions>
@@ -219,12 +221,12 @@ AccountView.propTypes = {
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
-  account: PropTypes.object.isRequired
+  accountInfo: PropTypes.object.isRequired
 };
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
-  account: account.account
+  accountInfo: account.accountInfo
 });
 
 export default connect(reduxProps, {

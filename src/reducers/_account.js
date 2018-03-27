@@ -16,6 +16,7 @@ import { web3SetProvider } from '../helpers/web3';
 import { warningOffline, warningOnline } from './_warning';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
+import nativeCurrencies from '../libraries/native-currencies.json';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -41,8 +42,6 @@ const ACCOUNT_GET_NATIVE_PRICES_FAILURE = 'account/ACCOUNT_GET_NATIVE_PRICES_FAI
 
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 
-const ACCOUNT_PARSE_ACCOUNT_BALANCES_PRICES = 'account/ACCOUNT_PARSE_ACCOUNT_BALANCES_PRICES';
-
 const ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST';
 const ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS';
 const ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE';
@@ -51,20 +50,6 @@ const ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE = 'account/ACCOUNT_PARSE_TRANSACT
 
 let accountInterval = null;
 let getPricesInterval = null;
-
-export const accountParseAccountBalancesPrices = () => (dispatch, getState) => {
-  const prices = getState().account.prices;
-  console.log('prices', prices);
-  let account = getState().account.account;
-  if (prices.selected) {
-    account = parseAccountBalances(account, prices);
-  }
-  console.log('account', account);
-  dispatch({
-    type: ACCOUNT_PARSE_ACCOUNT_BALANCES_PRICES,
-    payload: account
-  });
-};
 
 export const accountParseTransactionPrices = () => (dispatch, getState) => {
   dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST });
@@ -85,9 +70,9 @@ export const accountParseTransactionPrices = () => (dispatch, getState) => {
 };
 
 export const accountGetAccountTransactions = () => (dispatch, getState) => {
-  const { account, web3Network } = getState().account;
+  const { accountInfo, web3Network } = getState().account;
   dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST });
-  apiGetEtherscanAccountTransactions(account.address, web3Network)
+  apiGetEtherscanAccountTransactions(accountInfo.address, web3Network)
     .then(transactions => {
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: transactions });
       dispatch(accountParseTransactionPrices());
@@ -103,11 +88,11 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
   const { web3Network } = getState().account;
   dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST });
   apiGetEthplorerAddressInfo(address, web3Network)
-    .then(account => {
-      account = { ...account, type };
-      dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS, payload: account });
+    .then(accountInfo => {
+      accountInfo = { ...accountInfo, type };
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS, payload: accountInfo });
       dispatch(accountGetNativePrices());
-      if (account.txCount) dispatch(accountGetAccountTransactions());
+      if (accountInfo.txCount) dispatch(accountGetAccountTransactions());
     })
     .catch(error => {
       const message = parseError(error);
@@ -156,7 +141,7 @@ export const accountClearIntervals = () => dispatch => {
 };
 
 export const accountGetNativePrices = account => (dispatch, getState) => {
-  const assetSymbols = getState().account.account.assets.map(asset => asset.symbol);
+  const assetSymbols = getState().account.accountInfo.assets.map(asset => asset.symbol);
   const getPrices = () => {
     dispatch({
       type: ACCOUNT_GET_NATIVE_PRICES_REQUEST,
@@ -168,10 +153,10 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
         const nativeCurrency = getState().account.nativeCurrency;
         if (nativeCurrency === nativePriceRequest) {
           const prices = parsePricesObject(data, assetSymbols, nativeCurrency);
-          const account = parseAccountBalances(getState().account.account, prices);
+          const accountInfo = parseAccountBalances(getState().account.accountInfo, prices);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
-            payload: { account, prices }
+            payload: { accountInfo, prices }
           });
         }
       })
@@ -183,19 +168,19 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
   };
   getPrices();
   clearInterval(getPricesInterval);
-  getPricesInterval = setInterval(getPrices, 60000); // 1min
+  getPricesInterval = setInterval(getPrices, 30000); // 30secs
 };
 
 export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState) => {
   saveLocal('native_currency', nativeCurrency);
-  const prices = getState().account.prices || getLocal('native_prices');
-  const account = parseAccountBalances(getState().account.account, prices);
+  let prices = getState().account.prices || getLocal('native_prices');
+  prices.selected = nativeCurrencies[nativeCurrency];
+  const accountInfo = parseAccountBalances(getState().account.accountInfo, prices);
   dispatch({
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
-    payload: { nativeCurrency, account }
+    payload: { nativeCurrency, prices, accountInfo }
   });
   dispatch(accountParseTransactionPrices());
-  dispatch(accountParseAccountBalancesPrices());
 };
 
 // -- Reducer --------------------------------------------------------------- //
@@ -207,8 +192,7 @@ const INITIAL_STATE = {
   web3Available: false,
   web3Network: 'mainnet',
   metamaskAccount: '',
-  asset: ['ETH'],
-  account: parseEthplorerAddressInfo(null),
+  accountInfo: parseEthplorerAddressInfo(null),
   transactions: [],
   fetchingTransactions: false,
   fetching: false,
@@ -227,11 +211,6 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, fetchingTransactions: false, transactions: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE:
       return { ...state, fetchingTransactions: false, transactions: [] };
-    case ACCOUNT_PARSE_ACCOUNT_BALANCES_PRICES:
-      return {
-        ...state,
-        account: action.payload
-      };
     case ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS:
       return {
         ...state,
@@ -240,12 +219,12 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST:
       return { ...state, fetching: true };
     case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:
-      return { ...state, fetching: false, account: action.payload };
+      return { ...state, fetching: false, accountInfo: action.payload };
     case ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE:
       return {
         ...state,
         fetching: false,
-        account: parseEthplorerAddressInfo(null)
+        accountInfo: parseEthplorerAddressInfo(null)
       };
     case ACCOUNT_METAMASK_GET_NETWORK_REQUEST:
       return {
@@ -282,7 +261,7 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         nativePriceRequest: '',
         prices: action.payload.prices,
-        account: action.payload.account
+        accountInfo: action.payload.accountInfo
       };
     case ACCOUNT_GET_NATIVE_PRICES_FAILURE:
       return {
@@ -293,7 +272,8 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         nativeCurrency: action.payload.nativeCurrency,
-        account: action.payload.account
+        prices: action.payload.prices,
+        accountInfo: action.payload.accountInfo
       };
     default:
       return state;

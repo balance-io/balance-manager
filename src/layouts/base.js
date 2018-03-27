@@ -154,7 +154,7 @@ BaseLayout.propTypes = {
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
-  account: account.account,
+  account: account.accountInfo,
   nativeCurrency: account.nativeCurrency,
   web3Network: account.web3Network,
   web3Available: account.web3Available,

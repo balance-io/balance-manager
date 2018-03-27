@@ -184,17 +184,15 @@ class AccountViewBalances extends Component {
   onShowTokensWithLowMarketvalue = () => {
     this.setState({ showTokensWithLowMarketValue: !this.state.showTokensWithLowMarketValue });
   };
-
   render() {
-    console.log(this.props.account);
-    const ethereum = this.props.account.assets.filter(asset => asset.symbol === 'ETH')[0];
-    const tokensWithHighMarketValue = this.props.account.assets.filter(
+    const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+    const tokensWithHighMarketValue = this.props.accountInfo.assets.filter(
       asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
     );
-    let tokensWithLowMarketValue = this.props.account.assets.filter(
+    let tokensWithLowMarketValue = this.props.accountInfo.assets.filter(
       asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
     );
-    const tokensWithNoMarketValue = this.props.account.assets.filter(asset => !asset.native);
+    const tokensWithNoMarketValue = this.props.accountInfo.assets.filter(asset => !asset.native);
     tokensWithLowMarketValue = [...tokensWithLowMarketValue, ...tokensWithNoMarketValue];
     const allLowMarketTokensHaveNoValue =
       tokensWithNoMarketValue.length === tokensWithLowMarketValue.length;
@@ -224,7 +222,7 @@ class AccountViewBalances extends Component {
         </StyledEthereum>
         {!!tokensWithHighMarketValue &&
           tokensWithHighMarketValue.map(token => (
-            <StyledToken key={`${this.props.account.address}-${token.symbol}`}>
+            <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
               <StyledAsset>
                 <AssetIcon currency={token.symbol} />
                 <p>{token.name}</p>
@@ -242,7 +240,7 @@ class AccountViewBalances extends Component {
         {!!tokensWithLowMarketValue.length &&
           this.state.showTokensWithLowMarketValue &&
           tokensWithLowMarketValue.map(token => (
-            <StyledToken key={`${this.props.account.address}-${token.symbol}`}>
+            <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
               <StyledAsset>
                 <AssetIcon currency={token.symbol} />
                 <p>{token.name}</p>
@@ -278,7 +276,7 @@ class AccountViewBalances extends Component {
           ) : (
             <div />
           )}
-          <p>{`${this.props.account.total.display || '———'}`}</p>
+          <p>{`${this.props.accountInfo.total.display || '———'}`}</p>
         </StyledLastRow>
       </StyledGrid>
     );
@@ -286,11 +284,11 @@ class AccountViewBalances extends Component {
 }
 
 AccountViewBalances.propTypes = {
-  account: PropTypes.object.isRequired
+  accountInfo: PropTypes.object.isRequired
 };
 
 const reduxProps = ({ account }) => ({
-  account: account.account
+  accountInfo: account.accountInfo
 });
 
 export default connect(reduxProps, null)(AccountViewBalances);

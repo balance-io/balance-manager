@@ -385,7 +385,7 @@ AccountViewTransactions.propTypes = {
 const reduxProps = ({ account }) => ({
   transactions: account.transactions,
   fetchingTransactions: account.fetchingTransactions,
-  account: account.account,
+  account: account.accountInfo,
   web3Network: account.web3Network
 });
 

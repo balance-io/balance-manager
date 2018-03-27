@@ -498,6 +498,7 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
 
     account.total = { amount: totalAmount, display: totalDisplay };
   }
+  console.log(account);
   return account;
 };
 

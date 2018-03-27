@@ -200,15 +200,11 @@ class AccountView extends Component {
               </StyledTabsWrapper>
             </StyledTabMenu>
             <Switch>
-              <Route
-                exact
-                path={this.props.match.url}
-                render={routerProps => <AccountViewBalances {...routerProps} />}
-              />
+              <Route exact path={this.props.match.url} component={AccountViewBalances} />
               <Route
                 exact
                 path={`${this.props.match.url}/transactions`}
-                render={routerProps => <AccountViewTransactions {...routerProps} />}
+                component={AccountViewTransactions}
               />
               <Route render={() => <Redirect to={this.props.match.url} />} />
             </Switch>

@@ -276,7 +276,6 @@ class AccountViewTransactions extends Component {
                         ? tx.native[nativeCurrency].price.display
                         : '———'}
                     </p>
-                    {console.log(tx.native ? tx.native[nativeCurrency] : 'no native')}
                     <p>
                       {tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].value
                         ? tx.from === this.props.account.address

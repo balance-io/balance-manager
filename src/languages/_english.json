@@ -23,6 +23,7 @@
       "unknown_token": "Unknown Token"
     },
     "button": {
+      "connect_walletconnect": "Use WalletConnect",
       "connect_metamask": "Connect to Metamask",
       "send": "Send",
       "receive": "Receive",

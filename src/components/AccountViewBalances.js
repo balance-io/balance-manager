@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
@@ -36,9 +37,6 @@ const StyledRow = styled.div`
   @media screen and (${responsive.sm.max}) {
     grid-template-columns: repeat(5, 1fr);
     padding: 16px;
-    & p {
-      font-size: ${fonts.size.small};
-    }
   }
   @media screen and (${responsive.xs.max}) {
     grid-template-columns: 1fr repeat(3, 3fr);
@@ -92,7 +90,7 @@ const StyledToken = styled(StyledRow)`
     font-family: ${fonts.family.SFMono};
   }
   &:nth-child(n + 3) {
-    border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
+    border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
   }
 `;
 
@@ -130,7 +128,7 @@ const StyledLastRow = styled(StyledRow)`
   grid-template-columns: 3fr 1fr;
   min-height: 0;
   min-width: 0;
-  border-top: 1px solid rgba(${colors.darkGrey}, 0.2);
+  border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
   & > p {
     font-size: ${fonts.size.medium};
     font-weight: ${fonts.weight.semibold};
@@ -179,110 +177,115 @@ const StyledShowMoreTokens = styled(StyledToken)`
   }
 `;
 
-const AccountViewBalances = ({
-  onShowTokensWithLowMarketvalue,
-  showTokensWithLowMarketValue,
-  account,
-  ...props
-}) => {
-  const ethereum = account.assets.filter(asset => asset.symbol === 'ETH')[0];
-  const tokensWithHighMarketValue = account.assets.filter(
-    asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
-  );
-  const tokensWithLowMarketValue = account.assets.filter(
-    asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
-  );
-  const allLowMarketTokensHaveNoValue =
-    tokensWithLowMarketValue.filter(asset => !asset.native).length ===
-    tokensWithLowMarketValue.length;
-  return (
-    <StyledGrid {...props}>
-      <StyledLabelsRow>
-        <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
-        <StyledLabels>{lang.t('account.label_quantity')}</StyledLabels>
-        <StyledLabels>{lang.t('account.label_price')}</StyledLabels>
-        <StyledLabels>{lang.t('account.label_24h')}</StyledLabels>
-        <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
-      </StyledLabelsRow>
+class AccountViewBalances extends Component {
+  state = {
+    showMoreTokens: false
+  };
+  onShowMoreTokens = () => {
+    this.setState({ showMoreTokens: !this.state.showMoreTokens });
+  };
+  render() {
+    const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+    const tokensWithHighMarketValue = this.props.accountInfo.assets.filter(
+      asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
+    );
+    let tokensWithLowMarketValue = this.props.accountInfo.assets.filter(
+      asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
+    );
+    const tokensWithNoMarketValue = this.props.accountInfo.assets.filter(asset => !asset.native);
+    tokensWithLowMarketValue = [...tokensWithLowMarketValue, ...tokensWithNoMarketValue];
+    const allLowMarketTokensHaveNoValue =
+      tokensWithNoMarketValue.length === tokensWithLowMarketValue.length;
+    return (
+      <StyledGrid>
+        <StyledLabelsRow>
+          <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
+          <StyledLabels>{lang.t('account.label_quantity')}</StyledLabels>
+          <StyledLabels>{lang.t('account.label_price')}</StyledLabels>
+          <StyledLabels>{lang.t('account.label_24h')}</StyledLabels>
+          <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
+        </StyledLabelsRow>
 
-      <StyledEthereum>
-        <StyledAsset>
-          <AssetIcon currency={ethereum.symbol} />
-          <p>{ethereum.name}</p>
-        </StyledAsset>
-        <p>{ethereum.balance.display}</p>
-        <p>{ethereum.native ? ethereum.native.price.display : '———'}</p>
-        <StyledPercentage
-          percentage={ethereum.native ? convertStringToNumber(ethereum.native.change.amount) : 0}
-        >
-          {ethereum.native ? ethereum.native.change.display : '———'}
-        </StyledPercentage>
-        <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
-      </StyledEthereum>
-      {!!tokensWithHighMarketValue &&
-        tokensWithHighMarketValue.map(token => (
-          <StyledToken key={`${account.address}-${token.symbol}`}>
-            <StyledAsset>
-              <AssetIcon currency={token.symbol} />
-              <p>{token.name}</p>
-            </StyledAsset>
-            <p>{token.balance.display}</p>
-            <p>{token.native ? token.native.price.display : '———'}</p>
-            <StyledPercentage
-              percentage={token.native ? convertStringToNumber(token.native.change.amount) : 0}
-            >
-              {token.native ? token.native.change.display : '———'}
-            </StyledPercentage>
-            <p>{token.native ? token.native.balance.display : '———'}</p>
-          </StyledToken>
-        ))}
-      {!!tokensWithLowMarketValue.length &&
-        showTokensWithLowMarketValue &&
-        tokensWithLowMarketValue.map(token => (
-          <StyledToken key={`${account.address}-${token.symbol}`}>
-            <StyledAsset>
-              <AssetIcon currency={token.symbol} />
-              <p>{token.name}</p>
-            </StyledAsset>
-            <p>{token.balance.display}</p>
-            <p>{token.native ? token.native.price.display : '———'}</p>
-            <StyledPercentage
-              percentage={token.native ? convertStringToNumber(token.native.change.amount) : 0}
-            >
-              {token.native ? token.native.change.display : '———'}
-            </StyledPercentage>
-            <p>{token.native ? token.native.balance.display : '———'}</p>
-          </StyledToken>
-        ))}
-      <StyledLastRow>
-        {!!tokensWithLowMarketValue.length ? (
-          <StyledShowMoreTokens onClick={onShowTokensWithLowMarketvalue}>
+        <StyledEthereum>
+          <StyledAsset>
+            <AssetIcon currency={ethereum.symbol} />
+            <p>{ethereum.name}</p>
+          </StyledAsset>
+          <p>{ethereum.balance.display}</p>
+          <p>{ethereum.native ? ethereum.native.price.display : '———'}</p>
+          <StyledPercentage
+            percentage={ethereum.native ? convertStringToNumber(ethereum.native.change.amount) : 0}
+          >
+            {ethereum.native ? ethereum.native.change.display : '———'}
+          </StyledPercentage>
+          <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
+        </StyledEthereum>
+        {!!tokensWithHighMarketValue &&
+          tokensWithHighMarketValue.map(token => (
+            <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
+              <StyledAsset>
+                <AssetIcon currency={token.symbol} />
+                <p>{token.name}</p>
+              </StyledAsset>
+              <p>{token.balance.display}</p>
+              <p>{token.native ? token.native.price.display : '———'}</p>
+              <StyledPercentage
+                percentage={token.native ? convertStringToNumber(token.native.change.amount) : 0}
+              >
+                {token.native ? token.native.change.display : '———'}
+              </StyledPercentage>
+              <p>{token.native ? token.native.balance.display : '———'}</p>
+            </StyledToken>
+          ))}
+        {!!tokensWithLowMarketValue.length &&
+          this.state.showMoreTokens &&
+          tokensWithLowMarketValue.map(token => (
+            <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
+              <StyledAsset>
+                <AssetIcon currency={token.symbol} />
+                <p>{token.name}</p>
+              </StyledAsset>
+              <p>{token.balance.display}</p>
+              <p>{token.native ? token.native.price.display : '———'}</p>
+              <StyledPercentage
+                percentage={token.native ? convertStringToNumber(token.native.change.amount) : 0}
+              >
+                {token.native ? token.native.change.display : '———'}
+              </StyledPercentage>
+              <p>{token.native ? token.native.balance.display : '———'}</p>
+            </StyledToken>
+          ))}
+        <StyledLastRow>
+          {!!tokensWithLowMarketValue.length ? (
+            <StyledShowMoreTokens onClick={this.onShowMoreTokens}>
+              <div />
+              {`${this.state.showMoreTokens ? lang.t('account.hide') : lang.t('account.show')} ${
+                tokensWithLowMarketValue.length
+              } ${
+                tokensWithLowMarketValue.length === 1
+                  ? lang.t('account.token')
+                  : lang.t('account.tokens')
+              } ${
+                allLowMarketTokensHaveNoValue
+                  ? lang.t('account.no_market_value')
+                  : lang.t('account.low_market_value')
+              }`}
+            </StyledShowMoreTokens>
+          ) : (
             <div />
-            {`${showTokensWithLowMarketValue ? lang.t('account.hide') : lang.t('account.show')} ${
-              tokensWithLowMarketValue.length
-            } ${
-              tokensWithLowMarketValue.length === 1
-                ? lang.t('account.token')
-                : lang.t('account.tokens')
-            } ${
-              allLowMarketTokensHaveNoValue
-                ? lang.t('account.no_market_value')
-                : lang.t('account.low_market_value')
-            }`}
-          </StyledShowMoreTokens>
-        ) : (
-          <div />
-        )}
-        <p>{`${account.total.display || '———'}`}</p>
-      </StyledLastRow>
-    </StyledGrid>
-  );
-};
+          )}
+          <p>{`${this.props.accountInfo.total.display || '———'}`}</p>
+        </StyledLastRow>
+      </StyledGrid>
+    );
+  }
+}
 
 AccountViewBalances.propTypes = {
-  onShowTokensWithLowMarketvalue: PropTypes.func.isRequired,
-  showTokensWithLowMarketValue: PropTypes.bool.isRequired,
-  account: PropTypes.object.isRequired
+  accountInfo: PropTypes.object.isRequired
 };
+const reduxProps = ({ account }) => ({
+  accountInfo: account.accountInfo
+});
 
-export default AccountViewBalances;
+export default connect(reduxProps, null)(AccountViewBalances);

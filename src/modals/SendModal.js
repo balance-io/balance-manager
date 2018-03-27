@@ -300,19 +300,19 @@ class SendModal extends Component {
       address: this.props.modalProps.address,
       recipient: this.props.recipient,
       amount: this.props.assetAmount,
-      privateKey: this.props.privateKey,
       tokenObject: this.props.selected,
       gasPrice: this.props.gasPrice,
       gasLimit: this.props.gasLimit
     };
-    if (this.props.modalProps.type === 'METAMASK') {
-      if (this.props.selected.symbol === 'ETH') {
-        this.props.sendEtherMetamask(request);
-      } else {
-        this.props.sendTokenMetamask(request);
-      }
-      this.props.sendToggleConfirmationView(true);
-    } else if (!this.props.confirm) {
+    // if (this.props.modalProps.type === 'METAMASK') {
+    //   if (this.props.selected.symbol === 'ETH') {
+    //     this.props.sendEtherMetamask(request);
+    //   } else {
+    //     this.props.sendTokenMetamask(request);
+    //   }
+    //   this.props.sendToggleConfirmationView(true);
+    // }
+    if (!this.props.confirm) {
       if (!isValidAddress(this.props.recipient)) {
         this.props.notificationShow(lang.t('notification.error.invalid_address'), true);
         return;
@@ -333,6 +333,7 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
+        this.props.sendEtherMetamask(request);
       } else {
         const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
         const etherBalanceAmount = ethereum.balance.amount;
@@ -348,7 +349,9 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
+        this.props.sendTokenMetamask(request);
       }
+
       this.props.sendToggleConfirmationView(true);
     }
   };
@@ -361,19 +364,11 @@ class SendModal extends Component {
       const onError = () =>
         this.props.notificationShow(lang.t('notification.error.invalid_address_scanned'), true);
       return { data, result, onError };
-    } else if (this.state.QRCodeReaderTarget === 'privateKey') {
-      const data = rawData.match(/0x\w{64}/g) ? rawData.match(/0x\w{64}/g)[0] : null;
-      const result = !!data;
-      const onError = () =>
-        this.props.notificationShow(lang.t('notification.error.invalid_private_key_scanned'), true);
-      return { data, result, onError };
     }
   };
   onQRCodeScan = data => {
     if (this.state.QRCodeReaderTarget === 'recipient') {
       this.props.sendUpdateRecipient(data);
-    } else if (this.state.QRCodeReaderTarget === 'privateKey') {
-      this.props.sendUpdatePrivateKey(data);
     }
     this.setState({ showQRCodeReader: false, QRCodeReaderTarget: '' });
   };

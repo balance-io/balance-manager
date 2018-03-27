@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import send from './_send';
 import account from './_account';
 import modal from './_modal';
+import walletconnect from './_walletconnect';
 import notification from './_notification';
 import warning from './_warning';
 
@@ -10,5 +11,6 @@ export default combineReducers({
   account,
   modal,
   notification,
-  warning
+  warning,
+  walletconnect
 });

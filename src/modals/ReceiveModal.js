@@ -13,6 +13,7 @@ import { capitalize } from '../helpers/utilities';
 import { fonts, colors, responsive } from '../styles';
 
 const StyledContainer = styled.div`
+  width: 100%;
   padding: 22px;
   @media screen and (${responsive.sm.max}) {
     padding: 15px;

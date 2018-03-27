@@ -108,7 +108,7 @@ const BaseLayout = ({
     <StyledLayout>
       <Background />
       <IconPreload />
-      <Column maxWidth={900}>
+      <Column maxWidth={1000}>
         <StyledHeader>
           <Link to="/">
             <StyledBranding>
@@ -154,7 +154,7 @@ BaseLayout.propTypes = {
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
-  account: account.account,
+  account: account.accountInfo,
   nativeCurrency: account.nativeCurrency,
   web3Network: account.web3Network,
   web3Available: account.web3Available,

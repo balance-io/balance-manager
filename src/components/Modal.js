@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Column from '../components/Column';
 import SendModal from '../modals/SendModal';
 import ReceiveModal from '../modals/ReceiveModal';
+import WalletConnectInit from '../modals/WalletConnectInit';
 import { modalClose } from '../reducers/_modal';
 import { sendClearFields } from '../reducers/_send';
 import { colors, transitions } from '../styles';
@@ -47,6 +48,8 @@ class Modal extends Component {
         return <SendModal />;
       case 'RECEIVE_MODAL':
         return <ReceiveModal />;
+      case 'WALLET_CONNECT_INIT':
+        return <WalletConnectInit />;
       default:
         return <div />;
     }

@@ -21,7 +21,6 @@ const StyledWrapper = styled.div`
 `;
 
 const StyledMessage = styled.div`
-  height: 177px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,7 +36,7 @@ class Metamask extends Component {
   }
   renderMessage() {
     if (!this.props.web3Available) return lang.t('message.web3_not_available');
-    if (!this.props.metamaskAccount) return lang.t('message.web3_not_unlocked');
+    if (!this.props.accountAddress) return lang.t('message.web3_not_unlocked');
     if (!this.props.web3Network) return lang.t('message.web3_unknown_network');
   }
   componentWillUnmount() {
@@ -48,10 +47,10 @@ class Metamask extends Component {
     <BaseLayout>
       <StyledWrapper>
         {this.props.fetching ||
-        (this.props.web3Network && this.props.metamaskAccount && this.props.web3Available) ? (
+        (this.props.web3Network && this.props.accountAddress && this.props.web3Available) ? (
           <AccountView match={this.props.match} />
         ) : (
-          <Card fetching={this.props.fetching}>
+          <Card minHeight={180} fetching={this.props.fetching}>
             <StyledMessage>{this.renderMessage()}</StyledMessage>
           </Card>
         )}
@@ -72,17 +71,17 @@ Metamask.propTypes = {
   fetching: PropTypes.bool.isRequired,
   error: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired,
-  metamaskAccount: PropTypes.string
+  accountAddress: PropTypes.string
 };
 
 Metamask.defaultProps = {
-  metamaskAccount: null
+  accountAddress: null
 };
 
 const reduxProps = ({ account }) => ({
   web3Available: account.web3Available,
   web3Network: account.web3Network,
-  metamaskAccount: account.metamaskAccount,
+  accountAddress: account.accountAddress,
   fetching: account.fetching,
   error: account.error
 });

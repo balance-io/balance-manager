@@ -27,7 +27,7 @@ class Wallet extends Component {
   render = () => (
     <BaseLayout>
       <StyledWrapper>
-        {this.props.fetching || this.props.walletConnectAccount ? (
+        {this.props.fetching || this.props.accountAddress ? (
           <AccountView match={this.props.match} />
         ) : (
           <Card fetching={this.props.fetching}>
@@ -42,18 +42,18 @@ class Wallet extends Component {
 Wallet.propTypes = {
   accountUpdateWalletConnect: PropTypes.func.isRequired,
   accountClearState: PropTypes.func.isRequired,
-  walletConnectAccount: PropTypes.string,
+  accountAddress: PropTypes.string,
   fetching: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired
 };
 
 Wallet.defaultProps = {
-  walletConnectAccount: null
+  accountAddress: null
 };
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
-  walletConnectAccount: account.walletConnectAccount
+  accountAddress: account.accountAddress
 });
 
 export default connect(reduxProps, {

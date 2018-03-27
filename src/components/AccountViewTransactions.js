@@ -213,7 +213,6 @@ const StyledCard = styled(Card)`
 `;
 
 const StyledMessage = styled.div`
-  height: 177px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -241,9 +240,8 @@ class AccountViewTransactions extends Component {
   render = () => {
     const _transactions = this.props.transactions.filter(tx => !tx.interaction);
     const nativeCurrency = this.props.nativeCurrency;
-    return (
-      !!_transactions &&
-      (!this.props.fetchingTransactions ? (
+    return !!_transactions.length ? (
+      !this.props.fetchingTransactions ? (
         <StyledGrid>
           <StyledLabelsRow>
             <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
@@ -377,9 +375,13 @@ class AccountViewTransactions extends Component {
         </StyledGrid>
       ) : (
         <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
-          <StyledMessage>{`No transactions found or failed request, please refresh`}</StyledMessage>
+          <StyledMessage>{`Failed request, please refresh`}</StyledMessage>
         </StyledCard>
-      ))
+      )
+    ) : (
+      <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
+        <StyledMessage>{`No transactions found for this account`}</StyledMessage>
+      </StyledCard>
     );
   };
 }

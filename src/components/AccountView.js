@@ -221,12 +221,14 @@ AccountView.propTypes = {
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
-  accountInfo: PropTypes.object.isRequired
+  accountInfo: PropTypes.object.isRequired,
+  accountAddress: PropTypes.string.isRequired
 };
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
-  accountInfo: account.accountInfo
+  accountInfo: account.accountInfo,
+  accountAddress: account.accountAddress
 });
 
 export default connect(reduxProps, {

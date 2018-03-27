@@ -440,6 +440,10 @@ export const parseEthplorerAddressInfo = (data = null) => {
       };
     });
     assets = [...assets, ...tokens];
+
+    const accountLocal = getLocal(data.address) || {};
+    accountLocal.balances = { assets, total: '———' };
+    saveLocal(data.address, accountLocal);
   }
   return {
     address: (data && data.address) || '',
@@ -498,11 +502,16 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
       0
     );
     const totalDisplay = convertAmountToDisplay(totalAmount, nativePrices);
+    const total = { amount: totalAmount, display: totalDisplay };
     newAccount = {
       ...newAccount,
       assets: newAssets,
-      total: { amount: totalAmount, display: totalDisplay }
+      total: total
     };
+
+    const accountLocal = getLocal(account.address) || {};
+    accountLocal.balances = { assets: newAssets, total: total };
+    saveLocal(account.address, accountLocal);
   }
   return newAccount;
 };

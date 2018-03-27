@@ -342,8 +342,6 @@ class SendModal extends Component {
         const tokenBalance = convertAmountFromBigNumber(tokenBalanceAmount);
         const requestedAmount = BigNumber(`${this.props.assetAmount}`).toString();
         const includingFees = convertAmountFromBigNumber(this.props.gasPrice.txFee.value.amount);
-        console.log('requestedAmount', requestedAmount);
-        console.log('tokenBalance', tokenBalance);
         if (BigNumber(requestedAmount).comparedTo(BigNumber(tokenBalance)) === 1) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;

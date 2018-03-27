@@ -90,8 +90,9 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
 };
 
 export const accountGetAccountBalances = (address, type) => (dispatch, getState) => {
-  const { web3Network } = getState().account;
-  dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST });
+  const { web3Network, accountInfo } = getState().account;
+  // const
+  dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST, payload: accountInfo });
   apiGetEthplorerAddressInfo(address, web3Network)
     .then(accountInfo => {
       accountInfo = { ...accountInfo, type };
@@ -107,11 +108,11 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
 };
 
 export const accountUpdateMetamaskAccount = () => (dispatch, getState) => {
-  if (window.web3.eth.defaultAccount !== getState().account.metamaskAccount) {
-    const newAccount = window.web3.eth.defaultAccount;
+  if (window.web3.eth.defaultAccount !== getState().account.accountAddress) {
+    const accountAddress = window.web3.eth.defaultAccount;
     dispatch(modalClose());
-    dispatch({ type: ACCOUNT_UPDATE_METAMASK_ACCOUNT, payload: newAccount });
-    if (newAccount) dispatch(accountGetAccountBalances(newAccount, 'METAMASK'));
+    dispatch({ type: ACCOUNT_UPDATE_METAMASK_ACCOUNT, payload: accountAddress });
+    if (accountAddress) dispatch(accountGetAccountBalances(accountAddress, 'METAMASK'));
   }
 };
 
@@ -140,10 +141,10 @@ export const accountConnectMetamask = () => (dispatch, getState) => {
   }
 };
 
-export const accountUpdateWalletConnect = address => dispatch => {
+export const accountUpdateWalletConnect = accountAddress => dispatch => {
   web3SetProvider(`https://mainnet.infura.io/`);
-  dispatch({ type: ACCOUNT_CONNECT_WALLET_REQUEST, payload: address });
-  if (address) dispatch(accountGetAccountBalances(address, 'WalletConnect'));
+  dispatch({ type: ACCOUNT_CONNECT_WALLET_REQUEST, payload: accountAddress });
+  if (accountAddress) dispatch(accountGetAccountBalances(accountAddress, 'WalletConnect'));
 };
 
 export const accountClearIntervals = () => dispatch => {
@@ -207,8 +208,7 @@ const INITIAL_STATE = {
   web3Connected: true,
   web3Available: false,
   web3Network: 'mainnet',
-  metamaskAccount: '',
-  walletConnectAccount: '',
+  accountAddress: '',
   accountInfo: parseEthplorerAddressInfo(null),
   transactions: [],
   fetchingTransactions: false,
@@ -219,7 +219,7 @@ const INITIAL_STATE = {
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ACCOUNT_UPDATE_METAMASK_ACCOUNT:
-      return { ...state, metamaskAccount: action.payload, transactions: [] };
+      return { ...state, accountAddress: action.payload, transactions: [] };
     case ACCOUNT_CHECK_NETWORK_IS_CONNECTED:
       return { ...state, web3Connected: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST:
@@ -228,13 +228,24 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, fetchingTransactions: false, transactions: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE:
       return { ...state, fetchingTransactions: false, transactions: [] };
+    case ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST:
+      return {
+        ...state,
+        fetchingTransactions: true
+      };
     case ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS:
       return {
         ...state,
+        fetchingTransactions: false,
         transactions: action.payload
       };
+    case ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE:
+      return {
+        ...state,
+        fetchingTransactions: false
+      };
     case ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST:
-      return { ...state, fetching: true };
+      return { ...state, fetching: true, accountInfo: action.payload };
     case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:
       return { ...state, fetching: false, accountInfo: action.payload };
     case ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE:
@@ -295,7 +306,7 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_CONNECT_WALLET_REQUEST:
       return {
         ...state,
-        walletConnectAccount: action.payload,
+        accountAddress: action.payload,
         web3Network: 'mainnet',
         web3Available: true
       };

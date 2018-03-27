@@ -85,10 +85,12 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     })
     .catch(error => {
       const message = parseError(error);
-      const requestedAmount = convertAmountToBigNumber(`${assetAmount}`);
-      const availableBalance = selected.balance.amount;
-      if (BigNumber(requestedAmount).comparedTo(BigNumber(availableBalance)) === 1) {
-        dispatch(notificationShow(lang.t('notification.error.insufficient_balance'), true));
+      if (assetAmount) {
+        const requestedAmount = convertAmountToBigNumber(`${assetAmount}`);
+        const availableBalance = selected.balance.amount;
+        if (BigNumber(requestedAmount).comparedTo(BigNumber(availableBalance)) === 1) {
+          dispatch(notificationShow(lang.t('notification.error.insufficient_balance'), true));
+        }
       } else {
         dispatch(notificationShow(message || lang.t('notification.error.failed_get_tx_fee'), true));
       }

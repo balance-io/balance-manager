@@ -418,13 +418,13 @@ export const parseEthplorerAddressInfo = (data = null) => {
         address: token.tokenInfo.address || null,
         decimals: convertStringToNumber(token.tokenInfo.decimals)
       };
-      let allTokens = getLocal('tokens') || {};
+      const allTokens = getLocal('token_info') || {};
       if (asset.symbol === '———' && !allTokens[asset.address]) {
         allTokens[asset.address] = asset;
       } else if (!allTokens[asset.symbol]) {
         allTokens[asset.symbol] = asset;
       }
-      saveLocal('tokens', allTokens);
+      saveLocal('token_info', allTokens);
       const assetBalance = convertAssetAmountToBigNumber(token.balance, asset.decimals);
       return {
         ...asset,
@@ -508,9 +508,10 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
 /**
  * @desc parse etherscan account transactions response
  * @param  {String}   [data = null]
+ * @param  {String}   [address = '']
  * @return {Promise}
  */
-export const parseEtherscanAccountTransactions = async (data = null) => {
+export const parseEtherscanAccountTransactions = async (data = null, address = '') => {
   if (!data || !data.result) return null;
 
   let transactions = await Promise.all(
@@ -554,7 +555,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
       const tokenTransfer = sha3('transfer(address,uint256)').slice(0, 10);
 
       if (tx.input.startsWith(tokenTransfer)) {
-        const allTokens = getLocal('tokens') || {};
+        const allTokens = getLocal('token_info') || {};
         let foundToken = null;
         Object.keys(allTokens).forEach(tokenSymbol => {
           if (allTokens[tokenSymbol].address === tx.to) {
@@ -586,7 +587,7 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
           } else if (!allTokens[asset.symbol]) {
             allTokens[asset.symbol] = asset;
           }
-          saveLocal('tokens', allTokens);
+          saveLocal('token_info', allTokens);
         }
 
         to = `0x${tx.input.slice(34, 74)}`;
@@ -617,7 +618,12 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
   );
 
   transactions = transactions.reverse();
-  saveLocal('transactions', transactions);
+
+  console.log('address', address);
+  const accountLocal = getLocal(address) || {};
+  accountLocal.transactions = transactions;
+  saveLocal(address, accountLocal);
+
   return transactions;
 };
 
@@ -625,9 +631,14 @@ export const parseEtherscanAccountTransactions = async (data = null) => {
  * @desc parse transactions from native prices
  * @param  {Object} [transactions=null]
  * @param  {Object} [nativeCurrency='']
+ * @param  {String} [address='']
  * @return {String}
  */
-export const parseTransactionsPrices = async (transactions = null, nativeCurrency = '') => {
+export const parseTransactionsPrices = async (
+  transactions = null,
+  nativeCurrency = '',
+  address = ''
+) => {
   let _transactions = transactions;
 
   if (_transactions && _transactions.length && nativeCurrency) {
@@ -675,6 +686,11 @@ export const parseTransactionsPrices = async (transactions = null, nativeCurrenc
       })
     );
   }
-  saveLocal('transactions', _transactions);
+
+  console.log('address', address);
+  const accountLocal = getLocal(address) || {};
+  accountLocal.transactions = _transactions;
+  saveLocal(address, accountLocal);
+
   return _transactions;
 };

@@ -93,7 +93,7 @@ export const apiGetEtherscanAccountTransactions = (address = '', network = 'main
         `https://${subdomain}.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=8KDJ1H41UEGEA6CF4P8NEPUANQ3SE8HZGE`
       )
       .then(({ data }) =>
-        parseEtherscanAccountTransactions(data)
+        parseEtherscanAccountTransactions(data, address)
           .then(transactions => resolve(transactions))
           .catch(err => reject(err))
       )

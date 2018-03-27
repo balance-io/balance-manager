@@ -58,8 +58,10 @@ let getPricesInterval = null;
 export const accountParseTransactionPrices = () => (dispatch, getState) => {
   dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST });
   const currentTransactions = getState().account.transactions;
+  const address = getState().account.accountInfo.address;
+  console.log('address', address);
   const nativeCurrency = getState().account.nativeCurrency;
-  parseTransactionsPrices(currentTransactions, nativeCurrency)
+  parseTransactionsPrices(currentTransactions, nativeCurrency, address)
     .then(transactions => {
       dispatch({
         type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,

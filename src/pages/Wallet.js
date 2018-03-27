@@ -7,25 +7,14 @@ import AccountView from '../components/AccountView';
 import Card from '../components/Card';
 import { getLocal } from '../helpers/utilities';
 import { accountUpdateWalletConnect, accountClearState } from '../reducers/_account';
-// import { fonts, colors } from '../styles';
 
 const StyledWrapper = styled.div`
   width: 100%;
 `;
 
-// const StyledMessage = styled.div`
-//   height: 177px;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   color: rgb(${colors.grey});
-//   font-weight: ${fonts.weight.medium};
-// `;
-
 class Wallet extends Component {
   componentDidMount() {
     const storedAddress = getLocal('walletconnect');
-    console.log('storedAddress', storedAddress);
     if (storedAddress) {
       this.props.accountUpdateWalletConnect(storedAddress);
     } else {
@@ -42,7 +31,6 @@ class Wallet extends Component {
           <AccountView match={this.props.match} />
         ) : (
           <Card fetching={this.props.fetching}>
-            {/* <StyledMessage>{this.renderMessage()}</StyledMessage> */}
             <div />
           </Card>
         )}

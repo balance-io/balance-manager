@@ -461,7 +461,6 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
     ...account
   };
   let nativeSelected = nativePrices.selected.currency;
-  console.log(nativeSelected);
   if (account) {
     const newAssets = account.assets.map(asset => {
       if (!nativePrices || (nativePrices && !nativePrices[nativeSelected][asset.symbol]))

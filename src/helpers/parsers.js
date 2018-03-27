@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import lang from '../languages';
 import {
+  debounceRequest,
   hexToNumberString,
   convertStringToNumber,
   convertAmountToBigNumber,
@@ -659,7 +660,11 @@ export const parseTransactionsPrices = async (
         if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
           tx.native = { selected: nativeCurrencies[nativeSelected] };
 
-          const response = await apiGetHistoricalPrices(assetSymbol, timestamp);
+          const response = await debounceRequest(
+            apiGetHistoricalPrices,
+            [assetSymbol, timestamp],
+            100 * idx
+          );
 
           if (response.data.response === 'Error' || !response.data[assetSymbol]) {
             return tx;

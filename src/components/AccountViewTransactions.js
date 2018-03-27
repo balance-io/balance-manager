@@ -272,14 +272,15 @@ class AccountViewTransactions extends Component {
 
                     <p>{`${tx.value.display}`}</p>
                     <p>
-                      {tx.native && tx.native[nativeCurrency]
+                      {tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].price
                         ? tx.native[nativeCurrency].price.display
                         : '———'}
                     </p>
+                    {console.log(tx.native ? tx.native[nativeCurrency] : 'no native')}
                     <p>
-                      {tx.native
+                      {tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].value
                         ? tx.from === this.props.account.address
-                          ? tx.native[nativeCurrency]
+                          ? tx.native[nativeCurrency] && tx.native[nativeCurrency].value
                             ? `- ${tx.native[nativeCurrency].value.display}`
                             : '———'
                           : `${tx.native[nativeCurrency].value.display || '———'}`
@@ -304,7 +305,7 @@ class AccountViewTransactions extends Component {
                           <strong>{'FEE'}</strong>
                         </p>
                         <p>{`${tx.txFee.display} (${
-                          tx.native && tx.native[nativeCurrency]
+                          tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].txFee
                             ? tx.native[nativeCurrency].txFee.display
                             : '———'
                         })`}</p>

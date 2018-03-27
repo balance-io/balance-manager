@@ -15,7 +15,8 @@ import LedgerLogo from '../components/LedgerLogo';
 import TrezorLogo from '../components/TrezorLogo';
 import metamaskWhite from '../assets/metamask-white.png';
 import walletConnectWhite from '../assets/walletconnect-white.svg';
-import { accountConnectMetamask } from '../reducers/_account';
+import { getLocal } from '../helpers/utilities';
+import { accountConnectMetamask, accountUpdateWalletConnect } from '../reducers/_account';
 import { modalOpen } from '../reducers/_modal';
 import { responsive } from '../styles';
 
@@ -54,7 +55,15 @@ const StyledHardwareWallets = styled(Column)`
 `;
 
 class Home extends Component {
-  onWalletConnectInit = () => this.props.modalOpen('WALLET_CONNECT_INIT', null);
+  onWalletConnectInit = () => {
+    const storedAddress = getLocal('walletconnect');
+    if (storedAddress) {
+      this.props.accountUpdateWalletConnect(storedAddress);
+      this.props.history.push('/wallet');
+    } else {
+      this.props.modalOpen('WALLET_CONNECT_INIT', null);
+    }
+  };
   render = () => (
     <BaseLayout>
       <Card>
@@ -93,10 +102,12 @@ class Home extends Component {
 
 Home.propTypes = {
   accountConnectMetamask: PropTypes.func.isRequired,
+  accountUpdateWalletConnect: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired
 };
 
 export default connect(null, {
   modalOpen,
-  accountConnectMetamask
+  accountConnectMetamask,
+  accountUpdateWalletConnect
 })(Home);

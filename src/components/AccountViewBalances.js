@@ -177,14 +177,6 @@ const StyledShowMoreTokens = styled(StyledToken)`
   }
 `;
 
-const StyledHidden = styled.div`
-  position: absolute;
-  top: -2000px;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-`;
-
 class AccountViewBalances extends Component {
   state = {
     showTokensWithLowMarketValue: false
@@ -193,7 +185,6 @@ class AccountViewBalances extends Component {
     this.setState({ showTokensWithLowMarketValue: !this.state.showTokensWithLowMarketValue });
   };
   render() {
-    console.log(this.props.fetching);
     const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
     const tokensWithHighMarketValue = this.props.accountInfo.assets.filter(
       asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
@@ -207,7 +198,6 @@ class AccountViewBalances extends Component {
       tokensWithNoMarketValue.length === tokensWithLowMarketValue.length;
     return (
       <StyledGrid>
-        <StyledHidden>{this.props.fetching ? 'fetching' : 'done'}</StyledHidden>
         <StyledLabelsRow>
           <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
           <StyledLabels>{lang.t('account.label_quantity')}</StyledLabels>
@@ -294,12 +284,10 @@ class AccountViewBalances extends Component {
 }
 
 AccountViewBalances.propTypes = {
-  fetching: PropTypes.bool.isRequired,
   accountInfo: PropTypes.object.isRequired
 };
 
 const reduxProps = ({ account }) => ({
-  fetching: account.fetching,
   accountInfo: account.accountInfo
 });
 

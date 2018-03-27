@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
 import AccountView from '../components/AccountView';
 import Card from '../components/Card';
+import { getLocal } from '../helpers/utilities';
 import { accountUpdateWalletConnect } from '../reducers/_account';
 // import { fonts, colors } from '../styles';
 
@@ -23,8 +24,13 @@ const StyledWrapper = styled.div`
 
 class Wallet extends Component {
   componentDidMount() {
-    // const route = window.browserHistory.location.pathname.replace(this.props.match.url, '') || '/';
-    // console.log(route);
+    const storedAddress = getLocal('walletconnect');
+    console.log('storedAddress', storedAddress);
+    if (storedAddress) {
+      this.props.accountUpdateWalletConnect(storedAddress);
+    } else {
+      this.props.history.push('/');
+    }
   }
   render = () => (
     <BaseLayout>

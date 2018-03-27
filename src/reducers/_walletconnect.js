@@ -1,5 +1,5 @@
 import { apiWalletConnectInit, apiWalletConnectGetAddress } from '../helpers/api';
-import { generateUUID } from '../helpers/utilities';
+import { generateUUID, saveLocal } from '../helpers/utilities';
 import { parseError } from '../helpers/parsers';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
@@ -30,6 +30,7 @@ export const walletConnectGetAddress = newGasPriceOption => (dispatch, getState)
           type: WALLET_CONNECT_GET_ADDRESS_SUCCESS,
           payload: address
         });
+        saveLocal('walletconnect', address);
         dispatch(modalClose());
         dispatch(accountUpdateWalletConnect(address));
         window.browserHistory.push('/wallet');

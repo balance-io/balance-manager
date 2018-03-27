@@ -276,12 +276,13 @@ export const convertAmountToDisplay = (value, nativePrices, asset, buffer) => {
 export const convertAmountToDisplaySpecific = (value, nativePrices, selected, buffer) => {
   if (!nativePrices) return null;
   value = convertAmountFromBigNumber(value);
-  const decimals = nativeCurrencies[selected].decimals;
+  const nativeSelected = nativeCurrencies[selected];
+  const decimals = nativeSelected.decimals;
   const display = handleSignificantDecimals(value, decimals, buffer);
-  if (nativeCurrencies[selected].alignment === 'left') {
-    return `${nativeCurrencies[selected].symbol}${display}`;
+  if (nativeSelected.alignment === 'left') {
+    return `${nativeSelected.symbol}${display}`;
   }
-  return `${display} ${nativeCurrencies[selected].currency}`;
+  return `${display} ${nativeSelected.currency}`;
 };
 
 /**

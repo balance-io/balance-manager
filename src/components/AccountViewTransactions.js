@@ -240,6 +240,7 @@ class AccountViewTransactions extends Component {
 
   render = () => {
     const _transactions = this.props.transactions.filter(tx => !tx.interaction);
+    const nativeCurrency = this.props.nativeCurrency;
     return (
       !!_transactions &&
       (!this.props.fetchingTransactions ? (
@@ -272,12 +273,18 @@ class AccountViewTransactions extends Component {
                     <TransactionStatus tx={tx} accountAddress={this.props.account.address} />
 
                     <p>{`${tx.value.display}`}</p>
-                    <p>{tx.native ? tx.native.price.display : '———'}</p>
+                    <p>
+                      {tx.native && tx.native[nativeCurrency]
+                        ? tx.native[nativeCurrency].price.display
+                        : '———'}
+                    </p>
                     <p>
                       {tx.native
                         ? tx.from === this.props.account.address
-                          ? tx.native.value.display ? `- ${tx.native.value.display}` : '———'
-                          : `${tx.native.value.display || '———'}`
+                          ? tx.native[nativeCurrency]
+                            ? `- ${tx.native[nativeCurrency].value.display}`
+                            : '———'
+                          : `${tx.native[nativeCurrency].value.display || '———'}`
                         : '———'}
                     </p>
                   </StyledTransactionMainRow>
@@ -299,7 +306,9 @@ class AccountViewTransactions extends Component {
                           <strong>{'FEE'}</strong>
                         </p>
                         <p>{`${tx.txFee.display} (${
-                          tx.native ? tx.native.txFee.display : '———'
+                          tx.native && tx.native[nativeCurrency]
+                            ? tx.native[nativeCurrency].txFee.display
+                            : '———'
                         })`}</p>
                       </div>
                     </div>
@@ -379,14 +388,16 @@ AccountViewTransactions.propTypes = {
   transactions: PropTypes.array.isRequired,
   fetchingTransactions: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
-  web3Network: PropTypes.string.isRequired
+  web3Network: PropTypes.string.isRequired,
+  nativeCurrency: PropTypes.string.isRequired
 };
 
 const reduxProps = ({ account }) => ({
   transactions: account.transactions,
   fetchingTransactions: account.fetchingTransactions,
   account: account.accountInfo,
-  web3Network: account.web3Network
+  web3Network: account.web3Network,
+  nativeCurrency: account.nativeCurrency
 });
 
 export default connect(reduxProps, null)(AccountViewTransactions);

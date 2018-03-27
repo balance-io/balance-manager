@@ -188,6 +188,7 @@ export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState
   let prices = getState().account.prices || getLocal('native_prices');
   const selected = nativeCurrencies[nativeCurrency];
   let newPrices = { ...prices, selected };
+  console.log('newPrices', newPrices);
   let oldAccountInfo = getState().account.accountInfo;
   const newAccountInfo = parseAccountBalances(oldAccountInfo, newPrices);
   const accountInfo = { ...oldAccountInfo, ...newAccountInfo };

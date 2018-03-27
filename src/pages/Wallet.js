@@ -6,7 +6,7 @@ import BaseLayout from '../layouts/base';
 import AccountView from '../components/AccountView';
 import Card from '../components/Card';
 import { getLocal } from '../helpers/utilities';
-import { accountUpdateWalletConnect } from '../reducers/_account';
+import { accountUpdateWalletConnect, accountClearState } from '../reducers/_account';
 // import { fonts, colors } from '../styles';
 
 const StyledWrapper = styled.div`
@@ -32,6 +32,9 @@ class Wallet extends Component {
       this.props.history.push('/');
     }
   }
+  componentWillUnmount() {
+    this.props.accountClearState();
+  }
   render = () => (
     <BaseLayout>
       <StyledWrapper>
@@ -50,6 +53,7 @@ class Wallet extends Component {
 
 Wallet.propTypes = {
   accountUpdateWalletConnect: PropTypes.func.isRequired,
+  accountClearState: PropTypes.func.isRequired,
   walletConnectAccount: PropTypes.string,
   fetching: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired
@@ -65,5 +69,6 @@ const reduxProps = ({ account }) => ({
 });
 
 export default connect(reduxProps, {
-  accountUpdateWalletConnect
+  accountUpdateWalletConnect,
+  accountClearState
 })(Wallet);

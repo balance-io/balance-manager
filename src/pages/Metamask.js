@@ -10,6 +10,7 @@ import {
   accountUpdateMetamaskAccount,
   accountConnectMetamask,
   accountClearIntervals,
+  accountClearState,
   accountChangeNativeCurrency,
   accountCheckNetworkIsConnected
 } from '../reducers/_account';
@@ -19,14 +20,14 @@ const StyledWrapper = styled.div`
   width: 100%;
 `;
 
-// const StyledMessage = styled.div`
-//   height: 177px;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   color: rgb(${colors.grey});
-//   font-weight: ${fonts.weight.medium};
-// `;
+const StyledMessage = styled.div`
+  height: 177px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(${colors.grey});
+  font-weight: ${fonts.weight.medium};
+`;
 
 class Metamask extends Component {
   componentDidMount() {
@@ -41,6 +42,7 @@ class Metamask extends Component {
   }
   componentWillUnmount() {
     this.props.accountClearIntervals();
+    this.props.accountClearState();
   }
   render = () => (
     <BaseLayout>
@@ -50,8 +52,7 @@ class Metamask extends Component {
           <AccountView match={this.props.match} />
         ) : (
           <Card fetching={this.props.fetching}>
-            {/* <StyledMessage>{this.renderMessage()}</StyledMessage> */}
-            <div />
+            <StyledMessage>{this.renderMessage()}</StyledMessage>
           </Card>
         )}
       </StyledWrapper>
@@ -63,6 +64,7 @@ Metamask.propTypes = {
   accountUpdateMetamaskAccount: PropTypes.func.isRequired,
   accountConnectMetamask: PropTypes.func.isRequired,
   accountClearIntervals: PropTypes.func.isRequired,
+  accountClearState: PropTypes.func.isRequired,
   accountChangeNativeCurrency: PropTypes.func.isRequired,
   accountCheckNetworkIsConnected: PropTypes.func.isRequired,
   web3Available: PropTypes.bool.isRequired,
@@ -90,5 +92,6 @@ export default connect(reduxProps, {
   accountCheckNetworkIsConnected,
   accountConnectMetamask,
   accountClearIntervals,
+  accountClearState,
   accountChangeNativeCurrency
 })(Metamask);

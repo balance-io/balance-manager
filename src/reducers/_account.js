@@ -48,6 +48,8 @@ const ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST = 'account/ACCOUNT_PARSE_TRANSACT
 const ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS';
 const ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE';
 
+const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
+
 // -- Actions --------------------------------------------------------------- //
 
 let accountInterval = null;
@@ -139,7 +141,7 @@ export const accountConnectMetamask = () => (dispatch, getState) => {
 
 export const accountUpdateWalletConnect = address => dispatch => {
   dispatch({ type: ACCOUNT_CONNECT_WALLET_REQUEST, payload: address });
-  dispatch(accountGetAccountBalances(address, 'WalletConnect'));
+  if (address) dispatch(accountGetAccountBalances(address, 'WalletConnect'));
 };
 
 export const accountClearIntervals = () => dispatch => {
@@ -189,6 +191,8 @@ export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState
   });
   dispatch(accountParseTransactionPrices());
 };
+
+export const accountClearState = () => ({ type: ACCOUNT_CLEAR_STATE });
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
@@ -287,6 +291,11 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         walletConnectAccount: action.payload
+      };
+    case ACCOUNT_CLEAR_STATE:
+      return {
+        ...state,
+        ...INITIAL_STATE
       };
     default:
       return state;

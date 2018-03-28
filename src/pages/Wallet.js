@@ -6,7 +6,7 @@ import BaseLayout from '../layouts/base';
 import AccountView from '../components/AccountView';
 import Card from '../components/Card';
 import { getLocal } from '../helpers/utilities';
-import { accountUpdateWalletConnect, accountClearState } from '../reducers/_account';
+import { accountUpdateAccountAddress, accountClearState } from '../reducers/_account';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -16,7 +16,7 @@ class Wallet extends Component {
   componentDidMount() {
     const storedAddress = getLocal('walletconnect');
     if (storedAddress) {
-      this.props.accountUpdateWalletConnect(storedAddress);
+      this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
     } else {
       this.props.history.push('/');
     }
@@ -40,7 +40,7 @@ class Wallet extends Component {
 }
 
 Wallet.propTypes = {
-  accountUpdateWalletConnect: PropTypes.func.isRequired,
+  accountUpdateAccountAddress: PropTypes.func.isRequired,
   accountClearState: PropTypes.func.isRequired,
   accountAddress: PropTypes.string,
   fetching: PropTypes.bool.isRequired,
@@ -57,6 +57,6 @@ const reduxProps = ({ account }) => ({
 });
 
 export default connect(reduxProps, {
-  accountUpdateWalletConnect,
+  accountUpdateAccountAddress,
   accountClearState
 })(Wallet);

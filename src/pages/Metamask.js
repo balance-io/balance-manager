@@ -7,13 +7,10 @@ import BaseLayout from '../layouts/base';
 import AccountView from '../components/AccountView';
 import Card from '../components/Card';
 import {
-  accountUpdateMetamaskAccount,
-  accountConnectMetamask,
-  accountClearIntervals,
-  accountClearState,
-  accountChangeNativeCurrency,
-  accountCheckNetworkIsConnected
-} from '../reducers/_account';
+  metamaskUpdateMetamaskAccount,
+  metamaskConnectMetamask,
+  metamaskClearIntervals
+} from '../reducers/_metamask';
 import { fonts, colors } from '../styles';
 
 const StyledWrapper = styled.div`
@@ -30,9 +27,7 @@ const StyledMessage = styled.div`
 
 class Metamask extends Component {
   componentDidMount() {
-    this.props.accountConnectMetamask();
-    window.onoffline = () => this.props.accountCheckNetworkIsConnected(false);
-    window.ononline = () => this.props.accountCheckNetworkIsConnected(true);
+    this.props.metamaskConnectMetamask();
   }
   renderMessage() {
     if (!this.props.web3Available) return lang.t('message.web3_not_available');
@@ -40,7 +35,7 @@ class Metamask extends Component {
     if (!this.props.web3Network) return lang.t('message.web3_unknown_network');
   }
   componentWillUnmount() {
-    this.props.accountClearIntervals();
+    this.props.metamaskClearIntervals();
     this.props.accountClearState();
   }
   render = () => (
@@ -60,16 +55,12 @@ class Metamask extends Component {
 }
 
 Metamask.propTypes = {
-  accountUpdateMetamaskAccount: PropTypes.func.isRequired,
-  accountConnectMetamask: PropTypes.func.isRequired,
-  accountClearIntervals: PropTypes.func.isRequired,
-  accountClearState: PropTypes.func.isRequired,
-  accountChangeNativeCurrency: PropTypes.func.isRequired,
-  accountCheckNetworkIsConnected: PropTypes.func.isRequired,
+  metamaskUpdateMetamaskAccount: PropTypes.func.isRequired,
+  metamaskConnectMetamask: PropTypes.func.isRequired,
+  metamaskClearIntervals: PropTypes.func.isRequired,
   web3Available: PropTypes.bool.isRequired,
   web3Network: PropTypes.string.isRequired,
   fetching: PropTypes.bool.isRequired,
-  error: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired,
   accountAddress: PropTypes.string
 };
@@ -78,19 +69,15 @@ Metamask.defaultProps = {
   accountAddress: null
 };
 
-const reduxProps = ({ account }) => ({
-  web3Available: account.web3Available,
-  web3Network: account.web3Network,
-  accountAddress: account.accountAddress,
-  fetching: account.fetching,
-  error: account.error
+const reduxProps = ({ metamask }) => ({
+  web3Available: metamask.web3Available,
+  web3Network: metamask.web3Network,
+  accountAddress: metamask.accountAddress,
+  fetching: metamask.fetching
 });
 
 export default connect(reduxProps, {
-  accountUpdateMetamaskAccount,
-  accountCheckNetworkIsConnected,
-  accountConnectMetamask,
-  accountClearIntervals,
-  accountClearState,
-  accountChangeNativeCurrency
+  metamaskUpdateMetamaskAccount,
+  metamaskConnectMetamask,
+  metamaskClearIntervals
 })(Metamask);

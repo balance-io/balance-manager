@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import BigNumber from 'bignumber.js';
 import lang, { resources } from './languages';
@@ -9,6 +10,7 @@ import Metamask from './pages/Metamask';
 import Ledger from './pages/Ledger';
 import Trezor from './pages/Trezor';
 import NotFound from './pages/NotFound';
+import { warningOnline, warningOffline } from './reducers/_warning';
 
 class Router extends Component {
   componentWillMount() {
@@ -23,6 +25,8 @@ class Router extends Component {
       window.BigNumber = BigNumber;
     }
     window.browserHistory = this.context.router.history;
+    window.onoffline = () => this.props.warningOffline();
+    window.ononline = () => this.props.warningOnline();
   }
   render = () => (
     <Switch>
@@ -43,4 +47,7 @@ Router.contextTypes = {
   signup: PropTypes.any
 };
 
-export default Router;
+export default connect(null, {
+  warningOffline,
+  warningOnline
+})(Router);

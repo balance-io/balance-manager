@@ -1,8 +1,7 @@
 import {
   apiGetEthplorerAddressInfo,
   apiGetEtherscanAccountTransactions,
-  apiGetPrices,
-  apiGetMetamaskNetwork
+  apiGetPrices
 } from '../helpers/api';
 import {
   parseError,
@@ -13,9 +12,7 @@ import {
 } from '../helpers/parsers';
 import { saveLocal, getLocal } from '../helpers/utilities';
 import { web3SetProvider } from '../helpers/web3';
-import { warningOffline, warningOnline } from './_warning';
 import { notificationShow } from './_notification';
-import { modalClose } from './_modal';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
 // -- Constants ------------------------------------------------------------- //
@@ -29,20 +26,14 @@ const ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS = 'account/ACCOUNT_GET_ACCOUNT_BALANC
 const ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE';
 
 const ACCOUNT_UPDATE_METAMASK_ACCOUNT = 'account/ACCOUNT_UPDATE_METAMASK_ACCOUNT';
-const ACCOUNT_CHECK_NETWORK_IS_CONNECTED = 'account/ACCOUNT_CHECK_NETWORK_IS_CONNECTED';
-
-const ACCOUNT_CONNECT_WALLET_REQUEST = 'account/ACCOUNT_CONNECT_WALLET_REQUEST';
-
-const ACCOUNT_METAMASK_GET_NETWORK_REQUEST = 'account/ACCOUNT_METAMASK_GET_NETWORK_REQUEST';
-const ACCOUNT_METAMASK_GET_NETWORK_SUCCESS = 'account/ACCOUNT_METAMASK_GET_NETWORK_SUCCESS';
-const ACCOUNT_METAMASK_GET_NETWORK_FAILURE = 'account/ACCOUNT_METAMASK_GET_NETWORK_FAILURE';
-const ACCOUNT_METAMASK_NOT_AVAILABLE = 'account/ACCOUNT_METAMASK_NOT_AVAILABLE';
 
 const ACCOUNT_GET_NATIVE_PRICES_REQUEST = 'account/ACCOUNT_GET_NATIVE_PRICES_REQUEST';
 const ACCOUNT_GET_NATIVE_PRICES_SUCCESS = 'account/ACCOUNT_GET_NATIVE_PRICES_SUCCESS';
 const ACCOUNT_GET_NATIVE_PRICES_FAILURE = 'account/ACCOUNT_GET_NATIVE_PRICES_FAILURE';
 
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
+const ACCOUNT_UPDATE_WEB3_NETWORK = 'account/ACCOUNT_UPDATE_WEB3_NETWORK';
+const ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST = 'account/ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST';
 
 const ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST';
 const ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS';
@@ -107,49 +98,19 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
     });
 };
 
-export const accountUpdateMetamaskAccount = () => (dispatch, getState) => {
-  if (window.web3.eth.defaultAccount !== getState().account.accountAddress) {
-    const accountAddress = window.web3.eth.defaultAccount;
-    dispatch(modalClose());
-    dispatch({ type: ACCOUNT_UPDATE_METAMASK_ACCOUNT, payload: accountAddress });
-    if (accountAddress) dispatch(accountGetAccountBalances(accountAddress, 'METAMASK'));
-  }
-};
-
-export const accountCheckNetworkIsConnected = online => dispatch => {
-  if (online) {
-    dispatch(warningOnline());
-  } else {
-    dispatch(warningOffline());
-  }
-  dispatch({ type: ACCOUNT_CHECK_NETWORK_IS_CONNECTED, payload: online });
-};
-
-export const accountConnectMetamask = () => (dispatch, getState) => {
-  dispatch({ type: ACCOUNT_METAMASK_GET_NETWORK_REQUEST });
-  if (typeof window.web3 !== 'undefined') {
-    apiGetMetamaskNetwork()
-      .then(network => {
-        web3SetProvider(`https://${network}.infura.io/`);
-        dispatch({ type: ACCOUNT_METAMASK_GET_NETWORK_SUCCESS, payload: network });
-        dispatch(accountUpdateMetamaskAccount());
-        accountInterval = setInterval(() => dispatch(accountUpdateMetamaskAccount()), 100);
-      })
-      .catch(err => dispatch({ type: ACCOUNT_METAMASK_GET_NETWORK_FAILURE }));
-  } else {
-    dispatch({ type: ACCOUNT_METAMASK_NOT_AVAILABLE });
-  }
-};
-
-export const accountUpdateWalletConnect = accountAddress => dispatch => {
-  web3SetProvider(`https://mainnet.infura.io/`);
-  dispatch({ type: ACCOUNT_CONNECT_WALLET_REQUEST, payload: accountAddress });
-  if (accountAddress) dispatch(accountGetAccountBalances(accountAddress, 'WalletConnect'));
+export const accountUpdateWeb3Network = network => dispatch => {
+  web3SetProvider(`https://${network}.infura.io/`);
+  dispatch({ type: ACCOUNT_UPDATE_WEB3_NETWORK, payload: network });
 };
 
 export const accountClearIntervals = () => dispatch => {
   clearInterval(accountInterval);
   clearInterval(getPricesInterval);
+};
+
+export const accountUpdateAccountAddress = (accountAddress, type) => dispatch => {
+  dispatch({ type: ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST, payload: accountAddress });
+  if (accountAddress) dispatch(accountGetAccountBalances(accountAddress, 'WALLETCONNECT'));
 };
 
 export const accountGetNativePrices = account => (dispatch, getState) => {
@@ -205,23 +166,18 @@ const INITIAL_STATE = {
   nativePriceRequest: getLocal('native_currency') || 'USD',
   nativeCurrency: getLocal('native_currency') || 'USD',
   prices: {},
-  web3Connected: true,
-  web3Available: false,
   web3Network: 'mainnet',
   accountAddress: '',
   accountInfo: parseEthplorerAddressInfo(null),
   transactions: [],
   fetchingTransactions: false,
-  fetching: false,
-  error: false
+  fetching: false
 };
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ACCOUNT_UPDATE_METAMASK_ACCOUNT:
       return { ...state, accountAddress: action.payload, transactions: [] };
-    case ACCOUNT_CHECK_NETWORK_IS_CONNECTED:
-      return { ...state, web3Connected: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST:
       return { ...state, fetchingTransactions: true };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS:
@@ -254,31 +210,6 @@ export default (state = INITIAL_STATE, action) => {
         fetching: false,
         accountInfo: parseEthplorerAddressInfo(null)
       };
-    case ACCOUNT_METAMASK_GET_NETWORK_REQUEST:
-      return {
-        ...state,
-        fetching: true,
-        web3Available: false
-      };
-    case ACCOUNT_METAMASK_GET_NETWORK_SUCCESS:
-      return {
-        ...state,
-        fetching: false,
-        web3Available: true,
-        web3Network: action.payload
-      };
-    case ACCOUNT_METAMASK_GET_NETWORK_FAILURE:
-      return {
-        ...state,
-        fetching: false,
-        web3Available: true
-      };
-    case ACCOUNT_METAMASK_NOT_AVAILABLE:
-      return {
-        ...state,
-        fetching: false,
-        web3Available: false
-      };
     case ACCOUNT_GET_NATIVE_PRICES_REQUEST:
       return {
         ...state,
@@ -302,13 +233,6 @@ export default (state = INITIAL_STATE, action) => {
         nativeCurrency: action.payload.nativeCurrency,
         prices: action.payload.prices,
         accountInfo: action.payload.accountInfo
-      };
-    case ACCOUNT_CONNECT_WALLET_REQUEST:
-      return {
-        ...state,
-        accountAddress: action.payload,
-        web3Network: 'mainnet',
-        web3Available: true
       };
     case ACCOUNT_CLEAR_STATE:
       return {

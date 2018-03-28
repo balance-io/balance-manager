@@ -13,16 +13,22 @@ class AssetIcon extends Component {
   state = {
     imgSrc: null
   };
-  componentWillMount() {
-    if (this.props.asset.toUpperCase() === 'ETH') {
+  updateIcon = props => {
+    if (props.asset.toUpperCase() === 'ETH') {
       this.setState({ imgSrc: eth });
     } else {
       this.setState({
         imgSrc: `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${
-          this.props.asset
+          props.asset
         }.png`
       });
     }
+  };
+  componentWillMount() {
+    this.updateIcon(this.props);
+  }
+  componentWillReceiveProps(newProps) {
+    this.updateIcon(this.props);
   }
   onError = () => this.setState({ imgSrc: erc20 });
   render() {

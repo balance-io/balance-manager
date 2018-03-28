@@ -132,7 +132,6 @@ class AccountView extends Component {
   };
   componentWillReceiveProps(newProps) {
     const tabRoute = window.browserHistory.location.pathname.replace(newProps.match.url, '') || '/';
-    console.log('tabRoute', tabRoute);
     switch (tabRoute) {
       case '/':
         this.setState({ activeTab: 'BALANCES_TAB' });

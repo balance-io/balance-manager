@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import BigNumber from 'bignumber.js';
@@ -47,7 +47,9 @@ Router.contextTypes = {
   signup: PropTypes.any
 };
 
-export default connect(null, {
-  warningOffline,
-  warningOnline
-})(Router);
+export default withRouter(
+  connect(null, {
+    warningOffline,
+    warningOnline
+  })(Router)
+);

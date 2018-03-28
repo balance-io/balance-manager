@@ -60,7 +60,7 @@ class Home extends Component {
   onWalletConnectInit = () => {
     const storedAddress = getLocal('walletconnect');
     if (storedAddress) {
-      this.props.accountUpdateAccountAddress(storedAddress);
+      this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
       this.props.history.push('/wallet');
     } else {
       this.props.modalOpen('WALLET_CONNECT_INIT', null);
@@ -108,7 +108,7 @@ class Home extends Component {
 }
 
 Home.propTypes = {
-  accountConnectMetamask: PropTypes.func.isRequired,
+  metamaskConnectMetamask: PropTypes.func.isRequired,
   accountUpdateAccountAddress: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired
 };

@@ -165,12 +165,18 @@ class AccountView extends Component {
   render() {
     return (
       <StyledAccountView>
-        <Card fetching={this.props.fetching} background={'lightGrey'}>
+        <Card
+          fetching={this.props.fetching || this.props.fetchingMetamask}
+          background={'lightGrey'}
+        >
           <StyledFlex>
             <StyledTop>
               <StyledAddressWrapper>
-                <h6>{capitalize(this.props.accountInfo.type)} </h6>
-                <CopyToClipboard iconOnHover text={this.props.accountInfo.address} />
+                <h6>{capitalize(this.props.accountInfo.accountType || this.props.accountType)} </h6>
+                <CopyToClipboard
+                  iconOnHover
+                  text={this.props.accountInfo.address || this.props.accountAddress}
+                />
               </StyledAddressWrapper>
 
               <StyledActions>
@@ -227,13 +233,20 @@ AccountView.propTypes = {
   accountClearState: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
   accountInfo: PropTypes.object.isRequired,
-  accountAddress: PropTypes.string.isRequired
+  accountAddress: PropTypes.string.isRequired,
+  accountType: PropTypes.string.isRequired,
+  fetchingMetamask: PropTypes.bool
+};
+
+AccountView.defaultProps = {
+  fetchingMetamask: false
 };
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
   accountInfo: account.accountInfo,
-  accountAddress: account.accountAddress
+  accountAddress: account.accountAddress,
+  accountType: account.accountType
 });
 
 export default connect(reduxProps, {

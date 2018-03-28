@@ -268,7 +268,7 @@ class AccountViewTransactions extends Component {
                       <AssetIcon asset={tx.asset.symbol === 'ETH' ? 'ETH' : tx.asset.address} />
                       <p>{tx.asset.name}</p>
                     </StyledAsset>
-                    <TransactionStatus tx={tx} accountAddress={this.props.account.address} />
+                    <TransactionStatus tx={tx} accountAddress={this.props.accountAddress} />
 
                     <p>{`${tx.value.display}`}</p>
                     <p>
@@ -397,6 +397,7 @@ AccountViewTransactions.propTypes = {
 const reduxProps = ({ account }) => ({
   transactions: account.transactions,
   fetchingTransactions: account.fetchingTransactions,
+  accountAddress: account.accountAddress,
   account: account.accountInfo,
   web3Network: account.web3Network,
   nativeCurrency: account.nativeCurrency

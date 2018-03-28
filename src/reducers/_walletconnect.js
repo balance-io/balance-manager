@@ -54,7 +54,7 @@ export const walletConnectGetAddress = () => (dispatch, getState) => {
         saveLocal('walletconnect', address);
         dispatch(modalClose());
         // Q: do I need to add account update wallet connect for device UUID?
-        dispatch(accountUpdateAccountAddress(address));
+        dispatch(accountUpdateAccountAddress(address, 'WALLETCONNECT'));
         window.browserHistory.push('/wallet');
       } else if (!getState().walletconnect.address) {
         setTimeout(() => dispatch(walletConnectGetAddress()), 500);

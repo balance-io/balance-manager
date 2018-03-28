@@ -42,7 +42,7 @@ class Metamask extends Component {
       <StyledWrapper>
         {this.props.fetching ||
         (this.props.web3Network && this.props.accountAddress && this.props.web3Available) ? (
-          <AccountView match={this.props.match} />
+          <AccountView fetchingMetamask={this.props.fetching} match={this.props.match} />
         ) : (
           <Card minHeight={180} fetching={this.props.fetching}>
             <StyledMessage>{this.renderMessage()}</StyledMessage>

@@ -101,6 +101,7 @@
         "failed_scanning_qr_code": "Failed to scan QR code, please try again",
         "failed_get_gas_prices": "Failed to get Ethereum Gas prices",
         "failed_get_tx_fee": "Failed to estimate Transaction fee",
+        "failed_get_account_tx": "Failed to get Account transactions",
         "generic_error": "Something went wrong, please try again"
       },
       "info": {

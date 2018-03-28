@@ -151,9 +151,9 @@ BaseLayout.propTypes = {
 };
 
 const reduxProps = ({ account, metamask, warning }) => ({
-  fetching: account.fetching,
   account: account.accountInfo,
   nativeCurrency: account.nativeCurrency,
+  fetching: metamask.fetching,
   web3Network: metamask.web3Network,
   web3Available: metamask.web3Available,
   online: warning.online

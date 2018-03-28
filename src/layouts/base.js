@@ -7,7 +7,6 @@ import Modal from '../components/Modal';
 import Indicator from '../components/Indicator';
 import DropdownNative from '../components/DropdownNative';
 import Background from '../components/Background';
-import IconPreload from '../components/IconPreload';
 import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
 import Notification from '../components/Notification';
@@ -107,7 +106,6 @@ const BaseLayout = ({
   return (
     <StyledLayout>
       <Background />
-      <IconPreload />
       <Column maxWidth={1000}>
         <StyledHeader>
           <Link to="/">

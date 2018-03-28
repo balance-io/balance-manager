@@ -60,7 +60,7 @@ export const getAccountTokens = async (accountAddress, network) => {
  * @return {Promise}
  */
 export const testnetGetAddressInfo = async (address = '', network = 'ropsten') => {
-  const countTxs = await web3Instance.eth.getTransactionCount(address);
+  const countTxs = await web3Instance.eth.getTransactionCount(address, 'pending');
   const balance = await getAccountBalance(address);
   const tokens = await getAccountTokens(address, network);
   const response = {

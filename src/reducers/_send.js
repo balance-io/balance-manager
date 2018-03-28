@@ -1,8 +1,10 @@
+import BigNumber from 'bignumber.js';
 import { apiGetGasPrices } from '../helpers/api';
 import { notificationShow } from './_notification';
 import lang from '../languages';
 import ethUnits from '../libraries/ethereum-units.json';
 import {
+  convertAmountToBigNumber,
   convertAssetAmountFromNativeValue,
   convertAssetAmountToNativeValue,
   countDecimalPlaces,
@@ -83,7 +85,15 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     })
     .catch(error => {
       const message = parseError(error);
-      dispatch(notificationShow(message || lang.t('notification.error.failed_get_tx_fee'), true));
+      if (assetAmount) {
+        const requestedAmount = convertAmountToBigNumber(`${assetAmount}`);
+        const availableBalance = selected.balance.amount;
+        if (BigNumber(requestedAmount).comparedTo(BigNumber(availableBalance)) === 1) {
+          dispatch(notificationShow(lang.t('notification.error.insufficient_balance'), true));
+        }
+      } else {
+        dispatch(notificationShow(message || lang.t('notification.error.failed_get_tx_fee'), true));
+      }
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_FAILURE,
         payload: {

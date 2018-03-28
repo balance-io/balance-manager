@@ -30,7 +30,7 @@ export const warningOffline = () => dispatch => {
     warningShow({
       key: 'USER_IS_OFFLINE',
       color: 'red',
-      message: lang.t('warning.user_is_online'),
+      message: lang.t('warning.user_is_offline'),
       action: () => {}
     })
   );

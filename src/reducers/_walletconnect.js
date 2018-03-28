@@ -1,5 +1,9 @@
-import { apiWalletConnectInit, apiWalletConnectGetAddress } from '../helpers/api';
-import { generateUUID, saveLocal } from '../helpers/utilities';
+import {
+  apiWalletConnectInit,
+  apiWalletConnectGetAddress,
+  apiWalletConnectInitiateTransaction
+} from '../helpers/api';
+import { saveLocal } from '../helpers/utilities';
 import { parseError } from '../helpers/parsers';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
@@ -15,13 +19,19 @@ const WALLET_CONNECT_GET_ADDRESS_REQUEST = 'walletConnect/WALLET_CONNECT_GET_ADD
 const WALLET_CONNECT_GET_ADDRESS_SUCCESS = 'walletConnect/WALLET_CONNECT_GET_ADDRESS_SUCCESS';
 const WALLET_CONNECT_GET_ADDRESS_FAILURE = 'walletConnect/WALLET_CONNECT_GET_ADDRESS_FAILURE';
 
-const WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST = 'walletConnect/WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST';
-const WALLET_CONNECT_GET_TRANSACTION_HASH_SUCCESS = 'walletConnect/WALLET_CONNECT_GET_TRANSACTION_HASH_SUCCESS';
-const WALLET_CONNECT_GET_TRANSACTION_HASH_FAILURE = 'walletConnect/WALLET_CONNECT_GET_TRANSACTION_HASH_FAILURE';
+const WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST =
+  'walletConnect/WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST';
+const WALLET_CONNECT_GET_TRANSACTION_HASH_SUCCESS =
+  'walletConnect/WALLET_CONNECT_GET_TRANSACTION_HASH_SUCCESS';
+const WALLET_CONNECT_GET_TRANSACTION_HASH_FAILURE =
+  'walletConnect/WALLET_CONNECT_GET_TRANSACTION_HASH_FAILURE';
 
-const WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST = 'walletConnect/WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST';
-const WALLET_CONNECT_INITIATE_TRANSACTION_SUCCESS = 'walletConnect/WALLET_CONNECT_INITIATE_TRANSACTION_SUCCESS';
-const WALLET_CONNECT_INITIATE_TRANSACTION_FAILURE = 'walletConnect/WALLET_CONNECT_INITIATE_TRANSACTION_FAILURE';
+const WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST =
+  'walletConnect/WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST';
+const WALLET_CONNECT_INITIATE_TRANSACTION_SUCCESS =
+  'walletConnect/WALLET_CONNECT_INITIATE_TRANSACTION_SUCCESS';
+const WALLET_CONNECT_INITIATE_TRANSACTION_FAILURE =
+  'walletConnect/WALLET_CONNECT_INITIATE_TRANSACTION_FAILURE';
 
 const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
 
@@ -59,8 +69,7 @@ export const walletConnectGetAddress = () => (dispatch, getState) => {
 };
 
 export const walletConnectGetTransactionHash = () => (dispatch, getState) => {
-  const transactionUuid = getState().walletconnect.transactionUuid;
-  const deviceUuid = getState().walletconnect.deviceUuid;
+  const sessionToken = getState().walletconnect.sessionToken;
   dispatch({ type: WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST });
   apiWalletConnectGetAddress(sessionToken)
     .then(({ data }) => {
@@ -83,11 +92,20 @@ export const walletConnectGetTransactionHash = () => (dispatch, getState) => {
     });
 };
 
-export const walletConnectInitiateTransaction = () => (dispatch, getState) => {
+export const walletConnectInitiateTransaction = (
+  encryptedPayload,
+  notificationTitle,
+  notificationBody
+) => (dispatch, getState) => {
   const deviceUuid = getState().walletconnect.deviceUuid;
   // Q: get transaction details and make encrypted payload, notification title, notification body
   dispatch({ type: WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST });
-  apiWalletConnectInitiateTransaction(deviceUuid, encryptedPayload, notificationTitle, notificationBody)
+  apiWalletConnectInitiateTransaction(
+    deviceUuid,
+    encryptedPayload,
+    notificationTitle,
+    notificationBody
+  )
     .then(({ data }) => {
       const transactionUuid = data ? data.transactionUuid : '';
       dispatch({
@@ -108,7 +126,8 @@ export const wallletConnectModalInit = () => (dispatch, getState) => {
     .then(({ data }) => {
       const sessionToken = data ? data.sessionToken : '';
       dispatch({
-        type: WALLET_CONNECT_SEND_TOKEN_SUCCESS, payload: sessionToken
+        type: WALLET_CONNECT_SEND_TOKEN_SUCCESS,
+        payload: sessionToken
       });
       dispatch(walletConnectGetAddress());
     })
@@ -136,7 +155,7 @@ export default (state = INITIAL_STATE, action) => {
     case WALLET_CONNECT_SEND_TOKEN_REQUEST:
       return {
         ...state,
-        fetching: true,
+        fetching: true
       };
     case WALLET_CONNECT_SEND_TOKEN_SUCCESS:
       return {
@@ -178,7 +197,7 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: false,
-        transactionUuid: '' 
+        transactionUuid: ''
       };
     case WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST:
       return { ...state, fetching: true };

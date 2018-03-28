@@ -118,8 +118,7 @@ const walletConnect = axios.create({
  * @desc wallet connect request device details
  * @return {Promise}
  */
-export const apiWalletConnectInit = () =>
-  walletConnect.get('/request-device-details');
+export const apiWalletConnectInit = () => walletConnect.get('/request-device-details');
 
 /**
  * @desc wallet connect get address
@@ -134,6 +133,15 @@ export const apiWalletConnectGetAddress = (sessionToken = '') =>
  * @param  {String}   [deviceUuid = '', encryptedPayload = '', notificationTitle = '', notificationBody = '']
  * @return {Promise}
  */
-export const apiWalletConnectInitiateTransaction = (deviceUuid = '', encryptedPayload = '', 
-                                                    notificationTitle = '', notificationBody = '') =>
-  walletConnect.post('/add-transaction-details', { deviceUuid, encryptedPayload, notificationTitle, notificationBody });
+export const apiWalletConnectInitiateTransaction = (
+  deviceUuid = '',
+  encryptedPayload = '',
+  notificationTitle = '',
+  notificationBody = ''
+) =>
+  walletConnect.post('/add-transaction-details', {
+    deviceUuid,
+    encryptedPayload,
+    notificationTitle,
+    notificationBody
+  });

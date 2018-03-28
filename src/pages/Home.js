@@ -16,7 +16,8 @@ import TrezorLogo from '../components/TrezorLogo';
 import metamaskWhite from '../assets/metamask-white.png';
 // import walletConnectWhite from '../assets/walletconnect-white.svg';
 import { getLocal } from '../helpers/utilities';
-import { accountConnectMetamask, accountUpdateWalletConnect } from '../reducers/_account';
+import { accountUpdateAccountAddress } from '../reducers/_account';
+import { metamaskConnectMetamask } from '../reducers/_metamask';
 import { modalOpen } from '../reducers/_modal';
 import { responsive } from '../styles';
 
@@ -59,7 +60,7 @@ class Home extends Component {
   onWalletConnectInit = () => {
     const storedAddress = getLocal('walletconnect');
     if (storedAddress) {
-      this.props.accountUpdateWalletConnect(storedAddress);
+      this.props.accountUpdateAccountAddress(storedAddress);
       this.props.history.push('/wallet');
     } else {
       this.props.modalOpen('WALLET_CONNECT_INIT', null);
@@ -90,7 +91,12 @@ class Home extends Component {
           <StyledMetamaskConnect>
             <MetamaskLogo />
             <Link to="/metamask">
-              <Button left color="orange" icon={metamaskWhite} onClick={accountConnectMetamask}>
+              <Button
+                left
+                color="orange"
+                icon={metamaskWhite}
+                onClick={this.props.metamaskConnectMetamask}
+              >
                 {lang.t('button.connect_metamask')}
               </Button>
             </Link>
@@ -103,12 +109,12 @@ class Home extends Component {
 
 Home.propTypes = {
   accountConnectMetamask: PropTypes.func.isRequired,
-  accountUpdateWalletConnect: PropTypes.func.isRequired,
+  accountUpdateAccountAddress: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired
 };
 
 export default connect(null, {
   modalOpen,
-  accountConnectMetamask,
-  accountUpdateWalletConnect
+  metamaskConnectMetamask,
+  accountUpdateAccountAddress
 })(Home);

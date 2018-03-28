@@ -208,7 +208,7 @@ class AccountViewBalances extends Component {
 
         <StyledEthereum>
           <StyledAsset>
-            <AssetIcon currency={ethereum.symbol} />
+            <AssetIcon asset={ethereum.symbol} />
             <p>{ethereum.name}</p>
           </StyledAsset>
           <p>{ethereum.balance.display}</p>
@@ -224,7 +224,7 @@ class AccountViewBalances extends Component {
           tokensWithHighMarketValue.map(token => (
             <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
               <StyledAsset>
-                <AssetIcon currency={token.symbol} />
+                <AssetIcon asset={token.address} />
                 <p>{token.name}</p>
               </StyledAsset>
               <p>{token.balance.display}</p>
@@ -242,7 +242,7 @@ class AccountViewBalances extends Component {
           tokensWithLowMarketValue.map(token => (
             <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
               <StyledAsset>
-                <AssetIcon currency={token.symbol} />
+                <AssetIcon asset={token.address} />
                 <p>{token.name}</p>
               </StyledAsset>
               <p>{token.balance.display}</p>

@@ -265,7 +265,7 @@ class AccountViewTransactions extends Component {
                     onClick={() => this.onShowTxDetails(tx.hash)}
                   >
                     <StyledAsset>
-                      <AssetIcon currency={tx.asset.symbol} />
+                      <AssetIcon asset={tx.asset.symbol === 'ETH' ? 'ETH' : tx.asset.address} />
                       <p>{tx.asset.name}</p>
                     </StyledAsset>
                     <TransactionStatus tx={tx} accountAddress={this.props.account.address} />

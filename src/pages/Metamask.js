@@ -36,7 +36,6 @@ class Metamask extends Component {
   }
   componentWillUnmount() {
     this.props.metamaskClearIntervals();
-    this.props.accountClearState();
   }
   render = () => (
     <BaseLayout>

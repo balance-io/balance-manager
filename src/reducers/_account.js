@@ -25,8 +25,6 @@ const ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST = 'account/ACCOUNT_GET_ACCOUNT_BALANC
 const ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS';
 const ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE';
 
-const ACCOUNT_UPDATE_METAMASK_ACCOUNT = 'account/ACCOUNT_UPDATE_METAMASK_ACCOUNT';
-
 const ACCOUNT_GET_NATIVE_PRICES_REQUEST = 'account/ACCOUNT_GET_NATIVE_PRICES_REQUEST';
 const ACCOUNT_GET_NATIVE_PRICES_SUCCESS = 'account/ACCOUNT_GET_NATIVE_PRICES_SUCCESS';
 const ACCOUNT_GET_NATIVE_PRICES_FAILURE = 'account/ACCOUNT_GET_NATIVE_PRICES_FAILURE';
@@ -43,7 +41,6 @@ const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 
 // -- Actions --------------------------------------------------------------- //
 
-let accountInterval = null;
 let getPricesInterval = null;
 
 export const accountParseTransactionPrices = () => (dispatch, getState) => {
@@ -104,7 +101,6 @@ export const accountUpdateWeb3Network = network => dispatch => {
 };
 
 export const accountClearIntervals = () => dispatch => {
-  clearInterval(accountInterval);
   clearInterval(getPricesInterval);
 };
 
@@ -176,7 +172,7 @@ const INITIAL_STATE = {
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case ACCOUNT_UPDATE_METAMASK_ACCOUNT:
+    case ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST:
       return { ...state, accountAddress: action.payload, transactions: [] };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST:
       return { ...state, fetchingTransactions: true };

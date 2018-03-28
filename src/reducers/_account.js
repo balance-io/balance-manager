@@ -152,7 +152,6 @@ export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
         if (nativeCurrency === nativePriceRequest) {
           const prices = parsePricesObject(data, assetSymbols, nativeCurrency);
           const parsedAccountInfo = parseAccountBalances(accountInfo, prices);
-          console.log(parsedAccountInfo);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
             payload: { accountInfo: parsedAccountInfo, prices }

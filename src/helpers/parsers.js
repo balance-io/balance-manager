@@ -12,13 +12,13 @@ import {
   convertAssetAmountToNativeValue,
   convertAssetAmountToNativeAmount,
   saveLocal,
-  getLocal,
-  sha3
+  getLocal
 } from './utilities';
 import { getTimeString } from './time';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
 import timeUnits from '../libraries/time-units.json';
+import smartContractMethods from '../libraries/smartcontract-methods.json';
 import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
 
 /**
@@ -28,20 +28,23 @@ import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
  */
 
 export const parseError = error => {
-  const msgEnd =
-    error.message.indexOf('\n') !== -1 ? error.message.indexOf('\n') : error.message.length;
-  let message = error.message.slice(0, msgEnd);
-  if (error.message.includes('MetaMask') || error.message.includes('Returned error:')) {
-    message = message
-      .replace('Error: ', '')
-      .replace('MetaMask ', '')
-      .replace('Returned error: ', '');
-    message = message.slice(0, 1).toUpperCase() + message.slice(1).toLowerCase();
-    console.error(new Error(message));
+  if (error) {
+    const msgEnd =
+      error.message.indexOf('\n') !== -1 ? error.message.indexOf('\n') : error.message.length;
+    let message = error.message.slice(0, msgEnd);
+    if (error.message.includes('MetaMask') || error.message.includes('Returned error:')) {
+      message = message
+        .replace('Error: ', '')
+        .replace('MetaMask ', '')
+        .replace('Returned error: ', '');
+      message = message.slice(0, 1).toUpperCase() + message.slice(1).toLowerCase();
+      console.error(new Error(message));
+      return message;
+    }
+    console.error(error);
     return message;
   }
-  console.error(error);
-  return message;
+  return `Something went wrong`;
 };
 
 /**
@@ -534,7 +537,6 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         ms: `${tx.timeStamp}000`
       };
       const blockNumber = tx.blockNumber;
-      const txIndex = tx.transactionIndex;
       const error = tx.isError === '1';
       let interaction = false;
       const data = tx.input;
@@ -564,9 +566,7 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         })
       };
 
-      const tokenTransfer = sha3('transfer(address,uint256)').slice(0, 10);
-
-      if (tx.input.startsWith(tokenTransfer)) {
+      if (tx.input.startsWith(smartContractMethods.token_transfer.hash)) {
         const allTokens = getLocal('token_info') || {};
         let foundToken = null;
         Object.keys(allTokens).forEach(tokenSymbol => {
@@ -614,7 +614,6 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         hash,
         timestamp,
         blockNumber,
-        txIndex,
         from,
         to,
         data,
@@ -719,4 +718,106 @@ export const parseTransactionsPrices = async (
   saveLocal(address, accountLocal);
 
   return _transactions;
+};
+
+/**
+ * @desc parse websocket pending transaction objects
+ * @param  {Object}   [tx = null]
+ * @param  {String}   [address = '']
+ * @return {Promise}
+ */
+export const parseWebsocketTransaction = async (tx = null, address = '') => {
+  let result = null;
+  const hash = tx.hash;
+  const blockNumber = tx.blockNumber;
+  let interaction = false;
+  const data = tx.input;
+  const from = tx.from;
+  let to = tx.to;
+  let asset = {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    address: null,
+    decimals: 18
+  };
+  let value = {
+    amount: tx.value,
+    display: convertAmountToDisplay(tx.value, null, {
+      symbol: 'ETH',
+      decimals: 18
+    })
+  };
+  let totalGas = BigNumber(`${tx.gas}`)
+    .times(BigNumber(`${tx.gasPrice}`))
+    .toString();
+  let txFee = {
+    amount: totalGas,
+    display: convertAmountToDisplay(totalGas, null, {
+      symbol: 'ETH',
+      decimals: 18
+    })
+  };
+  if (tx.input.startsWith(smartContractMethods.token_transfer.hash)) {
+    const allTokens = getLocal('token_info') || {};
+    let foundToken = null;
+    Object.keys(allTokens).forEach(tokenSymbol => {
+      if (allTokens[tokenSymbol].address === tx.to) {
+        foundToken = allTokens[tokenSymbol];
+      }
+    });
+    if (tx.to === '0xc55cf4b03948d7ebc8b9e8bad92643703811d162') {
+      /* STT token on Ropsten */
+      asset = {
+        name: 'Status Test Token',
+        symbol: 'STT',
+        address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
+        decimals: 18
+      };
+    } else if (foundToken) {
+      asset = foundToken;
+    } else {
+      const response = await apiGetEthplorerTokenInfo(tx.to);
+
+      asset = {
+        name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
+        symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
+        address: !response.data.error ? response.data.address : '',
+        decimals: !response.data.error ? convertStringToNumber(response.data.decimals) : 18
+      };
+
+      if (asset.symbol === '———' && !allTokens[asset.address]) {
+        allTokens[asset.address] = asset;
+      } else if (!allTokens[asset.symbol]) {
+        allTokens[asset.symbol] = asset;
+      }
+      saveLocal('token_info', allTokens);
+    }
+
+    to = `0x${tx.input.slice(34, 74)}`;
+    const hexResult = hexToNumberString(`${tx.input.slice(74)}`);
+    const amount = convertAssetAmountToBigNumber(hexResult, asset.decimals);
+    value = { amount, display: convertAmountToDisplay(amount, null, asset) };
+  } else if (tx.input !== '0x') {
+    interaction = true;
+  }
+  result = {
+    hash,
+    timestamp: null,
+    blockNumber,
+    from,
+    to,
+    data,
+    error: null,
+    interaction,
+    value,
+    txFee,
+    native: null,
+    asset
+  };
+
+  if (tx.to === address || tx.from === address) {
+    return result;
+  } else {
+    return null;
+  }
 };

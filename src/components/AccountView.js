@@ -15,6 +15,7 @@ import transactionsTabIcon from '../assets/transactions-tab.svg';
 import LineBreak from '../components/LineBreak';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
+import { accountSubscribeTxWebSocket } from '../reducers/_account';
 import { modalOpen } from '../reducers/_modal';
 import { capitalize } from '../helpers/utilities';
 import { colors, fonts, responsive, shadows, transitions } from '../styles';
@@ -129,6 +130,9 @@ class AccountView extends Component {
   state = {
     activeTab: 'BALANCES_TAB'
   };
+  componentDidMount() {
+    this.props.accountSubscribeTxWebSocket();
+  }
   componentWillReceiveProps(newProps) {
     const tabRoute = window.browserHistory.location.pathname.replace(newProps.match.url, '') || '/';
     switch (tabRoute) {
@@ -220,6 +224,7 @@ class AccountView extends Component {
 AccountView.propTypes = {
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
+  accountSubscribeTxWebSocket: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
   accountInfo: PropTypes.object.isRequired,
   accountAddress: PropTypes.string.isRequired
@@ -232,5 +237,6 @@ const reduxProps = ({ account }) => ({
 });
 
 export default connect(reduxProps, {
-  modalOpen
+  modalOpen,
+  accountSubscribeTxWebSocket
 })(AccountView);

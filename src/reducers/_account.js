@@ -9,14 +9,20 @@ import {
   parseTransactionsPrices,
   parseAccountBalances,
   parsePricesObject,
-  parseEthplorerAddressInfo
+  parseEthplorerAddressInfo,
+  parseWebsocketTransaction
 } from '../helpers/parsers';
 import { saveLocal, getLocal } from '../helpers/utilities';
-import { web3SetProvider } from '../helpers/web3';
+import {
+  web3WebSocketPendingTxs,
+  web3SetHttpProvider,
+  web3SetWebSocketProvider
+} from '../helpers/web3';
 import { warningOffline, warningOnline } from './_warning';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
 import nativeCurrencies from '../libraries/native-currencies.json';
+import ethereumNetworks from '../libraries/ethereum-networks.json';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -122,30 +128,18 @@ export const accountUpdateAccountTransactions = data => (dispatch, getState) => 
     });
 };
 
-export const accountSubscribeTxWebSocket = address => dispatch => {
-  window.WebSocket = window.WebSocket || window.MozWebSocket;
-
-  const connection = new WebSocket('wss://socket.etherscan.io/wshandler');
-
-  connection.onopen = function() {
-    console.log('connection.onopen');
-    connection.send(`{"event": "txlist", "address": "${address}"}`);
-  };
-
-  connection.onerror = function(error) {
-    console.log('connection.onerror');
-  };
-
-  connection.onmessage = function(message) {
-    console.log('connection.onmessage', message);
-    try {
-      const json = JSON.parse(message.data);
-      accountUpdateAccountTransactions(json);
-    } catch (e) {
-      console.log("This doesn't look like a valid JSON: ", message.data);
-      return;
-    }
-  };
+export const accountSubscribeTxWebSocket = () => (dispatch, getState) => {
+  const address = getState().account.accountAddress;
+  web3WebSocketPendingTxs()
+    .then(tx => {
+      const parsedTx = parseWebsocketTransaction(tx, address);
+      console.log(parsedTx);
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch(accountSubscribeTxWebSocket());
+    });
 };
 
 export const accountUpdateMetamaskAccount = () => (dispatch, getState) => {
@@ -171,7 +165,10 @@ export const accountConnectMetamask = () => (dispatch, getState) => {
   if (typeof window.web3 !== 'undefined') {
     apiGetMetamaskNetwork()
       .then(network => {
-        web3SetProvider(`https://${network}.infura.io/`);
+        web3SetHttpProvider(`https://${network}.infura.io/`);
+        if (ethereumNetworks[network].WebSocket) {
+          web3SetWebSocketProvider(`wss://${network}.infura.io/ws`);
+        }
         dispatch({ type: ACCOUNT_METAMASK_GET_NETWORK_SUCCESS, payload: network });
         dispatch(accountUpdateMetamaskAccount());
         accountInterval = setInterval(() => dispatch(accountUpdateMetamaskAccount()), 100);
@@ -183,7 +180,8 @@ export const accountConnectMetamask = () => (dispatch, getState) => {
 };
 
 export const accountUpdateWalletConnect = accountAddress => dispatch => {
-  web3SetProvider(`https://mainnet.infura.io/`);
+  web3SetHttpProvider(`https://mainnet.infura.io/`);
+  web3SetWebSocketProvider(`wss://mainnet.infura.io/ws`);
   dispatch({ type: ACCOUNT_CONNECT_WALLET_REQUEST, payload: accountAddress });
   if (accountAddress) dispatch(accountGetAccountBalances(accountAddress, 'WalletConnect'));
 };

@@ -1,22 +1,27 @@
 {
   "mainnet": {
     "id": 1,
-    "value": "Mainnet"
+    "value": "Mainnet",
+    "WebSocket": true
   },
   "morden": {
     "id": 2,
-    "value": "Morden"
+    "value": "Morden",
+    "WebSocket": false
   },
   "ropsten": {
     "id": 3,
-    "value": "Ropsten"
+    "value": "Ropsten",
+    "WebSocket": true
   },
   "rinkeby": {
     "id": 4,
-    "value": "Rinkeby"
+    "value": "Rinkeby",
+    "WebSocket": true
   },
   "kovan": {
     "id": 42,
-    "value": "Kovan"
+    "value": "Kovan",
+    "WebSocket": false
   }
 }

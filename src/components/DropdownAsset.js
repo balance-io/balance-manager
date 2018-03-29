@@ -110,7 +110,10 @@ class DropdownAsset extends Component {
         <StyledSelected noOptions={Object.keys(options).length < 2} onClick={this.toggleDropdown}>
           <div>
             <StyledAsset>
-              <AssetIcon size={18} currency={options[this.props.selected].symbol} />
+              <AssetIcon
+                size={18}
+                asset={this.props.selected === 'ETH' ? 'ETH' : options[this.props.selected].address}
+              />
               <p>{options[this.props.selected].name}</p>
             </StyledAsset>
             <p>{`${options[this.props.selected].balance.display}${
@@ -129,7 +132,7 @@ class DropdownAsset extends Component {
                 onClick={() => this.onChangeSelected(options[key].symbol)}
               >
                 <StyledAsset>
-                  <AssetIcon size={18} currency={options[key].symbol} />
+                  <AssetIcon size={18} asset={key === 'ETH' ? 'ETH' : options[key].address} />
                   <p>{options[key].name}</p>
                 </StyledAsset>
                 <p>{`${options[key].balance.display}${

@@ -10,13 +10,14 @@ import Column from '../components/Column';
 import SubscribeForm from '../components/SubscribeForm';
 import Button from '../components/Button';
 import MetamaskLogo from '../components/MetamaskLogo';
-import WalletConnectLogo from '../components/WalletConnectLogo';
+// import WalletConnectLogo from '../components/WalletConnectLogo';
 import LedgerLogo from '../components/LedgerLogo';
 import TrezorLogo from '../components/TrezorLogo';
 import metamaskWhite from '../assets/metamask-white.png';
-import walletConnectWhite from '../assets/walletconnect-white.svg';
+// import walletConnectWhite from '../assets/walletconnect-white.svg';
 import { getLocal } from '../helpers/utilities';
-import { accountConnectMetamask, accountUpdateWalletConnect } from '../reducers/_account';
+import { accountUpdateAccountAddress } from '../reducers/_account';
+import { metamaskConnectMetamask } from '../reducers/_metamask';
 import { modalOpen } from '../reducers/_modal';
 import { responsive } from '../styles';
 
@@ -38,12 +39,12 @@ const StyledMetamaskConnect = styled(Column)`
   }
 `;
 
-const StyledWalletConnect = styled(Column)`
-  padding: 15px;
-  & > * {
-    margin: 24px;
-  }
-`;
+// const StyledWalletConnect = styled(Column)`
+//   padding: 15px;
+//   & > * {
+//     margin: 24px;
+//   }
+// `;
 
 const StyledHardwareWallets = styled(Column)`
   padding: 15px;
@@ -59,7 +60,7 @@ class Home extends Component {
   onWalletConnectInit = () => {
     const storedAddress = getLocal('walletconnect');
     if (storedAddress) {
-      this.props.accountUpdateWalletConnect(storedAddress);
+      this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
       this.props.history.push('/wallet');
     } else {
       this.props.modalOpen('WALLET_CONNECT_INIT', null);
@@ -75,7 +76,7 @@ class Home extends Component {
             <SubscribeForm />
           </StyledHardwareWallets>
 
-          <StyledWalletConnect>
+          {/* <StyledWalletConnect>
             <WalletConnectLogo />
             <Button
               left
@@ -85,12 +86,17 @@ class Home extends Component {
             >
               {lang.t('button.connect_walletconnect')}
             </Button>
-          </StyledWalletConnect>
+          </StyledWalletConnect> */}
 
           <StyledMetamaskConnect>
             <MetamaskLogo />
             <Link to="/metamask">
-              <Button left color="orange" icon={metamaskWhite} onClick={accountConnectMetamask}>
+              <Button
+                left
+                color="orange"
+                icon={metamaskWhite}
+                onClick={this.props.metamaskConnectMetamask}
+              >
                 {lang.t('button.connect_metamask')}
               </Button>
             </Link>
@@ -102,13 +108,13 @@ class Home extends Component {
 }
 
 Home.propTypes = {
-  accountConnectMetamask: PropTypes.func.isRequired,
-  accountUpdateWalletConnect: PropTypes.func.isRequired,
+  metamaskConnectMetamask: PropTypes.func.isRequired,
+  accountUpdateAccountAddress: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired
 };
 
 export default connect(null, {
   modalOpen,
-  accountConnectMetamask,
-  accountUpdateWalletConnect
+  metamaskConnectMetamask,
+  accountUpdateAccountAddress
 })(Home);

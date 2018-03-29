@@ -447,13 +447,18 @@ class SendModal extends Component {
                     placeholder="0.0"
                     type="text"
                     value={this.props.nativeAmount}
-                    disabled={!this.props.prices[this.props.selected.symbol]}
+                    disabled={
+                      !this.props.prices[this.props.nativeCurrency] ||
+                      !this.props.prices[this.props.nativeCurrency][this.props.selected.symbol]
+                    }
                     onChange={({ target }) =>
                       this.props.sendUpdateNativeAmount(target.value, this.props.selected)
                     }
                   />
                   <StyledAmountCurrency disabled={!this.props.prices[this.props.selected.symbol]}>
-                    {this.props.prices.selected.currency}
+                    {this.props.prices && this.props.prices.selected
+                      ? this.props.prices.selected.currency
+                      : ''}
                   </StyledAmountCurrency>
                 </StyledFlex>
               </StyledFlex>
@@ -563,7 +568,7 @@ class SendModal extends Component {
           ) : (
             <StyledApproveTransaction>
               {(() => {
-                switch (this.props.modalProps.type) {
+                switch (this.props.modalProps.accountType) {
                   case 'METAMASK':
                     return <MetamaskLogo />;
                   case 'LEDGER':
@@ -575,7 +580,9 @@ class SendModal extends Component {
                 }
               })()}
               <StyledParagraph>
-                {lang.t('modal.approve_tx', { walletType: capitalize(this.props.modalProps.type) })}
+                {lang.t('modal.approve_tx', {
+                  walletType: capitalize(this.props.modalProps.accountType)
+                })}
               </StyledParagraph>
               <StyledActions single>
                 <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
@@ -664,6 +671,7 @@ const reduxProps = ({ modal, send, account }) => ({
   gasPriceOption: send.gasPriceOption,
   confirm: send.confirm,
   web3Network: account.web3Network,
+  nativeCurrency: account.nativeCurrency,
   prices: account.prices
 });
 

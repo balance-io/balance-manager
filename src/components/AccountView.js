@@ -146,10 +146,9 @@ class AccountView extends Component {
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
       name:
-        this.props.accountInfo.name ||
-        `${this.props.accountInfo.type}${lang.t('modal.default_wallet')}`,
+        this.props.accountInfo.name || `${this.props.accountType}${lang.t('modal.default_wallet')}`,
       address: this.props.accountInfo.address,
-      type: this.props.accountInfo.type,
+      accountType: this.props.accountType,
       assets: this.props.accountInfo.assets
     });
   openReceiveModal = () =>
@@ -172,7 +171,7 @@ class AccountView extends Component {
           <StyledFlex>
             <StyledTop>
               <StyledAddressWrapper>
-                <h6>{capitalize(this.props.accountInfo.accountType || this.props.accountType)} </h6>
+                <h6>{capitalize(this.props.accountType)} </h6>
                 <CopyToClipboard
                   iconOnHover
                   text={this.props.accountInfo.address || this.props.accountAddress}

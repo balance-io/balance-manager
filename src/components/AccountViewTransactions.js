@@ -240,7 +240,7 @@ class AccountViewTransactions extends Component {
   render = () => {
     const nativeCurrency = this.props.nativeCurrency;
     let _transactions = [];
-    if (this.props.transactions) {
+    if (this.props.transactions && this.props.transactions.length) {
       _transactions = this.props.transactions.filter(tx => !tx.interaction);
     }
     return !!_transactions.length ? (

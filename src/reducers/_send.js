@@ -59,7 +59,6 @@ export const sendModalInit = (address, selected) => (dispatch, getState) => {
     })
     .catch(error => {
       console.error(error);
-      dispatch(notificationShow(lang.t('notification.error.failed_get_gas_prices'), true));
       const fallbackGasPrices = parseGasPrices(null, prices, gasLimit);
       dispatch({ type: SEND_GET_GAS_PRICES_FAILURE, payload: fallbackGasPrices });
     });

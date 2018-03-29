@@ -93,6 +93,7 @@ export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }
   const estimateGasData = value === '0x00' ? { from, to, data } : { to, data };
   const _gasLimit = gasLimit || (await web3Instance.eth.estimateGas(estimateGasData));
   const nonce = await web3Instance.eth.getTransactionCount(from);
+  console.log('nonce', nonce);
   const tx = {
     nonce: web3Instance.utils.toHex(nonce),
     gasPrice: web3Instance.utils.toHex(_gasPrice),

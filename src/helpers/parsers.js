@@ -248,7 +248,7 @@ export const parseGasPrices = (data, prices, gasLimit) => {
       native: null
     };
   }
-  if (prices) {
+  if (prices && prices.selected) {
     gasPrices.fast.txFee.native = {
       selected: prices.selected,
       value: {

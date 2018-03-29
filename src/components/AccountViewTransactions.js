@@ -293,7 +293,13 @@ class AccountViewTransactions extends Component {
                       />
                       <div>
                         <p>
-                          <strong>{tx.from === this.props.account.address ? 'TO' : 'FROM'}</strong>
+                          <strong>
+                            {tx.from === tx.to
+                              ? lang.t('account.tx_self').toUpperCase()
+                              : tx.from === this.props.account.address
+                                ? lang.t('account.tx_to').toUpperCase()
+                                : lang.t('account.tx_from').toUpperCase()}
+                          </strong>
                         </p>
                         <p>{tx.from === this.props.account.address ? tx.to : tx.from}</p>
                       </div>
@@ -301,7 +307,7 @@ class AccountViewTransactions extends Component {
                     <div>
                       <div>
                         <p>
-                          <strong>{'FEE'}</strong>
+                          <strong>{lang.t('account.tx_fee').toUpperCase()}</strong>
                         </p>
                         <p>{`${tx.txFee.display} (${
                           tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].txFee
@@ -313,9 +319,9 @@ class AccountViewTransactions extends Component {
                     <div>
                       <div>
                         <p>
-                          <strong>{'TIMESTAMP'}</strong>
+                          <strong>{lang.t('account.tx_timestamp').toUpperCase()}</strong>
                         </p>
-                        <p>{getLocalTimeDate(tx.timestamp.ms)}</p>
+                        <p>{tx.timestamp ? getLocalTimeDate(tx.timestamp.ms) : '———'}</p>
                       </div>
                     </div>
                   </StyledTransactionTopDetails>
@@ -325,7 +331,7 @@ class AccountViewTransactions extends Component {
                     <div>
                       <div>
                         <p>
-                          <strong>{'TRANSACTION HASH'}</strong>
+                          <strong>{lang.t('account.tx_hash').toUpperCase()}</strong>
                         </p>
                         <p>{tx.hash}</p>
                       </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
+import circle from '../assets/circle.svg';
 import txSentIcon from '../assets/arrow-sent.svg';
 import txReceivedIcon from '../assets/arrow-received.svg';
 import txFailedIcon from '../assets/arrow-failed.svg';
@@ -43,7 +44,11 @@ const TransactionStatus = ({ tx, accountAddress, ...props }) => {
     color = 'red';
     icon = txFailedIcon;
   } else {
-    if (tx.from === accountAddress) {
+    if (tx.from === tx.to) {
+      text = lang.t('account.tx_self');
+      color = 'blue';
+      icon = circle;
+    } else if (tx.from === accountAddress) {
       text = lang.t('account.tx_sent');
       color = 'gold';
       icon = txSentIcon;

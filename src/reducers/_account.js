@@ -46,6 +46,7 @@ const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 let getPricesInterval = null;
 
 export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
+  console.log('accountUpdateTransactions txDetails', txDetails);
   dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST });
   const currentTransactions = getState().account.transactions;
   const address = getState().account.accountInfo.address;
@@ -73,10 +74,10 @@ export const accountParseTransactionPrices = transactions => (dispatch, getState
   const address = getState().account.accountInfo.address;
   const nativeCurrency = getState().account.nativeCurrency;
   parseTransactionsPrices(transactions, nativeCurrency, address)
-    .then(transactions => {
+    .then(parsedTransactions => {
       dispatch({
         type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,
-        payload: transactions
+        payload: parsedTransactions
       });
     })
     .catch(error => {
@@ -97,7 +98,8 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
     type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST,
     payload: {
       transactions: cachedTransactions,
-      fetchingTransactions: !accountLocal.transactions || !accountLocal.transactions.length
+      fetchingTransactions:
+        !accountLocal || !accountLocal.transactions || !accountLocal.transactions.length
     }
   });
   apiGetEtherscanAccountTransactions(accountAddress, web3Network)
@@ -295,6 +297,11 @@ export default (state = INITIAL_STATE, action) => {
         nativeCurrency: action.payload.nativeCurrency,
         prices: action.payload.prices,
         accountInfo: action.payload.accountInfo
+      };
+    case ACCOUNT_UPDATE_WEB3_NETWORK:
+      return {
+        ...state,
+        web3Network: action.payload
       };
     case ACCOUNT_CLEAR_STATE:
       return {

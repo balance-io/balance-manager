@@ -93,18 +93,16 @@ export const walletConnectGetTransactionHash = () => (dispatch, getState) => {
 };
 
 export const walletConnectInitiateTransaction = (
-  encryptedPayload,
-  notificationTitle,
-  notificationBody
+  encryptedTransactionDetails,
+  notificationDetails
 ) => (dispatch, getState) => {
   const deviceUuid = getState().walletconnect.deviceUuid;
-  // Q: get transaction details and make encrypted payload, notification title, notification body
+  // Q: get transaction details and make encryptedTransactionDetails, notificationDetails (json with  notficationTitle, notificationBody)
   dispatch({ type: WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST });
   apiWalletConnectInitiateTransaction(
     deviceUuid,
-    encryptedPayload,
-    notificationTitle,
-    notificationBody
+    encryptedTransactionDetails,
+    notificationDetails
   )
     .then(({ data }) => {
       const transactionUuid = data ? data.transactionUuid : '';

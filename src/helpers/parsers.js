@@ -12,12 +12,12 @@ import {
   convertAssetAmountToNativeValue,
   convertAssetAmountToNativeAmount,
   saveLocal,
-  getLocal,
-  sha3
+  getLocal
 } from './utilities';
 import { getTimeString } from './time';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
+import smartContractMethods from '../libraries/smartcontract-methods.json';
 import timeUnits from '../libraries/time-units.json';
 import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
 
@@ -534,7 +534,6 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         ms: `${tx.timeStamp}000`
       };
       const blockNumber = tx.blockNumber;
-      const txIndex = tx.transactionIndex;
       const error = tx.isError === '1';
       let interaction = false;
       const data = tx.input;
@@ -564,9 +563,7 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         })
       };
 
-      const tokenTransfer = sha3('transfer(address,uint256)').slice(0, 10);
-
-      if (tx.input.startsWith(tokenTransfer)) {
+      if (tx.input.startsWith(smartContractMethods.token_transfer.hash)) {
         const allTokens = getLocal('token_info') || {};
         let foundToken = null;
         Object.keys(allTokens).forEach(tokenSymbol => {
@@ -614,7 +611,6 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         hash,
         timestamp,
         blockNumber,
-        txIndex,
         from,
         to,
         data,
@@ -623,6 +619,7 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         value,
         txFee,
         native: null,
+        pending: false,
         asset
       };
       return result;
@@ -713,6 +710,109 @@ export const parseTransactionsPrices = async (
       })
     );
   }
+
+  const accountLocal = getLocal(address) || {};
+  accountLocal.transactions = _transactions;
+  saveLocal(address, accountLocal);
+
+  return _transactions;
+};
+
+// /**
+//  * @desc parse transactions from native prices
+//  * @param  {Object} [transactions=null]
+//  * @param  {Object} [nativeCurrency='']
+//  * @param  {String} [address='']
+//  * @return {String}
+//  */
+// export const parseTransactionsPrices = async (
+
+/**
+ * @desc parse transactions from native prices
+ * @param  {Object} [txDetails=null]
+ * @param  {Object} [transactions=null]
+ * @param  {Object} [nativeCurrency='']
+ * @param  {String} [address='']
+ * @return {String}
+ */
+export const parseNewTransaction = async (
+  txDetails = null,
+  transactions = null,
+  nativeSelected = '',
+  address = ''
+) => {
+  let _transactions = transactions;
+
+  let totalGas = BigNumber(`${txDetails.gasLimit}`)
+    .times(BigNumber(`${txDetails.gasPrice}`))
+    .toString();
+  let txFee = {
+    amount: totalGas,
+    display: convertAmountToDisplay(totalGas, null, {
+      symbol: 'ETH',
+      decimals: 18
+    })
+  };
+  let tx = {
+    hash: txDetails.txHash,
+    timestamp: null,
+    blockNumber: null,
+    from: txDetails.address,
+    to: txDetails.recipient,
+    data: null,
+    error: false,
+    interaction: false,
+    value: txDetails.amount,
+    txFee: txFee,
+    native: null,
+    pending: true,
+    asset: txDetails.selectedAsset
+  };
+
+  const timestamp = tx.timestamp.secs;
+  const assetSymbol = tx.asset.symbol;
+  if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
+    tx.native = { selected: nativeCurrencies[nativeSelected] };
+
+    const response = await apiGetHistoricalPrices(assetSymbol, timestamp);
+
+    if (response.data.response === 'Error' || !response.data[assetSymbol]) {
+      return tx;
+    }
+
+    await Promise.all(
+      Object.keys(nativeCurrencies).map(async nativeCurrency => {
+        const assetPriceAmount = convertAmountToBigNumber(
+          response.data[assetSymbol][nativeCurrency]
+        );
+        let prices = { selected: nativeCurrencies[nativeCurrency] };
+        prices[nativeCurrency] = {};
+        prices[nativeCurrency][assetSymbol] = {
+          price: { amount: assetPriceAmount, display: null }
+        };
+        const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
+        prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
+        const assetPrice = prices[nativeCurrency][assetSymbol].price;
+        const valuePriceAmount = convertAssetAmountToNativeValue(tx.value.amount, tx.asset, prices);
+        const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
+
+        const valuePrice = !tx.error
+          ? { amount: valuePriceAmount, display: valuePriceDisplay }
+          : { amount: '', display: '' };
+        const txFeePriceAmount = convertAssetAmountToNativeValue(tx.txFee.amount, tx.asset, prices);
+        const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
+        const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
+
+        tx.native[nativeCurrency] = {
+          price: assetPrice,
+          value: valuePrice,
+          txFee: txFeePrice
+        };
+      })
+    );
+  }
+
+  _transactions = [tx, ..._transactions];
 
   const accountLocal = getLocal(address) || {};
   accountLocal.transactions = _transactions;

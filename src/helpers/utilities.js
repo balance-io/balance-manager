@@ -17,7 +17,8 @@ export const saveLocal = (key = '', data = {}) => localStorage.setItem(key, JSON
  * @param  {String}  [key='']
  * @return {Object}
  */
-export const getLocal = (key = '') => JSON.parse(localStorage.getItem(key));
+export const getLocal = (key = '') =>
+  localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : null;
 
 /**
  * @desc get from local storage

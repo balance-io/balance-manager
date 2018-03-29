@@ -28,7 +28,7 @@ class AssetIcon extends Component {
     this.updateIcon(this.props);
   }
   componentWillReceiveProps(newProps) {
-    this.updateIcon(this.props);
+    this.updateIcon(newProps);
   }
   onError = () => this.setState({ imgSrc: erc20 });
   render() {

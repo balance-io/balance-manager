@@ -300,7 +300,7 @@ class SendModal extends Component {
       address: this.props.modalProps.address,
       recipient: this.props.recipient,
       amount: this.props.assetAmount,
-      tokenObject: this.props.selected,
+      selectedAsset: this.props.selected,
       gasPrice: this.props.gasPrice,
       gasLimit: this.props.gasLimit
     };

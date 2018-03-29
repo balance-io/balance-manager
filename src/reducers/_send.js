@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js';
 import { apiGetGasPrices } from '../helpers/api';
-import { notificationShow } from './_notification';
 import lang from '../languages';
 import ethUnits from '../libraries/ethereum-units.json';
 import {
@@ -12,6 +11,8 @@ import {
 } from '../helpers/utilities';
 import { parseError, parseGasPrices, parseGasPricesTxFee } from '../helpers/parsers';
 import { metamaskSendTransaction, metamaskTransferToken, estimateGasLimit } from '../helpers/web3';
+import { notificationShow } from './_notification';
+import { accountUpdateTransactions } from './_account';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -65,7 +66,8 @@ export const sendModalInit = (address, selected) => (dispatch, getState) => {
 
 export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
   const { selected, address, recipient, assetAmount, gasPrice, gasPriceOption } = getState().send;
-  let { gasPrices } = getState().send;
+  let gasPrices = getState().send.gasPrices;
+  if (!Object.keys(gasPrices).length) return null;
   const _gasPriceOption = newGasPriceOption || gasPriceOption;
   const _gasPrice = gasPriceOption ? gasPrices[_gasPriceOption] : gasPrice;
   dispatch({ type: SEND_UPDATE_GAS_PRICE_REQUEST });
@@ -111,10 +113,14 @@ export const sendUpdateSelected = selected => (dispatch, getState) => {
   dispatch(sendUpdateGasPrice());
 };
 
-export const sendEtherMetamask = ({ address, recipient, amount, gasPrice, gasLimit }) => (
-  dispatch,
-  getState
-) => {
+export const sendEtherMetamask = ({
+  address,
+  recipient,
+  amount,
+  selectedAsset,
+  gasPrice,
+  gasLimit
+}) => (dispatch, getState) => {
   dispatch({ type: SEND_ETHER_METAMASK_REQUEST });
   metamaskSendTransaction({
     from: address,
@@ -123,12 +129,22 @@ export const sendEtherMetamask = ({ address, recipient, amount, gasPrice, gasLim
     gasPrice: gasPrice.value.amount,
     gasLimit: gasLimit
   })
-    .then(txHash =>
+    .then(txHash => {
+      const txDetails = {
+        hash: txHash,
+        from: address,
+        to: recipient,
+        value: amount,
+        gasPrice: gasPrice.value.amount,
+        gasLimit: gasLimit,
+        asset: selectedAsset
+      };
+      dispatch(accountUpdateTransactions(txDetails));
       dispatch({
         type: SEND_ETHER_METAMASK_SUCCESS,
         payload: txHash
-      })
-    )
+      });
+    })
     .catch(error => {
       const message = parseError(error);
       dispatch(notificationShow(message, true));
@@ -136,26 +152,39 @@ export const sendEtherMetamask = ({ address, recipient, amount, gasPrice, gasLim
     });
 };
 
-export const sendTokenMetamask = ({ address, recipient, amount, tokenObject, gasPrice }) => (
-  dispatch,
-  getState
-) => {
-  const { gasLimit } = getState().send;
+export const sendTokenMetamask = ({
+  address,
+  recipient,
+  amount,
+  selectedAsset,
+  gasPrice,
+  gasLimit
+}) => (dispatch, getState) => {
   dispatch({ type: SEND_TOKEN_METAMASK_REQUEST });
   metamaskTransferToken({
-    tokenObject,
+    tokenObject: selectedAsset,
     from: address,
     to: recipient,
     amount: amount,
     gasPrice: gasPrice.value.amount,
     gasLimit: gasLimit
   })
-    .then(txHash =>
+    .then(txHash => {
+      const txDetails = {
+        hash: txHash,
+        from: address,
+        to: recipient,
+        value: amount,
+        gasPrice: gasPrice.value.amount,
+        gasLimit: gasLimit,
+        asset: selectedAsset
+      };
+      dispatch(accountUpdateTransactions(txDetails));
       dispatch({
         type: SEND_TOKEN_METAMASK_SUCCESS,
         payload: txHash
-      })
-    )
+      });
+    })
     .catch(error => {
       const message = parseError(error);
       dispatch(notificationShow(message, true));

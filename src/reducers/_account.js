@@ -5,6 +5,7 @@ import {
 } from '../helpers/api';
 import {
   parseError,
+  parseNewTransaction,
   parseTransactionsPrices,
   parseAccountBalances,
   parsePricesObject,
@@ -44,12 +45,34 @@ const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 
 let getPricesInterval = null;
 
-export const accountParseTransactionPrices = () => (dispatch, getState) => {
+export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
   dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST });
   const currentTransactions = getState().account.transactions;
   const address = getState().account.accountInfo.address;
   const nativeCurrency = getState().account.nativeCurrency;
-  parseTransactionsPrices(currentTransactions, nativeCurrency, address)
+  parseNewTransaction(txDetails, currentTransactions, nativeCurrency, address)
+    .then(transactions => {
+      dispatch({
+        type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,
+        payload: transactions
+      });
+    })
+    .catch(error => {
+      dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE });
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+    });
+};
+
+export const accountParseTransactionPrices = transactions => (dispatch, getState) => {
+  const currentTransactions = getState().account.transactions;
+  dispatch({
+    type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST,
+    payload: !currentTransactions.length
+  });
+  const address = getState().account.accountInfo.address;
+  const nativeCurrency = getState().account.nativeCurrency;
+  parseTransactionsPrices(transactions, nativeCurrency, address)
     .then(transactions => {
       dispatch({
         type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,
@@ -67,12 +90,15 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { accountAddress, web3Network } = getState().account;
   let cachedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
-  if (accountLocal) {
+  if (accountLocal && accountLocal.transactions) {
     cachedTransactions = [...accountLocal.transactions];
   }
   dispatch({
     type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST,
-    payload: { transactions: cachedTransactions, fetchingTransactions: !accountLocal }
+    payload: {
+      transactions: cachedTransactions,
+      fetchingTransactions: !accountLocal.transactions || !accountLocal.transactions.length
+    }
   });
   apiGetEtherscanAccountTransactions(accountAddress, web3Network)
     .then(transactions => {
@@ -91,12 +117,14 @@ export const accountGetAccountBalances = address => (dispatch, getState) => {
   let cachedAccount = { ...accountInfo };
   let cachedTransactions = [];
   const accountLocal = getLocal(address) || null;
-  if (accountLocal) {
+  if (accountLocal && accountLocal.balances) {
     cachedAccount = {
       ...cachedAccount,
       assets: accountLocal.balances.assets,
       total: accountLocal.balances.total
     };
+  }
+  if (accountLocal && accountLocal.transactions) {
     cachedTransactions = [...accountLocal.transactions];
   }
   dispatch({
@@ -218,15 +246,21 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS:
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE:
       return { ...state, fetchingTransactions: false };
+    case ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST:
+      return {
+        ...state,
+        fetchingTransactions: action.payload
+      };
     case ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS:
       return {
         ...state,
-        transactions: action.payload
+        transactions: action.payload,
+        fetchingTransactions: false
       };
-    case ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST:
     case ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE:
       return {
-        ...state
+        ...state,
+        fetchingTransactions: false
       };
     case ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST:
       return {

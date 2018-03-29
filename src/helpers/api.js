@@ -57,7 +57,8 @@ export const apiGetEthplorerTokenInfo = (address = '') =>
  * @desc get ethereum gas prices
  * @return {Promise}
  */
-export const apiGetGasPrices = () => axios.get(`https://ethgasstation.info/json/ethgasAPI.json`);
+export const apiGetGasPrices = () =>
+  axios.get(`https://ethgasstation.info/json/ethgasAPI.json`, { timeout: 10000 });
 
 /**
  * @desc get metmask selected network

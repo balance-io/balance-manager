@@ -60,7 +60,8 @@ export const sendModalInit = (address, selected) => (dispatch, getState) => {
     .catch(error => {
       console.error(error);
       dispatch(notificationShow(lang.t('notification.error.failed_get_gas_prices'), true));
-      dispatch({ type: SEND_GET_GAS_PRICES_FAILURE });
+      const fallbackGasPrices = parseGasPrices(null, prices, gasLimit);
+      dispatch({ type: SEND_GET_GAS_PRICES_FAILURE, payload: fallbackGasPrices });
     });
 };
 
@@ -283,7 +284,10 @@ export default (state = INITIAL_STATE, action) => {
     case SEND_GET_GAS_PRICES_FAILURE:
       return {
         ...state,
-        fetchingGasPrices: false
+        fetchingGasPrices: false,
+        gasPrice: action.payload.average,
+        gasPrices: action.payload,
+        gasPriceOption: action.payload.average.option
       };
     case SEND_UPDATE_GAS_PRICE_REQUEST:
       return { ...state, fetchingGasPrices: true };

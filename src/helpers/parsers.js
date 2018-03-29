@@ -56,115 +56,198 @@ export const parseGasPrices = (data, prices, gasLimit) => {
     average: null,
     fast: null
   };
-  gasPrices.fast = {
-    option: 'fast',
-    estimatedTime: {
-      amount: BigNumber(`${data.fastWait}`)
-        .times(BigNumber(`${timeUnits.ms.minute}`))
-        .toString(),
-      display: getTimeString(
-        BigNumber(`${data.fastWait}`)
-          .times(BigNumber(`${timeUnits.ms.minute}`))
-          .toString(),
-        'ms'
-      )
-    },
-    value: {
-      amount: `${BigNumber(`${data.fast}`)
-        .dividedBy(10)
-        .times(`${ethUnits.gwei}`)
-        .toString()}`,
-      display: `${BigNumber(`${data.fast}`).dividedBy(10)} Gwei`
-    }
-  };
-  gasPrices.fast.txFee = {
-    value: {
-      amount: BigNumber(gasPrices.fast.value.amount)
-        .times(BigNumber(`${gasLimit}`))
-        .toString(),
-      display: convertAmountToDisplay(
-        BigNumber(gasPrices.fast.value.amount)
+  if (!data) {
+    gasPrices.fast = {
+      option: 'fast',
+      estimatedTime: {
+        amount: '30000',
+        display: getTimeString('30000', 'ms')
+      },
+      value: {
+        amount: '5000000000',
+        display: '5 Gwei'
+      }
+    };
+    gasPrices.fast.txFee = {
+      value: {
+        amount: BigNumber(gasPrices.fast.value.amount)
           .times(BigNumber(`${gasLimit}`))
           .toString(),
-        null,
-        { symbol: 'ETH', decimals: 18 }
-      )
-    },
-    native: null
-  };
-  gasPrices.average = {
-    option: 'average',
-    estimatedTime: {
-      amount: BigNumber(`${data.avgWait}`)
-        .times(BigNumber(`${timeUnits.ms.minute}`))
-        .toString(),
-      display: getTimeString(
-        BigNumber(`${data.avgWait}`)
-          .times(BigNumber(`${timeUnits.ms.minute}`))
-          .toString(),
-        'ms'
-      )
-    },
-    value: {
-      amount: `${BigNumber(`${data.average}`)
-        .dividedBy(10)
-        .times(`${ethUnits.gwei}`)
-        .toString()}`,
-      display: `${BigNumber(`${data.average}`).dividedBy(10)} Gwei`
-    }
-  };
-  gasPrices.average.txFee = {
-    value: {
-      amount: BigNumber(gasPrices.average.value.amount)
-        .times(BigNumber(`${gasLimit}`))
-        .toString(),
-      display: convertAmountToDisplay(
-        BigNumber(gasPrices.average.value.amount)
-          .times(BigNumber(`${gasLimit}`))
-          .toString(),
-        null,
-        { symbol: 'ETH', decimals: 18 }
-      )
-    },
-    native: null
-  };
+        display: convertAmountToDisplay(
+          BigNumber(gasPrices.fast.value.amount)
+            .times(BigNumber(`${gasLimit}`))
+            .toString(),
+          null,
+          { symbol: 'ETH', decimals: 18 }
+        )
+      },
+      native: null
+    };
 
-  gasPrices.slow = {
-    option: 'slow',
-    estimatedTime: {
-      amount: BigNumber(`${data.safeLowWait}`)
-        .times(BigNumber(`${timeUnits.ms.minute}`))
-        .toString(),
-      display: getTimeString(
-        BigNumber(`${data.safeLowWait}`)
-          .times(BigNumber(`${timeUnits.ms.minute}`))
-          .toString(),
-        'ms'
-      )
-    },
-    value: {
-      amount: `${BigNumber(`${data.safeLow}`)
-        .dividedBy(10)
-        .times(`${ethUnits.gwei}`)
-        .toString()}`,
-      display: `${BigNumber(`${data.safeLow}`).dividedBy(10)} Gwei`
-    }
-  };
-  gasPrices.slow.txFee = {
-    value: {
-      amount: BigNumber(gasPrices.slow.value.amount)
-        .times(BigNumber(`${gasLimit}`))
-        .toString(),
-      display: convertAmountToDisplay(
-        BigNumber(gasPrices.slow.value.amount)
+    gasPrices.average = {
+      option: 'average',
+      estimatedTime: {
+        amount: '360000',
+        display: getTimeString('360000', 'ms')
+      },
+      value: {
+        amount: '2000000000',
+        display: '2 Gwei'
+      }
+    };
+    gasPrices.average.txFee = {
+      value: {
+        amount: BigNumber(gasPrices.average.value.amount)
           .times(BigNumber(`${gasLimit}`))
           .toString(),
-        null,
-        { symbol: 'ETH', decimals: 18 }
-      )
-    },
-    native: null
-  };
+        display: convertAmountToDisplay(
+          BigNumber(gasPrices.average.value.amount)
+            .times(BigNumber(`${gasLimit}`))
+            .toString(),
+          null,
+          { symbol: 'ETH', decimals: 18 }
+        )
+      },
+      native: null
+    };
+
+    gasPrices.slow = {
+      option: 'slow',
+      estimatedTime: {
+        amount: '1800000',
+        display: getTimeString('1800000', 'ms')
+      },
+      value: {
+        amount: '1000000000',
+        display: '1 Gwei'
+      }
+    };
+    gasPrices.slow.txFee = {
+      value: {
+        amount: BigNumber(gasPrices.slow.value.amount)
+          .times(BigNumber(`${gasLimit}`))
+          .toString(),
+        display: convertAmountToDisplay(
+          BigNumber(gasPrices.slow.value.amount)
+            .times(BigNumber(`${gasLimit}`))
+            .toString(),
+          null,
+          { symbol: 'ETH', decimals: 18 }
+        )
+      },
+      native: null
+    };
+  } else {
+    gasPrices.fast = {
+      option: 'fast',
+      estimatedTime: {
+        amount: BigNumber(`${data.fastWait}`)
+          .times(BigNumber(`${timeUnits.ms.minute}`))
+          .toString(),
+        display: getTimeString(
+          BigNumber(`${data.fastWait}`)
+            .times(BigNumber(`${timeUnits.ms.minute}`))
+            .toString(),
+          'ms'
+        )
+      },
+      value: {
+        amount: `${BigNumber(`${data.fast}`)
+          .dividedBy(10)
+          .times(`${ethUnits.gwei}`)
+          .toString()}`,
+        display: `${BigNumber(`${data.fast}`).dividedBy(10)} Gwei`
+      }
+    };
+    gasPrices.fast.txFee = {
+      value: {
+        amount: BigNumber(gasPrices.fast.value.amount)
+          .times(BigNumber(`${gasLimit}`))
+          .toString(),
+        display: convertAmountToDisplay(
+          BigNumber(gasPrices.fast.value.amount)
+            .times(BigNumber(`${gasLimit}`))
+            .toString(),
+          null,
+          { symbol: 'ETH', decimals: 18 }
+        )
+      },
+      native: null
+    };
+    gasPrices.average = {
+      option: 'average',
+      estimatedTime: {
+        amount: BigNumber(`${data.avgWait}`)
+          .times(BigNumber(`${timeUnits.ms.minute}`))
+          .toString(),
+        display: getTimeString(
+          BigNumber(`${data.avgWait}`)
+            .times(BigNumber(`${timeUnits.ms.minute}`))
+            .toString(),
+          'ms'
+        )
+      },
+      value: {
+        amount: `${BigNumber(`${data.average}`)
+          .dividedBy(10)
+          .times(`${ethUnits.gwei}`)
+          .toString()}`,
+        display: `${BigNumber(`${data.average}`).dividedBy(10)} Gwei`
+      }
+    };
+    gasPrices.average.txFee = {
+      value: {
+        amount: BigNumber(gasPrices.average.value.amount)
+          .times(BigNumber(`${gasLimit}`))
+          .toString(),
+        display: convertAmountToDisplay(
+          BigNumber(gasPrices.average.value.amount)
+            .times(BigNumber(`${gasLimit}`))
+            .toString(),
+          null,
+          { symbol: 'ETH', decimals: 18 }
+        )
+      },
+      native: null
+    };
+
+    gasPrices.slow = {
+      option: 'slow',
+      estimatedTime: {
+        amount: BigNumber(`${data.safeLowWait}`)
+          .times(BigNumber(`${timeUnits.ms.minute}`))
+          .toString(),
+        display: getTimeString(
+          BigNumber(`${data.safeLowWait}`)
+            .times(BigNumber(`${timeUnits.ms.minute}`))
+            .toString(),
+          'ms'
+        )
+      },
+      value: {
+        amount: `${BigNumber(`${data.safeLow}`)
+          .dividedBy(10)
+          .times(`${ethUnits.gwei}`)
+          .toString()}`,
+        display: `${BigNumber(`${data.safeLow}`).dividedBy(10)} Gwei`
+      }
+    };
+    gasPrices.slow.txFee = {
+      value: {
+        amount: BigNumber(gasPrices.slow.value.amount)
+          .times(BigNumber(`${gasLimit}`))
+          .toString(),
+        display: convertAmountToDisplay(
+          BigNumber(gasPrices.slow.value.amount)
+            .times(BigNumber(`${gasLimit}`))
+            .toString(),
+          null,
+          { symbol: 'ETH', decimals: 18 }
+        )
+      },
+      native: null
+    };
+  }
   if (prices) {
     gasPrices.fast.txFee.native = {
       selected: prices.selected,

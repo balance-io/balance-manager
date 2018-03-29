@@ -241,3 +241,10 @@ export const estimateGasLimit = async ({ tokenObject, address, recipient, amount
   }
   return gasLimit;
 };
+
+/**
+ * @desc fetch transaction status/information
+ * @param  {String} txHash
+ * @return {Object}
+ */
+export const fetchTx = txHash => web3Instance.eth.getTransaction(txHash);

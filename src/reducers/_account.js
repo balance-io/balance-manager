@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import {
   apiGetEthplorerAddressInfo,
   apiGetEtherscanAccountTransactions,
@@ -91,8 +92,11 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { accountAddress, web3Network } = getState().account;
   let cachedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
+  if (accountLocal && accountLocal.pending) {
+    cachedTransactions = [...accountLocal.pending];
+  }
   if (accountLocal && accountLocal.transactions) {
-    cachedTransactions = [...accountLocal.transactions];
+    cachedTransactions = _.unionBy(cachedTransactions, accountLocal.transactions, 'hash');
   }
   dispatch({
     type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST,
@@ -105,7 +109,11 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   apiGetEtherscanAccountTransactions(accountAddress, web3Network)
     .then(transactions => {
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS });
-      dispatch(accountParseTransactionPrices(transactions));
+      let _transactions = transactions;
+      if (accountLocal && accountLocal.pending) {
+        _transactions = _.unionBy(accountLocal.pending, transactions, 'hash');
+      }
+      dispatch(accountParseTransactionPrices(_transactions));
     })
     .catch(error => {
       // const message = parseError(error);
@@ -126,8 +134,11 @@ export const accountGetAccountBalances = address => (dispatch, getState) => {
       total: accountLocal.balances.total
     };
   }
+  if (accountLocal && accountLocal.pending) {
+    cachedTransactions = [...accountLocal.pending];
+  }
   if (accountLocal && accountLocal.transactions) {
-    cachedTransactions = [...accountLocal.transactions];
+    cachedTransactions = _.unionBy(cachedTransactions, accountLocal.transactions, 'hash');
   }
   dispatch({
     type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST,
@@ -211,7 +222,6 @@ export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
     payload: { nativeCurrency, prices: newPrices, accountInfo }
   });
-  dispatch(accountParseTransactionPrices());
 };
 
 export const accountClearState = () => ({ type: ACCOUNT_CLEAR_STATE });

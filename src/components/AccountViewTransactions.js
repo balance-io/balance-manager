@@ -238,8 +238,11 @@ class AccountViewTransactions extends Component {
   };
 
   render = () => {
-    const _transactions = this.props.transactions.filter(tx => !tx.interaction);
     const nativeCurrency = this.props.nativeCurrency;
+    let _transactions = [];
+    if (this.props.transactions) {
+      _transactions = this.props.transactions.filter(tx => !tx.interaction);
+    }
     return !!_transactions.length ? (
       !this.props.fetchingTransactions ? (
         <StyledGrid>

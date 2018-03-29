@@ -619,7 +619,6 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
       const blockNumber = tx.blockNumber;
       const error = tx.isError === '1';
       let interaction = false;
-      const data = tx.input;
       const from = tx.from;
       let to = tx.to;
       let asset = {
@@ -696,7 +695,6 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         blockNumber,
         from,
         to,
-        data,
         error,
         interaction,
         value,
@@ -735,7 +733,7 @@ export const parseTransactionsPrices = async (
   if (_transactions && _transactions.length && nativeSelected) {
     _transactions = await Promise.all(
       _transactions.map(async (tx, idx) => {
-        const timestamp = tx.timestamp.secs;
+        const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
         const assetSymbol = tx.asset.symbol;
         if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
           tx.native = { selected: nativeCurrencies[nativeSelected] };
@@ -796,19 +794,12 @@ export const parseTransactionsPrices = async (
 
   const accountLocal = getLocal(address) || {};
   accountLocal.transactions = _transactions;
+  const pending = _transactions ? _transactions.filter(tx => tx.pending) : [];
+  accountLocal.pending = pending;
   saveLocal(address, accountLocal);
 
   return _transactions;
 };
-
-// /**
-//  * @desc parse transactions from native prices
-//  * @param  {Object} [transactions=null]
-//  * @param  {Object} [nativeCurrency='']
-//  * @param  {String} [address='']
-//  * @return {String}
-//  */
-// export const parseTransactionsPrices = async (
 
 /**
  * @desc parse transactions from native prices
@@ -837,16 +828,22 @@ export const parseNewTransaction = async (
       decimals: 18
     })
   };
-  const amount = convertAssetAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
+
+  let amount = '';
+  if (txDetails.asset.symbol !== 'ETH') {
+    amount = convertAssetAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
+  } else {
+    amount = convertAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
+  }
   const value = { amount, display: convertAmountToDisplay(amount, null, txDetails.asset) };
+  console.log();
 
   let tx = {
-    hash: txDetails.txHash,
+    hash: txDetails.hash,
     timestamp: null,
     blockNumber: null,
-    from: txDetails.address,
-    to: txDetails.recipient,
-    data: null,
+    from: txDetails.from,
+    to: txDetails.to,
     error: false,
     interaction: false,
     value: value,
@@ -902,6 +899,8 @@ export const parseNewTransaction = async (
 
   const accountLocal = getLocal(address) || {};
   accountLocal.transactions = _transactions;
+  const pending = _transactions.filter(tx => tx.pending);
+  accountLocal.pending = pending;
   saveLocal(address, accountLocal);
 
   return _transactions;

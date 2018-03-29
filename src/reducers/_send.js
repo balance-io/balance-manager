@@ -180,7 +180,6 @@ export const sendTokenMetamask = ({
         gasLimit: gasLimit,
         asset: selectedAsset
       };
-      console.log('metamaskTransferToken txDetails', txDetails);
       dispatch(accountUpdateTransactions(txDetails));
       dispatch({
         type: SEND_TOKEN_METAMASK_SUCCESS,

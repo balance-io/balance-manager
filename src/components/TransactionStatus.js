@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import Loader from './Loader';
 import lang from '../languages';
 import circle from '../assets/circle.svg';
 import txSentIcon from '../assets/arrow-sent.svg';
@@ -35,6 +36,21 @@ const StyledTransactionStatus = styled.p`
   }
 `;
 
+const StyledLoader = styled(Loader)`
+  position: absolute;
+  right: -13px;
+  background ${({ color }) => `rgb(${colors[color]})`};
+  background: ${({ background, color }) =>
+    `linear-gradient(to right, rgb(${colors[color]}) 10%, rgba(${colors[background]}, 0) 42%)`};
+
+  &:before {
+    background ${({ color }) => `rgb(${colors[color]})`};
+  }
+  &:after {
+    background: ${({ background }) => `rgb(${colors[background]})`};
+  }
+`;
+
 const TransactionStatus = ({ tx, accountAddress, ...props }) => {
   let text = null;
   let color = null;
@@ -59,7 +75,8 @@ const TransactionStatus = ({ tx, accountAddress, ...props }) => {
     }
   }
   return (
-    <StyledTransactionStatus color={color} icon={icon} {...props}>
+    <StyledTransactionStatus color={color} icon={!tx.pending ? icon : null} {...props}>
+      <StyledLoader size={9} color="dark" background={color} />
       <span>{text}</span>
       {text}
     </StyledTransactionStatus>

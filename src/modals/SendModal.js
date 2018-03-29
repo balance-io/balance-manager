@@ -36,6 +36,7 @@ import { convertAmountFromBigNumber, capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
 const StyledSuccessMessage = styled.div`
+  width: 100%;
   padding: 22px;
   & a {
     text-decoration: underline;
@@ -304,14 +305,9 @@ class SendModal extends Component {
       gasPrice: this.props.gasPrice,
       gasLimit: this.props.gasLimit
     };
-    // if (this.props.modalProps.type === 'METAMASK') {
-    //   if (this.props.selected.symbol === 'ETH') {
-    //     this.props.sendEtherMetamask(request);
-    //   } else {
-    //     this.props.sendTokenMetamask(request);
-    //   }
-    //   this.props.sendToggleConfirmationView(true);
-    // }
+    if (!this.props.gasPrice.txFee) {
+      return;
+    }
     if (!this.props.confirm) {
       if (!isValidAddress(this.props.recipient)) {
         this.props.notificationShow(lang.t('notification.error.invalid_address'), true);

@@ -130,9 +130,6 @@ class AccountView extends Component {
   state = {
     activeTab: 'BALANCES_TAB'
   };
-  componentDidMount() {
-    this.props.accountSubscribeTxWebSocket();
-  }
   componentWillReceiveProps(newProps) {
     const tabRoute = window.browserHistory.location.pathname.replace(newProps.match.url, '') || '/';
     switch (tabRoute) {

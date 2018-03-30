@@ -14,6 +14,7 @@ import {
   saveLocal,
   getLocal
 } from './utilities';
+import { getTransactionCount } from './web3';
 import { getTimeString } from './time';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
@@ -604,6 +605,116 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
 };
 
 /**
+ * @desc parse ethplorer address token history
+ * @param  {String}   [data = null]
+ * @return {Promise}
+ */
+export const parseEthplorerAddressHistory = async (data = null) => {
+  if (!data || !data.result) return null;
+
+  let transactions = await Promise.all(
+    data.result.map(async (tx, idx) => {
+      const hash = tx.hash;
+      const timestamp = tx.timeStamp;
+      const error = false;
+      let interaction = false;
+      const from = tx.from;
+      let to = tx.to;
+      const asset = {
+        name: tx.tokenInfo.name || 'Unknown Token',
+        symbol: tx.tokenInfo.symbol || '———',
+        address: tx.tokenInfo.address || null,
+        decimals: tx.tokenInfo.decimals ? convertStringToNumber(tx.tokenInfo.decimals) : 18
+      };
+
+      let asset = {
+        name: tx.tokenInfo.name,
+        symbol: tx.tokenInfo.symbol,
+        address: tx.tokenInfo.address,
+        decimals: tx.tokenInfo.decimals
+      };
+
+      const allTokens = getLocal('token_info') || {};
+      if (asset.symbol === '———' && !allTokens[asset.address]) {
+        allTokens[asset.address] = asset;
+      } else if (!allTokens[asset.symbol]) {
+        allTokens[asset.symbol] = asset;
+      }
+      saveLocal('token_info', allTokens);
+
+      let value = {
+        amount: tx.value,
+        display: convertAmountToDisplay(tx.value, null, {
+          symbol: asset.symbol,
+          decimals: asset.decimals
+        })
+      };
+      let txFee = null;
+
+      if (tx.input.startsWith(smartContractMethods.token_transfer.hash)) {
+        const allTokens = getLocal('token_info') || {};
+        let foundToken = null;
+        Object.keys(allTokens).forEach(tokenSymbol => {
+          if (allTokens[tokenSymbol].address === tx.to) {
+            foundToken = allTokens[tokenSymbol];
+          }
+        });
+        if (tx.to === '0xc55cf4b03948d7ebc8b9e8bad92643703811d162') {
+          /* STT token on Ropsten */
+          asset = {
+            name: 'Status Test Token',
+            symbol: 'STT',
+            address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
+            decimals: 18
+          };
+        } else if (foundToken) {
+          asset = foundToken;
+        } else {
+          const response = await apiGetEthplorerTokenInfo(tx.to);
+
+          asset = {
+            name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
+            symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
+            address: !response.data.error ? response.data.address : '',
+            decimals: !response.data.error ? convertStringToNumber(response.data.decimals) : 18
+          };
+        }
+
+        to = `0x${tx.input.slice(34, 74)}`;
+        const hexResult = hexToNumberString(`${tx.input.slice(74)}`);
+        const amount = convertAssetAmountToBigNumber(hexResult, asset.decimals);
+        value = { amount, display: convertAmountToDisplay(amount, null, asset) };
+      } else if (tx.input !== '0x') {
+        interaction = true;
+      }
+
+      const result = {
+        hash,
+        timestamp,
+        from,
+        to,
+        error,
+        interaction,
+        value,
+        txFee,
+        native: null,
+        pending: false,
+        asset
+      };
+      return result;
+    })
+  );
+
+  transactions = transactions.reverse();
+
+  const accountLocal = getLocal(address) || {};
+  accountLocal.transactions = transactions;
+  saveLocal(address, accountLocal);
+
+  return transactions;
+};
+
+/**
  * @desc parse etherscan account transactions response
  * @param  {String}   [data = null]
  * @param  {String}   [address = '']
@@ -619,7 +730,6 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         secs: tx.timeStamp,
         ms: `${tx.timeStamp}000`
       };
-      const blockNumber = tx.blockNumber;
       const error = tx.isError === '1';
       let interaction = false;
       const from = tx.from;
@@ -695,7 +805,6 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
       const result = {
         hash,
         timestamp,
-        blockNumber,
         from,
         to,
         error,
@@ -840,14 +949,15 @@ export const parseNewTransaction = async (
   }
   const value = { amount, display: convertAmountToDisplay(amount, null, txDetails.asset) };
   console.log();
+  const nonce = txDetails.nonce || (await getTransactionCount(txDetails.from));
 
   let tx = {
     hash: txDetails.hash,
     timestamp: null,
-    blockNumber: null,
     from: txDetails.from,
     to: txDetails.to,
     error: false,
+    nonce: nonce,
     interaction: false,
     value: value,
     txFee: txFee,
@@ -907,106 +1017,4 @@ export const parseNewTransaction = async (
   saveLocal(address, accountLocal);
 
   return _transactions;
-};
-
-/**
- * @desc parse websocket pending transaction objects
- * @param  {Object}   [tx = null]
- * @param  {String}   [address = '']
- * @return {Promise}
- */
-export const parseWebsocketTransaction = async (tx = null, address = '') => {
-  let result = null;
-  const hash = tx.hash;
-  const blockNumber = tx.blockNumber;
-  let interaction = false;
-  const data = tx.input;
-  const from = tx.from;
-  let to = tx.to;
-  let asset = {
-    name: 'Ethereum',
-    symbol: 'ETH',
-    address: null,
-    decimals: 18
-  };
-  let value = {
-    amount: tx.value,
-    display: convertAmountToDisplay(tx.value, null, {
-      symbol: 'ETH',
-      decimals: 18
-    })
-  };
-  let totalGas = BigNumber(`${tx.gas}`)
-    .times(BigNumber(`${tx.gasPrice}`))
-    .toString();
-  let txFee = {
-    amount: totalGas,
-    display: convertAmountToDisplay(totalGas, null, {
-      symbol: 'ETH',
-      decimals: 18
-    })
-  };
-  if (tx.input.startsWith(smartContractMethods.token_transfer.hash)) {
-    const allTokens = getLocal('token_info') || {};
-    let foundToken = null;
-    Object.keys(allTokens).forEach(tokenSymbol => {
-      if (allTokens[tokenSymbol].address === tx.to) {
-        foundToken = allTokens[tokenSymbol];
-      }
-    });
-    if (tx.to === '0xc55cf4b03948d7ebc8b9e8bad92643703811d162') {
-      /* STT token on Ropsten */
-      asset = {
-        name: 'Status Test Token',
-        symbol: 'STT',
-        address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
-        decimals: 18
-      };
-    } else if (foundToken) {
-      asset = foundToken;
-    } else {
-      const response = await apiGetEthplorerTokenInfo(tx.to);
-
-      asset = {
-        name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
-        symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
-        address: !response.data.error ? response.data.address : '',
-        decimals: !response.data.error ? convertStringToNumber(response.data.decimals) : 18
-      };
-
-      if (asset.symbol === '———' && !allTokens[asset.address]) {
-        allTokens[asset.address] = asset;
-      } else if (!allTokens[asset.symbol]) {
-        allTokens[asset.symbol] = asset;
-      }
-      saveLocal('token_info', allTokens);
-    }
-
-    to = `0x${tx.input.slice(34, 74)}`;
-    const hexResult = hexToNumberString(`${tx.input.slice(74)}`);
-    const amount = convertAssetAmountToBigNumber(hexResult, asset.decimals);
-    value = { amount, display: convertAmountToDisplay(amount, null, asset) };
-  } else if (tx.input !== '0x') {
-    interaction = true;
-  }
-  result = {
-    hash,
-    timestamp: null,
-    blockNumber,
-    from,
-    to,
-    data,
-    error: null,
-    interaction,
-    value,
-    txFee,
-    native: null,
-    asset
-  };
-
-  if (tx.to === address || tx.from === address) {
-    return result;
-  } else {
-    return null;
-  }
 };

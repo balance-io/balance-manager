@@ -17,7 +17,7 @@ import {
   fetchTx
 } from '../helpers/web3';
 import { notificationShow } from './_notification';
-import { accountUpdateTransactions } from './_account';
+import { accountUpdateTransactions, accountSetupWebSocket } from './_account';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -136,10 +136,12 @@ export const sendEtherMetamask = ({
   })
     .then(txHash => {
       fetchTx(txHash).then(console.log);
+      dispatch(accountSetupWebSocket(address));
       const txDetails = {
         hash: txHash,
         from: address,
         to: recipient,
+        nonce: null,
         value: amount,
         gasPrice: gasPrice.value.amount,
         gasLimit: gasLimit,
@@ -171,6 +173,7 @@ export const sendTokenMetamask = ({
     tokenObject: selectedAsset,
     from: address,
     to: recipient,
+    nonce: null,
     amount: amount,
     gasPrice: gasPrice.value.amount,
     gasLimit: gasLimit

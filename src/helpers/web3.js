@@ -72,6 +72,14 @@ export const web3WebSocketPendingTxs = () =>
   });
 
 /**
+ * @desc get address transaction count
+ * @param {String} address
+ * @return {Promise}
+ */
+export const getTransactionCount = address =>
+  web3Instance.eth.getTransactionCount(address, 'pending');
+
+/**
  * @desc get account ether balance
  * @param  {String} accountAddress
  * @param  {String} tokenAddress
@@ -126,8 +134,7 @@ export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }
   const _gasPrice = gasPrice || (await web3Instance.eth.getGasPrice());
   const estimateGasData = value === '0x00' ? { from, to, data } : { to, data };
   const _gasLimit = gasLimit || (await web3Instance.eth.estimateGas(estimateGasData));
-  const nonce = await web3Instance.eth.getTransactionCount(from);
-  console.log('nonce', nonce);
+  const nonce = await getTransactionCount(from);
   const tx = {
     nonce: web3Instance.utils.toHex(nonce),
     gasPrice: web3Instance.utils.toHex(_gasPrice),

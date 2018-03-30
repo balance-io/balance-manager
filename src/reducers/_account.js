@@ -46,6 +46,36 @@ const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 
 let getPricesInterval = null;
 
+export const accountSetupWebSocket = address => dispatch => {
+  window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+  const connection = new WebSocket('wss://socket.etherscan.io/wshandler');
+
+  connection.onopen = () => {
+    console.log('WebSocket open');
+    const subscription = {
+      event: 'txlist',
+      address: address
+    };
+    console.log('send subscription', JSON.stringify(subscription, null, 2));
+    connection.send(JSON.stringify(subscription));
+  };
+
+  connection.onerror = error => {
+    console.log('WebSocket error');
+  };
+
+  connection.onmessage = message => {
+    try {
+      const json = JSON.parse(message.data);
+      console.log('Websocket message', JSON.stringify(json, null, 2));
+    } catch (e) {
+      console.log("This doesn't look like a valid JSON: ", message.data);
+      return;
+    }
+  };
+};
+
 export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
   console.log('accountUpdateTransactions txDetails', txDetails);
   dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST });

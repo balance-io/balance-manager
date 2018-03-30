@@ -102,8 +102,8 @@ export const walletConnectInitiateTransaction = (
   notificationDetails
 ) => (dispatch, getState) => {
   const deviceUuid = getState().walletconnect.deviceUuid;
-  const keypair = getState().walletconnect.keypair;
-  const encryptedTransactionDetails = encryptMessage(transactionDetails, keypair.publicKey);
+  const keypair = getState().walletconnect.clientPublicKey;
+  const encryptedTransactionDetails = encryptMessage(transactionDetails, clientPublicKey);
   // Q: get transaction details and make encryptedTransactionDetails, notificationDetails (json with  notficationTitle, notificationBody)
   dispatch({ type: WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST });
   apiWalletConnectInitiateTransaction(

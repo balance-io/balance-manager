@@ -107,7 +107,7 @@ export const apiGetEtherscanAccountTransactions = (address = '', network = 'main
  * @type axios instance
  */
 const walletConnect = axios.create({
-  baseURL: 'http://bridge.balance.io',
+  baseURL: 'https://walletconnect.balance.io',
   timeout: 30000, // 30 secs
   headers: {
     'Content-Type': 'application/json',

@@ -1,0 +1,6 @@
+{
+  "token_transfer": {
+    "method": "transfer(address,uint256)",
+    "hash": "0xa9059cbb"
+  }
+}

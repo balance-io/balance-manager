@@ -28,11 +28,13 @@ class AssetIcon extends Component {
     this.updateIcon(this.props);
   }
   componentWillReceiveProps(newProps) {
-    this.updateIcon(this.props);
+    this.updateIcon(newProps);
   }
   onError = () => this.setState({ imgSrc: erc20 });
   render() {
-    return <StyledIcon size={this.props.size} src={this.state.imgSrc} onError={this.onError} />;
+    return (
+      <StyledIcon size={this.props.size} src={this.state.imgSrc || erc20} onError={this.onError} />
+    );
   }
 }
 

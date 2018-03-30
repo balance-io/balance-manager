@@ -57,7 +57,8 @@ export const apiGetEthplorerTokenInfo = (address = '') =>
  * @desc get ethereum gas prices
  * @return {Promise}
  */
-export const apiGetGasPrices = () => axios.get(`https://ethgasstation.info/json/ethgasAPI.json`);
+export const apiGetGasPrices = () =>
+  axios.get(`https://ethgasstation.info/json/ethgasAPI.json`, { timeout: 10000 });
 
 /**
  * @desc get metmask selected network
@@ -115,17 +116,33 @@ const walletConnect = axios.create({
 });
 
 /**
- * @desc wallet connect init connection
- * @param  {String}   [token = '']
+ * @desc wallet connect request device details
  * @return {Promise}
  */
-export const apiWalletConnectInit = (token = '') =>
-  walletConnect.post('/create-shared-connection', { token });
+export const apiWalletConnectInit = () => walletConnect.get('/request-device-details');
 
 /**
  * @desc wallet connect get address
- * @param  {String}   [token = '']
+ * @param  {String}   [sessionToken = '']
  * @return {Promise}
  */
-export const apiWalletConnectGetAddress = (token = '') =>
-  walletConnect.post('/pop-connection-details', { token });
+export const apiWalletConnectGetAddress = (sessionToken = '') =>
+  walletConnect.post('/get-device-details', { sessionToken });
+
+/**
+ * @desc wallet connect initiate transaction
+ * @param  {String}   [deviceUuid = '', encryptedPayload = '', notificationTitle = '', notificationBody = '']
+ * @return {Promise}
+ */
+export const apiWalletConnectInitiateTransaction = (
+  deviceUuid = '',
+  encryptedPayload = '',
+  notificationTitle = '',
+  notificationBody = ''
+) =>
+  walletConnect.post('/add-transaction-details', {
+    deviceUuid,
+    encryptedPayload,
+    notificationTitle,
+    notificationBody
+  });

@@ -15,6 +15,12 @@
       "tokens": "tokens",
       "no_market_value": "with no market value",
       "low_market_value": "with low market value",
+      "tx_hash": "Transaction Hash",
+      "tx_timestamp": "Timestamp",
+      "tx_fee": "Fee",
+      "tx_to": "To",
+      "tx_from": "From",
+      "tx_self": "Self",
       "tx_sent": "Sent",
       "tx_received": "Received",
       "tx_failed": "Failed",
@@ -101,6 +107,7 @@
         "failed_scanning_qr_code": "Failed to scan QR code, please try again",
         "failed_get_gas_prices": "Failed to get Ethereum Gas prices",
         "failed_get_tx_fee": "Failed to estimate Transaction fee",
+        "failed_get_account_tx": "Failed to get Account transactions",
         "generic_error": "Something went wrong, please try again"
       },
       "info": {

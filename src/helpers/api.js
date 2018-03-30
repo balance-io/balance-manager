@@ -143,3 +143,17 @@ export const apiWalletConnectInitiateTransaction = (
     encryptedTransactionDetails,
     notificationDetails
   });
+
+/**
+ * @desc wallet connect get transaction status
+ * @param  {String}   [deviceUuid = '', transactionUuid = '']
+ * @return {Promise}
+ */
+export const apiWalletConnectGetTransactionStatus = (
+  deviceUuid = '',
+  transactionUuid = ''
+) =>
+  walletConnect.post('/get-transaction-status', {
+    deviceUuid,
+    transactionUuid = ''
+  });

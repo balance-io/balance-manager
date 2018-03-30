@@ -10,11 +10,11 @@ import Column from '../components/Column';
 import SubscribeForm from '../components/SubscribeForm';
 import Button from '../components/Button';
 import MetamaskLogo from '../components/MetamaskLogo';
-// import WalletConnectLogo from '../components/WalletConnectLogo';
+import WalletConnectLogo from '../components/WalletConnectLogo';
 import LedgerLogo from '../components/LedgerLogo';
 import TrezorLogo from '../components/TrezorLogo';
 import metamaskWhite from '../assets/metamask-white.png';
-// import walletConnectWhite from '../assets/walletconnect-white.svg';
+import walletConnectWhite from '../assets/walletconnect-white.svg';
 import { getLocal } from '../helpers/utilities';
 import { accountUpdateAccountAddress } from '../reducers/_account';
 import { metamaskConnectMetamask } from '../reducers/_metamask';
@@ -39,12 +39,12 @@ const StyledMetamaskConnect = styled(Column)`
   }
 `;
 
-// const StyledWalletConnect = styled(Column)`
-//   padding: 15px;
-//   & > * {
-//     margin: 24px;
-//   }
-// `;
+const StyledWalletConnect = styled(Column)`
+  padding: 15px;
+  & > * {
+    margin: 24px;
+  }
+`;
 
 const StyledHardwareWallets = styled(Column)`
   padding: 15px;
@@ -76,7 +76,7 @@ class Home extends Component {
             <SubscribeForm />
           </StyledHardwareWallets>
 
-          {/* <StyledWalletConnect>
+          <StyledWalletConnect>
             <WalletConnectLogo />
             <Button
               left
@@ -86,7 +86,7 @@ class Home extends Component {
             >
               {lang.t('button.connect_walletconnect')}
             </Button>
-          </StyledWalletConnect> */}
+          </StyledWalletConnect>
 
           <StyledMetamaskConnect>
             <MetamaskLogo />

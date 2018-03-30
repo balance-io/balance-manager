@@ -4,7 +4,7 @@ forge.options.usePureJavascript = true;
 
 const pki = forge.pki;
 
-const trimeHeaders = key => {
+const trimHeaders = key => {
   if (key.indexOf('PRIVATE KEY') !== -1) {
     return key
       .replace('-----BEGIN RSA PRIVATE KEY-----', '')
@@ -29,8 +29,8 @@ export const generateKeyPair = () =>
 
       const keypair = {
         trimmedHeaders: {
-          publicKey: trimeHeaders(publicKey),
-          privateKey: trimeHeaders(privateKey)
+          publicKey: trimHeaders(publicKey),
+          privateKey: trimHeaders(privateKey)
         },
         publicKey,
         privateKey

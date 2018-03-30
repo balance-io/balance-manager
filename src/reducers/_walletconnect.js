@@ -200,15 +200,15 @@ export default (state = INITIAL_STATE, action) => {
         fetching: false,
         transactionUuid: ''
       };
-    case WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST:
+    case WALLET_CONNECT_GET_TRANSACTION_STATUS_REQUEST:
       return { ...state, fetching: true };
-    case WALLET_CONNECT_GET_TRANSACTION_HASH_SUCCESS:
+    case WALLET_CONNECT_GET_TRANSACTION_STATUS_SUCCESS:
       return {
         ...state,
         transactionHash: action.payload,
         fetching: false
       };
-    case WALLET_CONNECT_GET_TRANSACTION_HASH_FAILURE:
+    case WALLET_CONNECT_GET_TRANSACTION_STATUS_FAILURE:
       return {
         ...state,
         fetching: false,

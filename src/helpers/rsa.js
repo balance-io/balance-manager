@@ -1,16 +1,47 @@
-import { Crypt, RSA } from 'hybrid-crypto-js';
+import forge from 'node-forge';
 
-const rsa = new RSA();
-const crypt = new Crypt();
+forge.options.usePureJavascript = true;
 
-export const generateKeypair = () => new Promise((resolve) =>
-  rsa.generateKeypair(keypair => resolve(keypair), 2048));
+const pki = forge.pki;
 
-export const encryptMessage = (message, publicKey) => 
-  crypt.encrypt(publicKey, message);
+const trimeHeaders = key => {
+  if (key.indexOf('PRIVATE KEY') !== -1) {
+    return key
+      .replace('-----BEGIN RSA PRIVATE KEY-----', '')
+      .replace('-----END RSA PRIVATE KEY-----', '')
+      .replace(/[\r\n\s\t]/g, '');
+  } else {
+    return key
+      .replace('-----BEGIN PUBLIC KEY-----', '')
+      .replace('-----END PUBLIC KEY-----', '')
+      .replace(/[\r\n\s\t]/g, '');
+  }
+};
 
-export const decryptMessage = (encryptedMessage, privateKey) => 
-  crypt.decrypt(privateKey, encryptedMessage);
+export const generateKeyPair = () =>
+  new Promise((resolve, reject) =>
+    pki.rsa.generateKeyPair({ bits: 1024 }, (err, raw) => {
+      if (err) {
+        reject(err);
+      }
+      const publicKey = pki.publicKeyToPem(raw.publicKey);
+      const privateKey = pki.privateKeyToPem(raw.privateKey);
 
+      const keypair = {
+        trimmedHeaders: {
+          publicKey: trimeHeaders(publicKey),
+          privateKey: trimeHeaders(privateKey)
+        },
+        publicKey,
+        privateKey
+      };
 
+      resolve(keypair);
+    })
+  );
 
+export const encryptMessage = (message, publicKey) =>
+  pki.publicKeyFromPem(publicKey).encrypt(message);
+
+export const decryptMessage = (encryptedMessage, privateKey) =>
+  pki.privateKeyFromPem(privateKey).decrypt(encryptedMessage);

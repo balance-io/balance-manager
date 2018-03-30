@@ -4,7 +4,7 @@ import {
   apiWalletConnectGetTransactionStatus,
   apiWalletConnectInitiateTransaction
 } from '../helpers/api';
-import { generateKeypair, encryptMessage, decryptMessage } from '../helpers/rsa';
+import { generateKeyPair, encryptMessage, decryptMessage } from '../helpers/rsa';
 import { saveLocal } from '../helpers/utilities';
 import { parseError } from '../helpers/parsers';
 import { notificationShow } from './_notification';
@@ -40,7 +40,7 @@ const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
 // -- Actions --------------------------------------------------------------- //
 
 export const walletConnectModalInit = () => async (dispatch, getState) => {
-  const keypair = await generateKeypair();
+  const keypair = await generateKeyPair();
   dispatch({ type: WALLET_CONNECT_SEND_TOKEN_REQUEST, payload: keypair });
   apiWalletConnectInit()
     .then(({ data }) => {

@@ -14,7 +14,7 @@ import {
   saveLocal,
   getLocal
 } from './utilities';
-import { getTransactionCount } from './web3';
+import { getTransactionCount, fetchTx } from './web3';
 import { getTimeString } from './time';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
@@ -607,9 +607,10 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
 /**
  * @desc parse ethplorer address token history
  * @param  {String}   [data = null]
+ * @param  {String} [address='']
  * @return {Promise}
  */
-export const parseEthplorerAddressHistory = async (data = null) => {
+export const parseEthplorerAddressHistory = async (data = null, address = '') => {
   if (!data || !data.result) return null;
 
   let transactions = await Promise.all(
@@ -625,13 +626,6 @@ export const parseEthplorerAddressHistory = async (data = null) => {
         symbol: tx.tokenInfo.symbol || '———',
         address: tx.tokenInfo.address || null,
         decimals: tx.tokenInfo.decimals ? convertStringToNumber(tx.tokenInfo.decimals) : 18
-      };
-
-      let asset = {
-        name: tx.tokenInfo.name,
-        symbol: tx.tokenInfo.symbol,
-        address: tx.tokenInfo.address,
-        decimals: tx.tokenInfo.decimals
       };
 
       const allTokens = getLocal('token_info') || {};
@@ -651,41 +645,19 @@ export const parseEthplorerAddressHistory = async (data = null) => {
       };
       let txFee = null;
 
-      if (tx.input.startsWith(smartContractMethods.token_transfer.hash)) {
-        const allTokens = getLocal('token_info') || {};
-        let foundToken = null;
-        Object.keys(allTokens).forEach(tokenSymbol => {
-          if (allTokens[tokenSymbol].address === tx.to) {
-            foundToken = allTokens[tokenSymbol];
-          }
-        });
-        if (tx.to === '0xc55cf4b03948d7ebc8b9e8bad92643703811d162') {
-          /* STT token on Ropsten */
-          asset = {
-            name: 'Status Test Token',
-            symbol: 'STT',
-            address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
+      const response = await fetchTx(tx.hash);
+
+      if (response.data) {
+        let totalGas = BigNumber(`${response.data.gas}`)
+          .times(BigNumber(`${response.data.gasPrice}`))
+          .toString();
+        txFee = {
+          amount: totalGas,
+          display: convertAmountToDisplay(totalGas, null, {
+            symbol: 'ETH',
             decimals: 18
-          };
-        } else if (foundToken) {
-          asset = foundToken;
-        } else {
-          const response = await apiGetEthplorerTokenInfo(tx.to);
-
-          asset = {
-            name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
-            symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
-            address: !response.data.error ? response.data.address : '',
-            decimals: !response.data.error ? convertStringToNumber(response.data.decimals) : 18
-          };
-        }
-
-        to = `0x${tx.input.slice(34, 74)}`;
-        const hexResult = hexToNumberString(`${tx.input.slice(74)}`);
-        const amount = convertAssetAmountToBigNumber(hexResult, asset.decimals);
-        value = { amount, display: convertAmountToDisplay(amount, null, asset) };
-      } else if (tx.input !== '0x') {
-        interaction = true;
+          })
+        };
       }
 
       const result = {
@@ -704,12 +676,6 @@ export const parseEthplorerAddressHistory = async (data = null) => {
       return result;
     })
   );
-
-  transactions = transactions.reverse();
-
-  const accountLocal = getLocal(address) || {};
-  accountLocal.transactions = transactions;
-  saveLocal(address, accountLocal);
 
   return transactions;
 };

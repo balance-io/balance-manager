@@ -1,5 +1,9 @@
 import axios from 'axios';
-import { parseEthplorerAddressInfo, parseEtherscanAccountTransactions } from './parsers';
+import {
+  parseEthplorerAddressInfo,
+  parseEthplorerAddressHistory,
+  parseEtherscanAccountTransactions
+} from './parsers';
 import { testnetGetAddressInfo } from './testnet';
 import networkList from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
@@ -43,6 +47,27 @@ export const apiGetEthplorerAddressInfo = (address = '', network = 'mainnet') =>
   return axios
     .get(`https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`)
     .then(({ data }) => parseEthplorerAddressInfo(data));
+};
+
+/**
+ * @desc get ethplorer address info
+ * @param  {String}   [address = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetEthplorerAddressHistory = (address = '', network = 'mainnet') => {
+  if (network !== 'mainnet') {
+    return null;
+  }
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`https://api.ethplorer.io/getAddressHistory/${address}?apiKey=freekey`)
+      .then(({ data }) =>
+        parseEthplorerAddressHistory(data, address)
+          .then(transactions => resolve(transactions))
+          .catch(err => reject(err))
+      );
+  });
 };
 
 /**

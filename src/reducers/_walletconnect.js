@@ -1,8 +1,10 @@
 import {
   apiWalletConnectInit,
   apiWalletConnectGetAddress,
+  apiWalletConnectGetTransactionStatus,
   apiWalletConnectInitiateTransaction
 } from '../helpers/api';
+import { generateKeypair, encryptMessage, decryptMessage } from '../helpers/rsa';
 import { saveLocal } from '../helpers/utilities';
 import { parseError } from '../helpers/parsers';
 import { notificationShow } from './_notification';
@@ -19,12 +21,12 @@ const WALLET_CONNECT_GET_ADDRESS_REQUEST = 'walletConnect/WALLET_CONNECT_GET_ADD
 const WALLET_CONNECT_GET_ADDRESS_SUCCESS = 'walletConnect/WALLET_CONNECT_GET_ADDRESS_SUCCESS';
 const WALLET_CONNECT_GET_ADDRESS_FAILURE = 'walletConnect/WALLET_CONNECT_GET_ADDRESS_FAILURE';
 
-const WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST =
-  'walletConnect/WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST';
-const WALLET_CONNECT_GET_TRANSACTION_HASH_SUCCESS =
-  'walletConnect/WALLET_CONNECT_GET_TRANSACTION_HASH_SUCCESS';
-const WALLET_CONNECT_GET_TRANSACTION_HASH_FAILURE =
-  'walletConnect/WALLET_CONNECT_GET_TRANSACTION_HASH_FAILURE';
+const WALLET_CONNECT_GET_TRANSACTION_STATUS_REQUEST =
+  'walletConnect/WALLET_CONNECT_GET_TRANSACTION_STATUS_REQUEST';
+const WALLET_CONNECT_GET_TRANSACTION_STATUS_SUCCESS =
+  'walletConnect/WALLET_CONNECT_GET_TRANSACTION_STATUS_SUCCESS';
+const WALLET_CONNECT_GET_TRANSACTION_STATUS_FAILURE =
+  'walletConnect/WALLET_CONNECT_GET_TRANSACTION_STATUS_FAILURE';
 
 const WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST =
   'walletConnect/WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST';
@@ -37,91 +39,9 @@ const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
-export const walletConnectGetAddress = () => (dispatch, getState) => {
-  const sessionToken = getState().walletconnect.sessionToken;
-  dispatch({ type: WALLET_CONNECT_GET_ADDRESS_REQUEST });
-  apiWalletConnectGetAddress(sessionToken)
-    .then(({ data }) => {
-      const deviceUuid = data ? data.deviceUuid : '';
-      const address = data ? JSON.parse(data.encryptedPayload).addresses[0] : '';
-      // Q: why only taking the first address?
-      if (address) {
-        dispatch({
-          type: WALLET_CONNECT_GET_ADDRESS_SUCCESS,
-          payload: { address, deviceUuid }
-        });
-        // Q: do I need to also saveLocal the device UUID?
-        saveLocal('walletconnect', address);
-        dispatch(modalClose());
-        // Q: do I need to add account update wallet connect for device UUID?
-        dispatch(accountUpdateAccountAddress(address, 'WALLETCONNECT'));
-        window.browserHistory.push('/wallet');
-      } else if (!getState().walletconnect.address) {
-        setTimeout(() => dispatch(walletConnectGetAddress()), 500);
-      }
-    })
-    .catch(error => {
-      const message = parseError(error);
-      dispatch(notificationShow(message), true);
-      dispatch({ type: WALLET_CONNECT_GET_ADDRESS_FAILURE });
-      setTimeout(() => dispatch(walletConnectGetAddress()), 500);
-    });
-};
-
-export const walletConnectGetTransactionHash = () => (dispatch, getState) => {
-  const sessionToken = getState().walletconnect.sessionToken;
-  dispatch({ type: WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST });
-  apiWalletConnectGetAddress(sessionToken)
-    .then(({ data }) => {
-      const transactionHash = data ? data.transactionHash : '';
-      if (transactionHash) {
-        dispatch({
-          type: WALLET_CONNECT_GET_TRANSACTION_HASH_SUCCESS,
-          payload: transactionHash
-        });
-        dispatch(modalClose());
-      } else if (!getState().walletconnect.address) {
-        setTimeout(() => dispatch(walletConnectGetTransactionHash()), 500);
-      }
-    })
-    .catch(error => {
-      const message = parseError(error);
-      dispatch(notificationShow(message), true);
-      dispatch({ type: WALLET_CONNECT_GET_TRANSACTION_HASH_FAILURE });
-      setTimeout(() => dispatch(walletConnectGetTransactionHash()), 500);
-    });
-};
-
-export const walletConnectInitiateTransaction = (
-  encryptedPayload,
-  notificationTitle,
-  notificationBody
-) => (dispatch, getState) => {
-  const deviceUuid = getState().walletconnect.deviceUuid;
-  // Q: get transaction details and make encrypted payload, notification title, notification body
-  dispatch({ type: WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST });
-  apiWalletConnectInitiateTransaction(
-    deviceUuid,
-    encryptedPayload,
-    notificationTitle,
-    notificationBody
-  )
-    .then(({ data }) => {
-      const transactionUuid = data ? data.transactionUuid : '';
-      dispatch({
-        type: WALLET_CONNECT_INITIATE_TRANSACTION_SUCCESS,
-        payload: transactionUuid
-      });
-    })
-    .catch(error => {
-      const message = parseError(error);
-      dispatch(notificationShow(message), true);
-      dispatch({ type: WALLET_CONNECT_INITIATE_TRANSACTION_FAILURE });
-    });
-};
-
-export const wallletConnectModalInit = () => (dispatch, getState) => {
-  dispatch({ type: WALLET_CONNECT_SEND_TOKEN_REQUEST });
+export const walletConnectModalInit = () => async (dispatch, getState) => {
+  const keypair = await generateKeypair();
+  dispatch({ type: WALLET_CONNECT_SEND_TOKEN_REQUEST, payload: keypair });
   apiWalletConnectInit()
     .then(({ data }) => {
       const sessionToken = data ? data.sessionToken : '';
@@ -139,7 +59,98 @@ export const wallletConnectModalInit = () => (dispatch, getState) => {
     });
 };
 
-export const wallletConnectClearFields = () => ({ type: WALLET_CONNECT_CLEAR_FIELDS });
+export const walletConnectGetAddress = () => (dispatch, getState) => {
+  const sessionToken = getState().walletconnect.sessionToken;
+  const keypair = getState().walletconnect.keypair;
+  dispatch({ type: WALLET_CONNECT_GET_ADDRESS_REQUEST });
+  apiWalletConnectGetAddress(sessionToken)
+    .then(({ data }) => {
+      const deviceUuid = data ? data.deviceUuid : '';
+      const encryptedDeviceDetails = data ? JSON.parse(data.encryptedDeviceDetails) : '';
+      if (deviceUuid && encryptedDeviceDetails) {
+        const deviceDetails = decryptMessage(encryptedDeviceDetails, keypair.privateKey);
+        const clientPublicKey = deviceDetails.publicKey;
+        const addresses = deviceDetails.addresses;
+        dispatch({
+          type: WALLET_CONNECT_GET_ADDRESS_SUCCESS,
+          payload: { addresses, deviceUuid, clientPublicKey }
+        });
+        // Q: do I need to also saveLocal the device UUID?
+        saveLocal('walletconnect', addresses);
+        dispatch(modalClose());
+        // Q: do I need to add account update wallet connect for device UUID?
+        dispatch(accountUpdateAccountAddress(addresses[0], 'WALLETCONNECT'));
+        window.browserHistory.push('/wallet');
+      } else if (!getState().walletconnect.addresses.length) {
+        setTimeout(() => dispatch(walletConnectGetAddress()), 500);
+      }
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message), true);
+      dispatch({ type: WALLET_CONNECT_GET_ADDRESS_FAILURE });
+      setTimeout(() => dispatch(walletConnectGetAddress()), 500);
+    });
+};
+
+export const walletConnectInitiateTransaction = (transactionDetails, notificationDetails) => (
+  dispatch,
+  getState
+) => {
+  const deviceUuid = getState().walletconnect.deviceUuid;
+  const clientPublicKey = getState().walletconnect.clientPublicKey;
+  const encryptedTransactionDetails = encryptMessage(transactionDetails, clientPublicKey);
+  // Q: get transaction details and make encryptedTransactionDetails, notificationDetails (json with  notficationTitle, notificationBody)
+  dispatch({ type: WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST });
+  apiWalletConnectInitiateTransaction(deviceUuid, encryptedTransactionDetails, notificationDetails)
+    .then(({ data }) => {
+      const transactionUuid = data ? data.transactionUuid : '';
+      dispatch({
+        type: WALLET_CONNECT_INITIATE_TRANSACTION_SUCCESS,
+        payload: transactionUuid
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message), true);
+      dispatch({ type: WALLET_CONNECT_INITIATE_TRANSACTION_FAILURE });
+    });
+};
+
+export const walletConnectGetTransactionStatus = transactionUuid => (dispatch, getState) => {
+  const deviceUuid = getState().walletconnect.deviceUuid;
+  dispatch({ type: WALLET_CONNECT_GET_TRANSACTION_STATUS_REQUEST });
+  apiWalletConnectGetTransactionStatus(deviceUuid, transactionUuid)
+    .then(({ data }) => {
+      const encryptedTransactionStatus = data ? data.encryptedTransactionStatus : '';
+      if (encryptedTransactionStatus) {
+        const transactionStatus = decryptMessage(encryptedTransactionStatus);
+        const transactionSuccess = transactionStatus.success;
+        if (transactionSuccess) {
+          const transactionHash = transactionStatus.transactionHash;
+          dispatch({
+            type: WALLET_CONNECT_GET_TRANSACTION_STATUS_SUCCESS,
+            payload: transactionHash
+          });
+          dispatch(modalClose());
+        } else {
+          dispatch({ type: WALLET_CONNECT_GET_TRANSACTION_STATUS_FAILURE });
+          // Q: do anything else if failed?
+        }
+        //Q: any specific check required?
+      } else {
+        setTimeout(() => dispatch(walletConnectGetTransactionStatus(transactionUuid)), 500);
+      }
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message), true);
+      dispatch({ type: WALLET_CONNECT_GET_TRANSACTION_STATUS_FAILURE });
+      setTimeout(() => dispatch(walletConnectGetTransactionStatus(transactionUuid)), 500);
+    });
+};
+
+export const walletConnectClearFields = () => ({ type: WALLET_CONNECT_CLEAR_FIELDS });
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
@@ -147,7 +158,9 @@ const INITIAL_STATE = {
   sessionToken: '',
   transactionUuid: '',
   deviceUuid: '',
-  address: ''
+  addresses: [],
+  keypair: {},
+  clientPublicKey: ''
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -155,7 +168,8 @@ export default (state = INITIAL_STATE, action) => {
     case WALLET_CONNECT_SEND_TOKEN_REQUEST:
       return {
         ...state,
-        fetching: true
+        fetching: true,
+        keypair: action.payload
       };
     case WALLET_CONNECT_SEND_TOKEN_SUCCESS:
       return {
@@ -174,16 +188,18 @@ export default (state = INITIAL_STATE, action) => {
     case WALLET_CONNECT_GET_ADDRESS_SUCCESS:
       return {
         ...state,
-        address: action.payload.address,
+        addresses: action.payload.addresses,
         deviceUuid: action.payload.deviceUuid,
+        clientPublicKey: action.payload.clientPublicKey,
         fetching: false
       };
     case WALLET_CONNECT_GET_ADDRESS_FAILURE:
       return {
         ...state,
         fetching: false,
-        address: '',
-        deviceUuid: ''
+        addresses: [],
+        deviceUuid: '',
+        clientPublicKey: ''
       };
     case WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST:
       return { ...state, fetching: true };
@@ -199,15 +215,15 @@ export default (state = INITIAL_STATE, action) => {
         fetching: false,
         transactionUuid: ''
       };
-    case WALLET_CONNECT_GET_TRANSACTION_HASH_REQUEST:
+    case WALLET_CONNECT_GET_TRANSACTION_STATUS_REQUEST:
       return { ...state, fetching: true };
-    case WALLET_CONNECT_GET_TRANSACTION_HASH_SUCCESS:
+    case WALLET_CONNECT_GET_TRANSACTION_STATUS_SUCCESS:
       return {
         ...state,
         transactionHash: action.payload,
         fetching: false
       };
-    case WALLET_CONNECT_GET_TRANSACTION_HASH_FAILURE:
+    case WALLET_CONNECT_GET_TRANSACTION_STATUS_FAILURE:
       return {
         ...state,
         fetching: false,

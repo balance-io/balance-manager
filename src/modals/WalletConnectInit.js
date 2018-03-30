@@ -47,7 +47,7 @@ class WalletConnectInit extends Component {
       <StyledContainer>
         {this.props.sessionToken && (
           <StyledQRCodeDisplay
-            data={`{"domain":"http://bridge.balance.io","sessionToken":"${this.props.sessionToken}"}`}
+            data={`{"domain":"https://walletconnect.balance.io","sessionToken":"${this.props.sessionToken}","publicKey":"${this.props.keypair.publicKey}"}`}
           />
         )}
         <StyledCenter>

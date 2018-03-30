@@ -134,9 +134,9 @@ export const apiWalletConnectGetAddress = (sessionToken = '') =>
  * @return {Promise}
  */
 export const apiWalletConnectInitiateTransaction = (
-  deviceUuid = '',
-  encryptedTransactionDetails = '',
-  notificationDetails = {}
+  deviceUuid: '',
+  encryptedTransactionDetails: '',
+  notificationDetails: {}
 ) =>
   walletConnect.post('/add-transaction-details', {
     deviceUuid,
@@ -150,10 +150,10 @@ export const apiWalletConnectInitiateTransaction = (
  * @return {Promise}
  */
 export const apiWalletConnectGetTransactionStatus = (
-  deviceUuid = '',
-  transactionUuid = ''
+  deviceUuid: '',
+  transactionUuid: ''
 ) =>
   walletConnect.post('/get-transaction-status', {
     deviceUuid,
-    transactionUuid = ''
+    transactionUuid
   });

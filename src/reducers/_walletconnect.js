@@ -1,6 +1,7 @@
 import {
   apiWalletConnectInit,
   apiWalletConnectGetAddress,
+  apiWalletConnectGetTransactionStatus,
   apiWalletConnectInitiateTransaction
 } from '../helpers/api';
 import { saveLocal } from '../helpers/utilities';

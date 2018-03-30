@@ -136,12 +136,12 @@ export const apiWalletConnectGetAddress = (sessionToken = '') =>
  */
 export const apiWalletConnectInitiateTransaction = (
   deviceUuid: '',
-  encryptedTransactionDetails: '',
+  transactionDetails: '',
   notificationDetails: {}
 ) =>
   walletConnect.post('/add-transaction-details', {
     deviceUuid,
-    encryptedTransactionDetails,
+    transactionDetails,
     notificationDetails
   });
 

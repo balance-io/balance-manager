@@ -2,6 +2,7 @@ import axios from 'axios';
 import { parseEthplorerAddressInfo, parseEtherscanAccountTransactions } from './parsers';
 import { testnetGetAddressInfo } from './testnet';
 import networkList from '../libraries/ethereum-networks.json';
+import nativeCurrencies from '../libraries/native-currencies.json';
 
 /**
  * @desc TEST lambda function
@@ -14,12 +15,11 @@ export const apiLambdaGetBalance = (address = '') =>
 /**
  * @desc get prices
  * @param  {Array}   [asset=[]]
- * @param  {Array}   [native=[]]
  * @return {Promise}
  */
-export const apiGetPrices = (assets = [], native = []) => {
+export const apiGetPrices = (assets = []) => {
   const assetsQuery = JSON.stringify(assets).replace(/[[\]"]/gi, '');
-  const nativeQuery = JSON.stringify(native).replace(/[[\]"]/gi, '');
+  const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(/[[\]"]/gi, '');
   return axios.get(
     `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}`
   );
@@ -28,12 +28,11 @@ export const apiGetPrices = (assets = [], native = []) => {
 /**
  * @desc get historical prices
  * @param  {String}  [assetSymbol='']
- * @param  {Array}   [native=[]]
  * @param  {Number}  [timestamp=Date.now()]
  * @return {Promise}
  */
-export const apiGetHistoricalPrices = (assetSymbol = '', native = [], timestamp = Date.now()) => {
-  const nativeQuery = JSON.stringify(native).replace(/[[\]"]/gi, '');
+export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now()) => {
+  const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(/[[\]"]/gi, '');
   return axios.get(
     `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`
   );
@@ -66,7 +65,8 @@ export const apiGetEthplorerTokenInfo = (address = '') =>
  * @desc get ethereum gas prices
  * @return {Promise}
  */
-export const apiGetGasPrices = () => axios.get(`https://ethgasstation.info/json/ethgasAPI.json`);
+export const apiGetGasPrices = () =>
+  axios.get(`https://ethgasstation.info/json/ethgasAPI.json`, { timeout: 10000 });
 
 /**
  * @desc get metmask selected network
@@ -102,10 +102,55 @@ export const apiGetEtherscanAccountTransactions = (address = '', network = 'main
         `https://${subdomain}.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=8KDJ1H41UEGEA6CF4P8NEPUANQ3SE8HZGE`
       )
       .then(({ data }) =>
-        parseEtherscanAccountTransactions(data)
+        parseEtherscanAccountTransactions(data, address)
           .then(transactions => resolve(transactions))
           .catch(err => reject(err))
       )
       .catch(err => reject(err));
   });
 };
+
+/**
+ * Configuration for WalletConnect api instance
+ * @type axios instance
+ */
+const walletConnect = axios.create({
+  baseURL: 'http://bridge.balance.io',
+  timeout: 30000, // 30 secs
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: '&xFvdofLFGDPzk9LwWQEEpoqP^YFJ8ReGREe2VPWZsKKYcwnBndAA8xWncYgJDqm'
+  }
+});
+
+/**
+ * @desc wallet connect request device details
+ * @return {Promise}
+ */
+export const apiWalletConnectInit = () => walletConnect.get('/request-device-details');
+
+/**
+ * @desc wallet connect get address
+ * @param  {String}   [sessionToken = '']
+ * @return {Promise}
+ */
+export const apiWalletConnectGetAddress = (sessionToken = '') =>
+  walletConnect.post('/get-device-details', { sessionToken });
+
+/**
+ * @desc wallet connect initiate transaction
+ * @param  {String}   [deviceUuid = '', encryptedPayload = '', notificationTitle = '', notificationBody = '']
+ * @return {Promise}
+ */
+export const apiWalletConnectInitiateTransaction = (
+  deviceUuid = '',
+  encryptedPayload = '',
+  notificationTitle = '',
+  notificationBody = ''
+) =>
+  walletConnect.post('/add-transaction-details', {
+    deviceUuid,
+    encryptedPayload,
+    notificationTitle,
+    notificationBody
+  });

@@ -1,20 +1,45 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import iconIndex from '../cryptocurrency-icons';
+import eth from '../assets/eth.svg';
+import erc20 from '../assets/erc20.svg';
 
 const StyledIcon = styled.img`
   width: ${({ size }) => `${size}px`};
   height: ${({ size }) => `${size}px`};
 `;
 
-const AssetIcon = ({ currency, size, ...props }) => {
-  const icon = iconIndex[currency.split(' ')[0].toLowerCase()] || iconIndex['erc20'];
-  return <StyledIcon size={size} src={icon} />;
-};
+class AssetIcon extends Component {
+  state = {
+    imgSrc: null
+  };
+  updateIcon = props => {
+    if (props.asset.toUpperCase() === 'ETH') {
+      this.setState({ imgSrc: eth });
+    } else {
+      this.setState({
+        imgSrc: `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${
+          props.asset
+        }.png`
+      });
+    }
+  };
+  componentWillMount() {
+    this.updateIcon(this.props);
+  }
+  componentWillReceiveProps(newProps) {
+    this.updateIcon(newProps);
+  }
+  onError = () => this.setState({ imgSrc: erc20 });
+  render() {
+    return (
+      <StyledIcon size={this.props.size} src={this.state.imgSrc || erc20} onError={this.onError} />
+    );
+  }
+}
 
 AssetIcon.propTypes = {
-  currency: PropTypes.string.isRequired,
+  asset: PropTypes.string.isRequired,
   size: PropTypes.number
 };
 

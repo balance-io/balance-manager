@@ -1,21 +1,22 @@
+import _ from 'lodash';
 import {
   apiGetEthplorerAddressInfo,
   apiGetEtherscanAccountTransactions,
-  apiGetPrices,
-  apiGetMetamaskNetwork
+  apiGetPrices
 } from '../helpers/api';
 import {
   parseError,
+  parseNewTransaction,
   parseTransactionsPrices,
   parseAccountBalances,
   parsePricesObject,
   parseEthplorerAddressInfo
 } from '../helpers/parsers';
+import lang from '../languages';
 import { saveLocal, getLocal } from '../helpers/utilities';
 import { web3SetProvider } from '../helpers/web3';
-import { warningOffline, warningOnline } from './_warning';
 import { notificationShow } from './_notification';
-import { modalClose } from './_modal';
+import nativeCurrencies from '../libraries/native-currencies.json';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -27,49 +28,131 @@ const ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST = 'account/ACCOUNT_GET_ACCOUNT_BALANC
 const ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS';
 const ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE';
 
-const ACCOUNT_UPDATE_METAMASK_ACCOUNT = 'account/ACCOUNT_UPDATE_METAMASK_ACCOUNT';
-const ACCOUNT_CHECK_NETWORK_IS_CONNECTED = 'account/ACCOUNT_CHECK_NETWORK_IS_CONNECTED';
-
-const ACCOUNT_METAMASK_GET_NETWORK_REQUEST = 'account/ACCOUNT_METAMASK_GET_NETWORK_REQUEST';
-const ACCOUNT_METAMASK_GET_NETWORK_SUCCESS = 'account/ACCOUNT_METAMASK_GET_NETWORK_SUCCESS';
-const ACCOUNT_METAMASK_GET_NETWORK_FAILURE = 'account/ACCOUNT_METAMASK_GET_NETWORK_FAILURE';
-const ACCOUNT_METAMASK_NOT_AVAILABLE = 'account/ACCOUNT_METAMASK_NOT_AVAILABLE';
-
 const ACCOUNT_GET_NATIVE_PRICES_REQUEST = 'account/ACCOUNT_GET_NATIVE_PRICES_REQUEST';
 const ACCOUNT_GET_NATIVE_PRICES_SUCCESS = 'account/ACCOUNT_GET_NATIVE_PRICES_SUCCESS';
 const ACCOUNT_GET_NATIVE_PRICES_FAILURE = 'account/ACCOUNT_GET_NATIVE_PRICES_FAILURE';
 
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
+const ACCOUNT_UPDATE_WEB3_NETWORK = 'account/ACCOUNT_UPDATE_WEB3_NETWORK';
+const ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST = 'account/ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST';
+
+const ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST';
+const ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS';
+const ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE';
+
+const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 
 // -- Actions --------------------------------------------------------------- //
 
-let accountInterval = null;
 let getPricesInterval = null;
 
-export const accountGetAccountTransactions = () => (dispatch, getState) => {
-  const { account, web3Network } = getState().account;
-  dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST });
-  apiGetEtherscanAccountTransactions(account.address, web3Network)
+export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
+  dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST });
+  const currentTransactions = getState().account.transactions;
+  const address = getState().account.accountInfo.address;
+  const nativeCurrency = getState().account.nativeCurrency;
+  parseNewTransaction(txDetails, currentTransactions, nativeCurrency, address)
     .then(transactions => {
-      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: transactions });
-      dispatch(accountGetNativePrices());
+      dispatch({
+        type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,
+        payload: transactions
+      });
     })
     .catch(error => {
+      dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE });
       const message = parseError(error);
       dispatch(notificationShow(message, true));
+    });
+};
+
+export const accountParseTransactionPrices = transactions => (dispatch, getState) => {
+  const currentTransactions = getState().account.transactions;
+  dispatch({
+    type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST,
+    payload: !currentTransactions.length
+  });
+  const address = getState().account.accountInfo.address;
+  const nativeCurrency = getState().account.nativeCurrency;
+  parseTransactionsPrices(transactions, nativeCurrency, address)
+    .then(parsedTransactions => {
+      dispatch({
+        type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,
+        payload: parsedTransactions
+      });
+    })
+    .catch(error => {
+      dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE });
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+    });
+};
+
+export const accountGetAccountTransactions = () => (dispatch, getState) => {
+  const { accountAddress, web3Network } = getState().account;
+  let cachedTransactions = [];
+  const accountLocal = getLocal(accountAddress) || null;
+  if (accountLocal && accountLocal.pending) {
+    cachedTransactions = [...accountLocal.pending];
+  }
+  if (accountLocal && accountLocal.transactions) {
+    cachedTransactions = _.unionBy(cachedTransactions, accountLocal.transactions, 'hash');
+  }
+  dispatch({
+    type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST,
+    payload: {
+      transactions: cachedTransactions,
+      fetchingTransactions:
+        !accountLocal || !accountLocal.transactions || !accountLocal.transactions.length
+    }
+  });
+  apiGetEtherscanAccountTransactions(accountAddress, web3Network)
+    .then(transactions => {
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS });
+      let _transactions = transactions;
+      if (accountLocal && accountLocal.pending) {
+        _transactions = _.unionBy(accountLocal.pending, transactions, 'hash');
+      }
+      dispatch(accountParseTransactionPrices(_transactions));
+    })
+    .catch(error => {
+      // const message = parseError(error);
+      dispatch(notificationShow(lang.t('notification.error.failed_get_account_tx'), true));
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE });
     });
 };
 
-export const accountGetAccountBalances = (address, type) => (dispatch, getState) => {
-  const { web3Network } = getState().account;
-  dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST });
+export const accountGetAccountBalances = address => (dispatch, getState) => {
+  const { web3Network, accountInfo, accountType } = getState().account;
+  let cachedAccount = { ...accountInfo };
+  let cachedTransactions = [];
+  const accountLocal = getLocal(address) || null;
+  if (accountLocal && accountLocal.balances) {
+    cachedAccount = {
+      ...cachedAccount,
+      assets: accountLocal.balances.assets,
+      total: accountLocal.balances.total
+    };
+  }
+  if (accountLocal && accountLocal.pending) {
+    cachedTransactions = [...accountLocal.pending];
+  }
+  if (accountLocal && accountLocal.transactions) {
+    cachedTransactions = _.unionBy(cachedTransactions, accountLocal.transactions, 'hash');
+  }
+  dispatch({
+    type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST,
+    payload: {
+      accountInfo: cachedAccount,
+      transactions: cachedTransactions,
+      fetching: !accountLocal
+    }
+  });
   apiGetEthplorerAddressInfo(address, web3Network)
-    .then(account => {
-      account = { ...account, type };
-      dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS, payload: account });
-      dispatch(accountGetNativePrices());
-      if (account.txCount) dispatch(accountGetAccountTransactions());
+    .then(accountInfo => {
+      accountInfo = { ...accountInfo, accountType };
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS });
+      dispatch(accountGetNativePrices(accountInfo));
+      if (accountInfo.txCount) dispatch(accountGetAccountTransactions());
     })
     .catch(error => {
       const message = parseError(error);
@@ -78,76 +161,41 @@ export const accountGetAccountBalances = (address, type) => (dispatch, getState)
     });
 };
 
-export const accountUpdateMetamaskAccount = () => (dispatch, getState) => {
-  if (window.web3.eth.defaultAccount !== getState().account.metamaskAccount) {
-    const newAccount = window.web3.eth.defaultAccount;
-    dispatch(modalClose());
-    dispatch({ type: ACCOUNT_UPDATE_METAMASK_ACCOUNT, payload: newAccount });
-    if (newAccount) dispatch(accountGetAccountBalances(newAccount, 'METAMASK'));
-  }
-};
-
-export const accountCheckNetworkIsConnected = online => dispatch => {
-  if (online) {
-    dispatch(warningOnline());
-  } else {
-    dispatch(warningOffline());
-  }
-  dispatch({ type: ACCOUNT_CHECK_NETWORK_IS_CONNECTED, payload: online });
-};
-
-export const accountConnectMetamask = () => (dispatch, getState) => {
-  dispatch({ type: ACCOUNT_METAMASK_GET_NETWORK_REQUEST });
-  if (typeof window.web3 !== 'undefined') {
-    apiGetMetamaskNetwork()
-      .then(network => {
-        web3SetProvider(`https://${network}.infura.io/`);
-        dispatch({ type: ACCOUNT_METAMASK_GET_NETWORK_SUCCESS, payload: network });
-        dispatch(accountUpdateMetamaskAccount());
-        accountInterval = setInterval(() => dispatch(accountUpdateMetamaskAccount()), 100);
-      })
-      .catch(err => dispatch({ type: ACCOUNT_METAMASK_GET_NETWORK_FAILURE }));
-  } else {
-    dispatch({ type: ACCOUNT_METAMASK_NOT_AVAILABLE });
-  }
+export const accountUpdateWeb3Network = network => dispatch => {
+  web3SetProvider(`https://${network}.infura.io/`);
+  dispatch({ type: ACCOUNT_UPDATE_WEB3_NETWORK, payload: network });
 };
 
 export const accountClearIntervals = () => dispatch => {
-  clearInterval(accountInterval);
   clearInterval(getPricesInterval);
 };
 
-export const accountGetNativePrices = account => (dispatch, getState) => {
-  const assetSymbols = getState().account.account.assets.map(asset => asset.symbol);
+export const accountUpdateAccountAddress = (accountAddress, accountType) => dispatch => {
+  dispatch({
+    type: ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST,
+    payload: { accountAddress, accountType }
+  });
+  if (accountAddress) dispatch(accountGetAccountBalances(accountAddress));
+};
+
+export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
+  const assetSymbols = accountInfo.assets.map(asset => asset.symbol);
   const getPrices = () => {
     dispatch({
       type: ACCOUNT_GET_NATIVE_PRICES_REQUEST,
       payload: getState().account.nativeCurrency
     });
-    apiGetPrices(assetSymbols, getState().account.nativeCurrency)
+    apiGetPrices(assetSymbols)
       .then(({ data }) => {
-        if (getState().account.nativeCurrency === getState().account.nativePriceRequest) {
-          const prices = parsePricesObject(data, assetSymbols, getState().account.nativeCurrency);
-          const account = parseAccountBalances(getState().account.account, prices);
-          parseTransactionsPrices(
-            getState().account.transactions,
-            getState().account.nativeCurrency
-          )
-            .then(transactions => {
-              transactions =
-                transactions && transactions.length
-                  ? transactions
-                  : getState().account.transactions;
-              dispatch({
-                type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
-                payload: { account, transactions, prices }
-              });
-            })
-            .catch(error => {
-              dispatch({ type: ACCOUNT_GET_NATIVE_PRICES_FAILURE });
-              const message = parseError(error);
-              dispatch(notificationShow(message, true));
-            });
+        const nativePriceRequest = getState().account.nativePriceRequest;
+        const nativeCurrency = getState().account.nativeCurrency;
+        if (nativeCurrency === nativePriceRequest) {
+          const prices = parsePricesObject(data, assetSymbols, nativeCurrency);
+          const parsedAccountInfo = parseAccountBalances(accountInfo, prices);
+          dispatch({
+            type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
+            payload: { accountInfo: parsedAccountInfo, prices }
+          });
         }
       })
       .catch(error => {
@@ -158,82 +206,83 @@ export const accountGetNativePrices = account => (dispatch, getState) => {
   };
   getPrices();
   clearInterval(getPricesInterval);
-  getPricesInterval = setInterval(getPrices, 60000); // 1min
+  getPricesInterval = setInterval(getPrices, 15000); // 15secs
 };
 
-export const accountChangeNativeCurrency = nativeCurrency => dispatch => {
+export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState) => {
   saveLocal('native_currency', nativeCurrency);
+  let prices = getState().account.prices || getLocal('native_prices');
+  const selected = nativeCurrencies[nativeCurrency];
+  let newPrices = { ...prices, selected };
+  let oldAccountInfo = getState().account.accountInfo;
+  const newAccountInfo = parseAccountBalances(oldAccountInfo, newPrices);
+  const accountInfo = { ...oldAccountInfo, ...newAccountInfo };
   dispatch({
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
-    payload: nativeCurrency
+    payload: { nativeCurrency, prices: newPrices, accountInfo }
   });
-  dispatch(accountGetNativePrices());
 };
+
+export const accountClearState = () => ({ type: ACCOUNT_CLEAR_STATE });
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
   nativePriceRequest: getLocal('native_currency') || 'USD',
   nativeCurrency: getLocal('native_currency') || 'USD',
   prices: {},
-  web3Connected: true,
-  web3Available: false,
   web3Network: 'mainnet',
-  metamaskAccount: '',
-  asset: ['ETH'],
-  account: parseEthplorerAddressInfo(null),
+  accountType: '',
+  accountAddress: '',
+  accountInfo: parseEthplorerAddressInfo(null),
   transactions: [],
   fetchingTransactions: false,
-  fetching: false,
-  error: false
+  fetching: false
 };
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case ACCOUNT_UPDATE_METAMASK_ACCOUNT:
-      return { ...state, metamaskAccount: action.payload, transactions: [] };
-    case ACCOUNT_CHECK_NETWORK_IS_CONNECTED:
-      return { ...state, web3Connected: action.payload };
+    case ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST:
+      return {
+        ...state,
+        accountType: action.payload.accountType,
+        accountAddress: action.payload.accountAddress,
+        transactions: []
+      };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST:
-      return { ...state, fetchingTransactions: true };
+      return {
+        ...state,
+        fetchingTransactions: action.payload.fetchingTransactions,
+        transactions: action.payload.transactions
+      };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS:
-      return { ...state, fetchingTransactions: false, transactions: action.payload };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE:
-      return { ...state, fetchingTransactions: false, transactions: [] };
+      return { ...state, fetchingTransactions: false };
+    case ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST:
+      return {
+        ...state,
+        fetchingTransactions: action.payload
+      };
+    case ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS:
+      return {
+        ...state,
+        transactions: action.payload,
+        fetchingTransactions: false
+      };
+    case ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE:
+      return {
+        ...state,
+        fetchingTransactions: false
+      };
     case ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST:
-      return { ...state, fetching: true };
+      return {
+        ...state,
+        fetching: action.payload.fetching,
+        accountInfo: action.payload.accountInfo,
+        transactions: action.payload.transactions
+      };
     case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:
-      return { ...state, fetching: false, account: action.payload };
     case ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE:
-      return {
-        ...state,
-        fetching: false,
-        account: parseEthplorerAddressInfo(null)
-      };
-    case ACCOUNT_METAMASK_GET_NETWORK_REQUEST:
-      return {
-        ...state,
-        fetching: true,
-        web3Available: false
-      };
-    case ACCOUNT_METAMASK_GET_NETWORK_SUCCESS:
-      return {
-        ...state,
-        fetching: false,
-        web3Available: true,
-        web3Network: action.payload
-      };
-    case ACCOUNT_METAMASK_GET_NETWORK_FAILURE:
-      return {
-        ...state,
-        fetching: false,
-        web3Available: true
-      };
-    case ACCOUNT_METAMASK_NOT_AVAILABLE:
-      return {
-        ...state,
-        fetching: false,
-        web3Available: false
-      };
+      return { ...state, fetching: false };
     case ACCOUNT_GET_NATIVE_PRICES_REQUEST:
       return {
         ...state,
@@ -244,8 +293,7 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         nativePriceRequest: '',
         prices: action.payload.prices,
-        account: action.payload.account,
-        transactions: action.payload.transactions
+        accountInfo: action.payload.accountInfo
       };
     case ACCOUNT_GET_NATIVE_PRICES_FAILURE:
       return {
@@ -253,7 +301,22 @@ export default (state = INITIAL_STATE, action) => {
         nativePriceRequest: ''
       };
     case ACCOUNT_CHANGE_NATIVE_CURRENCY:
-      return { ...state, nativeCurrency: action.payload };
+      return {
+        ...state,
+        nativeCurrency: action.payload.nativeCurrency,
+        prices: action.payload.prices,
+        accountInfo: action.payload.accountInfo
+      };
+    case ACCOUNT_UPDATE_WEB3_NETWORK:
+      return {
+        ...state,
+        web3Network: action.payload
+      };
+    case ACCOUNT_CLEAR_STATE:
+      return {
+        ...state,
+        ...INITIAL_STATE
+      };
     default:
       return state;
   }

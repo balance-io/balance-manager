@@ -14,6 +14,7 @@
     "i18next": "^10.6.0",
     "jsonp": "^0.2.1",
     "netlify-lambda": "^0.3.0",
+    "lodash": "^4.17.5",
     "prop-types": "^15.6.1",
     "qrcode": "^1.2.0",
     "react": "^16.2.0",
@@ -26,6 +27,7 @@
     "redux-devtools-extension": "^2.13.2",
     "redux-thunk": "^2.2.0",
     "styled-components": "^3.2.3",
+    "uuid": "^3.2.1",
     "web3": "^1.0.0-beta.30"
   },
   "scripts": {

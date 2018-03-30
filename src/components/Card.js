@@ -27,6 +27,9 @@ const StyledContent = styled.div`
   opacity: ${({ fetching }) => (fetching ? 0 : 1)};
   visibility: ${({ fetching }) => (fetching ? 'hidden' : 'visible')};
   pointer-events: ${({ fetching }) => (fetching ? 'none' : 'auto')};
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const StyledFetching = styled.div`

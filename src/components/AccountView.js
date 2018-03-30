@@ -15,6 +15,7 @@ import transactionsTabIcon from '../assets/transactions-tab.svg';
 import LineBreak from '../components/LineBreak';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
+import { accountClearState } from '../reducers/_account';
 import { modalOpen } from '../reducers/_modal';
 import { capitalize } from '../helpers/utilities';
 import { colors, fonts, responsive, shadows, transitions } from '../styles';
@@ -127,10 +128,7 @@ const StyledTab = styled(Button)`
 
 class AccountView extends Component {
   state = {
-    activeTab: 'BALANCES_TAB',
-    openSettings: false,
-    showTokensWithLowMarketValue: false,
-    limitTransactions: 10
+    activeTab: 'BALANCES_TAB'
   };
   componentWillReceiveProps(newProps) {
     const tabRoute = window.browserHistory.location.pathname.replace(newProps.match.url, '') || '/';
@@ -145,47 +143,39 @@ class AccountView extends Component {
         break;
     }
   }
-  toggleSettings = () => {
-    this.setState({ openSettings: !this.state.openSettings });
-  };
-  onShowTokensWithLowMarketvalue = () => {
-    this.setState({ showTokensWithLowMarketValue: !this.state.showTokensWithLowMarketValue });
-  };
-  onShowMoreTransactions = () => {
-    if (this.state.limitTransactions > this.props.transactions.length) return null;
-    this.setState({ limitTransactions: this.state.limitTransactions + 10 });
-  };
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
       name:
-        this.props.account.name || `${this.props.account.type}${lang.t('modal.default_wallet')}`,
-      address: this.props.account.address,
-      type: this.props.account.type,
-      assets: this.props.account.assets
+        this.props.accountInfo.name || `${this.props.accountType}${lang.t('modal.default_wallet')}`,
+      address: this.props.accountInfo.address,
+      accountType: this.props.accountType,
+      assets: this.props.accountInfo.assets
     });
   openReceiveModal = () =>
     this.props.modalOpen('RECEIVE_MODAL', {
       name:
-        this.props.account.name || `${this.props.account.type}${lang.t('modal.default_wallet')}`,
-      address: this.props.account.address
+        this.props.accountInfo.name ||
+        `${this.props.accountInfo.type}${lang.t('modal.default_wallet')}`,
+      address: this.props.accountInfo.address
     });
-  shouldComponentUpdate(nextProps) {
-    if (
-      nextProps.nativeCurrency !== this.props.nativeCurrency &&
-      nextProps.prices === this.props.prices
-    )
-      return false;
-    return true;
+  componentWillUnmount() {
+    this.props.accountClearState();
   }
   render() {
     return (
       <StyledAccountView>
-        <Card fetching={this.props.fetching} background={'lightGrey'}>
+        <Card
+          fetching={this.props.fetching || this.props.fetchingMetamask}
+          background={'lightGrey'}
+        >
           <StyledFlex>
             <StyledTop>
               <StyledAddressWrapper>
-                <h6>{capitalize(this.props.account.type)} </h6>
-                <CopyToClipboard iconOnHover text={this.props.account.address} />
+                <h6>{capitalize(this.props.accountType)} </h6>
+                <CopyToClipboard
+                  iconOnHover
+                  text={this.props.accountInfo.address || this.props.accountAddress}
+                />
               </StyledAddressWrapper>
 
               <StyledActions>
@@ -221,29 +211,11 @@ class AccountView extends Component {
               </StyledTabsWrapper>
             </StyledTabMenu>
             <Switch>
-              <Route
-                exact
-                path={this.props.match.url}
-                render={routerProps => (
-                  <AccountViewBalances
-                    onShowTokensWithLowMarketvalue={this.onShowTokensWithLowMarketvalue}
-                    showTokensWithLowMarketValue={this.state.showTokensWithLowMarketValue}
-                    account={this.props.account}
-                  />
-                )}
-              />
+              <Route exact path={this.props.match.url} component={AccountViewBalances} />
               <Route
                 exact
                 path={`${this.props.match.url}/transactions`}
-                render={routerProps => (
-                  <AccountViewTransactions
-                    onShowMoreTransactions={this.onShowMoreTransactions}
-                    fetchingTransactions={this.props.fetchingTransactions}
-                    limitTransactions={this.state.limitTransactions}
-                    accountAddress={this.props.account.address}
-                    transactions={this.props.transactions}
-                  />
-                )}
+                component={AccountViewTransactions}
               />
               <Route render={() => <Redirect to={this.props.match.url} />} />
             </Switch>
@@ -255,27 +227,28 @@ class AccountView extends Component {
 }
 
 AccountView.propTypes = {
+  match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
+  accountClearState: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
-  account: PropTypes.object.isRequired,
-  prices: PropTypes.object.isRequired,
-  nativeCurrency: PropTypes.string.isRequired,
-  transactions: PropTypes.array.isRequired,
-  fetchingTransactions: PropTypes.bool.isRequired,
-  match: PropTypes.object.isRequired
+  accountInfo: PropTypes.object.isRequired,
+  accountAddress: PropTypes.string.isRequired,
+  accountType: PropTypes.string.isRequired,
+  fetchingMetamask: PropTypes.bool
+};
+
+AccountView.defaultProps = {
+  fetchingMetamask: false
 };
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
-  account: account.account,
-  prices: account.prices,
-  nativeCurrency: account.nativeCurrency,
-  transactions: account.transactions,
-  fetchingTransactions: account.fetchingTransactions
+  accountInfo: account.accountInfo,
+  accountAddress: account.accountAddress,
+  accountType: account.accountType
 });
 
 export default connect(reduxProps, {
-  modalOpen
+  modalOpen,
+  accountClearState
 })(AccountView);
-
-connect({}, {})(AccountView);

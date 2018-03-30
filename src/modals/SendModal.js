@@ -36,6 +36,7 @@ import { convertAmountFromBigNumber, capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
 const StyledSuccessMessage = styled.div`
+  width: 100%;
   padding: 22px;
   & a {
     text-decoration: underline;
@@ -300,19 +301,14 @@ class SendModal extends Component {
       address: this.props.modalProps.address,
       recipient: this.props.recipient,
       amount: this.props.assetAmount,
-      privateKey: this.props.privateKey,
-      tokenObject: this.props.selected,
+      selectedAsset: this.props.selected,
       gasPrice: this.props.gasPrice,
       gasLimit: this.props.gasLimit
     };
-    if (this.props.modalProps.type === 'METAMASK') {
-      if (this.props.selected.symbol === 'ETH') {
-        this.props.sendEtherMetamask(request);
-      } else {
-        this.props.sendTokenMetamask(request);
-      }
-      this.props.sendToggleConfirmationView(true);
-    } else if (!this.props.confirm) {
+    if (!this.props.gasPrice.txFee) {
+      return;
+    }
+    if (!this.props.confirm) {
       if (!isValidAddress(this.props.recipient)) {
         this.props.notificationShow(lang.t('notification.error.invalid_address'), true);
         return;
@@ -333,6 +329,7 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
+        this.props.sendEtherMetamask(request);
       } else {
         const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
         const etherBalanceAmount = ethereum.balance.amount;
@@ -348,7 +345,9 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
+        this.props.sendTokenMetamask(request);
       }
+
       this.props.sendToggleConfirmationView(true);
     }
   };
@@ -361,19 +360,11 @@ class SendModal extends Component {
       const onError = () =>
         this.props.notificationShow(lang.t('notification.error.invalid_address_scanned'), true);
       return { data, result, onError };
-    } else if (this.state.QRCodeReaderTarget === 'privateKey') {
-      const data = rawData.match(/0x\w{64}/g) ? rawData.match(/0x\w{64}/g)[0] : null;
-      const result = !!data;
-      const onError = () =>
-        this.props.notificationShow(lang.t('notification.error.invalid_private_key_scanned'), true);
-      return { data, result, onError };
     }
   };
   onQRCodeScan = data => {
     if (this.state.QRCodeReaderTarget === 'recipient') {
       this.props.sendUpdateRecipient(data);
-    } else if (this.state.QRCodeReaderTarget === 'privateKey') {
-      this.props.sendUpdatePrivateKey(data);
     }
     this.setState({ showQRCodeReader: false, QRCodeReaderTarget: '' });
   };
@@ -456,13 +447,18 @@ class SendModal extends Component {
                     placeholder="0.0"
                     type="text"
                     value={this.props.nativeAmount}
-                    disabled={!this.props.prices[this.props.selected.symbol]}
+                    disabled={
+                      !this.props.prices[this.props.nativeCurrency] ||
+                      !this.props.prices[this.props.nativeCurrency][this.props.selected.symbol]
+                    }
                     onChange={({ target }) =>
                       this.props.sendUpdateNativeAmount(target.value, this.props.selected)
                     }
                   />
                   <StyledAmountCurrency disabled={!this.props.prices[this.props.selected.symbol]}>
-                    {this.props.prices.selected.currency}
+                    {this.props.prices && this.props.prices.selected
+                      ? this.props.prices.selected.currency
+                      : ''}
                   </StyledAmountCurrency>
                 </StyledFlex>
               </StyledFlex>
@@ -572,7 +568,7 @@ class SendModal extends Component {
           ) : (
             <StyledApproveTransaction>
               {(() => {
-                switch (this.props.modalProps.type) {
+                switch (this.props.modalProps.accountType) {
                   case 'METAMASK':
                     return <MetamaskLogo />;
                   case 'LEDGER':
@@ -584,7 +580,9 @@ class SendModal extends Component {
                 }
               })()}
               <StyledParagraph>
-                {lang.t('modal.approve_tx', { walletType: capitalize(this.props.modalProps.type) })}
+                {lang.t('modal.approve_tx', {
+                  walletType: capitalize(this.props.modalProps.accountType)
+                })}
               </StyledParagraph>
               <StyledActions single>
                 <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
@@ -673,6 +671,7 @@ const reduxProps = ({ modal, send, account }) => ({
   gasPriceOption: send.gasPriceOption,
   confirm: send.confirm,
   web3Network: account.web3Network,
+  nativeCurrency: account.nativeCurrency,
   prices: account.prices
 });
 

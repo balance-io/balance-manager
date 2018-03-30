@@ -38,6 +38,14 @@ export const web3SetProvider = provider => {
 };
 
 /**
+ * @desc get address transaction count
+ * @param {String} address
+ * @return {Promise}
+ */
+export const getTransactionCount = address =>
+  web3Instance.eth.getTransactionCount(address, 'pending');
+
+/**
  * @desc get account ether balance
  * @param  {String} accountAddress
  * @param  {String} tokenAddress
@@ -85,22 +93,19 @@ export const signTx = (txDetails, privateKey) => {
 
 /**
  * @desc get transaction details
- * @param {String} from
- * @param {String} to
- * @param {String} data
- * @param {String} value
- * @param {String} gasPrice
+ * @param  {Object} transaction { from, to, data, value, gasPrice, gasLimit }
  * @return {Object}
  */
-export const getTxDetails = async (from, to, data, value, gasPrice) => {
+export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }) => {
   const _gasPrice = gasPrice || (await web3Instance.eth.getGasPrice());
   const estimateGasData = value === '0x00' ? { from, to, data } : { to, data };
-  const gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
-  const nonce = await web3Instance.eth.getTransactionCount(from);
+  const _gasLimit = gasLimit || (await web3Instance.eth.estimateGas(estimateGasData));
+  const nonce = await getTransactionCount(from);
   const tx = {
     nonce: web3Instance.utils.toHex(nonce),
     gasPrice: web3Instance.utils.toHex(_gasPrice),
-    gasLimit: web3Instance.utils.toHex(gasLimit),
+    gasLimit: web3Instance.utils.toHex(_gasLimit),
+    gas: web3Instance.utils.toHex(_gasLimit),
     value: web3Instance.utils.toHex(value),
     data: data,
     to
@@ -171,7 +176,14 @@ export const metamaskSendTransaction = transaction =>
     const to = transaction.to.substr(0, 2) === '0x' ? transaction.to : `0x${transaction.to}`;
     const value = transaction.value ? toWei(transaction.value) : '0x00';
     const data = transaction.data ? transaction.data : '0x';
-    getTxDetails(from, to, data, value, transaction.gasPrice)
+    getTxDetails({
+      from,
+      to,
+      data,
+      value,
+      gasPrice: transaction.gasPrice,
+      gasLimit: transaction.gasLimit
+    })
       .then(txDetails => {
         if (typeof window.web3 !== 'undefined') {
           window.web3.eth.sendTransaction(txDetails, (err, txHash) => {
@@ -204,7 +216,8 @@ export const metamaskTransferToken = transaction =>
       from: transaction.from,
       to: transaction.tokenObject.address,
       data: dataString,
-      gasPrice: transaction.gasPrice
+      gasPrice: transaction.gasPrice,
+      gasLimit: transaction.gasLimit
     })
       .then(txHash => resolve(txHash))
       .catch(error => reject(error));
@@ -235,3 +248,10 @@ export const estimateGasLimit = async ({ tokenObject, address, recipient, amount
   }
   return gasLimit;
 };
+
+/**
+ * @desc fetch transaction status/information
+ * @param  {String} txHash
+ * @return {Object}
+ */
+export const fetchTx = txHash => web3Instance.eth.getTransaction(txHash);

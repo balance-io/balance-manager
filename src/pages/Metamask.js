@@ -7,12 +7,10 @@ import BaseLayout from '../layouts/base';
 import AccountView from '../components/AccountView';
 import Card from '../components/Card';
 import {
-  accountUpdateMetamaskAccount,
-  accountConnectMetamask,
-  accountClearIntervals,
-  accountChangeNativeCurrency,
-  accountCheckNetworkIsConnected
-} from '../reducers/_account';
+  metamaskUpdateMetamaskAccount,
+  metamaskConnectMetamask,
+  metamaskClearIntervals
+} from '../reducers/_metamask';
 import { fonts, colors } from '../styles';
 
 const StyledWrapper = styled.div`
@@ -20,7 +18,6 @@ const StyledWrapper = styled.div`
 `;
 
 const StyledMessage = styled.div`
-  height: 177px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,26 +27,24 @@ const StyledMessage = styled.div`
 
 class Metamask extends Component {
   componentDidMount() {
-    this.props.accountConnectMetamask();
-    window.onoffline = () => this.props.accountCheckNetworkIsConnected(false);
-    window.ononline = () => this.props.accountCheckNetworkIsConnected(true);
+    this.props.metamaskConnectMetamask();
   }
   renderMessage() {
     if (!this.props.web3Available) return lang.t('message.web3_not_available');
-    if (!this.props.metamaskAccount) return lang.t('message.web3_not_unlocked');
+    if (!this.props.accountAddress) return lang.t('message.web3_not_unlocked');
     if (!this.props.web3Network) return lang.t('message.web3_unknown_network');
   }
   componentWillUnmount() {
-    this.props.accountClearIntervals();
+    this.props.metamaskClearIntervals();
   }
   render = () => (
     <BaseLayout>
       <StyledWrapper>
         {this.props.fetching ||
-        (this.props.web3Network && this.props.metamaskAccount && this.props.web3Available) ? (
-          <AccountView match={this.props.match} />
+        (this.props.web3Network && this.props.accountAddress && this.props.web3Available) ? (
+          <AccountView fetchingMetamask={this.props.fetching} match={this.props.match} />
         ) : (
-          <Card fetching={this.props.fetching}>
+          <Card minHeight={180} fetching={this.props.fetching}>
             <StyledMessage>{this.renderMessage()}</StyledMessage>
           </Card>
         )}
@@ -59,35 +54,29 @@ class Metamask extends Component {
 }
 
 Metamask.propTypes = {
-  accountUpdateMetamaskAccount: PropTypes.func.isRequired,
-  accountConnectMetamask: PropTypes.func.isRequired,
-  accountClearIntervals: PropTypes.func.isRequired,
-  accountChangeNativeCurrency: PropTypes.func.isRequired,
-  accountCheckNetworkIsConnected: PropTypes.func.isRequired,
+  metamaskUpdateMetamaskAccount: PropTypes.func.isRequired,
+  metamaskConnectMetamask: PropTypes.func.isRequired,
+  metamaskClearIntervals: PropTypes.func.isRequired,
   web3Available: PropTypes.bool.isRequired,
   web3Network: PropTypes.string.isRequired,
   fetching: PropTypes.bool.isRequired,
-  error: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired,
-  metamaskAccount: PropTypes.string
+  accountAddress: PropTypes.string
 };
 
 Metamask.defaultProps = {
-  metamaskAccount: null
+  accountAddress: null
 };
 
-const reduxProps = ({ account }) => ({
-  web3Available: account.web3Available,
-  web3Network: account.web3Network,
-  metamaskAccount: account.metamaskAccount,
-  fetching: account.fetching,
-  error: account.error
+const reduxProps = ({ metamask }) => ({
+  web3Available: metamask.web3Available,
+  web3Network: metamask.web3Network,
+  accountAddress: metamask.accountAddress,
+  fetching: metamask.fetching
 });
 
 export default connect(reduxProps, {
-  accountUpdateMetamaskAccount,
-  accountCheckNetworkIsConnected,
-  accountConnectMetamask,
-  accountClearIntervals,
-  accountChangeNativeCurrency
+  metamaskUpdateMetamaskAccount,
+  metamaskConnectMetamask,
+  metamaskClearIntervals
 })(Metamask);

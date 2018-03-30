@@ -7,7 +7,6 @@ import Modal from '../components/Modal';
 import Indicator from '../components/Indicator';
 import DropdownNative from '../components/DropdownNative';
 import Background from '../components/Background';
-import IconPreload from '../components/IconPreload';
 import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
 import Notification from '../components/Notification';
@@ -100,15 +99,14 @@ const BaseLayout = ({
   nativeCurrency,
   web3Network,
   web3Available,
-  web3Connected,
+  online,
   ...props
 }) => {
   const showToolbar = window.location.pathname !== '/' && !fetching && web3Available && web3Network;
   return (
     <StyledLayout>
       <Background />
-      <IconPreload />
-      <Column maxWidth={900}>
+      <Column maxWidth={1000}>
         <StyledHeader>
           <Link to="/">
             <StyledBranding>
@@ -122,7 +120,7 @@ const BaseLayout = ({
           <StyledIndicators show={showToolbar}>
             <StyledNetworkStatus
               selected={web3Network}
-              iconColor={web3Connected ? 'green' : 'red'}
+              iconColor={online ? 'green' : 'red'}
               options={ethereumNetworks}
             />
             <StyledVerticalLine />
@@ -149,16 +147,16 @@ BaseLayout.propTypes = {
   nativeCurrency: PropTypes.string.isRequired,
   web3Network: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
-  web3Connected: PropTypes.bool.isRequired
+  online: PropTypes.bool.isRequired
 };
 
-const reduxProps = ({ account }) => ({
-  fetching: account.fetching,
-  account: account.account,
+const reduxProps = ({ account, metamask, warning }) => ({
+  account: account.accountInfo,
   nativeCurrency: account.nativeCurrency,
-  web3Network: account.web3Network,
-  web3Available: account.web3Available,
-  web3Connected: account.web3Connected
+  fetching: metamask.fetching,
+  web3Network: metamask.web3Network,
+  web3Available: metamask.web3Available,
+  online: warning.online
 });
 
 export default connect(reduxProps, { accountChangeNativeCurrency })(BaseLayout);

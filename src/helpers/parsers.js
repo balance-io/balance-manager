@@ -480,10 +480,11 @@ export const parsePricesObject = (data = null, assets = [], nativeSelected = 'US
 
 /**
  * @desc parse ethplorer address info response
- * @param  {String}   [data = null]
+ * @param  {Object}   [data = null]
+ * @param  {String}   [web3Network = '']
  * @return {Promise}
  */
-export const parseEthplorerAddressInfo = (data = null) => {
+export const parseEthplorerAddressInfo = (data = null, web3Network = '') => {
   const ethereumBalance =
     data && data.ETH.balance ? convertAmountToBigNumber(data.ETH.balance) : '0';
   const ethereum = {
@@ -531,6 +532,7 @@ export const parseEthplorerAddressInfo = (data = null) => {
 
     const accountLocal = getLocal(data.address) || {};
     accountLocal.balances = { assets, total: '———' };
+    accountLocal.web3Network = web3Network;
     saveLocal(data.address, accountLocal);
   }
   return {
@@ -546,9 +548,10 @@ export const parseEthplorerAddressInfo = (data = null) => {
  * @desc parse account balances from native prices
  * @param  {Object} [account=null]
  * @param  {Object} [prices=null]
+ * @param  {String} [web3Network='']
  * @return {String}
  */
-export const parseAccountBalances = (account = null, nativePrices = null) => {
+export const parseAccountBalances = (account = null, nativePrices = null, web3Network = '') => {
   let totalAmount = 0;
   let newAccount = {
     ...account
@@ -599,6 +602,7 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
 
     const accountLocal = getLocal(account.address) || {};
     accountLocal.balances = { assets: newAssets, total: total };
+    accountLocal.web3Network = web3Network;
     saveLocal(account.address, accountLocal);
   }
   return newAccount;
@@ -684,9 +688,14 @@ export const parseEthplorerAddressHistory = async (data = null, address = '') =>
  * @desc parse etherscan account transactions response
  * @param  {String}   [data = null]
  * @param  {String}   [address = '']
+ * @param  {String}   [web3Network = '']
  * @return {Promise}
  */
-export const parseEtherscanAccountTransactions = async (data = null, address = '') => {
+export const parseEtherscanAccountTransactions = async (
+  data = null,
+  address = '',
+  web3Network = ''
+) => {
   if (!data || !data.result) return null;
 
   let transactions = await Promise.all(
@@ -789,6 +798,7 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
 
   const accountLocal = getLocal(address) || {};
   accountLocal.transactions = transactions;
+  accountLocal.web3Network = web3Network;
   saveLocal(address, accountLocal);
 
   return transactions;
@@ -799,12 +809,14 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
  * @param  {Object} [transactions=null]
  * @param  {Object} [nativeCurrency='']
  * @param  {String} [address='']
+ * @param  {String} [web3Network='']
  * @return {String}
  */
 export const parseTransactionsPrices = async (
   transactions = null,
   nativeSelected = '',
-  address = ''
+  address = '',
+  web3Network = ''
 ) => {
   let _transactions = transactions;
 
@@ -873,6 +885,7 @@ export const parseTransactionsPrices = async (
   const accountLocal = getLocal(address) || {};
   accountLocal.transactions = _transactions;
   const pending = _transactions ? _transactions.filter(tx => tx.pending) : [];
+  accountLocal.web3Network = web3Network;
   accountLocal.pending = pending;
   saveLocal(address, accountLocal);
 
@@ -885,13 +898,15 @@ export const parseTransactionsPrices = async (
  * @param  {Object} [transactions=null]
  * @param  {Object} [nativeCurrency='']
  * @param  {String} [address='']
+ * @param  {String} [web3Network='']
  * @return {String}
  */
 export const parseNewTransaction = async (
   txDetails = null,
   transactions = null,
   nativeSelected = '',
-  address = ''
+  address = '',
+  web3Network = ''
 ) => {
   let _transactions = [...transactions];
 
@@ -975,6 +990,7 @@ export const parseNewTransaction = async (
   accountLocal.transactions = _transactions;
   const pending = _transactions.filter(tx => tx.pending);
   accountLocal.pending = pending;
+  accountLocal.web3Network = web3Network;
   saveLocal(address, accountLocal);
 
   return _transactions;

@@ -42,7 +42,9 @@ export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now())
  */
 export const apiGetEthplorerAddressInfo = (address = '', network = 'mainnet') => {
   if (network !== 'mainnet') {
-    return testnetGetAddressInfo(address, network).then(data => parseEthplorerAddressInfo(data));
+    return testnetGetAddressInfo(address, network).then(data =>
+      parseEthplorerAddressInfo(data, network)
+    );
   }
   return axios
     .get(`https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`)
@@ -119,7 +121,7 @@ export const apiGetEtherscanAccountTransactions = (address = '', network = 'main
         `https://${subdomain}.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=8KDJ1H41UEGEA6CF4P8NEPUANQ3SE8HZGE`
       )
       .then(({ data }) =>
-        parseEtherscanAccountTransactions(data, address)
+        parseEtherscanAccountTransactions(data, address, network)
           .then(transactions => resolve(transactions))
           .catch(err => reject(err))
       )
@@ -175,10 +177,7 @@ export const apiWalletConnectInitiateTransaction = (
  * @param  {String}   [deviceUuid = '', transactionUuid = '']
  * @return {Promise}
  */
-export const apiWalletConnectGetTransactionStatus = (
-  deviceUuid: '',
-  transactionUuid: ''
-) =>
+export const apiWalletConnectGetTransactionStatus = (deviceUuid: '', transactionUuid: '') =>
   walletConnect.post('/get-transaction-status', {
     deviceUuid,
     transactionUuid

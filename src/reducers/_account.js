@@ -79,9 +79,10 @@ export const accountSetupWebSocket = address => dispatch => {
 export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
   dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST });
   const currentTransactions = getState().account.transactions;
+  const web3Network = getState().account.web3Network;
   const address = getState().account.accountInfo.address;
   const nativeCurrency = getState().account.nativeCurrency;
-  parseNewTransaction(txDetails, currentTransactions, nativeCurrency, address)
+  parseNewTransaction(txDetails, currentTransactions, nativeCurrency, address, web3Network)
     .then(transactions => {
       dispatch({
         type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,
@@ -97,13 +98,14 @@ export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
 
 export const accountParseTransactionPrices = transactions => (dispatch, getState) => {
   const currentTransactions = getState().account.transactions;
+  const web3Network = getState().account.web3Network;
   dispatch({
     type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST,
     payload: !currentTransactions.length
   });
   const address = getState().account.accountInfo.address;
   const nativeCurrency = getState().account.nativeCurrency;
-  parseTransactionsPrices(transactions, nativeCurrency, address)
+  parseTransactionsPrices(transactions, nativeCurrency, address, web3Network)
     .then(parsedTransactions => {
       dispatch({
         type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,
@@ -220,9 +222,10 @@ export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
       .then(({ data }) => {
         const nativePriceRequest = getState().account.nativePriceRequest;
         const nativeCurrency = getState().account.nativeCurrency;
+        const web3Network = getState().account.web3Network;
         if (nativeCurrency === nativePriceRequest) {
           const prices = parsePricesObject(data, assetSymbols, nativeCurrency);
-          const parsedAccountInfo = parseAccountBalances(accountInfo, prices);
+          const parsedAccountInfo = parseAccountBalances(accountInfo, prices, web3Network);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
             payload: { accountInfo: parsedAccountInfo, prices }

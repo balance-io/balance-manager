@@ -11,6 +11,7 @@
     "axios": "^0.18.0",
     "bignumber.js": "^6.0.0",
     "ethereumjs-tx": "^1.3.4",
+    "hybrid-crypto-js": "^0.1.6",
     "i18next": "^10.6.0",
     "jsonp": "^0.2.1",
     "lodash": "^4.17.5",

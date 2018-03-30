@@ -210,10 +210,10 @@ export const sendUpdateRecipient = recipient => dispatch => {
 };
 
 export const sendUpdateAssetAmount = (assetAmount, selected, prices) => (dispatch, getState) => {
-  const { prices } = getState().account;
+  const { prices, nativeCurrency } = getState().account;
   const _assetAmount = assetAmount.replace(/[^0-9.]/g, '');
   let _nativeAmount = '';
-  if (_assetAmount.length && prices[selected.symbol]) {
+  if (_assetAmount.length && prices[nativeCurrency][selected.symbol]) {
     const _assetAmountDecimalPlaces = countDecimalPlaces(_assetAmount);
     const nativeAmount = convertAssetAmountToNativeValue(_assetAmount, selected, prices);
     const _nativeAmountDecimalPlaces =
@@ -227,10 +227,10 @@ export const sendUpdateAssetAmount = (assetAmount, selected, prices) => (dispatc
 };
 
 export const sendUpdateNativeAmount = (nativeAmount, selected, prices) => (dispatch, getState) => {
-  const { prices } = getState().account;
+  const { prices, nativeCurrency } = getState().account;
   const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
   let _assetAmount = '';
-  if (_nativeAmount.length && prices[selected.symbol]) {
+  if (_nativeAmount.length && prices[nativeCurrency][selected.symbol]) {
     const _nativeAmountDecimalPlaces = countDecimalPlaces(_nativeAmount);
     const assetAmount = convertAssetAmountFromNativeValue(_nativeAmount, selected, prices);
     const _assetAmountDecimalPlaces =

@@ -4,11 +4,7 @@ import {
   apiWalletConnectGetTransactionStatus,
   apiWalletConnectInitiateTransaction
 } from '../helpers/api';
-import {
-  generateKeypair,
-  encryptMessage,
-  decryptMessage
-} from '../helpers/rsa';
+import { generateKeypair, encryptMessage, decryptMessage } from '../helpers/rsa';
 import { saveLocal } from '../helpers/utilities';
 import { parseError } from '../helpers/parsers';
 import { notificationShow } from './_notification';
@@ -97,20 +93,16 @@ export const walletConnectGetAddress = () => (dispatch, getState) => {
     });
 };
 
-export const walletConnectInitiateTransaction = (
-  transactionDetails,
-  notificationDetails
-) => (dispatch, getState) => {
+export const walletConnectInitiateTransaction = (transactionDetails, notificationDetails) => (
+  dispatch,
+  getState
+) => {
   const deviceUuid = getState().walletconnect.deviceUuid;
-  const keypair = getState().walletconnect.clientPublicKey;
+  const clientPublicKey = getState().walletconnect.clientPublicKey;
   const encryptedTransactionDetails = encryptMessage(transactionDetails, clientPublicKey);
   // Q: get transaction details and make encryptedTransactionDetails, notificationDetails (json with  notficationTitle, notificationBody)
   dispatch({ type: WALLET_CONNECT_INITIATE_TRANSACTION_REQUEST });
-  apiWalletConnectInitiateTransaction(
-    deviceUuid,
-    encryptedTransactionDetails,
-    notificationDetails
-  )
+  apiWalletConnectInitiateTransaction(deviceUuid, encryptedTransactionDetails, notificationDetails)
     .then(({ data }) => {
       const transactionUuid = data ? data.transactionUuid : '';
       dispatch({
@@ -125,7 +117,7 @@ export const walletConnectInitiateTransaction = (
     });
 };
 
-export const walletConnectGetTransactionStatus = (transactionUuid) => (dispatch, getState) => {
+export const walletConnectGetTransactionStatus = transactionUuid => (dispatch, getState) => {
   const deviceUuid = getState().walletconnect.deviceUuid;
   dispatch({ type: WALLET_CONNECT_GET_TRANSACTION_STATUS_REQUEST });
   apiWalletConnectGetTransactionStatus(deviceUuid, transactionUuid)

@@ -47,7 +47,6 @@ const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 let getPricesInterval = null;
 
 export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
-  console.log('accountUpdateTransactions txDetails', txDetails);
   dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST });
   const currentTransactions = getState().account.transactions;
   const address = getState().account.accountInfo.address;

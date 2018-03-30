@@ -36,6 +36,7 @@ import { convertAmountFromBigNumber, capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
 const StyledSuccessMessage = styled.div`
+  width: 100%;
   padding: 22px;
   & a {
     text-decoration: underline;
@@ -300,18 +301,13 @@ class SendModal extends Component {
       address: this.props.modalProps.address,
       recipient: this.props.recipient,
       amount: this.props.assetAmount,
-      tokenObject: this.props.selected,
+      selectedAsset: this.props.selected,
       gasPrice: this.props.gasPrice,
       gasLimit: this.props.gasLimit
     };
-    // if (this.props.modalProps.type === 'METAMASK') {
-    //   if (this.props.selected.symbol === 'ETH') {
-    //     this.props.sendEtherMetamask(request);
-    //   } else {
-    //     this.props.sendTokenMetamask(request);
-    //   }
-    //   this.props.sendToggleConfirmationView(true);
-    // }
+    if (!this.props.gasPrice.txFee) {
+      return;
+    }
     if (!this.props.confirm) {
       if (!isValidAddress(this.props.recipient)) {
         this.props.notificationShow(lang.t('notification.error.invalid_address'), true);
@@ -451,13 +447,18 @@ class SendModal extends Component {
                     placeholder="0.0"
                     type="text"
                     value={this.props.nativeAmount}
-                    disabled={!this.props.prices[this.props.selected.symbol]}
+                    disabled={
+                      !this.props.prices[this.props.nativeCurrency] ||
+                      !this.props.prices[this.props.nativeCurrency][this.props.selected.symbol]
+                    }
                     onChange={({ target }) =>
                       this.props.sendUpdateNativeAmount(target.value, this.props.selected)
                     }
                   />
                   <StyledAmountCurrency disabled={!this.props.prices[this.props.selected.symbol]}>
-                    {this.props.prices.selected.currency}
+                    {this.props.prices && this.props.prices.selected
+                      ? this.props.prices.selected.currency
+                      : ''}
                   </StyledAmountCurrency>
                 </StyledFlex>
               </StyledFlex>
@@ -567,7 +568,7 @@ class SendModal extends Component {
           ) : (
             <StyledApproveTransaction>
               {(() => {
-                switch (this.props.modalProps.type) {
+                switch (this.props.modalProps.accountType) {
                   case 'METAMASK':
                     return <MetamaskLogo />;
                   case 'LEDGER':
@@ -579,7 +580,9 @@ class SendModal extends Component {
                 }
               })()}
               <StyledParagraph>
-                {lang.t('modal.approve_tx', { walletType: capitalize(this.props.modalProps.type) })}
+                {lang.t('modal.approve_tx', {
+                  walletType: capitalize(this.props.modalProps.accountType)
+                })}
               </StyledParagraph>
               <StyledActions single>
                 <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
@@ -668,6 +671,7 @@ const reduxProps = ({ modal, send, account }) => ({
   gasPriceOption: send.gasPriceOption,
   confirm: send.confirm,
   web3Network: account.web3Network,
+  nativeCurrency: account.nativeCurrency,
   prices: account.prices
 });
 

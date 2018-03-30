@@ -45,9 +45,9 @@ class WalletConnectInit extends Component {
   render = () => (
     <Card maxWidth={400} background="white">
       <StyledContainer>
-        {this.props.uuid && (
+        {this.props.sessionToken && (
           <StyledQRCodeDisplay
-            data={`{"domain":"http://bridge.balance.io","token":"${this.props.uuid}"}`}
+            data={`{"domain":"http://bridge.balance.io","sessionToken":"${this.props.sessionToken}"}`}
           />
         )}
         <StyledCenter>
@@ -64,11 +64,11 @@ WalletConnectInit.propTypes = {
   wallletConnectModalInit: PropTypes.func.isRequired,
   walletConnectGetAddress: PropTypes.func.isRequired,
   modalClose: PropTypes.func.isRequired,
-  uuid: PropTypes.string.isRequired
+  sessionToken: PropTypes.string.isRequired,
 };
 
 const reduxProps = ({ modal, walletconnect }) => ({
-  uuid: walletconnect.uuid
+  sessionToken: walletconnect.sessionToken,
 });
 
 export default connect(reduxProps, {

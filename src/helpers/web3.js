@@ -38,6 +38,14 @@ export const web3SetProvider = provider => {
 };
 
 /**
+ * @desc get address transaction count
+ * @param {String} address
+ * @return {Promise}
+ */
+export const getTransactionCount = address =>
+  web3Instance.eth.getTransactionCount(address, 'pending');
+
+/**
  * @desc get account ether balance
  * @param  {String} accountAddress
  * @param  {String} tokenAddress
@@ -92,7 +100,7 @@ export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }
   const _gasPrice = gasPrice || (await web3Instance.eth.getGasPrice());
   const estimateGasData = value === '0x00' ? { from, to, data } : { to, data };
   const _gasLimit = gasLimit || (await web3Instance.eth.estimateGas(estimateGasData));
-  const nonce = await web3Instance.eth.getTransactionCount(from);
+  const nonce = await getTransactionCount(from);
   const tx = {
     nonce: web3Instance.utils.toHex(nonce),
     gasPrice: web3Instance.utils.toHex(_gasPrice),
@@ -240,3 +248,10 @@ export const estimateGasLimit = async ({ tokenObject, address, recipient, amount
   }
   return gasLimit;
 };
+
+/**
+ * @desc fetch transaction status/information
+ * @param  {String} txHash
+ * @return {Object}
+ */
+export const fetchTx = txHash => web3Instance.eth.getTransaction(txHash);

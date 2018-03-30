@@ -1,4 +1,4 @@
-import { web3Instance, getTokenBalanceOf, getAccountBalance } from './web3';
+import { getTransactionCount, getTokenBalanceOf, getAccountBalance } from './web3';
 import { convertAssetAmountToBigNumber, convertStringToNumber } from './utilities';
 import ropstenTokens from '../libraries/ropsten-tokens.json';
 import rinkebyTokens from '../libraries/rinkeby-tokens.json';
@@ -60,7 +60,7 @@ export const getAccountTokens = async (accountAddress, network) => {
  * @return {Promise}
  */
 export const testnetGetAddressInfo = async (address = '', network = 'ropsten') => {
-  const countTxs = await web3Instance.eth.getTransactionCount(address, 'pending');
+  const countTxs = await getTransactionCount(address);
   const balance = await getAccountBalance(address);
   const tokens = await getAccountTokens(address, network);
   const response = {

@@ -913,11 +913,7 @@ export const parseNewTransaction = async (
     amount = convertAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
   }
   const value = { amount, display: convertAmountToDisplay(amount, null, txDetails.asset) };
-<<<<<<< HEAD
-  console.log();
   const nonce = txDetails.nonce || (await getTransactionCount(txDetails.from));
-=======
->>>>>>> 54ce7f9afcbdb131737a695a76e704f90a0ccae9
 
   let tx = {
     hash: txDetails.hash,

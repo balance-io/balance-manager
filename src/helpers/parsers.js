@@ -894,7 +894,6 @@ export const parseNewTransaction = async (
   address = ''
 ) => {
   let _transactions = [...transactions];
-  console.log('parseNewTransaction txDetails', txDetails);
 
   let totalGas = BigNumber(`${txDetails.gasLimit}`)
     .times(BigNumber(`${txDetails.gasPrice}`))
@@ -914,8 +913,11 @@ export const parseNewTransaction = async (
     amount = convertAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
   }
   const value = { amount, display: convertAmountToDisplay(amount, null, txDetails.asset) };
+<<<<<<< HEAD
   console.log();
   const nonce = txDetails.nonce || (await getTransactionCount(txDetails.from));
+=======
+>>>>>>> 54ce7f9afcbdb131737a695a76e704f90a0ccae9
 
   let tx = {
     hash: txDetails.hash,
@@ -932,7 +934,6 @@ export const parseNewTransaction = async (
     asset: txDetails.asset
   };
 
-  console.log('parseNewTransaction tx', tx);
   const timestamp = Date.now();
   const assetSymbol = tx.asset.symbol;
   tx.native = { selected: nativeCurrencies[nativeSelected] };
@@ -973,8 +974,6 @@ export const parseNewTransaction = async (
   );
 
   _transactions = [tx, ..._transactions];
-
-  console.log('parseNewTransaction _transactions', _transactions);
 
   const accountLocal = getLocal(address) || {};
   accountLocal.transactions = _transactions;

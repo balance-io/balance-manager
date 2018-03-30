@@ -179,17 +179,6 @@ export const sendTokenMetamask = ({
     gasLimit: gasLimit
   })
     .then(txHash => {
-      fetchTx(txHash).then(console.log);
-      const txDetails = {
-        hash: txHash,
-        from: address,
-        to: recipient,
-        value: amount,
-        gasPrice: gasPrice.value.amount,
-        gasLimit: gasLimit,
-        asset: selectedAsset
-      };
-      dispatch(accountUpdateTransactions(txDetails));
       dispatch({
         type: SEND_TOKEN_METAMASK_SUCCESS,
         payload: txHash

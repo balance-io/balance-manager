@@ -1,20 +1,15 @@
 import _ from 'lodash';
-import {
-  apiGetEthplorerAddressInfo,
-  apiGetEtherscanAccountTransactions,
-  apiGetPrices
-} from '../helpers/api';
+import { apiGetAccountBalances, apiGetAccountTransactions, apiGetPrices } from '../helpers/api';
 import {
   parseError,
   parseNewTransaction,
   parseTransactionsPrices,
-  parseAccountBalances,
-  parsePricesObject,
-  parseEthplorerAddressInfo
+  parseAccountBalancesPrices,
+  parsePricesObject
 } from '../helpers/parsers';
 import lang from '../languages';
 import { saveLocal, getLocal } from '../helpers/utilities';
-import { web3SetProvider } from '../helpers/web3';
+import { web3SetHttpProvider, web3SetWebSocketProvider } from '../helpers/web3';
 import { notificationShow } from './_notification';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
@@ -46,12 +41,43 @@ const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 
 let getPricesInterval = null;
 
+export const accountSetupWebSocket = address => dispatch => {
+  window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+  const connection = new WebSocket('wss://socket.etherscan.io/wshandler');
+
+  connection.onopen = () => {
+    console.log('WebSocket open');
+    const subscription = {
+      event: 'txlist',
+      address: address
+    };
+    console.log('WebSocket subscription', JSON.stringify(subscription, null, 2));
+    connection.send(JSON.stringify(subscription));
+  };
+
+  connection.onerror = error => {
+    console.log('WebSocket error');
+  };
+
+  connection.onmessage = message => {
+    try {
+      const json = JSON.parse(message.data);
+      console.log('WebSocket message', JSON.stringify(json, null, 2));
+    } catch (e) {
+      console.log('WebSocket invalid', message.data);
+      return;
+    }
+  };
+};
+
 export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
   dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST });
   const currentTransactions = getState().account.transactions;
+  const web3Network = getState().account.web3Network;
   const address = getState().account.accountInfo.address;
   const nativeCurrency = getState().account.nativeCurrency;
-  parseNewTransaction(txDetails, currentTransactions, nativeCurrency, address)
+  parseNewTransaction(txDetails, currentTransactions, nativeCurrency, address, web3Network)
     .then(transactions => {
       dispatch({
         type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,
@@ -67,13 +93,14 @@ export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
 
 export const accountParseTransactionPrices = transactions => (dispatch, getState) => {
   const currentTransactions = getState().account.transactions;
+  const web3Network = getState().account.web3Network;
   dispatch({
     type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST,
     payload: !currentTransactions.length
   });
   const address = getState().account.accountInfo.address;
   const nativeCurrency = getState().account.nativeCurrency;
-  parseTransactionsPrices(transactions, nativeCurrency, address)
+  parseTransactionsPrices(transactions, nativeCurrency, address, web3Network)
     .then(parsedTransactions => {
       dispatch({
         type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,
@@ -105,7 +132,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
         !accountLocal || !accountLocal.transactions || !accountLocal.transactions.length
     }
   });
-  apiGetEtherscanAccountTransactions(accountAddress, web3Network)
+  apiGetAccountTransactions(accountAddress, web3Network)
     .then(transactions => {
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS });
       let _transactions = transactions;
@@ -147,7 +174,7 @@ export const accountGetAccountBalances = address => (dispatch, getState) => {
       fetching: !accountLocal
     }
   });
-  apiGetEthplorerAddressInfo(address, web3Network)
+  apiGetAccountBalances(address, web3Network)
     .then(accountInfo => {
       accountInfo = { ...accountInfo, accountType };
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS });
@@ -162,7 +189,8 @@ export const accountGetAccountBalances = address => (dispatch, getState) => {
 };
 
 export const accountUpdateWeb3Network = network => dispatch => {
-  web3SetProvider(`https://${network}.infura.io/`);
+  web3SetHttpProvider(`https://${network}.infura.io/`);
+  web3SetWebSocketProvider(`wss://${network}.infura.io/ws`);
   dispatch({ type: ACCOUNT_UPDATE_WEB3_NETWORK, payload: network });
 };
 
@@ -189,9 +217,10 @@ export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
       .then(({ data }) => {
         const nativePriceRequest = getState().account.nativePriceRequest;
         const nativeCurrency = getState().account.nativeCurrency;
+        const web3Network = getState().account.web3Network;
         if (nativeCurrency === nativePriceRequest) {
           const prices = parsePricesObject(data, assetSymbols, nativeCurrency);
-          const parsedAccountInfo = parseAccountBalances(accountInfo, prices);
+          const parsedAccountInfo = parseAccountBalancesPrices(accountInfo, prices, web3Network);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
             payload: { accountInfo: parsedAccountInfo, prices }
@@ -215,7 +244,7 @@ export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState
   const selected = nativeCurrencies[nativeCurrency];
   let newPrices = { ...prices, selected };
   let oldAccountInfo = getState().account.accountInfo;
-  const newAccountInfo = parseAccountBalances(oldAccountInfo, newPrices);
+  const newAccountInfo = parseAccountBalancesPrices(oldAccountInfo, newPrices);
   const accountInfo = { ...oldAccountInfo, ...newAccountInfo };
   dispatch({
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
@@ -233,7 +262,25 @@ const INITIAL_STATE = {
   web3Network: 'mainnet',
   accountType: '',
   accountAddress: '',
-  accountInfo: parseEthplorerAddressInfo(null),
+  accountInfo: {
+    address: '',
+    type: '',
+    txCount: 0,
+    assets: [
+      {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        address: null,
+        decimals: 18,
+        balance: {
+          amount: '',
+          display: '0.00 ETH'
+        },
+        native: null
+      }
+    ],
+    total: '———'
+  },
   transactions: [],
   fetchingTransactions: false,
   fetching: false
@@ -286,11 +333,13 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_GET_NATIVE_PRICES_REQUEST:
       return {
         ...state,
+        fetchingNativePrices: true,
         nativePriceRequest: action.payload
       };
     case ACCOUNT_GET_NATIVE_PRICES_SUCCESS:
       return {
         ...state,
+        fetchingNativePrices: false,
         nativePriceRequest: '',
         prices: action.payload.prices,
         accountInfo: action.payload.accountInfo
@@ -298,6 +347,7 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_GET_NATIVE_PRICES_FAILURE:
       return {
         ...state,
+        fetchingNativePrices: false,
         nativePriceRequest: ''
       };
     case ACCOUNT_CHANGE_NATIVE_CURRENCY:

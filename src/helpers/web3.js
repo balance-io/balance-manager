@@ -63,7 +63,6 @@ export const web3WebSocketPendingTxs = () =>
   new Promise((resolve, reject) => {
     web3WebSocket.eth
       .subscribe('pendingTransactions', (error, result) => {
-        console.log(web3WebSocket.currentProvider.connection.url);
         if (!error) reject(error);
       })
       .on('data', transaction => {

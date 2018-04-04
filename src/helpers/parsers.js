@@ -14,7 +14,7 @@ import {
   saveLocal,
   getLocal
 } from './utilities';
-import { getTransactionCount } from './web3';
+import { getAccountBalance, getTokenBalanceOf, getTransactionCount } from './web3';
 import { getTimeString } from './time';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
@@ -478,14 +478,16 @@ export const parsePricesObject = (data = null, assets = [], nativeSelected = 'US
 };
 
 /**
- * @desc parse ethplorer address info response
+ * @desc parse account balances
  * @param  {Object}   [data = null]
  * @param  {String}   [web3Network = '']
  * @return {Promise}
  */
-export const parseEthplorerAddressInfo = (data = null, web3Network = '') => {
-  const ethereumBalance =
-    data && data.ETH.balance ? convertAmountToBigNumber(data.ETH.balance) : '0';
+export const parseAccountBalances = async (data = null, address = '', web3Network = '') => {
+  if (!data || !data.docs) return null;
+
+  const ethereumBalance = await getAccountBalance(address);
+  const countTxs = await getTransactionCount(address);
   const ethereum = {
     name: 'Ethereum',
     symbol: 'ETH',
@@ -499,13 +501,14 @@ export const parseEthplorerAddressInfo = (data = null, web3Network = '') => {
   };
 
   let assets = [ethereum];
-  if (data && data.tokens) {
-    const tokens = data.tokens.map(token => {
+
+  let tokens = await Promise.all(
+    data.docs.map(async token => {
       const asset = {
-        name: token.tokenInfo.name || lang.t('account.unknown_token'),
-        symbol: token.tokenInfo.symbol || '———',
-        address: token.tokenInfo.address || null,
-        decimals: convertStringToNumber(token.tokenInfo.decimals)
+        name: token.contract.name || lang.t('account.unknown_token'),
+        symbol: token.contract.symbol || '———',
+        address: token.contract.address || null,
+        decimals: convertStringToNumber(token.contract.decimals)
       };
       const allTokens = getLocal('token_info') || {};
       if (asset.symbol === '———' && !allTokens[asset.address]) {
@@ -514,7 +517,8 @@ export const parseEthplorerAddressInfo = (data = null, web3Network = '') => {
         allTokens[asset.symbol] = asset;
       }
       saveLocal('token_info', allTokens);
-      const assetBalance = convertAssetAmountToBigNumber(token.balance, asset.decimals);
+      const rawBalance = await getTokenBalanceOf(address, asset.address);
+      const assetBalance = convertAssetAmountToBigNumber(rawBalance, asset.decimals);
       return {
         ...asset,
         balance: {
@@ -526,18 +530,21 @@ export const parseEthplorerAddressInfo = (data = null, web3Network = '') => {
         },
         native: null
       };
-    });
-    assets = [...assets, ...tokens];
+    })
+  );
 
-    const accountLocal = getLocal(data.address) || {};
-    accountLocal.balances = { assets, total: '———' };
-    accountLocal.web3Network = web3Network;
-    saveLocal(data.address, accountLocal);
-  }
+  tokens = tokens.filter(token => !!Number(token.balance.amount));
+
+  assets = [...assets, ...tokens];
+
+  const accountLocal = getLocal(data.address) || {};
+  accountLocal.balances = { assets, total: '———' };
+  accountLocal.web3Network = web3Network;
+  saveLocal(data.address, accountLocal);
   return {
-    address: (data && data.address) || '',
+    address: address,
     type: '',
-    txCount: (data && data.countTxs) || 0,
+    txCount: countTxs,
     assets: assets,
     total: '———'
   };
@@ -550,7 +557,11 @@ export const parseEthplorerAddressInfo = (data = null, web3Network = '') => {
  * @param  {String} [web3Network='']
  * @return {String}
  */
-export const parseAccountBalances = (account = null, nativePrices = null, web3Network = '') => {
+export const parseAccountBalancesPrices = (
+  account = null,
+  nativePrices = null,
+  web3Network = ''
+) => {
   let totalAmount = 0;
   let newAccount = {
     ...account
@@ -608,13 +619,13 @@ export const parseAccountBalances = (account = null, nativePrices = null, web3Ne
 };
 
 /**
- * @desc parse etherscan account transactions response
+ * @desc parse account transactions response
  * @param  {String}   [data = null]
  * @param  {String}   [address = '']
  * @param  {String}   [web3Network = '']
  * @return {Promise}
  */
-export const parseTrustRayTransactions = async (data = null, address = '', web3Network = '') => {
+export const parseAccountTransactions = async (data = null, address = '', web3Network = '') => {
   if (!data || !data.docs) return null;
 
   let transactions = await Promise.all(
@@ -731,7 +742,7 @@ export const parseTrustRayTransactions = async (data = null, address = '', web3N
         web3Network === 'mainnet' ? `api` : web3Network
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=${data.page + 1}`
     );
-    const newPageTransations = await parseTrustRayTransactions(
+    const newPageTransations = await parseAccountTransactions(
       newPageResponse.data,
       address,
       web3Network

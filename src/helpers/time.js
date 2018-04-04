@@ -8,10 +8,8 @@ import timeUnits from '../libraries/time-units.json';
  * @return {String}
  */
 export const getTimeZone = (timestamp = null) => {
-  console.log('getTimeZone', timestamp);
   if (!timestamp) return '';
   const date = new Date(timestamp);
-  console.log(date.toLocaleString());
   const timezone = date
     .toString()
     .match(/\(.[^()]*\)/g)[0]

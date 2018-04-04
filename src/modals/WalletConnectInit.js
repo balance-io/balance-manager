@@ -8,9 +8,9 @@ import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import { modalClose } from '../reducers/_modal';
 import {
-  wallletConnectModalInit,
+  walletConnectModalInit,
   walletConnectGetAddress,
-  wallletConnectClearFields
+  walletConnectClearFields
 } from '../reducers/_walletconnect';
 import { responsive } from '../styles';
 
@@ -36,18 +36,20 @@ const StyledCenter = styled.div`
 
 class WalletConnectInit extends Component {
   componentDidMount() {
-    this.props.wallletConnectModalInit();
+    this.props.walletConnectModalInit();
   }
   onClose = () => {
     this.props.modalClose();
-    this.props.wallletConnectClearFields();
+    this.props.walletConnectClearFields();
   };
   render = () => (
     <Card maxWidth={400} background="white">
       <StyledContainer>
         {this.props.sessionToken && (
           <StyledQRCodeDisplay
-            data={`{"domain":"http://bridge.balance.io","sessionToken":"${this.props.sessionToken}"}`}
+            data={`{"domain":"https://walletconnect.balance.io","sessionToken":"${
+              this.props.sessionToken
+            }","publicKey":"${this.props.keypair.publicKey}"}`}
           />
         )}
         <StyledCenter>
@@ -61,19 +63,19 @@ class WalletConnectInit extends Component {
 }
 
 WalletConnectInit.propTypes = {
-  wallletConnectModalInit: PropTypes.func.isRequired,
+  walletConnectModalInit: PropTypes.func.isRequired,
   walletConnectGetAddress: PropTypes.func.isRequired,
   modalClose: PropTypes.func.isRequired,
-  sessionToken: PropTypes.string.isRequired,
+  sessionToken: PropTypes.string.isRequired
 };
 
 const reduxProps = ({ modal, walletconnect }) => ({
-  sessionToken: walletconnect.sessionToken,
+  sessionToken: walletconnect.sessionToken
 });
 
 export default connect(reduxProps, {
   modalClose,
-  wallletConnectModalInit,
+  walletConnectModalInit,
   walletConnectGetAddress,
-  wallletConnectClearFields
+  walletConnectClearFields
 })(WalletConnectInit);

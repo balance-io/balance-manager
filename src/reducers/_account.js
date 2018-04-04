@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import {
   apiGetEthplorerAddressInfo,
-  apiGetEtherscanAccountTransactions,
+  apiGetTrustRayTransactions,
   apiGetPrices
 } from '../helpers/api';
 import {
@@ -137,7 +137,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
         !accountLocal || !accountLocal.transactions || !accountLocal.transactions.length
     }
   });
-  apiGetEtherscanAccountTransactions(accountAddress, web3Network)
+  apiGetTrustRayTransactions(accountAddress, web3Network)
     .then(transactions => {
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS });
       let _transactions = transactions;

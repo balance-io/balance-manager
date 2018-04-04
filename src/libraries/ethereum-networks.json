@@ -4,11 +4,6 @@
     "value": "Mainnet",
     "WebSocket": true
   },
-  "morden": {
-    "id": 2,
-    "value": "Morden",
-    "WebSocket": false
-  },
   "ropsten": {
     "id": 3,
     "value": "Ropsten",

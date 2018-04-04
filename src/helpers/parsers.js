@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js';
 import lang from '../languages';
+import axios from 'axios';
 import {
   debounceRequest,
-  hexToNumberString,
   convertStringToNumber,
   convertAmountToBigNumber,
   convertAmountFromBigNumber,
@@ -14,13 +14,12 @@ import {
   saveLocal,
   getLocal
 } from './utilities';
-import { getTransactionCount, fetchTx } from './web3';
+import { getTransactionCount } from './web3';
 import { getTimeString } from './time';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
-import smartContractMethods from '../libraries/smartcontract-methods.json';
 import timeUnits from '../libraries/time-units.json';
-import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
+import { apiGetHistoricalPrices } from './api';
 
 /**
  * @desc parse error code message
@@ -609,105 +608,25 @@ export const parseAccountBalances = (account = null, nativePrices = null, web3Ne
 };
 
 /**
- * @desc parse ethplorer address token history
- * @param  {String}   [data = null]
- * @param  {String} [address='']
- * @return {Promise}
- */
-export const parseEthplorerAddressHistory = async (data = null, address = '') => {
-  if (!data || !data.result) return null;
-
-  let transactions = await Promise.all(
-    data.result.map(async (tx, idx) => {
-      const hash = tx.hash;
-      const timestamp = tx.timeStamp;
-      const error = false;
-      let interaction = false;
-      const from = tx.from;
-      let to = tx.to;
-      const asset = {
-        name: tx.tokenInfo.name || 'Unknown Token',
-        symbol: tx.tokenInfo.symbol || '———',
-        address: tx.tokenInfo.address || null,
-        decimals: tx.tokenInfo.decimals ? convertStringToNumber(tx.tokenInfo.decimals) : 18
-      };
-
-      const allTokens = getLocal('token_info') || {};
-      if (asset.symbol === '———' && !allTokens[asset.address]) {
-        allTokens[asset.address] = asset;
-      } else if (!allTokens[asset.symbol]) {
-        allTokens[asset.symbol] = asset;
-      }
-      saveLocal('token_info', allTokens);
-
-      let value = {
-        amount: tx.value,
-        display: convertAmountToDisplay(tx.value, null, {
-          symbol: asset.symbol,
-          decimals: asset.decimals
-        })
-      };
-      let txFee = null;
-
-      const response = await fetchTx(tx.hash);
-
-      if (response.data) {
-        let totalGas = BigNumber(`${response.data.gas}`)
-          .times(BigNumber(`${response.data.gasPrice}`))
-          .toString();
-        txFee = {
-          amount: totalGas,
-          display: convertAmountToDisplay(totalGas, null, {
-            symbol: 'ETH',
-            decimals: 18
-          })
-        };
-      }
-
-      const result = {
-        hash,
-        timestamp,
-        from,
-        to,
-        error,
-        interaction,
-        value,
-        txFee,
-        native: null,
-        pending: false,
-        asset
-      };
-      return result;
-    })
-  );
-
-  return transactions;
-};
-
-/**
  * @desc parse etherscan account transactions response
  * @param  {String}   [data = null]
  * @param  {String}   [address = '']
  * @param  {String}   [web3Network = '']
  * @return {Promise}
  */
-export const parseEtherscanAccountTransactions = async (
-  data = null,
-  address = '',
-  web3Network = ''
-) => {
-  if (!data || !data.result) return null;
+export const parseTrustRayTransactions = async (data = null, address = '', web3Network = '') => {
+  if (!data || !data.docs) return null;
 
   let transactions = await Promise.all(
-    data.result.map(async (tx, idx) => {
-      const hash = tx.hash;
+    data.docs.map(async (tx, idx) => {
+      const hash = tx._id;
       const timestamp = {
         secs: tx.timeStamp,
         ms: `${tx.timeStamp}000`
       };
       const error = tx.isError === '1';
       let interaction = false;
-      const from = tx.from;
+      let from = tx.from;
       let to = tx.to;
       let asset = {
         name: 'Ethereum',
@@ -732,52 +651,36 @@ export const parseEtherscanAccountTransactions = async (
           decimals: 18
         })
       };
-
-      if (tx.input.startsWith(smartContractMethods.token_transfer.hash)) {
-        const allTokens = getLocal('token_info') || {};
-        let foundToken = null;
-        Object.keys(allTokens).forEach(tokenSymbol => {
-          if (allTokens[tokenSymbol].address === tx.to) {
-            foundToken = allTokens[tokenSymbol];
+      const isTokenTransfer = (() => {
+        if (tx.operations.length) {
+          const tokenTransfers = tx.operations.filter(
+            operation => operation.type === 'token_transfer'
+          );
+          if (tokenTransfers.length) {
+            return true;
           }
-        });
-        if (tx.to === '0xc55cf4b03948d7ebc8b9e8bad92643703811d162') {
-          /* STT token on Ropsten */
-          asset = {
-            name: 'Status Test Token',
-            symbol: 'STT',
-            address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
-            decimals: 18
-          };
-        } else if (foundToken) {
-          asset = foundToken;
-        } else {
-          const response = await apiGetEthplorerTokenInfo(tx.to);
-
-          asset = {
-            name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
-            symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
-            address: !response.data.error ? response.data.address : '',
-            decimals: !response.data.error ? convertStringToNumber(response.data.decimals) : 18
-          };
-
-          if (asset.symbol === '———' && !allTokens[asset.address]) {
-            allTokens[asset.address] = asset;
-          } else if (!allTokens[asset.symbol]) {
-            allTokens[asset.symbol] = asset;
-          }
-          saveLocal('token_info', allTokens);
         }
+        return false;
+      })();
+      interaction = !isTokenTransfer && tx.input !== '0x';
+      if (isTokenTransfer) {
+        if (tx.operations.length === 1) {
+          const transfer = tx.operations[0];
 
-        to = `0x${tx.input.slice(34, 74)}`;
-        const hexResult = hexToNumberString(`${tx.input.slice(74)}`);
-        const amount = convertAssetAmountToBigNumber(hexResult, asset.decimals);
-        value = { amount, display: convertAmountToDisplay(amount, null, asset) };
-      } else if (tx.input !== '0x') {
-        interaction = true;
+          asset = {
+            name: transfer.contract.name || 'Unknown Token',
+            symbol: transfer.contract.symbol || '———',
+            address: transfer.contract.address || '',
+            decimals: transfer.contract.decimals || 18
+          };
+
+          from = transfer.from;
+          to = transfer.to;
+          const amount = convertAssetAmountToBigNumber(transfer.value, asset.decimals);
+          value = { amount, display: convertAmountToDisplay(amount, null, asset) };
+        }
       }
-
-      const result = {
+      let result = {
         hash,
         timestamp,
         from,
@@ -790,18 +693,57 @@ export const parseEtherscanAccountTransactions = async (
         pending: false,
         asset
       };
+      if (tx.operations.length === 2) {
+        let txOne = { ...result, hash: `${result.hash}-one` };
+        let txTwo = { ...result, hash: `${result.hash}-two` };
+        const transferTwo = tx.operations[1];
+        txTwo.asset = {
+          name: transferTwo.contract.name || 'Unknown Token',
+          symbol: transferTwo.contract.symbol || '———',
+          address: transferTwo.contract.address || '',
+          decimals: transferTwo.contract.decimals || 18
+        };
+        txTwo.from = transferTwo.from;
+        txTwo.to = transferTwo.to;
+        const amount = convertAssetAmountToBigNumber(transferTwo.value, asset.decimals);
+        txTwo.value = { amount, display: convertAmountToDisplay(amount, null, asset) };
+
+        return [txOne, txTwo];
+      }
       return result;
     })
   );
+  let _transactions = [];
 
-  transactions = transactions.reverse();
+  transactions.forEach(tx => {
+    if (Array.isArray(tx)) {
+      tx.forEach(subTx => {
+        _transactions.push(subTx);
+      });
+    } else {
+      _transactions.push(tx);
+    }
+  });
 
+  if (data.pages > data.page) {
+    const newPageResponse = await axios.get(
+      `https://${
+        web3Network === 'mainnet' ? `api` : web3Network
+      }.trustwalletapp.com/transactions?address=${address}&limit=50&page=${data.page + 1}`
+    );
+    const newPageTransations = await parseTrustRayTransactions(
+      newPageResponse.data,
+      address,
+      web3Network
+    );
+    _transactions = [..._transactions, ...newPageTransations];
+  }
   const accountLocal = getLocal(address) || {};
-  accountLocal.transactions = transactions;
+  accountLocal.transactions = _transactions;
   accountLocal.web3Network = web3Network;
   saveLocal(address, accountLocal);
 
-  return transactions;
+  return _transactions;
 };
 
 /**

@@ -336,7 +336,7 @@ class AccountViewTransactions extends Component {
                         <p>
                           <strong>{lang.t('account.tx_hash').toUpperCase()}</strong>
                         </p>
-                        <p>{tx.hash}</p>
+                        <p>{tx.hash.replace(/-.*/g, '')}</p>
                       </div>
                     </div>
 

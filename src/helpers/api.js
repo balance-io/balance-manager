@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { parseEthplorerAddressInfo, parseEtherscanAccountTransactions } from './parsers';
-import { testnetGetAddressInfo } from './testnet';
+import { parseAccountBalances, parseAccountTransactions } from './parsers';
 import networkList from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
@@ -39,29 +38,6 @@ export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now())
 };
 
 /**
- * @desc get ethplorer address info
- * @param  {String}   [address = '']
- * @param  {String}   [network = 'mainnet']
- * @return {Promise}
- */
-export const apiGetEthplorerAddressInfo = (address = '', network = 'mainnet') => {
-  if (network !== 'mainnet') {
-    return testnetGetAddressInfo(address, network).then(data => parseEthplorerAddressInfo(data));
-  }
-  return axios
-    .get(`https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`)
-    .then(({ data }) => parseEthplorerAddressInfo(data));
-};
-
-/**
- * @desc get ethplorer token info
- * @param  {String}   [address = '']
- * @return {Promise}
- */
-export const apiGetEthplorerTokenInfo = (address = '') =>
-  axios.get(`https://api.ethplorer.io/getTokenInfo/${address}?apiKey=freekey`);
-
-/**
  * @desc get ethereum gas prices
  * @return {Promise}
  */
@@ -89,25 +65,43 @@ export const apiGetMetamaskNetwork = () =>
   });
 
 /**
- * @desc get ethplorer address info
+ * @desc get account balances
  * @param  {String}   [address = '']
  * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
-export const apiGetEtherscanAccountTransactions = (address = '', network = 'mainnet') => {
-  const subdomain = network === 'mainnet' ? `api` : `api-${network}`;
-  return new Promise((resolve, reject) => {
-    axios
-      .get(
-        `https://${subdomain}.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=8KDJ1H41UEGEA6CF4P8NEPUANQ3SE8HZGE`
-      )
-      .then(({ data }) =>
-        parseEtherscanAccountTransactions(data, address)
-          .then(transactions => resolve(transactions))
-          .catch(err => reject(err))
-      )
-      .catch(err => reject(err));
-  });
+export const apiGetAccountBalances = async (address = '', network = 'mainnet') => {
+  try {
+    const { data } = await axios.get(
+      `https://${
+        network === 'mainnet' ? `api` : network
+      }.trustwalletapp.com/tokens?address=${address}`
+    );
+    const transactions = await parseAccountBalances(data, address, network);
+    return transactions;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @desc get account transactions
+ * @param  {String}   [address = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetAccountTransactions = async (address = '', network = 'mainnet') => {
+  try {
+    const { data } = await axios.get(
+      `https://${
+        network === 'mainnet' ? `api` : network
+      }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
+    );
+    const transactions = await parseAccountTransactions(data, address, network);
+    return transactions;
+  } catch (error) {
+    throw error;
+  }
 };
 
 /**
@@ -158,10 +152,7 @@ export const apiWalletConnectInitiateTransaction = (
  * @param  {String}   [deviceUuid = '', transactionUuid = '']
  * @return {Promise}
  */
-export const apiWalletConnectGetTransactionStatus = (
-  deviceUuid: '',
-  transactionUuid: ''
-) =>
+export const apiWalletConnectGetTransactionStatus = (deviceUuid: '', transactionUuid: '') =>
   walletConnect.post('/get-transaction-status', {
     deviceUuid,
     transactionUuid

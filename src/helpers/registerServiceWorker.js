@@ -57,7 +57,6 @@ function registerValidSW(swUrl) {
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         installingWorker.onstatechange = event => {
-          console.log('onstatechange event', event);
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
               // At this point, the old content will have been purged and
@@ -65,15 +64,12 @@ function registerValidSW(swUrl) {
               // It's the perfect time to display a "New content is
               // available; please refresh." message in your web app.
               console.log('New content is available; please refresh.');
-              window.location.reload();
             } else {
               // At this point, everything has been precached.
               // It's the perfect time to display a
               // "Content is cached for offline use." message.
               console.log('Content is cached for offline use.');
             }
-          } else if (event.target.state === 'redundant') {
-            window.location.reload();
           }
         };
       };

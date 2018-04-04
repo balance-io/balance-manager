@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js';
 import lang from '../languages';
+import axios from 'axios';
 import {
   debounceRequest,
-  hexToNumberString,
   convertStringToNumber,
   convertAmountToBigNumber,
   convertAmountFromBigNumber,
@@ -14,12 +14,12 @@ import {
   saveLocal,
   getLocal
 } from './utilities';
+import { getAccountBalance, getTokenBalanceOf, getTransactionCount } from './web3';
 import { getTimeString } from './time';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
-import smartContractMethods from '../libraries/smartcontract-methods.json';
 import timeUnits from '../libraries/time-units.json';
-import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
+import { apiGetHistoricalPrices } from './api';
 
 /**
  * @desc parse error code message
@@ -28,20 +28,23 @@ import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
  */
 
 export const parseError = error => {
-  const msgEnd =
-    error.message.indexOf('\n') !== -1 ? error.message.indexOf('\n') : error.message.length;
-  let message = error.message.slice(0, msgEnd);
-  if (error.message.includes('MetaMask') || error.message.includes('Returned error:')) {
-    message = message
-      .replace('Error: ', '')
-      .replace('MetaMask ', '')
-      .replace('Returned error: ', '');
-    message = message.slice(0, 1).toUpperCase() + message.slice(1).toLowerCase();
-    console.error(new Error(message));
+  if (error) {
+    const msgEnd =
+      error.message.indexOf('\n') !== -1 ? error.message.indexOf('\n') : error.message.length;
+    let message = error.message.slice(0, msgEnd);
+    if (error.message.includes('MetaMask') || error.message.includes('Returned error:')) {
+      message = message
+        .replace('Error: ', '')
+        .replace('MetaMask ', '')
+        .replace('Returned error: ', '');
+      message = message.slice(0, 1).toUpperCase() + message.slice(1).toLowerCase();
+      console.error(new Error(message));
+      return message;
+    }
+    console.error(error);
     return message;
   }
-  console.error(error);
-  return message;
+  return `Something went wrong`;
 };
 
 /**
@@ -475,13 +478,16 @@ export const parsePricesObject = (data = null, assets = [], nativeSelected = 'US
 };
 
 /**
- * @desc parse ethplorer address info response
- * @param  {String}   [data = null]
+ * @desc parse account balances
+ * @param  {Object}   [data = null]
+ * @param  {String}   [web3Network = '']
  * @return {Promise}
  */
-export const parseEthplorerAddressInfo = (data = null) => {
-  const ethereumBalance =
-    data && data.ETH.balance ? convertAmountToBigNumber(data.ETH.balance) : '0';
+export const parseAccountBalances = async (data = null, address = '', web3Network = '') => {
+  if (!data || !data.docs) return null;
+
+  const ethereumBalance = await getAccountBalance(address);
+  const countTxs = await getTransactionCount(address);
   const ethereum = {
     name: 'Ethereum',
     symbol: 'ETH',
@@ -495,13 +501,14 @@ export const parseEthplorerAddressInfo = (data = null) => {
   };
 
   let assets = [ethereum];
-  if (data && data.tokens) {
-    const tokens = data.tokens.map(token => {
+
+  let tokens = await Promise.all(
+    data.docs.map(async token => {
       const asset = {
-        name: token.tokenInfo.name || lang.t('account.unknown_token'),
-        symbol: token.tokenInfo.symbol || '———',
-        address: token.tokenInfo.address || null,
-        decimals: convertStringToNumber(token.tokenInfo.decimals)
+        name: token.contract.name || lang.t('account.unknown_token'),
+        symbol: token.contract.symbol || '———',
+        address: token.contract.address || null,
+        decimals: convertStringToNumber(token.contract.decimals)
       };
       const allTokens = getLocal('token_info') || {};
       if (asset.symbol === '———' && !allTokens[asset.address]) {
@@ -510,7 +517,8 @@ export const parseEthplorerAddressInfo = (data = null) => {
         allTokens[asset.symbol] = asset;
       }
       saveLocal('token_info', allTokens);
-      const assetBalance = convertAssetAmountToBigNumber(token.balance, asset.decimals);
+      const rawBalance = await getTokenBalanceOf(address, asset.address);
+      const assetBalance = convertAssetAmountToBigNumber(rawBalance, asset.decimals);
       return {
         ...asset,
         balance: {
@@ -522,17 +530,21 @@ export const parseEthplorerAddressInfo = (data = null) => {
         },
         native: null
       };
-    });
-    assets = [...assets, ...tokens];
+    })
+  );
 
-    const accountLocal = getLocal(data.address) || {};
-    accountLocal.balances = { assets, total: '———' };
-    saveLocal(data.address, accountLocal);
-  }
+  tokens = tokens.filter(token => !!Number(token.balance.amount));
+
+  assets = [...assets, ...tokens];
+
+  const accountLocal = getLocal(data.address) || {};
+  accountLocal.balances = { assets, total: '———' };
+  accountLocal.web3Network = web3Network;
+  saveLocal(data.address, accountLocal);
   return {
-    address: (data && data.address) || '',
+    address: address,
     type: '',
-    txCount: (data && data.countTxs) || 0,
+    txCount: countTxs,
     assets: assets,
     total: '———'
   };
@@ -542,9 +554,14 @@ export const parseEthplorerAddressInfo = (data = null) => {
  * @desc parse account balances from native prices
  * @param  {Object} [account=null]
  * @param  {Object} [prices=null]
+ * @param  {String} [web3Network='']
  * @return {String}
  */
-export const parseAccountBalances = (account = null, nativePrices = null) => {
+export const parseAccountBalancesPrices = (
+  account = null,
+  nativePrices = null,
+  web3Network = ''
+) => {
   let totalAmount = 0;
   let newAccount = {
     ...account
@@ -595,31 +612,32 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
 
     const accountLocal = getLocal(account.address) || {};
     accountLocal.balances = { assets: newAssets, total: total };
+    accountLocal.web3Network = web3Network;
     saveLocal(account.address, accountLocal);
   }
   return newAccount;
 };
 
 /**
- * @desc parse etherscan account transactions response
+ * @desc parse account transactions response
  * @param  {String}   [data = null]
  * @param  {String}   [address = '']
+ * @param  {String}   [web3Network = '']
  * @return {Promise}
  */
-export const parseEtherscanAccountTransactions = async (data = null, address = '') => {
-  if (!data || !data.result) return null;
+export const parseAccountTransactions = async (data = null, address = '', web3Network = '') => {
+  if (!data || !data.docs) return null;
 
   let transactions = await Promise.all(
-    data.result.map(async (tx, idx) => {
-      const hash = tx.hash;
+    data.docs.map(async (tx, idx) => {
+      const hash = tx._id;
       const timestamp = {
         secs: tx.timeStamp,
         ms: `${tx.timeStamp}000`
       };
-      const blockNumber = tx.blockNumber;
       const error = tx.isError === '1';
       let interaction = false;
-      const from = tx.from;
+      let from = tx.from;
       let to = tx.to;
       let asset = {
         name: 'Ethereum',
@@ -644,55 +662,38 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
           decimals: 18
         })
       };
-
-      if (tx.input.startsWith(smartContractMethods.token_transfer.hash)) {
-        const allTokens = getLocal('token_info') || {};
-        let foundToken = null;
-        Object.keys(allTokens).forEach(tokenSymbol => {
-          if (allTokens[tokenSymbol].address === tx.to) {
-            foundToken = allTokens[tokenSymbol];
+      const isTokenTransfer = (() => {
+        if (tx.operations.length) {
+          const tokenTransfers = tx.operations.filter(
+            operation => operation.type === 'token_transfer'
+          );
+          if (tokenTransfers.length) {
+            return true;
           }
-        });
-        if (tx.to === '0xc55cf4b03948d7ebc8b9e8bad92643703811d162') {
-          /* STT token on Ropsten */
-          asset = {
-            name: 'Status Test Token',
-            symbol: 'STT',
-            address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
-            decimals: 18
-          };
-        } else if (foundToken) {
-          asset = foundToken;
-        } else {
-          const response = await apiGetEthplorerTokenInfo(tx.to);
-
-          asset = {
-            name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
-            symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
-            address: !response.data.error ? response.data.address : '',
-            decimals: !response.data.error ? convertStringToNumber(response.data.decimals) : 18
-          };
-
-          if (asset.symbol === '———' && !allTokens[asset.address]) {
-            allTokens[asset.address] = asset;
-          } else if (!allTokens[asset.symbol]) {
-            allTokens[asset.symbol] = asset;
-          }
-          saveLocal('token_info', allTokens);
         }
+        return false;
+      })();
+      interaction = !isTokenTransfer && tx.input !== '0x';
+      if (isTokenTransfer) {
+        if (tx.operations.length === 1) {
+          const transfer = tx.operations[0];
 
-        to = `0x${tx.input.slice(34, 74)}`;
-        const hexResult = hexToNumberString(`${tx.input.slice(74)}`);
-        const amount = convertAssetAmountToBigNumber(hexResult, asset.decimals);
-        value = { amount, display: convertAmountToDisplay(amount, null, asset) };
-      } else if (tx.input !== '0x') {
-        interaction = true;
+          asset = {
+            name: transfer.contract.name || 'Unknown Token',
+            symbol: transfer.contract.symbol || '———',
+            address: transfer.contract.address || '',
+            decimals: transfer.contract.decimals || 18
+          };
+
+          from = transfer.from;
+          to = transfer.to;
+          const amount = convertAssetAmountToBigNumber(transfer.value, asset.decimals);
+          value = { amount, display: convertAmountToDisplay(amount, null, asset) };
+        }
       }
-
-      const result = {
+      let result = {
         hash,
         timestamp,
-        blockNumber,
         from,
         to,
         error,
@@ -703,17 +704,57 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
         pending: false,
         asset
       };
+      if (tx.operations.length === 2) {
+        let txOne = { ...result, hash: `${result.hash}-one` };
+        let txTwo = { ...result, hash: `${result.hash}-two` };
+        const transferTwo = tx.operations[1];
+        txTwo.asset = {
+          name: transferTwo.contract.name || 'Unknown Token',
+          symbol: transferTwo.contract.symbol || '———',
+          address: transferTwo.contract.address || '',
+          decimals: transferTwo.contract.decimals || 18
+        };
+        txTwo.from = transferTwo.from;
+        txTwo.to = transferTwo.to;
+        const amount = convertAssetAmountToBigNumber(transferTwo.value, asset.decimals);
+        txTwo.value = { amount, display: convertAmountToDisplay(amount, null, asset) };
+
+        return [txOne, txTwo];
+      }
       return result;
     })
   );
+  let _transactions = [];
 
-  transactions = transactions.reverse();
+  transactions.forEach(tx => {
+    if (Array.isArray(tx)) {
+      tx.forEach(subTx => {
+        _transactions.push(subTx);
+      });
+    } else {
+      _transactions.push(tx);
+    }
+  });
 
+  if (data.pages > data.page) {
+    const newPageResponse = await axios.get(
+      `https://${
+        web3Network === 'mainnet' ? `api` : web3Network
+      }.trustwalletapp.com/transactions?address=${address}&limit=50&page=${data.page + 1}`
+    );
+    const newPageTransations = await parseAccountTransactions(
+      newPageResponse.data,
+      address,
+      web3Network
+    );
+    _transactions = [..._transactions, ...newPageTransations];
+  }
   const accountLocal = getLocal(address) || {};
-  accountLocal.transactions = transactions;
+  accountLocal.transactions = _transactions;
+  accountLocal.web3Network = web3Network;
   saveLocal(address, accountLocal);
 
-  return transactions;
+  return _transactions;
 };
 
 /**
@@ -721,12 +762,14 @@ export const parseEtherscanAccountTransactions = async (data = null, address = '
  * @param  {Object} [transactions=null]
  * @param  {Object} [nativeCurrency='']
  * @param  {String} [address='']
+ * @param  {String} [web3Network='']
  * @return {String}
  */
 export const parseTransactionsPrices = async (
   transactions = null,
   nativeSelected = '',
-  address = ''
+  address = '',
+  web3Network = ''
 ) => {
   let _transactions = transactions;
 
@@ -795,6 +838,7 @@ export const parseTransactionsPrices = async (
   const accountLocal = getLocal(address) || {};
   accountLocal.transactions = _transactions;
   const pending = _transactions ? _transactions.filter(tx => tx.pending) : [];
+  accountLocal.web3Network = web3Network;
   accountLocal.pending = pending;
   saveLocal(address, accountLocal);
 
@@ -807,13 +851,15 @@ export const parseTransactionsPrices = async (
  * @param  {Object} [transactions=null]
  * @param  {Object} [nativeCurrency='']
  * @param  {String} [address='']
+ * @param  {String} [web3Network='']
  * @return {String}
  */
 export const parseNewTransaction = async (
   txDetails = null,
   transactions = null,
   nativeSelected = '',
-  address = ''
+  address = '',
+  web3Network = ''
 ) => {
   let _transactions = [...transactions];
 
@@ -835,14 +881,15 @@ export const parseNewTransaction = async (
     amount = convertAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
   }
   const value = { amount, display: convertAmountToDisplay(amount, null, txDetails.asset) };
+  const nonce = txDetails.nonce || (await getTransactionCount(txDetails.from));
 
   let tx = {
     hash: txDetails.hash,
     timestamp: null,
-    blockNumber: null,
     from: txDetails.from,
     to: txDetails.to,
     error: false,
+    nonce: nonce,
     interaction: false,
     value: value,
     txFee: txFee,
@@ -896,6 +943,7 @@ export const parseNewTransaction = async (
   accountLocal.transactions = _transactions;
   const pending = _transactions.filter(tx => tx.pending);
   accountLocal.pending = pending;
+  accountLocal.web3Network = web3Network;
   saveLocal(address, accountLocal);
 
   return _transactions;

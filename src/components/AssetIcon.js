@@ -18,9 +18,7 @@ class AssetIcon extends Component {
       this.setState({ imgSrc: eth });
     } else {
       this.setState({
-        imgSrc: `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${
-          props.asset
-        }.png`
+        imgSrc: `/tokens/images/${props.asset}.png`
       });
     }
   };

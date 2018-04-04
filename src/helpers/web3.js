@@ -14,7 +14,7 @@ import {
 } from './utilities';
 
 /**
- * @desc web3 instance
+ * @desc web3 http instance
  */
 export const web3Instance = new Web3(new Web3.providers.HttpProvider(`https://mainnet.infura.io/`));
 
@@ -22,20 +22,53 @@ export const web3Instance = new Web3(new Web3.providers.HttpProvider(`https://ma
  * @desc set a different web3 provider
  * @param {String}
  */
-export const web3SetProvider = provider => {
+export const web3SetHttpProvider = provider => {
   let providerObj = null;
   if (provider.match(/(https?:\/\/)(\w+.)+/g)) {
     providerObj = new Web3.providers.HttpProvider(provider);
-  } else if (provider.match(/(wss?:\/\/)(\w+.)+/g)) {
-    providerObj = new Web3.providers.WebsocketProvider(provider);
   }
   if (!providerObj) {
     throw new Error(
-      'function web3SetProvider requires provider to match a valid HTTP/HTTPS or WS/WSS address'
+      'function web3SetHttpProvider requires provider to match a valid HTTP/HTTPS endpoint'
     );
   }
   return web3Instance.setProvider(providerObj);
 };
+
+/**
+ * @desc web3 websocket instance
+ */
+export const web3WebSocket = new Web3(
+  new Web3.providers.WebsocketProvider(`wss://mainnet.infura.io/_ws`)
+);
+
+/**
+ * @desc set a different web3 provider
+ * @param {String}
+ */
+export const web3SetWebSocketProvider = provider => {
+  let providerObj = null;
+  if (provider.match(/(wss?:\/\/)(\w+.)+/g)) {
+    providerObj = new Web3.providers.WebsocketProvider(provider);
+  }
+  if (!providerObj) {
+    throw new Error(
+      'function web3SetWebSocketProvider requires provider to match a valid WS/WSS endpoint'
+    );
+  }
+  return web3WebSocket.setProvider(providerObj);
+};
+
+export const web3WebSocketPendingTxs = () =>
+  new Promise((resolve, reject) => {
+    web3WebSocket.eth
+      .subscribe('pendingTransactions', (error, result) => {
+        if (!error) reject(error);
+      })
+      .on('data', transaction => {
+        web3WebSocket.eth.getTransaction(transaction).then(result => resolve(result));
+      });
+  });
 
 /**
  * @desc get address transaction count

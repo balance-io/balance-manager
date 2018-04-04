@@ -10,8 +10,14 @@ import {
   formatFixedDecimals
 } from '../helpers/utilities';
 import { parseError, parseGasPrices, parseGasPricesTxFee } from '../helpers/parsers';
-import { metamaskSendTransaction, metamaskTransferToken, estimateGasLimit } from '../helpers/web3';
+import {
+  metamaskSendTransaction,
+  metamaskTransferToken,
+  estimateGasLimit,
+  fetchTx
+} from '../helpers/web3';
 import { notificationShow } from './_notification';
+import { accountUpdateTransactions, accountSetupWebSocket } from './_account';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -129,6 +135,19 @@ export const sendEtherMetamask = ({
     gasLimit: gasLimit
   })
     .then(txHash => {
+      fetchTx(txHash).then(console.log);
+      dispatch(accountSetupWebSocket(address));
+      const txDetails = {
+        hash: txHash,
+        from: address,
+        to: recipient,
+        nonce: null,
+        value: amount,
+        gasPrice: gasPrice.value.amount,
+        gasLimit: gasLimit,
+        asset: selectedAsset
+      };
+      dispatch(accountUpdateTransactions(txDetails));
       dispatch({
         type: SEND_ETHER_METAMASK_SUCCESS,
         payload: txHash
@@ -154,6 +173,7 @@ export const sendTokenMetamask = ({
     tokenObject: selectedAsset,
     from: address,
     to: recipient,
+    nonce: null,
     amount: amount,
     gasPrice: gasPrice.value.amount,
     gasLimit: gasLimit

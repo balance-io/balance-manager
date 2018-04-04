@@ -57,7 +57,6 @@ function registerValidSW(swUrl) {
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         installingWorker.onstatechange = event => {
-          console.log('onstatechange event', event);
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
               // At this point, the old content will have been purged and
@@ -72,8 +71,6 @@ function registerValidSW(swUrl) {
               // "Content is cached for offline use." message.
               console.log('Content is cached for offline use.');
             }
-          } else if (event.target.state === 'redundant') {
-            window.location.reload();
           }
         };
       };

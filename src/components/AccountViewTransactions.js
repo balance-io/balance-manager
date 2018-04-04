@@ -344,7 +344,7 @@ class AccountViewTransactions extends Component {
                       <a
                         href={`https://${
                           this.props.web3Network !== 'mainnet' ? `${this.props.web3Network}.` : ''
-                        }etherscan.io/tx/${tx.hash}`}
+                        }etherscan.io/tx/${tx.hash.replace(/-.*/g, '')}`}
                         target="_blank"
                         rel="noreferrer noopener"
                       >
@@ -353,7 +353,7 @@ class AccountViewTransactions extends Component {
                         </ButtonCustom>
                       </a>
                       <a
-                        href={`https://ethplorer.io/tx/${tx.hash}`}
+                        href={`https://ethplorer.io/tx/${tx.hash.replace(/-.*/g, '')}`}
                         target="_blank"
                         rel="noreferrer noopener"
                       >

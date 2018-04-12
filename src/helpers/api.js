@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { parseAccountBalances, parseAccountTransactions } from './parsers';
+import { updateLocalBalances, updateLocalTransactions } from './utilities';
 import networkList from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
@@ -69,8 +70,10 @@ export const apiGetAccountBalances = async (address = '', network = 'mainnet') =
         network === 'mainnet' ? `api` : network
       }.trustwalletapp.com/tokens?address=${address}`
     );
-    const transactions = await parseAccountBalances(data, address, network);
-    return transactions;
+    const account = await parseAccountBalances(data, address, network);
+    updateLocalBalances(account, network);
+
+    return account;
   } catch (error) {
     throw error;
   }
@@ -90,6 +93,7 @@ export const apiGetAccountTransactions = async (address = '', network = 'mainnet
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
     );
     const transactions = await parseAccountTransactions(data, address, network);
+    updateLocalTransactions(address, transactions, network);
     return transactions;
   } catch (error) {
     throw error;

@@ -343,7 +343,7 @@ class AccountViewTransactions extends Component {
                     <div>
                       <a
                         href={`https://${
-                          this.props.web3Network !== 'mainnet' ? `${this.props.web3Network}.` : ''
+                          this.props.network !== 'mainnet' ? `${this.props.network}.` : ''
                         }etherscan.io/tx/${tx.hash.replace(/-.*/g, '')}`}
                         target="_blank"
                         rel="noreferrer noopener"
@@ -359,7 +359,7 @@ class AccountViewTransactions extends Component {
                       >
                         <ButtonCustom
                           left
-                          disabled={this.props.web3Network !== 'mainnet'}
+                          disabled={this.props.network !== 'mainnet'}
                           txtColor="ethplorer"
                           img={ethplorerLogo}
                         >
@@ -399,7 +399,7 @@ AccountViewTransactions.propTypes = {
   transactions: PropTypes.array.isRequired,
   fetchingTransactions: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
-  web3Network: PropTypes.string.isRequired,
+  network: PropTypes.string.isRequired,
   nativeCurrency: PropTypes.string.isRequired
 };
 
@@ -408,7 +408,7 @@ const reduxProps = ({ account }) => ({
   fetchingTransactions: account.fetchingTransactions,
   accountAddress: account.accountAddress,
   account: account.accountInfo,
-  web3Network: account.web3Network,
+  network: account.network,
   nativeCurrency: account.nativeCurrency
 });
 

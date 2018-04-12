@@ -52,56 +52,32 @@ export const debounceRequest = (request, params, timeout) =>
   );
 
 /**
- * @desc create authenticated user session
- * @param  {String}   [token='']
- * @param  {String}   [email='']
- * @param  {Boolean}  [verified=false]
- * @param  {Boolean}  [twoFactor=false]
- * @param  {Date}     [expires=Date.now() + 180000]
- * @param  {Array}    [accounts=[]]
- * @param  {Array}    [asset=[]]
- * @param
- * @return {Session}
+ * @desc update local balances
+ * @param  {Object}   [account]
+ * @param  {String}   [network]
+ * @return {Void}
  */
-export const setSession = ({
-  token = '',
-  email = '',
-  verified = false,
-  twoFactor = false,
-  expires = Date.now() + 1800000, // 30mins
-  accounts = [],
-  asset = []
-}) => {
-  const session = {
-    token,
-    email,
-    verified,
-    twoFactor,
-    expires,
-    accounts,
-    asset
-  };
-  setTimeout(() => window.browserHistory.push('/signout'), 1800000); // 30mins
-  localStorage.setItem('USER_SESSION', JSON.stringify(session));
+export const updateLocalBalances = (account, network) => {
+  const accountLocal = getLocal(account.address) || {};
+  accountLocal.balances = { assets: account.assets, total: account.total || '———' };
+  accountLocal.network = network;
+  saveLocal(account.address, accountLocal);
 };
 
 /**
- * @desc get session as an object
- * @return {Object}
+ * @desc update local transactions
+ * @param  {String}   [address]
+ * @param  {Array}    [transactions]
+ * @param  {String}   [network]
+ * @return {Void}
  */
-export const getSession = () => {
-  const session = localStorage.getItem('USER_SESSION');
-  return JSON.parse(session);
-};
-
-/**
- * @desc update with new session data
- * @param  {Session}  [updatedSession]
- * @return {Session}
- */
-export const updateSession = updatedSession => {
-  const newSession = { ...getSession(), ...updatedSession };
-  return localStorage.setItem('USER_SESSION', JSON.stringify(newSession));
+export const updateLocalTransactions = (address, transactions, network) => {
+  const accountLocal = getLocal(address) || {};
+  const pending = transactions ? transactions.filter(tx => tx.pending) : [];
+  accountLocal.transactions = transactions;
+  accountLocal.pending = pending;
+  accountLocal.network = network;
+  saveLocal(address, accountLocal);
 };
 
 /**
@@ -121,43 +97,6 @@ export const flattenTokens = accounts => {
     }
   }
   return asset;
-};
-
-/**
- * @desc update accounts
- * @param  {Object}  [account=null]
- * @param  {String}  [address='']
- * @return {Session}
- */
-export const updateAccounts = (account = null, address = '') => {
-  const accountAddress = account ? account.address : address;
-  const prevAccounts = getSession().accounts;
-  const accounts = [];
-  let isNew = true;
-  for (let i = 0; i < prevAccounts.length; i++) {
-    if (prevAccounts[i].address === accountAddress) {
-      if (account && !address) {
-        isNew = false;
-        accounts.push(account);
-      }
-    } else {
-      accounts.push(prevAccounts[i]);
-    }
-  }
-  if (account && isNew) {
-    accounts.push(account);
-  }
-  const asset = flattenTokens(accounts);
-  updateSession({ accounts, asset });
-  return { accounts, asset };
-};
-
-/**
- * @desc delete session
- * @return {Void}
- */
-export const deleteSession = () => {
-  localStorage.removeItem('USER_SESSION');
 };
 
 /**

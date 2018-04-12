@@ -5,24 +5,6 @@ import networkList from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
 /**
- * @desc TEST lambda function balance
- * @param  {String}   [address='']
- * @param  {String}   [netowkr='mainnet']
- * @return {Promise}
- */
-export const apiLambdaGetBalance = (address = '', network = 'mainnet') =>
-  axios.get(`/.netlify/functions/balance?address=${address}&network=${network}`);
-
-/**
- * @desc TEST lambda function transactions
- * @param  {String}   [address='']
- * @param  {String}   [netowkr='mainnet']
- * @return {Promise}
- */
-export const apiLambdaGetTransactions = (address = '', network = 'mainnet') =>
-  axios.get(`/.netlify/functions/transactions?address=${address}&network=${network}`);
-
-/**
  * @desc get prices
  * @param  {Array}   [asset=[]]
  * @return {Promise}

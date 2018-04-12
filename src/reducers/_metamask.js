@@ -1,6 +1,6 @@
 import { apiGetMetamaskNetwork } from '../helpers/api';
 import { modalClose } from './_modal';
-import { accountUpdateAccountAddress, accountUpdateWeb3Network } from './_account';
+import { accountUpdateAccountAddress, accountUpdatenetwork } from './_account';
 
 // -- Constants ------------------------------------------------------------- //
 const METAMASK_GET_NETWORK_REQUEST = 'metamask/METAMASK_GET_NETWORK_REQUEST';
@@ -30,7 +30,7 @@ export const metamaskConnectMetamask = () => (dispatch, getState) => {
     apiGetMetamaskNetwork()
       .then(network => {
         dispatch({ type: METAMASK_GET_NETWORK_SUCCESS, payload: network });
-        dispatch(accountUpdateWeb3Network(network));
+        dispatch(accountUpdatenetwork(network));
         dispatch(metamaskUpdateMetamaskAccount());
         accountInterval = setInterval(() => dispatch(metamaskUpdateMetamaskAccount()), 100);
       })
@@ -49,7 +49,7 @@ const INITIAL_STATE = {
   fetching: false,
   accountAddress: '',
   web3Available: false,
-  web3Network: 'mainnet'
+  network: 'mainnet'
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -65,7 +65,7 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         fetching: false,
         web3Available: true,
-        web3Network: action.payload
+        network: action.payload
       };
     case METAMASK_GET_NETWORK_FAILURE:
       return {

@@ -1,15 +1,26 @@
 import axios from 'axios';
 import { parseAccountBalances, parseAccountTransactions } from './parsers';
+import { updateLocalBalances, updateLocalTransactions } from './utilities';
 import networkList from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
 /**
- * @desc TEST lambda function
+ * @desc TEST lambda function balance
  * @param  {String}   [address='']
+ * @param  {String}   [netowkr='mainnet']
  * @return {Promise}
  */
-export const apiLambdaGetBalance = (address = '') =>
-  axios.get(`/.netlify/functions/balance/${address}`);
+export const apiLambdaGetBalance = (address = '', network = 'mainnet') =>
+  axios.get(`/.netlify/functions/balance?address=${address}&network=${network}`);
+
+/**
+ * @desc TEST lambda function transactions
+ * @param  {String}   [address='']
+ * @param  {String}   [netowkr='mainnet']
+ * @return {Promise}
+ */
+export const apiLambdaGetTransactions = (address = '', network = 'mainnet') =>
+  axios.get(`/.netlify/functions/transactions?address=${address}&network=${network}`);
 
 /**
  * @desc get prices
@@ -77,8 +88,10 @@ export const apiGetAccountBalances = async (address = '', network = 'mainnet') =
         network === 'mainnet' ? `api` : network
       }.trustwalletapp.com/tokens?address=${address}`
     );
-    const transactions = await parseAccountBalances(data, address, network);
-    return transactions;
+    const account = await parseAccountBalances(data, address, network);
+    updateLocalBalances(account, network);
+
+    return account;
   } catch (error) {
     throw error;
   }
@@ -98,6 +111,7 @@ export const apiGetAccountTransactions = async (address = '', network = 'mainnet
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
     );
     const transactions = await parseAccountTransactions(data, address, network);
+    updateLocalTransactions(address, transactions, network);
     return transactions;
   } catch (error) {
     throw error;

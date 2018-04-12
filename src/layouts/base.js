@@ -97,12 +97,12 @@ const BaseLayout = ({
   account,
   accountChangeNativeCurrency,
   nativeCurrency,
-  web3Network,
+  network,
   web3Available,
   online,
   ...props
 }) => {
-  const showToolbar = window.location.pathname !== '/' && !fetching && web3Available && web3Network;
+  const showToolbar = window.location.pathname !== '/' && !fetching && web3Available && network;
   return (
     <StyledLayout>
       <Background />
@@ -119,7 +119,7 @@ const BaseLayout = ({
           </Link>
           <StyledIndicators show={showToolbar}>
             <StyledNetworkStatus
-              selected={web3Network}
+              selected={network}
               iconColor={online ? 'green' : 'red'}
               options={ethereumNetworks}
             />
@@ -145,7 +145,7 @@ BaseLayout.propTypes = {
   fetching: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
-  web3Network: PropTypes.string.isRequired,
+  network: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
   online: PropTypes.bool.isRequired
 };
@@ -154,7 +154,7 @@ const reduxProps = ({ account, metamask, warning }) => ({
   account: account.accountInfo,
   nativeCurrency: account.nativeCurrency,
   fetching: metamask.fetching,
-  web3Network: metamask.web3Network,
+  network: metamask.network,
   web3Available: metamask.web3Available,
   online: warning.online
 });

@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import lang from '../languages';
 import axios from 'axios';
 import {
   debounceRequest,
@@ -10,9 +9,7 @@ import {
   convertAmountToDisplaySpecific,
   convertAssetAmountToBigNumber,
   convertAssetAmountToNativeValue,
-  convertAssetAmountToNativeAmount,
-  saveLocal,
-  getLocal
+  convertAssetAmountToNativeAmount
 } from './utilities';
 import { getAccountBalance, getTokenBalanceOf, getTransactionCount } from './web3';
 import { getTimeString } from './time';
@@ -473,17 +470,16 @@ export const parsePricesObject = (data = null, assets = [], nativeSelected = 'US
       }
     });
   });
-  saveLocal('native_prices', prices);
   return prices;
 };
 
 /**
  * @desc parse account balances
  * @param  {Object}   [data = null]
- * @param  {String}   [web3Network = '']
+ * @param  {String}   [network = '']
  * @return {Promise}
  */
-export const parseAccountBalances = async (data = null, address = '', web3Network = '') => {
+export const parseAccountBalances = async (data = null, address = '', network = '') => {
   if (!data || !data.docs) return null;
 
   const ethereumBalance = await getAccountBalance(address);
@@ -494,8 +490,11 @@ export const parseAccountBalances = async (data = null, address = '', web3Networ
     address: null,
     decimals: 18,
     balance: {
-      amount: ethereumBalance,
-      display: convertAmountToDisplay(ethereumBalance, null, { symbol: 'ETH', decimals: 18 })
+      amount: convertAmountToBigNumber(ethereumBalance),
+      display: convertAmountToDisplay(convertAmountToBigNumber(ethereumBalance), null, {
+        symbol: 'ETH',
+        decimals: 18
+      })
     },
     native: null
   };
@@ -505,18 +504,11 @@ export const parseAccountBalances = async (data = null, address = '', web3Networ
   let tokens = await Promise.all(
     data.docs.map(async token => {
       const asset = {
-        name: token.contract.name || lang.t('account.unknown_token'),
+        name: token.contract.name || 'Unknown Token',
         symbol: token.contract.symbol || '———',
         address: token.contract.address || null,
         decimals: convertStringToNumber(token.contract.decimals)
       };
-      const allTokens = getLocal('token_info') || {};
-      if (asset.symbol === '———' && !allTokens[asset.address]) {
-        allTokens[asset.address] = asset;
-      } else if (!allTokens[asset.symbol]) {
-        allTokens[asset.symbol] = asset;
-      }
-      saveLocal('token_info', allTokens);
       const rawBalance = await getTokenBalanceOf(address, asset.address);
       const assetBalance = convertAssetAmountToBigNumber(rawBalance, asset.decimals);
       return {
@@ -537,10 +529,6 @@ export const parseAccountBalances = async (data = null, address = '', web3Networ
 
   assets = [...assets, ...tokens];
 
-  const accountLocal = getLocal(data.address) || {};
-  accountLocal.balances = { assets, total: '———' };
-  accountLocal.web3Network = web3Network;
-  saveLocal(data.address, accountLocal);
   return {
     address: address,
     type: '',
@@ -554,14 +542,10 @@ export const parseAccountBalances = async (data = null, address = '', web3Networ
  * @desc parse account balances from native prices
  * @param  {Object} [account=null]
  * @param  {Object} [prices=null]
- * @param  {String} [web3Network='']
+ * @param  {String} [network='']
  * @return {String}
  */
-export const parseAccountBalancesPrices = (
-  account = null,
-  nativePrices = null,
-  web3Network = ''
-) => {
+export const parseAccountBalancesPrices = (account = null, nativePrices = null, network = '') => {
   let totalAmount = 0;
   let newAccount = {
     ...account
@@ -609,11 +593,6 @@ export const parseAccountBalancesPrices = (
       assets: newAssets,
       total: total
     };
-
-    const accountLocal = getLocal(account.address) || {};
-    accountLocal.balances = { assets: newAssets, total: total };
-    accountLocal.web3Network = web3Network;
-    saveLocal(account.address, accountLocal);
   }
   return newAccount;
 };
@@ -622,10 +601,10 @@ export const parseAccountBalancesPrices = (
  * @desc parse account transactions response
  * @param  {String}   [data = null]
  * @param  {String}   [address = '']
- * @param  {String}   [web3Network = '']
+ * @param  {String}   [network = '']
  * @return {Promise}
  */
-export const parseAccountTransactions = async (data = null, address = '', web3Network = '') => {
+export const parseAccountTransactions = async (data = null, address = '', network = '') => {
   if (!data || !data.docs) return null;
 
   let transactions = await Promise.all(
@@ -739,20 +718,16 @@ export const parseAccountTransactions = async (data = null, address = '', web3Ne
   if (data.pages > data.page) {
     const newPageResponse = await axios.get(
       `https://${
-        web3Network === 'mainnet' ? `api` : web3Network
+        network === 'mainnet' ? `api` : network
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=${data.page + 1}`
     );
     const newPageTransations = await parseAccountTransactions(
       newPageResponse.data,
       address,
-      web3Network
+      network
     );
     _transactions = [..._transactions, ...newPageTransations];
   }
-  const accountLocal = getLocal(address) || {};
-  accountLocal.transactions = _transactions;
-  accountLocal.web3Network = web3Network;
-  saveLocal(address, accountLocal);
 
   return _transactions;
 };
@@ -761,16 +736,9 @@ export const parseAccountTransactions = async (data = null, address = '', web3Ne
  * @desc parse transactions from native prices
  * @param  {Object} [transactions=null]
  * @param  {Object} [nativeCurrency='']
- * @param  {String} [address='']
- * @param  {String} [web3Network='']
  * @return {String}
  */
-export const parseTransactionsPrices = async (
-  transactions = null,
-  nativeSelected = '',
-  address = '',
-  web3Network = ''
-) => {
+export const parseTransactionsPrices = async (transactions = null, nativeSelected = '') => {
   let _transactions = transactions;
 
   if (_transactions && _transactions.length && nativeSelected) {
@@ -835,13 +803,6 @@ export const parseTransactionsPrices = async (
     );
   }
 
-  const accountLocal = getLocal(address) || {};
-  accountLocal.transactions = _transactions;
-  const pending = _transactions ? _transactions.filter(tx => tx.pending) : [];
-  accountLocal.web3Network = web3Network;
-  accountLocal.pending = pending;
-  saveLocal(address, accountLocal);
-
   return _transactions;
 };
 
@@ -851,15 +812,13 @@ export const parseTransactionsPrices = async (
  * @param  {Object} [transactions=null]
  * @param  {Object} [nativeCurrency='']
  * @param  {String} [address='']
- * @param  {String} [web3Network='']
+ * @param  {String} [network='']
  * @return {String}
  */
 export const parseNewTransaction = async (
   txDetails = null,
   transactions = null,
-  nativeSelected = '',
-  address = '',
-  web3Network = ''
+  nativeSelected = ''
 ) => {
   let _transactions = [...transactions];
 
@@ -938,13 +897,6 @@ export const parseNewTransaction = async (
   );
 
   _transactions = [tx, ..._transactions];
-
-  const accountLocal = getLocal(address) || {};
-  accountLocal.transactions = _transactions;
-  const pending = _transactions.filter(tx => tx.pending);
-  accountLocal.pending = pending;
-  accountLocal.web3Network = web3Network;
-  saveLocal(address, accountLocal);
 
   return _transactions;
 };

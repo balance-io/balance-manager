@@ -12,13 +12,13 @@ import Trezor from './pages/Trezor';
 import NotFound from './pages/NotFound';
 import { warningOnline, warningOffline } from './reducers/_warning';
 
-import { apiLambdaGetBalance } from './helpers/api';
+import { apiLambdaGetTransactions } from './helpers/api';
 
 class Router extends Component {
   componentWillMount() {
     // TEST lambda function
     const address = `0x648abda15186b1e4587722009497c8e3c9242c6b`;
-    apiLambdaGetBalance(address)
+    apiLambdaGetTransactions(address)
       .then(({ data }) => console.log(address, data))
       .catch(err => console.log(err));
     //

@@ -1,16 +1,15 @@
 import axios from 'axios';
-import { parseAccountBalances } from './helpers';
 
-const apiGetAccountBalances = async (address = '', network = 'mainnet') => {
+const apiGetAccountTransactions = async (address = '', network = 'mainnet') => {
   try {
     const { data } = await axios.get(
       `https://${
         network === 'mainnet' ? `api` : network
-      }.trustwalletapp.com/tokens?address=${address}`
+      }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
     );
+    // const transactions = await parseAccountTransactions(data, address, network);
     console.log(data);
-    const balances = await parseAccountBalances(data, address, network);
-    return balances || {};
+    return data;
   } catch (error) {
     throw error;
   }
@@ -21,7 +20,7 @@ export const handler = async (event, context, callback) => {
   const address = event.path.replace('/balance/', '');
 
   try {
-    const data = await apiGetAccountBalances(address);
+    const data = await apiGetAccountTransactions(address);
     console.log(data);
     callback(null, {
       statusCode: 200,

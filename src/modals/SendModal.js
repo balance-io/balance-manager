@@ -604,7 +604,7 @@ class SendModal extends Component {
             <StyledParagraph>
               <a
                 href={`https://${
-                  this.props.web3Network !== 'mainnet' ? `${this.props.web3Network}.` : ''
+                  this.props.network !== 'mainnet' ? `${this.props.network}.` : ''
                 }etherscan.io/tx/${this.props.transaction}`}
                 target="_blank"
               >
@@ -651,7 +651,7 @@ SendModal.propTypes = {
   gasLimit: PropTypes.number.isRequired,
   gasPriceOption: PropTypes.string.isRequired,
   confirm: PropTypes.bool.isRequired,
-  web3Network: PropTypes.string.isRequired,
+  network: PropTypes.string.isRequired,
   prices: PropTypes.object.isRequired
 };
 
@@ -670,7 +670,7 @@ const reduxProps = ({ modal, send, account }) => ({
   gasLimit: send.gasLimit,
   gasPriceOption: send.gasPriceOption,
   confirm: send.confirm,
-  web3Network: account.web3Network,
+  network: account.network,
   nativeCurrency: account.nativeCurrency,
   prices: account.prices
 });

@@ -39,6 +39,8 @@ const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
+let getSessionInterval = null;
+
 export const walletConnectModalInit = () => async (dispatch, getState) => {
   const keypair = await generateKeyPair();
   dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST, payload: keypair });
@@ -81,14 +83,14 @@ export const walletConnectGetSession = () => (dispatch, getState) => {
         dispatch(accountUpdateAccountAddress(addresses[0], 'WALLETCONNECT'));
         window.browserHistory.push('/wallet');
       } else if (!getState().walletconnect.addresses.length) {
-        setTimeout(() => dispatch(walletConnectGetSession()), 500);
+        getSessionInterval = setTimeout(() => dispatch(walletConnectGetSession()), 500);
       }
     })
     .catch(error => {
       const message = parseError(error);
       dispatch(notificationShow(message), true);
       dispatch({ type: WALLET_CONNECT_GET_SESSION_FAILURE });
-      setTimeout(() => dispatch(walletConnectGetSession()), 500);
+      getSessionInterval = setTimeout(() => dispatch(walletConnectGetSession()), 500);
     });
 };
 
@@ -148,7 +150,10 @@ export const walletConnectGetTransactionStatus = transactionId => (dispatch, get
     });
 };
 
-export const walletConnectClearFields = () => ({ type: WALLET_CONNECT_CLEAR_FIELDS });
+export const walletConnectClearFields = () => (dispatch) => {
+  clearTimeout(getSessionInterval);
+  dispatch({ type: WALLET_CONNECT_CLEAR_FIELDS });
+}
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {

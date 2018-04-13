@@ -9,7 +9,7 @@ import Button from '../components/Button';
 import { modalClose } from '../reducers/_modal';
 import {
   walletConnectModalInit,
-  walletConnectGetAddress,
+  walletConnectGetSession,
   walletConnectClearFields
 } from '../reducers/_walletconnect';
 import { responsive } from '../styles';
@@ -64,7 +64,7 @@ class WalletConnectInit extends Component {
 
 WalletConnectInit.propTypes = {
   walletConnectModalInit: PropTypes.func.isRequired,
-  walletConnectGetAddress: PropTypes.func.isRequired,
+  walletConnectGetSession: PropTypes.func.isRequired,
   modalClose: PropTypes.func.isRequired,
   sessionToken: PropTypes.string.isRequired
 };
@@ -76,6 +76,6 @@ const reduxProps = ({ modal, walletconnect }) => ({
 export default connect(reduxProps, {
   modalClose,
   walletConnectModalInit,
-  walletConnectGetAddress,
+  walletConnectGetSession,
   walletConnectClearFields
 })(WalletConnectInit);

@@ -108,48 +108,43 @@ const walletConnect = axios.create({
   baseURL: 'https://walletconnect.balance.io',
   timeout: 30000, // 30 secs
   headers: {
-    'Content-Type': 'application/json',
-    Authorization: '&xFvdofLFGDPzk9LwWQEEpoqP^YFJ8ReGREe2VPWZsKKYcwnBndAA8xWncYgJDqm'
+    'Content-Type': 'application/json'
   }
 });
 
 /**
- * @desc wallet connect request device details
+ * @desc wallet connect create new session
  * @return {Promise}
  */
-export const apiWalletConnectInit = () => walletConnect.get('/request-device-details');
+export const apiWalletConnectNewSession = () => walletConnect.post('/session/new');
 
 /**
- * @desc wallet connect get address
- * @param  {String}   [sessionToken = '']
+ * @desc wallet connect get session
+ * @param  {String}   [sessionId = '']
  * @return {Promise}
  */
-export const apiWalletConnectGetAddress = (sessionToken = '') =>
-  walletConnect.post('/get-device-details', { sessionToken });
+export const apiWalletConnectGetSession = (sessionId = '') =>
+  walletConnect.get(`/session/${sessionId}`);
 
 /**
  * @desc wallet connect initiate transaction
- * @param  {String}   [deviceUuid = '', encryptedTransactionDetails = '', notificationDetails = {}]
+ * @param  {String}   [sessionId = '', data = '', dappName = '']
  * @return {Promise}
  */
-export const apiWalletConnectInitiateTransaction = (
-  deviceUuid: '',
-  transactionDetails: '',
-  notificationDetails: {}
+export const apiWalletConnectNewTransaction = (
+  sessionId: '',
+  data: '',
+  dappName: ''
 ) =>
-  walletConnect.post('/add-transaction-details', {
-    deviceUuid,
-    transactionDetails,
-    notificationDetails
+  walletConnect.post(`/session/${sessionId}/transaction/new`, {
+    data,
+    dappName
   });
 
 /**
  * @desc wallet connect get transaction status
- * @param  {String}   [deviceUuid = '', transactionUuid = '']
+ * @param  {String}   [sessionId = '', transactionIdd = '']
  * @return {Promise}
  */
-export const apiWalletConnectGetTransactionStatus = (deviceUuid: '', transactionUuid: '') =>
-  walletConnect.post('/get-transaction-status', {
-    deviceUuid,
-    transactionUuid
-  });
+export const apiWalletConnectGetTransactionStatus = (sessionId: '', transactionId: '') =>
+  walletConnect.get(`/session/${sessionId}/transaction/${transactionId}/status`);

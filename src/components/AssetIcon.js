@@ -11,7 +11,7 @@ const StyledIcon = styled.img`
 
 class AssetIcon extends Component {
   state = {
-    imgSrc: null
+    imgSrc: erc20
   };
   updateIcon = props => {
     if (props.asset.toUpperCase() === 'ETH') {

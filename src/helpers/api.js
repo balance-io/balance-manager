@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { parseAccountBalances, parseAccountTransactions } from './parsers';
 import { updateLocalBalances, updateLocalTransactions } from './utilities';
 import networkList from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
@@ -66,14 +65,11 @@ export const apiGetMetamaskNetwork = () =>
 export const apiGetAccountBalances = async (address = '', network = 'mainnet') => {
   try {
     const { data } = await axios.get(
-      `https://${
-        network === 'mainnet' ? `api` : network
-      }.trustwalletapp.com/tokens?address=${address}`
+      `/.netlify/functions/balance?address=${address}&network=${network}`
     );
-    const account = await parseAccountBalances(data, address, network);
-    updateLocalBalances(account, network);
+    updateLocalBalances(data, network);
 
-    return account;
+    return data;
   } catch (error) {
     throw error;
   }
@@ -88,13 +84,10 @@ export const apiGetAccountBalances = async (address = '', network = 'mainnet') =
 export const apiGetAccountTransactions = async (address = '', network = 'mainnet') => {
   try {
     const { data } = await axios.get(
-      `https://${
-        network === 'mainnet' ? `api` : network
-      }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
+      `/.netlify/functions/transactions?address=${address}&network=${network}`
     );
-    const transactions = await parseAccountTransactions(data, address, network);
-    updateLocalTransactions(address, transactions, network);
-    return transactions;
+    updateLocalTransactions(address, data, network);
+    return data;
   } catch (error) {
     throw error;
   }
@@ -133,9 +126,9 @@ export const apiWalletConnectGetAddress = (sessionToken = '') =>
  * @return {Promise}
  */
 export const apiWalletConnectInitiateTransaction = (
-  deviceUuid: '',
-  transactionDetails: '',
-  notificationDetails: {}
+  deviceUuid = '',
+  transactionDetails = '',
+  notificationDetails = {}
 ) =>
   walletConnect.post('/add-transaction-details', {
     deviceUuid,
@@ -148,7 +141,7 @@ export const apiWalletConnectInitiateTransaction = (
  * @param  {String}   [deviceUuid = '', transactionUuid = '']
  * @return {Promise}
  */
-export const apiWalletConnectGetTransactionStatus = (deviceUuid: '', transactionUuid: '') =>
+export const apiWalletConnectGetTransactionStatus = (deviceUuid = '', transactionUuid = '') =>
   walletConnect.post('/get-transaction-status', {
     deviceUuid,
     transactionUuid

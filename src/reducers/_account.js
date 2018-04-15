@@ -3,7 +3,6 @@ import { apiGetAccountBalances, apiGetAccountTransactions, apiGetPrices } from '
 import {
   parseError,
   parseNewTransaction,
-  parseTransactionsPrices,
   parseAccountBalancesPrices,
   parsePricesObject
 } from '../helpers/parsers';
@@ -97,30 +96,6 @@ export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
     });
 };
 
-export const accountParseTransactionPrices = transactions => (dispatch, getState) => {
-  const currentTransactions = getState().account.transactions;
-  const network = getState().account.network;
-  dispatch({
-    type: ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST,
-    payload: !currentTransactions.length
-  });
-  const address = getState().account.accountInfo.address;
-  const nativeCurrency = getState().account.nativeCurrency;
-  parseTransactionsPrices(transactions, nativeCurrency)
-    .then(parsedTransactions => {
-      updateLocalTransactions(address, parsedTransactions, network);
-      dispatch({
-        type: ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS,
-        payload: parsedTransactions
-      });
-    })
-    .catch(error => {
-      dispatch({ type: ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE });
-      const message = parseError(error);
-      dispatch(notificationShow(message, true));
-    });
-};
-
 export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { accountAddress, network } = getState().account;
   let cachedTransactions = [];
@@ -141,12 +116,11 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   });
   apiGetAccountTransactions(accountAddress, network)
     .then(transactions => {
-      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS });
       let _transactions = transactions;
       if (accountLocal && accountLocal.pending) {
         _transactions = _.unionBy(accountLocal.pending, transactions, 'hash');
       }
-      dispatch(accountParseTransactionPrices(_transactions));
+      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: _transactions });
     })
     .catch(error => {
       // const message = parseError(error);
@@ -313,6 +287,11 @@ export default (state = INITIAL_STATE, action) => {
         transactions: action.payload.transactions
       };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS:
+      return {
+        ...state,
+        fetchingTransactions: false,
+        transactions: action.payload
+      };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE:
       return { ...state, fetchingTransactions: false };
     case ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST:

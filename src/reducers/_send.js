@@ -8,7 +8,7 @@ import {
   convertAssetAmountToNativeValue,
   countDecimalPlaces,
   formatFixedDecimals
-} from '../helpers/utilities';
+} from '../helpers/bignumber';
 import { parseError, parseGasPrices, parseGasPricesTxFee } from '../helpers/parsers';
 import {
   metamaskSendTransaction,

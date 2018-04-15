@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import lang from '../languages';
 import AssetIcon from './AssetIcon';
 import balancesTabIcon from '../assets/balances-tab.svg';
-import { convertStringToNumber, hasHighMarketValue, hasLowMarketValue } from '../helpers/utilities';
+import { convertStringToNumber, hasHighMarketValue, hasLowMarketValue } from '../helpers/bignumber';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`

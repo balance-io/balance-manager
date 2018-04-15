@@ -32,7 +32,8 @@ import {
 } from '../reducers/_send';
 import { notificationShow } from '../reducers/_notification';
 import { isValidAddress } from '../helpers/validators';
-import { convertAmountFromBigNumber, capitalize } from '../helpers/utilities';
+import { convertAmountFromBigNumber } from '../helpers/bignumber';
+import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
 const StyledSuccessMessage = styled.div`

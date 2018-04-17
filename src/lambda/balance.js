@@ -38,8 +38,11 @@ const proxyGetAccountBalances = async (address = '', network = 'mainnet') => {
 
     assets = await Promise.all(
       assets.map(async assetData => {
+        const name = !assetData.contract.name.startsWith('0x')
+          ? assetData.contract.name
+          : assetData.contract.symbol || 'Unknown Token';
         const asset = {
-          name: assetData.contract.name || 'Unknown Token',
+          name: name,
           symbol: assetData.contract.symbol || '———',
           address: assetData.contract.address || null,
           decimals: convertStringToNumber(assetData.contract.decimals)

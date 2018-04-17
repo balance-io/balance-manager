@@ -45,7 +45,8 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
           decimals: 18
         })
       };
-      const isTokenTransfer = (() => {
+
+      const includesTokenTransfer = (() => {
         if (tx.operations.length) {
           const tokenTransfers = tx.operations.filter(
             operation => operation.type === 'token_transfer'
@@ -56,24 +57,9 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
         }
         return false;
       })();
-      interaction = !isTokenTransfer && tx.input !== '0x';
-      if (isTokenTransfer) {
-        if (tx.operations.length === 1) {
-          const transfer = tx.operations[0];
 
-          asset = {
-            name: transfer.contract.name || 'Unknown Token',
-            symbol: transfer.contract.symbol || '———',
-            address: transfer.contract.address || '',
-            decimals: transfer.contract.decimals || 18
-          };
+      interaction = !includesTokenTransfer && tx.input !== '0x';
 
-          from = transfer.from;
-          to = transfer.to;
-          const amount = convertAssetAmountToBigNumber(transfer.value, asset.decimals);
-          value = { amount, display: convertAmountToDisplay(amount, null, asset) };
-        }
-      }
       let result = {
         hash,
         timestamp,
@@ -87,23 +73,52 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
         pending: false,
         asset
       };
-      if (tx.operations.length === 2) {
-        let txOne = { ...result, hash: `${result.hash}-one` };
-        let txTwo = { ...result, hash: `${result.hash}-two` };
-        const transferTwo = tx.operations[1];
-        txTwo.asset = {
-          name: transferTwo.contract.name || 'Unknown Token',
-          symbol: transferTwo.contract.symbol || '———',
-          address: transferTwo.contract.address || '',
-          decimals: transferTwo.contract.decimals || 18
-        };
-        txTwo.from = transferTwo.from;
-        txTwo.to = transferTwo.to;
-        const amount = convertAssetAmountToBigNumber(transferTwo.value, asset.decimals);
-        txTwo.value = { amount, display: convertAmountToDisplay(amount, null, asset) };
 
-        return [txOne, txTwo];
+      if (includesTokenTransfer) {
+        const tokenTransfers = [];
+        if (tx.operations.length) {
+          tx.operations.forEach((transferData, idx) => {
+            const transferTx = {
+              hash: `${result.hash}-${idx + 1}`,
+              timestamp,
+              from,
+              to,
+              error,
+              interaction,
+              value,
+              txFee,
+              native: {},
+              pending: false,
+              asset
+            };
+            transferTx.asset = {
+              name: transferData.contract.name || 'Unknown Token',
+              symbol: transferData.contract.symbol || '———',
+              address: transferData.contract.address || '',
+              decimals: transferData.contract.decimals || 18
+            };
+
+            transferTx.from = transferData.from;
+            transferTx.to = transferData.to;
+            const amount = convertAssetAmountToBigNumber(
+              transferData.value,
+              transferTx.asset.decimals
+            );
+            transferTx.value = {
+              amount,
+              display: convertAmountToDisplay(amount, null, transferTx.asset)
+            };
+            tokenTransfers.push(transferTx);
+          });
+          if (!Number(tx.value)) {
+            result = [...tokenTransfers];
+          } else {
+            result.hash = `${result.hash}-0`;
+            result = [...tokenTransfers, result];
+          }
+        }
       }
+
       return result;
     })
   );

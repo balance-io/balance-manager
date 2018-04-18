@@ -1,6 +1,6 @@
 import { apiGetMetamaskNetwork } from '../helpers/api';
 import { modalClose } from './_modal';
-import { accountUpdateAccountAddress, accountUpdatenetwork } from './_account';
+import { accountUpdateAccountAddress, accountUpdateNetwork } from './_account';
 
 // -- Constants ------------------------------------------------------------- //
 const METAMASK_GET_NETWORK_REQUEST = 'metamask/METAMASK_GET_NETWORK_REQUEST';
@@ -30,7 +30,7 @@ export const metamaskConnectMetamask = () => (dispatch, getState) => {
     apiGetMetamaskNetwork()
       .then(network => {
         dispatch({ type: METAMASK_GET_NETWORK_SUCCESS, payload: network });
-        dispatch(accountUpdatenetwork(network));
+        dispatch(accountUpdateNetwork(network));
         dispatch(metamaskUpdateMetamaskAccount());
         accountInterval = setInterval(() => dispatch(metamaskUpdateMetamaskAccount()), 100);
       })

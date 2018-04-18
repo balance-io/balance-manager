@@ -39,14 +39,18 @@ const ACCOUNT_PARSE_TRANSACTION_PRICES_REQUEST = 'account/ACCOUNT_PARSE_TRANSACT
 const ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_SUCCESS';
 const ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE = 'account/ACCOUNT_PARSE_TRANSACTION_PRICES_FAILURE';
 
+const ACCOUNT_UPDATE_OPEN_WEBSOCKETS = 'account/ACCOUNT_UPDATE_OPEN_WEBSOCKETS';
+
 const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 
 // -- Actions --------------------------------------------------------------- //
 
 let getPricesInterval = null;
 
-export const accountSetupWebSocket = address => dispatch => {
+export const accountSetupWebSocket = () => (dispatch, getState) => {
+  const address = getState().account.accountAddress;
   window.WebSocket = window.WebSocket || window.MozWebSocket;
+  console.log('accountSetupWebSocket', address);
 
   const connection = new WebSocket('wss://socket.etherscan.io/wshandler');
 
@@ -67,6 +71,10 @@ export const accountSetupWebSocket = address => dispatch => {
   connection.onmessage = message => {
     try {
       const json = JSON.parse(message.data);
+      if (json.event === 'subscribe-txlist' && Number(json.status) === 1) {
+        const subscribedAddress = json.message.replace('OK, ', '');
+        dispatch({ type: ACCOUNT_UPDATE_OPEN_WEBSOCKETS, payload: subscribedAddress });
+      }
       console.log('WebSocket message', JSON.stringify(json, null, 2));
     } catch (e) {
       console.log('WebSocket invalid', message.data);
@@ -129,11 +137,11 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
     });
 };
 
-export const accountGetAccountBalances = address => (dispatch, getState) => {
-  const { network, accountInfo, accountType } = getState().account;
+export const accountGetAccountBalances = () => (dispatch, getState) => {
+  const { network, accountInfo, accountAddress, accountType } = getState().account;
   let cachedAccount = { ...accountInfo };
   let cachedTransactions = [];
-  const accountLocal = getLocal(address) || null;
+  const accountLocal = getLocal(accountAddress) || null;
   if (accountLocal && accountLocal.balances) {
     cachedAccount = {
       ...cachedAccount,
@@ -155,12 +163,11 @@ export const accountGetAccountBalances = address => (dispatch, getState) => {
       fetching: !accountLocal
     }
   });
-  apiGetAccountBalances(address, network)
+  apiGetAccountBalances(accountAddress, network)
     .then(accountInfo => {
       accountInfo = { ...accountInfo, accountType };
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS });
       dispatch(accountGetNativePrices(accountInfo));
-      if (accountInfo.txCount) dispatch(accountGetAccountTransactions());
     })
     .catch(error => {
       const message = parseError(error);
@@ -169,7 +176,7 @@ export const accountGetAccountBalances = address => (dispatch, getState) => {
     });
 };
 
-export const accountUpdatenetwork = network => dispatch => {
+export const accountUpdateNetwork = network => dispatch => {
   web3SetHttpProvider(`https://${network}.infura.io/`);
   web3SetWebSocketProvider(`wss://${network}.infura.io/ws`);
   dispatch({ type: ACCOUNT_UPDATE_WEB3_NETWORK, payload: network });
@@ -184,7 +191,11 @@ export const accountUpdateAccountAddress = (accountAddress, accountType) => disp
     type: ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST,
     payload: { accountAddress, accountType }
   });
-  if (accountAddress) dispatch(accountGetAccountBalances(accountAddress));
+  if (accountAddress) {
+    dispatch(accountGetAccountTransactions());
+    dispatch(accountGetAccountBalances());
+    dispatch(accountSetupWebSocket());
+  }
 };
 
 export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
@@ -250,7 +261,6 @@ const INITIAL_STATE = {
   accountInfo: {
     address: '',
     type: '',
-    txCount: 0,
     assets: [
       {
         name: 'Ethereum',
@@ -267,6 +277,7 @@ const INITIAL_STATE = {
     total: '———'
   },
   transactions: [],
+  websockets: [],
   fetchingTransactions: false,
   fetching: false
 };
@@ -351,6 +362,11 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         network: action.payload
+      };
+    case ACCOUNT_UPDATE_OPEN_WEBSOCKETS:
+      return {
+        ...state,
+        websockets: [action.payload, ...state.websockets]
       };
     case ACCOUNT_CLEAR_STATE:
       return {

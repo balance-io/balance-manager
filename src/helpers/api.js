@@ -24,9 +24,8 @@ export const apiGetPrices = (assets = []) => {
  */
 export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now()) => {
   const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(/[[\]"]/gi, '');
-  return axios.get(
-    `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`
-  );
+  const url = `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`;
+  return axios.get(url);
 };
 
 /**

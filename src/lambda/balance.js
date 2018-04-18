@@ -1,9 +1,5 @@
 import axios from 'axios';
-import {
-  infuraGetEthereumBalance,
-  infuraGetTransactionCount,
-  infuraCallTokenBalance
-} from '../helpers/infura';
+import { infuraGetEthereumBalance, infuraCallTokenBalance } from '../helpers/infura';
 import {
   convertStringToNumber,
   convertAmountToDisplay,
@@ -64,12 +60,9 @@ const proxyGetAccountBalances = async (address = '', network = 'mainnet') => {
 
     assets = assets.filter(asset => !!Number(asset.balance.amount));
 
-    const txCount = await infuraGetTransactionCount(address, network);
-
     return {
       address: address,
       type: '',
-      txCount: txCount,
       assets: assets,
       total: null
     };

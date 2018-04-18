@@ -6,6 +6,7 @@ import {
   convertAmountToBigNumber,
   convertAssetAmountToNativeValue
 } from '../helpers/bignumber';
+import { infuraGetTransactionCount } from '../helpers/infura';
 import { apiGetHistoricalPrices } from '../helpers/api';
 import { debounceRequest } from '../helpers/utilities';
 import nativeCurrencies from '../libraries/native-currencies.json';
@@ -91,8 +92,11 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
               pending: false,
               asset
             };
+            const name = !transferData.contract.name.startsWith('0x')
+              ? transferData.contract.name
+              : transferData.contract.symbol || 'Unknown Token';
             transferTx.asset = {
-              name: transferData.contract.name || 'Unknown Token',
+              name: name,
               symbol: transferData.contract.symbol || '———',
               address: transferData.contract.address || '',
               decimals: transferData.contract.decimals || 18
@@ -151,7 +155,10 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
   _transactions = await Promise.all(
     _transactions.map(async (tx, idx) => {
       const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
-      const assetSymbol = tx.asset.symbol;
+      let assetSymbol = tx.asset.symbol;
+      if (assetSymbol === 'WETH') {
+        assetSymbol = 'ETH';
+      }
       if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
         const response = await debounceRequest(
           apiGetHistoricalPrices,
@@ -163,44 +170,42 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
           return tx;
         }
 
-        await Promise.all(
-          Object.keys(nativeCurrencies).map(async nativeCurrency => {
-            const assetPriceAmount = convertAmountToBigNumber(
-              response.data[assetSymbol][nativeCurrency]
-            );
-            let prices = { selected: nativeCurrencies[nativeCurrency] };
-            prices[nativeCurrency] = {};
-            prices[nativeCurrency][assetSymbol] = {
-              price: { amount: assetPriceAmount, display: null }
-            };
-            const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
-            prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
-            const assetPrice = prices[nativeCurrency][assetSymbol].price;
-            const valuePriceAmount = convertAssetAmountToNativeValue(
-              tx.value.amount,
-              tx.asset,
-              prices
-            );
-            const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
-            const valuePrice = !tx.error
-              ? { amount: valuePriceAmount, display: valuePriceDisplay }
-              : { amount: '', display: '' };
-            const txFeePriceAmount = convertAssetAmountToNativeValue(
-              tx.txFee.amount,
-              tx.asset,
-              prices,
-              tx
-            );
-            const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
-            const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
+        Object.keys(nativeCurrencies).map(nativeCurrency => {
+          const assetPriceAmount = convertAmountToBigNumber(
+            response.data[assetSymbol][nativeCurrency]
+          );
+          let prices = { selected: nativeCurrencies[nativeCurrency] };
+          prices[nativeCurrency] = {};
+          prices[nativeCurrency][assetSymbol] = {
+            price: { amount: assetPriceAmount, display: null }
+          };
+          const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
+          prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
+          const assetPrice = prices[nativeCurrency][assetSymbol].price;
+          let asset = { ...tx.asset };
+          if (asset.symbol === 'WETH') {
+            asset.symbol = 'ETH';
+          }
+          const valuePriceAmount = convertAssetAmountToNativeValue(tx.value.amount, asset, prices);
+          const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
+          const valuePrice = !tx.error
+            ? { amount: valuePriceAmount, display: valuePriceDisplay }
+            : { amount: '', display: '' };
+          const txFeePriceAmount = convertAssetAmountToNativeValue(
+            tx.txFee.amount,
+            asset,
+            prices,
+            tx
+          );
+          const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
+          const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
 
-            tx.native[nativeCurrency] = {
-              price: assetPrice,
-              value: valuePrice,
-              txFee: txFeePrice
-            };
-          })
-        );
+          tx.native[nativeCurrency] = {
+            price: assetPrice,
+            value: valuePrice,
+            txFee: txFeePrice
+          };
+        });
       }
       return tx;
     })
@@ -226,10 +231,14 @@ const apiProxyGetAccountTransactions = async (address = '', network = 'mainnet')
 export const handler = async (event, context, callback) => {
   const { address, network } = event.queryStringParameters;
   try {
-    const data = await apiProxyGetAccountTransactions(address, network);
+    let transactions = [];
+    const txCount = await infuraGetTransactionCount(address, network);
+    if (Number(txCount)) {
+      transactions = await apiProxyGetAccountTransactions(address, network);
+    }
     callback(null, {
       statusCode: 200,
-      body: JSON.stringify(data)
+      body: JSON.stringify(transactions)
     });
   } catch (error) {
     console.error(error);

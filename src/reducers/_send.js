@@ -10,12 +10,7 @@ import {
   formatFixedDecimals
 } from '../helpers/bignumber';
 import { parseError, parseGasPrices, parseGasPricesTxFee } from '../helpers/parsers';
-import {
-  metamaskSendTransaction,
-  metamaskTransferToken,
-  estimateGasLimit,
-  fetchTx
-} from '../helpers/web3';
+import { metamaskSendTransaction, metamaskTransferToken, estimateGasLimit } from '../helpers/web3';
 import { notificationShow } from './_notification';
 import { accountUpdateTransactions } from './_account';
 
@@ -135,7 +130,6 @@ export const sendEtherMetamask = ({
     gasLimit: gasLimit
   })
     .then(txHash => {
-      fetchTx(txHash).then(console.log);
       const txDetails = {
         hash: txHash,
         from: address,
@@ -178,7 +172,6 @@ export const sendTokenMetamask = ({
     gasLimit: gasLimit
   })
     .then(txHash => {
-      fetchTx(txHash).then(console.log);
       const txDetails = {
         hash: txHash,
         from: address,

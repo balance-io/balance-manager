@@ -236,7 +236,6 @@ const apiProxyGetAccountTransactions = async (address = '', network = 'mainnet')
         network === 'mainnet' ? `api` : network
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
     );
-    console.log('apiProxyGetAccountTransactions', !!data);
     let transactions = await parseAccountTransactions(data, address, network);
     transactions = await parseHistoricalPrices(transactions);
     return transactions;

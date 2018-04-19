@@ -43,7 +43,6 @@ export const apiGetMetamaskNetwork = () =>
   new Promise((resolve, reject) => {
     if (typeof window.web3 !== 'undefined') {
       window.web3.version.getNetwork((err, networkID) => {
-        console.log('networkID', networkID);
         if (err) {
           console.error(err);
           reject(err);
@@ -52,7 +51,6 @@ export const apiGetMetamaskNetwork = () =>
         Object.keys(networkList).forEach(network => {
           networkIDList[networkList[network].id] = network;
         });
-        console.log(networkIDList);
         resolve(networkIDList[Number(networkID)] || null);
       });
     }

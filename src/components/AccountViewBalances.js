@@ -187,7 +187,6 @@ class AccountViewBalances extends Component {
   render() {
     if (!this.props.accountInfo.assets) return null;
     const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
-    console.log('ethereum', ethereum);
     const tokensWithHighMarketValue = this.props.accountInfo.assets.filter(
       asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
     );

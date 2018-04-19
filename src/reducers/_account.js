@@ -61,42 +61,6 @@ const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 
 let getPricesInterval = null;
 
-export const accountSetupWebSocket = () => (dispatch, getState) => {
-  const address = getState().account.accountAddress;
-  window.WebSocket = window.WebSocket || window.MozWebSocket;
-  console.log('accountSetupWebSocket', address);
-
-  const connection = new WebSocket('wss://socket.etherscan.io/wshandler');
-
-  connection.onopen = () => {
-    console.log('WebSocket open');
-    const subscription = {
-      event: 'txlist',
-      address: address
-    };
-    console.log('WebSocket subscription', JSON.stringify(subscription, null, 2));
-    connection.send(JSON.stringify(subscription));
-  };
-
-  connection.onerror = error => {
-    console.log('WebSocket error');
-  };
-
-  connection.onmessage = message => {
-    try {
-      const json = JSON.parse(message.data);
-      if (json.event === 'subscribe-txlist' && Number(json.status) === 1) {
-        const subscribedAddress = json.message.replace('OK, ', '');
-        dispatch({ type: ACCOUNT_UPDATE_OPEN_WEBSOCKETS, payload: subscribedAddress });
-      }
-      console.log('WebSocket message', JSON.stringify(json, null, 2));
-    } catch (e) {
-      console.log('WebSocket invalid', message.data);
-      return;
-    }
-  };
-};
-
 export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
   const network = getState().account.network;
   dispatch({ type: ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST });
@@ -263,7 +227,6 @@ export const accountUpdateAccountAddress = (accountAddress, accountType) => disp
   if (accountAddress) {
     dispatch(accountGetAccountTransactions());
     dispatch(accountGetAccountBalances());
-    dispatch(accountSetupWebSocket());
   }
 };
 

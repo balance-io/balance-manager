@@ -43,13 +43,16 @@ export const apiGetMetamaskNetwork = () =>
   new Promise((resolve, reject) => {
     if (typeof window.web3 !== 'undefined') {
       window.web3.version.getNetwork((err, networkID) => {
+        console.log('networkID', networkID);
         if (err) {
+          console.error(err);
           reject(err);
         }
         let networkIDList = {};
         Object.keys(networkList).forEach(network => {
           networkIDList[networkList[network].id] = network;
         });
+        console.log(networkIDList);
         resolve(networkIDList[Number(networkID)] || null);
       });
     }
@@ -86,6 +89,23 @@ export const apiGetAccountTransactions = async (address = '', network = 'mainnet
       `/.netlify/functions/transactions?address=${address}&network=${network}`
     );
     updateLocalTransactions(address, data, network);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @desc get transaction status
+ * @param  {String}   [hash = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') => {
+  try {
+    const { data } = await axios.get(
+      `/.netlify/functions/transaction-status?hash=${hash}&network=${network}`
+    );
     return data;
   } catch (error) {
     throw error;

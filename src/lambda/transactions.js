@@ -11,6 +11,76 @@ import { apiGetHistoricalPrices } from '../helpers/api';
 import { debounceRequest } from '../helpers/utilities';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
+const parseHistoricalPrices = async transactions => {
+  const _transactions = await Promise.all(
+    transactions.map(async (tx, idx) => {
+      const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
+      let assetSymbol = tx.asset.symbol;
+      if (assetSymbol === 'WETH') {
+        assetSymbol = 'ETH';
+      }
+      if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
+        try {
+          const response = await debounceRequest(
+            apiGetHistoricalPrices,
+            [assetSymbol, timestamp],
+            100 * idx
+          );
+
+          if (response.data.response === 'Error' || !response.data[assetSymbol]) {
+            return tx;
+          }
+
+          Object.keys(nativeCurrencies).map(nativeCurrency => {
+            const assetPriceAmount = convertAmountToBigNumber(
+              response.data[assetSymbol][nativeCurrency]
+            );
+            let prices = { selected: nativeCurrencies[nativeCurrency] };
+            prices[nativeCurrency] = {};
+            prices[nativeCurrency][assetSymbol] = {
+              price: { amount: assetPriceAmount, display: null }
+            };
+            const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
+            prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
+            const assetPrice = prices[nativeCurrency][assetSymbol].price;
+            let asset = { ...tx.asset };
+            if (asset.symbol === 'WETH') {
+              asset.symbol = 'ETH';
+            }
+            const valuePriceAmount = convertAssetAmountToNativeValue(
+              tx.value.amount,
+              asset,
+              prices
+            );
+            const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
+            const valuePrice = !tx.error
+              ? { amount: valuePriceAmount, display: valuePriceDisplay }
+              : { amount: '', display: '' };
+            const txFeePriceAmount = convertAssetAmountToNativeValue(
+              tx.txFee.amount,
+              asset,
+              prices,
+              tx
+            );
+            const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
+            const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
+
+            tx.native[nativeCurrency] = {
+              price: assetPrice,
+              value: valuePrice,
+              txFee: txFeePrice
+            };
+          });
+        } catch (error) {
+          throw error;
+        }
+      }
+      return tx;
+    })
+  );
+  return _transactions;
+};
+
 const parseAccountTransactions = async (data = null, address = '', network = '') => {
   if (!data || !data.docs) return null;
 
@@ -139,77 +209,22 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
   });
 
   if (data.pages > data.page) {
-    const newPageResponse = await axios.get(
-      `https://${
-        network === 'mainnet' ? `api` : network
-      }.trustwalletapp.com/transactions?address=${address}&limit=50&page=${data.page + 1}`
-    );
-    const newPageTransations = await parseAccountTransactions(
-      newPageResponse.data,
-      address,
-      network
-    );
-    _transactions = [..._transactions, ...newPageTransations];
+    try {
+      const newPageResponse = await axios.get(
+        `https://${
+          network === 'mainnet' ? `api` : network
+        }.trustwalletapp.com/transactions?address=${address}&limit=50&page=${data.page + 1}`
+      );
+      const newPageTransations = await parseAccountTransactions(
+        newPageResponse.data,
+        address,
+        network
+      );
+      _transactions = [..._transactions, ...newPageTransations];
+    } catch (error) {
+      throw error;
+    }
   }
-
-  _transactions = await Promise.all(
-    _transactions.map(async (tx, idx) => {
-      const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
-      let assetSymbol = tx.asset.symbol;
-      if (assetSymbol === 'WETH') {
-        assetSymbol = 'ETH';
-      }
-      if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
-        const response = await debounceRequest(
-          apiGetHistoricalPrices,
-          [assetSymbol, timestamp],
-          100 * idx
-        );
-
-        if (response.data.response === 'Error' || !response.data[assetSymbol]) {
-          return tx;
-        }
-
-        Object.keys(nativeCurrencies).map(nativeCurrency => {
-          const assetPriceAmount = convertAmountToBigNumber(
-            response.data[assetSymbol][nativeCurrency]
-          );
-          let prices = { selected: nativeCurrencies[nativeCurrency] };
-          prices[nativeCurrency] = {};
-          prices[nativeCurrency][assetSymbol] = {
-            price: { amount: assetPriceAmount, display: null }
-          };
-          const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
-          prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
-          const assetPrice = prices[nativeCurrency][assetSymbol].price;
-          let asset = { ...tx.asset };
-          if (asset.symbol === 'WETH') {
-            asset.symbol = 'ETH';
-          }
-          const valuePriceAmount = convertAssetAmountToNativeValue(tx.value.amount, asset, prices);
-          const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
-          const valuePrice = !tx.error
-            ? { amount: valuePriceAmount, display: valuePriceDisplay }
-            : { amount: '', display: '' };
-          const txFeePriceAmount = convertAssetAmountToNativeValue(
-            tx.txFee.amount,
-            asset,
-            prices,
-            tx
-          );
-          const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
-          const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
-
-          tx.native[nativeCurrency] = {
-            price: assetPrice,
-            value: valuePrice,
-            txFee: txFeePrice
-          };
-        });
-      }
-      return tx;
-    })
-  );
 
   return _transactions;
 };
@@ -221,7 +236,9 @@ const apiProxyGetAccountTransactions = async (address = '', network = 'mainnet')
         network === 'mainnet' ? `api` : network
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
     );
-    const transactions = await parseAccountTransactions(data, address, network);
+    console.log('apiProxyGetAccountTransactions', !!data);
+    let transactions = await parseAccountTransactions(data, address, network);
+    transactions = await parseHistoricalPrices(transactions);
     return transactions;
   } catch (error) {
     throw error;

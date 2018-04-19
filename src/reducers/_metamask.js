@@ -3,9 +3,9 @@ import { modalClose } from './_modal';
 import { accountUpdateAccountAddress, accountUpdateNetwork } from './_account';
 
 // -- Constants ------------------------------------------------------------- //
-const METAMASK_GET_NETWORK_REQUEST = 'metamask/METAMASK_GET_NETWORK_REQUEST';
-const METAMASK_GET_NETWORK_SUCCESS = 'metamask/METAMASK_GET_NETWORK_SUCCESS';
-const METAMASK_GET_NETWORK_FAILURE = 'metamask/METAMASK_GET_NETWORK_FAILURE';
+const METAMASK_CONNECT_REQUEST = 'metamask/METAMASK_CONNECT_REQUEST';
+const METAMASK_CONNECT_SUCCESS = 'metamask/METAMASK_CONNECT_SUCCESS';
+const METAMASK_CONNECT_FAILURE = 'metamask/METAMASK_CONNECT_FAILURE';
 
 const METAMASK_NOT_AVAILABLE = 'metamask/METAMASK_NOT_AVAILABLE';
 
@@ -25,16 +25,16 @@ export const metamaskUpdateMetamaskAccount = () => (dispatch, getState) => {
 };
 
 export const metamaskConnectMetamask = () => (dispatch, getState) => {
-  dispatch({ type: METAMASK_GET_NETWORK_REQUEST });
+  dispatch({ type: METAMASK_CONNECT_REQUEST });
   if (typeof window.web3 !== 'undefined') {
     apiGetMetamaskNetwork()
       .then(network => {
-        dispatch({ type: METAMASK_GET_NETWORK_SUCCESS, payload: network });
+        dispatch({ type: METAMASK_CONNECT_SUCCESS, payload: network });
         dispatch(accountUpdateNetwork(network));
         dispatch(metamaskUpdateMetamaskAccount());
         accountInterval = setInterval(() => dispatch(metamaskUpdateMetamaskAccount()), 100);
       })
-      .catch(err => dispatch({ type: METAMASK_GET_NETWORK_FAILURE }));
+      .catch(err => dispatch({ type: METAMASK_CONNECT_FAILURE }));
   } else {
     dispatch({ type: METAMASK_NOT_AVAILABLE });
   }
@@ -54,20 +54,20 @@ const INITIAL_STATE = {
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case METAMASK_GET_NETWORK_REQUEST:
+    case METAMASK_CONNECT_REQUEST:
       return {
         ...state,
         fetching: true,
         web3Available: false
       };
-    case METAMASK_GET_NETWORK_SUCCESS:
+    case METAMASK_CONNECT_SUCCESS:
       return {
         ...state,
         fetching: false,
         web3Available: true,
         network: action.payload
       };
-    case METAMASK_GET_NETWORK_FAILURE:
+    case METAMASK_CONNECT_FAILURE:
       return {
         ...state,
         fetching: false,

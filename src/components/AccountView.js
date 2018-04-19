@@ -159,7 +159,7 @@ class AccountView extends Component {
       address: this.props.accountInfo.address
     });
   componentWillUnmount() {
-    this.props.accountClearState();
+    // this.props.accountClearState();
   }
   render() {
     return (

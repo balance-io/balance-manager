@@ -149,21 +149,26 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { accountAddress, network } = getState().account;
   let cachedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
-  if (accountLocal && accountLocal.pending) {
-    cachedTransactions = [...accountLocal.pending];
-    accountLocal.pending.forEach(pendingTx =>
-      dispatch(accountCheckTransactionStatus(pendingTx.hash))
-    );
-  }
-  if (accountLocal && accountLocal.transactions) {
-    cachedTransactions = _.unionBy(cachedTransactions, accountLocal.transactions, 'hash');
+  if (accountLocal.network === network) {
+    if (accountLocal && accountLocal.pending) {
+      cachedTransactions = [...accountLocal.pending];
+      accountLocal.pending.forEach(pendingTx =>
+        dispatch(accountCheckTransactionStatus(pendingTx.hash))
+      );
+    }
+    if (accountLocal && accountLocal.transactions) {
+      cachedTransactions = _.unionBy(cachedTransactions, accountLocal.transactions, 'hash');
+    }
   }
   dispatch({
     type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST,
     payload: {
       transactions: cachedTransactions,
       fetchingTransactions:
-        !accountLocal || !accountLocal.transactions || !accountLocal.transactions.length
+        accountLocal.network !== network ||
+        !accountLocal ||
+        !accountLocal.transactions ||
+        !accountLocal.transactions.length
     }
   });
   apiGetAccountTransactions(accountAddress, network)
@@ -186,25 +191,27 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
   let cachedAccount = { ...accountInfo };
   let cachedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
-  if (accountLocal && accountLocal.balances) {
-    cachedAccount = {
-      ...cachedAccount,
-      assets: accountLocal.balances.assets,
-      total: accountLocal.balances.total
-    };
-  }
-  if (accountLocal && accountLocal.pending) {
-    cachedTransactions = [...accountLocal.pending];
-  }
-  if (accountLocal && accountLocal.transactions) {
-    cachedTransactions = _.unionBy(cachedTransactions, accountLocal.transactions, 'hash');
+  if (accountLocal.network === network) {
+    if (accountLocal && accountLocal.balances) {
+      cachedAccount = {
+        ...cachedAccount,
+        assets: accountLocal.balances.assets,
+        total: accountLocal.balances.total
+      };
+    }
+    if (accountLocal && accountLocal.pending) {
+      cachedTransactions = [...accountLocal.pending];
+    }
+    if (accountLocal && accountLocal.transactions) {
+      cachedTransactions = _.unionBy(cachedTransactions, accountLocal.transactions, 'hash');
+    }
   }
   dispatch({
     type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST,
     payload: {
       accountInfo: cachedAccount,
       transactions: cachedTransactions,
-      fetching: !accountLocal
+      fetching: accountLocal.network !== network || !accountLocal
     }
   });
   apiGetAccountBalances(accountAddress, network)

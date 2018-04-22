@@ -51,7 +51,7 @@ const ACCOUNT_GET_NATIVE_PRICES_FAILURE = 'account/ACCOUNT_GET_NATIVE_PRICES_FAI
 
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 const ACCOUNT_UPDATE_WEB3_NETWORK = 'account/ACCOUNT_UPDATE_WEB3_NETWORK';
-const ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST = 'account/ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST';
+const ACCOUNT_UPDATE_ACCOUNT_ADDRESS = 'account/ACCOUNT_UPDATE_ACCOUNT_ADDRESS';
 
 const ACCOUNT_UPDATE_OPEN_WEBSOCKETS = 'account/ACCOUNT_UPDATE_OPEN_WEBSOCKETS';
 
@@ -113,7 +113,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { accountAddress, network } = getState().account;
   let cachedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
-  if (accountLocal.network === network) {
+  if (accountLocal && accountLocal.network === network) {
     if (accountLocal && accountLocal.pending) {
       cachedTransactions = [...accountLocal.pending];
       accountLocal.pending.forEach(pendingTx =>
@@ -129,7 +129,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
     payload: {
       transactions: cachedTransactions,
       fetchingTransactions:
-        accountLocal.network !== network ||
+        (accountLocal && accountLocal.network !== network) ||
         !accountLocal ||
         !accountLocal.transactions ||
         !accountLocal.transactions.length
@@ -155,7 +155,7 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
   let cachedAccount = { ...accountInfo };
   let cachedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
-  if (accountLocal.network === network) {
+  if (accountLocal && accountLocal.network === network) {
     if (accountLocal && accountLocal.balances) {
       cachedAccount = {
         ...cachedAccount,
@@ -175,7 +175,7 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
     payload: {
       accountInfo: cachedAccount,
       transactions: cachedTransactions,
-      fetching: accountLocal.network !== network || !accountLocal
+      fetching: (accountLocal && accountLocal.network !== network) || !accountLocal
     }
   });
   apiGetAccountBalances(accountAddress, network)
@@ -220,8 +220,9 @@ export const accountClearIntervals = () => dispatch => {
 };
 
 export const accountUpdateAccountAddress = (accountAddress, accountType) => dispatch => {
+  console.log('a');
   dispatch({
-    type: ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST,
+    type: ACCOUNT_UPDATE_ACCOUNT_ADDRESS,
     payload: { accountAddress, accountType }
   });
   if (accountAddress) {
@@ -316,7 +317,7 @@ const INITIAL_STATE = {
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case ACCOUNT_UPDATE_ACCOUNT_ADDRESS_REQUEST:
+    case ACCOUNT_UPDATE_ACCOUNT_ADDRESS:
       return {
         ...state,
         accountType: action.payload.accountType,

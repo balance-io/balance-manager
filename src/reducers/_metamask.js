@@ -1,6 +1,8 @@
 import { apiGetMetamaskNetwork } from '../helpers/api';
+import { parseError } from '../helpers/parsers';
 import { modalClose } from './_modal';
 import { accountUpdateAccountAddress, accountUpdateNetwork } from './_account';
+import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //
 const METAMASK_CONNECT_REQUEST = 'metamask/METAMASK_CONNECT_REQUEST';
@@ -34,7 +36,11 @@ export const metamaskConnectMetamask = () => (dispatch, getState) => {
         dispatch(metamaskUpdateMetamaskAccount());
         accountInterval = setInterval(() => dispatch(metamaskUpdateMetamaskAccount()), 100);
       })
-      .catch(err => dispatch({ type: METAMASK_CONNECT_FAILURE }));
+      .catch(error => {
+        const message = parseError(error);
+        dispatch(notificationShow(message, true));
+        dispatch({ type: METAMASK_CONNECT_FAILURE });
+      });
   } else {
     dispatch({ type: METAMASK_NOT_AVAILABLE });
   }

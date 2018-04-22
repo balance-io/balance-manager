@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import lang from '../languages';
 import AssetIcon from './AssetIcon';
 import balancesTabIcon from '../assets/balances-tab.svg';
+import { ellipseText } from '../helpers/utilities';
 import { convertStringToNumber, hasHighMarketValue, hasLowMarketValue } from '../helpers/bignumber';
 import { colors, fonts, shadows, responsive } from '../styles';
 
@@ -95,6 +96,7 @@ const StyledToken = styled(StyledRow)`
 `;
 
 const StyledAsset = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -242,9 +244,9 @@ class AccountViewBalances extends Component {
           this.state.showMoreTokens &&
           tokensWithLowMarketValue.map(token => (
             <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
-              <StyledAsset>
+              <StyledAsset data-toggle="tooltip" title={token.name}>
                 <AssetIcon asset={token.address} />
-                <p>{token.name}</p>
+                <p>{ellipseText(token.name, 30)}</p>
               </StyledAsset>
               <p>{token.balance.display}</p>
               <p>{token.native ? token.native.price.display : '———'}</p>

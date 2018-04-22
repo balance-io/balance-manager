@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import AssetIcon from '../components/AssetIcon';
 import selector from '../assets/selector-grey.svg';
+import { ellipseText } from '../helpers/utilities';
 import { fonts, colors, shadows, responsive, transitions } from '../styles';
 
 const StyledWrapper = styled.div`
@@ -117,12 +118,12 @@ class DropdownAsset extends Component {
       <StyledWrapper show={this.state.showDropdown} {...props}>
         <StyledSelected noOptions={Object.keys(options).length < 2} onClick={this.toggleDropdown}>
           <div>
-            <StyledAsset>
+            <StyledAsset data-toggle="tooltip" title={options[this.props.selected].name}>
               <AssetIcon
                 size={18}
                 asset={this.props.selected === 'ETH' ? 'ETH' : options[this.props.selected].address}
               />
-              <p>{options[this.props.selected].name}</p>
+              <p>{ellipseText(options[this.props.selected].name, 30)}</p>
             </StyledAsset>
             <p>{`${options[this.props.selected].balance.display}${
               options[this.props.selected].native
@@ -139,9 +140,9 @@ class DropdownAsset extends Component {
                 key={options[key].symbol}
                 onClick={() => this.onChangeSelected(options[key].symbol)}
               >
-                <StyledAsset>
+                <StyledAsset data-toggle="tooltip" title={options[key].name}>
                   <AssetIcon size={18} asset={key === 'ETH' ? 'ETH' : options[key].address} />
-                  <p>{options[key].name}</p>
+                  <p>{ellipseText(options[key].name, 30)}</p>
                 </StyledAsset>
                 <p>{`${options[key].balance.display}${
                   options[key].native ? ` ≈ ${options[key].native.balance.display}` : ''

@@ -37,7 +37,7 @@ export const web3SetHttpProvider = provider => {
  * @desc web3 websocket instance
  */
 export const web3WebSocket = new Web3(
-  new Web3.providers.WebsocketProvider(`wss://mainnet.infura.io/_ws`)
+  new Web3.providers.WebsocketProvider(`wss://mainnet.infura.io/ws`)
 );
 
 /**
@@ -57,14 +57,18 @@ export const web3SetWebSocketProvider = provider => {
   return web3WebSocket.setProvider(providerObj);
 };
 
+/**
+ * @desc fetch pending transactions
+ * @return {Promise}
+ */
 export const web3WebSocketPendingTxs = () =>
   new Promise((resolve, reject) => {
     web3WebSocket.eth
       .subscribe('pendingTransactions', (error, result) => {
         if (!error) reject(error);
       })
-      .on('data', transaction => {
-        web3WebSocket.eth.getTransaction(transaction).then(result => resolve(result));
+      .on('data', txHash => {
+        web3WebSocket.eth.getTransaction(txHash).then(result => resolve(result));
       });
   });
 

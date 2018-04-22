@@ -24,9 +24,8 @@ export const apiGetPrices = (assets = []) => {
  */
 export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now()) => {
   const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(/[[\]"]/gi, '');
-  return axios.get(
-    `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`
-  );
+  const url = `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`;
+  return axios.get(url);
 };
 
 /**
@@ -45,6 +44,7 @@ export const apiGetMetamaskNetwork = () =>
     if (typeof window.web3 !== 'undefined') {
       window.web3.version.getNetwork((err, networkID) => {
         if (err) {
+          console.error(err);
           reject(err);
         }
         let networkIDList = {};
@@ -87,6 +87,23 @@ export const apiGetAccountTransactions = async (address = '', network = 'mainnet
       `/.netlify/functions/transactions?address=${address}&network=${network}`
     );
     updateLocalTransactions(address, data, network);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @desc get transaction status
+ * @param  {String}   [hash = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') => {
+  try {
+    const { data } = await axios.get(
+      `/.netlify/functions/transaction-status?hash=${hash}&network=${network}`
+    );
     return data;
   } catch (error) {
     throw error;

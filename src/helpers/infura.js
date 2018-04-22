@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 import { convertHexToString } from '../helpers/bignumber';
 import { getNakedAddress, getDataString } from '../helpers/utilities';
 import smartContractMethods from '../libraries/smartcontract-methods.json';
@@ -59,6 +58,42 @@ export const infuraCallTokenBalance = async (
       `https://api.infura.io/v1/jsonrpc/${network}/eth_call?params=[{"to":"${tokenAddress}","data":"${dataString}"},"latest"]`
     );
     const result = convertHexToString(response.data.result);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @desc infura rpc request transaction by hash
+ * @param  {String}  [address='']
+ * @param  {String}  [network='mainnet']
+ * @return {Promise}
+ */
+export const infuraGetTransactionByHash = async (hash = '', network = 'mainnet') => {
+  try {
+    const response = await axios.get(
+      `https://api.infura.io/v1/jsonrpc/${network}/eth_getTransactionByHash?params=["${hash}"]`
+    );
+    const result = response.data.result;
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @desc infura rpc request block by hash
+ * @param  {String}  [address='']
+ * @param  {String}  [network='mainnet']
+ * @return {Promise}
+ */
+export const infuraGetBlockByHash = async (hash = '', network = 'mainnet') => {
+  try {
+    const response = await axios.get(
+      `https://api.infura.io/v1/jsonrpc/${network}/eth_getBlockByHash?params=["${hash}", false]`
+    );
+    const result = response.data.result;
     return result;
   } catch (error) {
     throw error;

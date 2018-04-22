@@ -6,9 +6,80 @@ import {
   convertAmountToBigNumber,
   convertAssetAmountToNativeValue
 } from '../helpers/bignumber';
+import { infuraGetTransactionCount } from '../helpers/infura';
 import { apiGetHistoricalPrices } from '../helpers/api';
 import { debounceRequest } from '../helpers/utilities';
 import nativeCurrencies from '../libraries/native-currencies.json';
+
+const parseHistoricalPrices = async transactions => {
+  const _transactions = await Promise.all(
+    transactions.map(async (tx, idx) => {
+      const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
+      let assetSymbol = tx.asset.symbol;
+      if (assetSymbol === 'WETH') {
+        assetSymbol = 'ETH';
+      }
+      if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
+        try {
+          const response = await debounceRequest(
+            apiGetHistoricalPrices,
+            [assetSymbol, timestamp],
+            100 * idx
+          );
+
+          if (response.data.response === 'Error' || !response.data[assetSymbol]) {
+            return tx;
+          }
+
+          Object.keys(nativeCurrencies).map(nativeCurrency => {
+            const assetPriceAmount = convertAmountToBigNumber(
+              response.data[assetSymbol][nativeCurrency]
+            );
+            let prices = { selected: nativeCurrencies[nativeCurrency] };
+            prices[nativeCurrency] = {};
+            prices[nativeCurrency][assetSymbol] = {
+              price: { amount: assetPriceAmount, display: null }
+            };
+            const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
+            prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
+            const assetPrice = prices[nativeCurrency][assetSymbol].price;
+            let asset = { ...tx.asset };
+            if (asset.symbol === 'WETH') {
+              asset.symbol = 'ETH';
+            }
+            const valuePriceAmount = convertAssetAmountToNativeValue(
+              tx.value.amount,
+              asset,
+              prices
+            );
+            const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
+            const valuePrice = !tx.error
+              ? { amount: valuePriceAmount, display: valuePriceDisplay }
+              : { amount: '', display: '' };
+            const txFeePriceAmount = convertAssetAmountToNativeValue(
+              tx.txFee.amount,
+              asset,
+              prices,
+              tx
+            );
+            const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
+            const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
+
+            tx.native[nativeCurrency] = {
+              price: assetPrice,
+              value: valuePrice,
+              txFee: txFeePrice
+            };
+          });
+        } catch (error) {
+          throw error;
+        }
+      }
+      return tx;
+    })
+  );
+  return _transactions;
+};
 
 const parseAccountTransactions = async (data = null, address = '', network = '') => {
   if (!data || !data.docs) return null;
@@ -45,7 +116,8 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
           decimals: 18
         })
       };
-      const isTokenTransfer = (() => {
+
+      const includesTokenTransfer = (() => {
         if (tx.operations.length) {
           const tokenTransfers = tx.operations.filter(
             operation => operation.type === 'token_transfer'
@@ -56,24 +128,9 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
         }
         return false;
       })();
-      interaction = !isTokenTransfer && tx.input !== '0x';
-      if (isTokenTransfer) {
-        if (tx.operations.length === 1) {
-          const transfer = tx.operations[0];
 
-          asset = {
-            name: transfer.contract.name || 'Unknown Token',
-            symbol: transfer.contract.symbol || '———',
-            address: transfer.contract.address || '',
-            decimals: transfer.contract.decimals || 18
-          };
+      interaction = !includesTokenTransfer && tx.input !== '0x';
 
-          from = transfer.from;
-          to = transfer.to;
-          const amount = convertAssetAmountToBigNumber(transfer.value, asset.decimals);
-          value = { amount, display: convertAmountToDisplay(amount, null, asset) };
-        }
-      }
       let result = {
         hash,
         timestamp,
@@ -87,23 +144,55 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
         pending: false,
         asset
       };
-      if (tx.operations.length === 2) {
-        let txOne = { ...result, hash: `${result.hash}-one` };
-        let txTwo = { ...result, hash: `${result.hash}-two` };
-        const transferTwo = tx.operations[1];
-        txTwo.asset = {
-          name: transferTwo.contract.name || 'Unknown Token',
-          symbol: transferTwo.contract.symbol || '———',
-          address: transferTwo.contract.address || '',
-          decimals: transferTwo.contract.decimals || 18
-        };
-        txTwo.from = transferTwo.from;
-        txTwo.to = transferTwo.to;
-        const amount = convertAssetAmountToBigNumber(transferTwo.value, asset.decimals);
-        txTwo.value = { amount, display: convertAmountToDisplay(amount, null, asset) };
 
-        return [txOne, txTwo];
+      if (includesTokenTransfer) {
+        const tokenTransfers = [];
+        if (tx.operations.length) {
+          tx.operations.forEach((transferData, idx) => {
+            const transferTx = {
+              hash: `${result.hash}-${idx + 1}`,
+              timestamp,
+              from,
+              to,
+              error,
+              interaction,
+              value,
+              txFee,
+              native: {},
+              pending: false,
+              asset
+            };
+            const name = !transferData.contract.name.startsWith('0x')
+              ? transferData.contract.name
+              : transferData.contract.symbol || 'Unknown Token';
+            transferTx.asset = {
+              name: name,
+              symbol: transferData.contract.symbol || '———',
+              address: transferData.contract.address || '',
+              decimals: transferData.contract.decimals || 18
+            };
+
+            transferTx.from = transferData.from;
+            transferTx.to = transferData.to;
+            const amount = convertAssetAmountToBigNumber(
+              transferData.value,
+              transferTx.asset.decimals
+            );
+            transferTx.value = {
+              amount,
+              display: convertAmountToDisplay(amount, null, transferTx.asset)
+            };
+            tokenTransfers.push(transferTx);
+          });
+          if (!Number(tx.value)) {
+            result = [...tokenTransfers];
+          } else {
+            result.hash = `${result.hash}-0`;
+            result = [...tokenTransfers, result];
+          }
+        }
       }
+
       return result;
     })
   );
@@ -120,76 +209,22 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
   });
 
   if (data.pages > data.page) {
-    const newPageResponse = await axios.get(
-      `https://${
-        network === 'mainnet' ? `api` : network
-      }.trustwalletapp.com/transactions?address=${address}&limit=50&page=${data.page + 1}`
-    );
-    const newPageTransations = await parseAccountTransactions(
-      newPageResponse.data,
-      address,
-      network
-    );
-    _transactions = [..._transactions, ...newPageTransations];
+    try {
+      const newPageResponse = await axios.get(
+        `https://${
+          network === 'mainnet' ? `api` : network
+        }.trustwalletapp.com/transactions?address=${address}&limit=50&page=${data.page + 1}`
+      );
+      const newPageTransations = await parseAccountTransactions(
+        newPageResponse.data,
+        address,
+        network
+      );
+      _transactions = [..._transactions, ...newPageTransations];
+    } catch (error) {
+      throw error;
+    }
   }
-
-  _transactions = await Promise.all(
-    _transactions.map(async (tx, idx) => {
-      const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
-      const assetSymbol = tx.asset.symbol;
-      if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
-        const response = await debounceRequest(
-          apiGetHistoricalPrices,
-          [assetSymbol, timestamp],
-          100 * idx
-        );
-
-        if (response.data.response === 'Error' || !response.data[assetSymbol]) {
-          return tx;
-        }
-
-        await Promise.all(
-          Object.keys(nativeCurrencies).map(async nativeCurrency => {
-            const assetPriceAmount = convertAmountToBigNumber(
-              response.data[assetSymbol][nativeCurrency]
-            );
-            let prices = { selected: nativeCurrencies[nativeCurrency] };
-            prices[nativeCurrency] = {};
-            prices[nativeCurrency][assetSymbol] = {
-              price: { amount: assetPriceAmount, display: null }
-            };
-            const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
-            prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
-            const assetPrice = prices[nativeCurrency][assetSymbol].price;
-            const valuePriceAmount = convertAssetAmountToNativeValue(
-              tx.value.amount,
-              tx.asset,
-              prices
-            );
-            const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
-            const valuePrice = !tx.error
-              ? { amount: valuePriceAmount, display: valuePriceDisplay }
-              : { amount: '', display: '' };
-            const txFeePriceAmount = convertAssetAmountToNativeValue(
-              tx.txFee.amount,
-              tx.asset,
-              prices,
-              tx
-            );
-            const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
-            const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
-
-            tx.native[nativeCurrency] = {
-              price: assetPrice,
-              value: valuePrice,
-              txFee: txFeePrice
-            };
-          })
-        );
-      }
-      return tx;
-    })
-  );
 
   return _transactions;
 };
@@ -201,7 +236,8 @@ const apiProxyGetAccountTransactions = async (address = '', network = 'mainnet')
         network === 'mainnet' ? `api` : network
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
     );
-    const transactions = await parseAccountTransactions(data, address, network);
+    let transactions = await parseAccountTransactions(data, address, network);
+    transactions = await parseHistoricalPrices(transactions);
     return transactions;
   } catch (error) {
     throw error;
@@ -211,10 +247,14 @@ const apiProxyGetAccountTransactions = async (address = '', network = 'mainnet')
 export const handler = async (event, context, callback) => {
   const { address, network } = event.queryStringParameters;
   try {
-    const data = await apiProxyGetAccountTransactions(address, network);
+    let transactions = [];
+    const txCount = await infuraGetTransactionCount(address, network);
+    if (Number(txCount)) {
+      transactions = await apiProxyGetAccountTransactions(address, network);
+    }
     callback(null, {
       statusCode: 200,
-      body: JSON.stringify(data)
+      body: JSON.stringify(transactions)
     });
   } catch (error) {
     console.error(error);

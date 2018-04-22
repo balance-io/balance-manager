@@ -623,3 +623,21 @@ export const parseNewTransaction = async (
 
   return _transactions;
 };
+
+/**
+ * @desc parse confirmed transaction
+ * @param  {Object} [transactions=null]
+ * @param  {String} [hash='']
+ * @return {String}
+ */
+export const parseConfirmedTransaction = (transactions, hash, timestamp) => {
+  let _transactions = [];
+  transactions.forEach(tx => {
+    if (tx.hash === hash) {
+      tx.pending = false;
+      tx.timestamp = timestamp;
+    }
+    _transactions.push(tx);
+  });
+  return _transactions;
+};

@@ -273,7 +273,11 @@ class AccountViewTransactions extends Component {
                     </StyledAsset>
                     <TransactionStatus tx={tx} accountAddress={this.props.accountAddress} />
 
-                    <p>{`${tx.value.display}`}</p>
+                    <p>
+                      {tx.from === this.props.accountAddress
+                        ? `- ${tx.value.display}`
+                        : `${tx.value.display}`}
+                    </p>
                     <p>
                       {tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].price
                         ? tx.native[nativeCurrency].price.display
@@ -281,30 +285,28 @@ class AccountViewTransactions extends Component {
                     </p>
                     <p>
                       {tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].value
-                        ? tx.from === this.props.account.address
-                          ? tx.native[nativeCurrency] && tx.native[nativeCurrency].value
-                            ? `- ${tx.native[nativeCurrency].value.display}`
-                            : '———'
-                          : `${tx.native[nativeCurrency].value.display || '———'}`
+                        ? tx.from === this.props.accountAddress
+                          ? `- ${tx.native[nativeCurrency].value.display}`
+                          : `${tx.native[nativeCurrency].value.display}`
                         : '———'}
                     </p>
                   </StyledTransactionMainRow>
                   <StyledTransactionTopDetails showTxDetails={this.state.showTxDetails === tx.hash}>
                     <div>
                       <StyledBlockie
-                        seed={tx.from === this.props.account.address ? tx.to : tx.from}
+                        seed={tx.from === this.props.accountAddress ? tx.to : tx.from}
                       />
                       <div>
                         <p>
                           <strong>
                             {tx.from === tx.to
                               ? lang.t('account.tx_self').toUpperCase()
-                              : tx.from === this.props.account.address
+                              : tx.from === this.props.accountAddress
                                 ? lang.t('account.tx_to').toUpperCase()
                                 : lang.t('account.tx_from').toUpperCase()}
                           </strong>
                         </p>
-                        <p>{tx.from === this.props.account.address ? tx.to : tx.from}</p>
+                        <p>{tx.from === this.props.accountAddress ? tx.to : tx.from}</p>
                       </div>
                     </div>
                     <div>

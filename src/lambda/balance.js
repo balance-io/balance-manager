@@ -1,9 +1,5 @@
 import axios from 'axios';
-import {
-  infuraGetEthereumBalance,
-  infuraGetTransactionCount,
-  infuraCallTokenBalance
-} from '../helpers/infura';
+import { infuraGetEthereumBalance, infuraCallTokenBalance } from '../helpers/infura';
 import {
   convertStringToNumber,
   convertAmountToDisplay,
@@ -28,18 +24,23 @@ const proxyGetAccountBalances = async (address = '', network = 'mainnet') => {
         symbol: 'ETH'
       }
     };
-    const tokens = await Promise.all(
-      data.docs.map(async token => {
-        const balance = await infuraCallTokenBalance(address, token.contract.address, network);
-        return { ...token, balance };
-      })
-    );
+    let tokens = [];
+    if (data.docs && data.docs.length) {
+      tokens = await Promise.all(
+        data.docs.map(async token => {
+          const balance = await infuraCallTokenBalance(address, token.contract.address, network);
+          return { ...token, balance };
+        })
+      );
+    }
     let assets = [ethereum, ...tokens];
-
     assets = await Promise.all(
       assets.map(async assetData => {
+        const name = !assetData.contract.name.startsWith('0x')
+          ? assetData.contract.name
+          : assetData.contract.symbol || 'Unknown Token';
         const asset = {
-          name: assetData.contract.name || 'Unknown Token',
+          name: name,
           symbol: assetData.contract.symbol || '———',
           address: assetData.contract.address || null,
           decimals: convertStringToNumber(assetData.contract.decimals)
@@ -59,14 +60,11 @@ const proxyGetAccountBalances = async (address = '', network = 'mainnet') => {
       })
     );
 
-    assets = assets.filter(asset => !!Number(asset.balance.amount));
-
-    const txCount = await infuraGetTransactionCount(address, network);
+    assets = assets.filter(asset => !!Number(asset.balance.amount) || asset.symbol === 'ETH');
 
     return {
       address: address,
       type: '',
-      txCount: txCount,
       assets: assets,
       total: null
     };

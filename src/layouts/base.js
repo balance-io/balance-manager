@@ -11,7 +11,7 @@ import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
 import Notification from '../components/Notification';
 import Warning from '../components/Warning';
-import logo from '../assets/logo-light.png';
+import balanceLogo from '../assets/balance-logo.svg';
 import ethereumNetworks from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import { accountChangeNativeCurrency } from '../reducers/_account';
@@ -50,7 +50,7 @@ const StyledBranding = styled.div`
 `;
 
 const StyledHero = styled.h1`
-  margin-left: 10px;
+  margin-left: 4px;
   font-family: ${fonts.family.FFMarkPro} !important;
   font-size: ${fonts.size.h4};
   font-weight: normal;
@@ -65,10 +65,10 @@ const StyledHero = styled.h1`
   }
 `;
 
-const StyledLogo = styled.img`
-  width: 20px;
+const StyledBalanceLogo = styled.img`
+  width: 105px;
   @media screen and (${responsive.sm.max}) {
-    width: 16px;
+    width: 84px;
   }
 `;
 
@@ -110,9 +110,8 @@ const BaseLayout = ({
         <StyledHeader>
           <Link to="/">
             <StyledBranding>
-              <StyledLogo src={logo} alt="Balance" />
+              <StyledBalanceLogo src={balanceLogo} alt="Balance" />
               <StyledHero>
-                <strong>Balance</strong>
                 <span>{` Manager`}</span>
               </StyledHero>
             </StyledBranding>

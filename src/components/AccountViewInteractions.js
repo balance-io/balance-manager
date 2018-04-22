@@ -179,7 +179,7 @@ const StyledAsset = styled.div`
   }
 `;
 
-const StyledShowAllTransactions = styled(StyledRow)`
+const StyledShowAllInteractions = styled(StyledRow)`
   grid-template-columns: auto;
   min-height: 0;
   min-width: 0;
@@ -220,10 +220,10 @@ const StyledMessage = styled.div`
   font-weight: ${fonts.weight.medium};
 `;
 
-class AccountViewTransactions extends Component {
+class AccountViewInteractions extends Component {
   state = {
     showTxDetails: null,
-    showAllTransactions: false
+    showAllInteractions: false
   };
   onShowTxDetails = hash => {
     if (this.state.showTxDetails === hash) {
@@ -232,16 +232,16 @@ class AccountViewTransactions extends Component {
       this.setState({ showTxDetails: hash });
     }
   };
-  onShowAllTransactions = () =>
-    this.setState({ showAllTransactions: !this.state.showAllTransactions });
+  onShowAllInteractions = () =>
+    this.setState({ showAllInteractions: !this.state.showAllInteractions });
 
   render = () => {
     const nativeCurrency = this.props.nativeCurrency;
-    let _transactions = [];
+    let interactions = [];
     if (this.props.transactions && this.props.transactions.length) {
-      _transactions = this.props.transactions.filter(tx => !tx.interaction);
+      interactions = this.props.transactions.filter(tx => tx.interaction);
     }
-    return !!_transactions.length ? (
+    return !!interactions.length ? (
       !this.props.fetchingTransactions ? (
         <StyledGrid>
           <StyledLabelsRow>
@@ -252,8 +252,8 @@ class AccountViewTransactions extends Component {
             <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
           </StyledLabelsRow>
 
-          {_transactions.map((tx, idx, arr) => {
-            if (!this.state.showAllTransactions && idx > 10) return null;
+          {interactions.map((tx, idx, arr) => {
+            if (!this.state.showAllInteractions && idx > 10) return null;
             return (
               <StyledTransactionWrapper
                 showTxDetails={this.state.showTxDetails === tx.hash}
@@ -376,13 +376,13 @@ class AccountViewTransactions extends Component {
               </StyledTransactionWrapper>
             );
           })}
-          <StyledShowAllTransactions onClick={this.onShowAllTransactions}>
+          <StyledShowAllInteractions onClick={this.onShowAllInteractions}>
             <p>
-              {!this.state.showAllTransactions
+              {!this.state.showAllInteractions
                 ? lang.t('account.show_all')
                 : lang.t('account.show_less')}
-            </p>{' '}
-          </StyledShowAllTransactions>
+            </p>
+          </StyledShowAllInteractions>
         </StyledGrid>
       ) : (
         <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
@@ -397,7 +397,7 @@ class AccountViewTransactions extends Component {
   };
 }
 
-AccountViewTransactions.propTypes = {
+AccountViewInteractions.propTypes = {
   transactions: PropTypes.array.isRequired,
   fetchingTransactions: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
@@ -414,4 +414,4 @@ const reduxProps = ({ account }) => ({
   nativeCurrency: account.nativeCurrency
 });
 
-export default connect(reduxProps, null)(AccountViewTransactions);
+export default connect(reduxProps, null)(AccountViewInteractions);

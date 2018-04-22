@@ -3,6 +3,7 @@
     "account": {
       "tab_balances": "Balances",
       "tab_transactions": "Transactions",
+      "tab_interactions": "Interactions",
       "label_asset": "Asset",
       "label_quantity": "Quantity",
       "label_price": "Price",
@@ -25,7 +26,8 @@
       "tx_received": "Received",
       "tx_failed": "Failed",
       "tx_pending": "Pending",
-      "show_more": "Show more",
+      "show_all": "Show all",
+      "show_less": "Show less",
       "unknown_token": "Unknown Token"
     },
     "button": {

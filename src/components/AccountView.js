@@ -10,8 +10,10 @@ import Button from './Button';
 import CopyToClipboard from './CopyToClipboard';
 import AccountViewBalances from './AccountViewBalances';
 import AccountViewTransactions from './AccountViewTransactions';
+import AccountViewInteractions from './AccountViewInteractions';
 import balancesTabIcon from '../assets/balances-tab.svg';
 import transactionsTabIcon from '../assets/transactions-tab.svg';
+import interactionsTabIcon from '../assets/interactions-tab.svg';
 import LineBreak from '../components/LineBreak';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
@@ -139,6 +141,9 @@ class AccountView extends Component {
       case '/transactions':
         this.setState({ activeTab: 'TRANSACTIONS_TAB' });
         break;
+      case '/interactions':
+        this.setState({ activeTab: 'INTERACTIONS_TAB' });
+        break;
       default:
         break;
     }
@@ -208,6 +213,15 @@ class AccountView extends Component {
                     {lang.t('account.tab_transactions')}
                   </StyledTab>
                 </Link>
+                <Link to={`${this.props.match.url}/interactions`}>
+                  <StyledTab
+                    active={this.state.activeTab === 'INTERACTIONS_TAB'}
+                    icon={interactionsTabIcon}
+                    left
+                  >
+                    {lang.t('account.tab_interactions')}
+                  </StyledTab>
+                </Link>
               </StyledTabsWrapper>
             </StyledTabMenu>
             <Switch>
@@ -216,6 +230,11 @@ class AccountView extends Component {
                 exact
                 path={`${this.props.match.url}/transactions`}
                 component={AccountViewTransactions}
+              />
+              <Route
+                exact
+                path={`${this.props.match.url}/interactions`}
+                component={AccountViewInteractions}
               />
               <Route render={() => <Redirect to={this.props.match.url} />} />
             </Switch>

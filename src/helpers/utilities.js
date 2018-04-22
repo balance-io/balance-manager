@@ -61,8 +61,16 @@ export const updateLocalBalances = (account, network) => {
  */
 export const updateLocalTransactions = (address, transactions, network) => {
   const accountLocal = getLocal(address) || {};
-  const pending = transactions ? transactions.filter(tx => tx.pending) : [];
-  accountLocal.transactions = transactions;
+  const pending = [];
+  const _transactions = [];
+  transactions.forEach(tx => {
+    if (tx.pending) {
+      pending.push(tx);
+    } else {
+      _transactions.push(tx);
+    }
+  });
+  accountLocal.transactions = _transactions;
   accountLocal.pending = pending;
   accountLocal.network = network;
   saveLocal(address, accountLocal);

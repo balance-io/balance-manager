@@ -24,14 +24,16 @@ const proxyGetAccountBalances = async (address = '', network = 'mainnet') => {
         symbol: 'ETH'
       }
     };
-    const tokens = await Promise.all(
-      data.docs.map(async token => {
-        const balance = await infuraCallTokenBalance(address, token.contract.address, network);
-        return { ...token, balance };
-      })
-    );
+    let tokens = [];
+    if (data.docs && data.docs.length) {
+      tokens = await Promise.all(
+        data.docs.map(async token => {
+          const balance = await infuraCallTokenBalance(address, token.contract.address, network);
+          return { ...token, balance };
+        })
+      );
+    }
     let assets = [ethereum, ...tokens];
-
     assets = await Promise.all(
       assets.map(async assetData => {
         const name = !assetData.contract.name.startsWith('0x')
@@ -58,7 +60,7 @@ const proxyGetAccountBalances = async (address = '', network = 'mainnet') => {
       })
     );
 
-    assets = assets.filter(asset => !!Number(asset.balance.amount));
+    assets = assets.filter(asset => !!Number(asset.balance.amount) || asset.symbol === 'ETH');
 
     return {
       address: address,

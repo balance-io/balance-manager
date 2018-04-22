@@ -220,7 +220,6 @@ export const accountClearIntervals = () => dispatch => {
 };
 
 export const accountUpdateAccountAddress = (accountAddress, accountType) => dispatch => {
-  console.log('a');
   dispatch({
     type: ACCOUNT_UPDATE_ACCOUNT_ADDRESS,
     payload: { accountAddress, accountType }

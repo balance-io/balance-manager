@@ -47,6 +47,14 @@ const StyledRow = styled.div`
     align-items: center;
     justify-content: space-between;
   }
+  & ${StyledAsset} {
+    width: 70%;
+    text-align: left;
+  }
+  & > div > p {
+    width: 30%;
+    text-align: right;
+  }
   @media screen and (${responsive.xs.max}) {
     & p {
       font-size: ${fonts.size.tiny};

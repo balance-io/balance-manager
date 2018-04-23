@@ -374,9 +374,11 @@ class AccountViewTransactions extends Component {
             <StyledShowAllTransactions onClick={this.onShowAllTransactions}>
               <StyledToggleIndicator show={this.state.showAllTransactions} />
               <p>
-                {!this.state.showAllTransactions
-                  ? lang.t('account.show_all')
-                  : lang.t('account.show_less')}
+                {`${
+                  !this.state.showAllTransactions
+                    ? lang.t('account.show_all')
+                    : lang.t('account.show_less')
+                } ${lang.t('account.tab_transactions').toLowerCase()}`}
               </p>
             </StyledShowAllTransactions>
           )}

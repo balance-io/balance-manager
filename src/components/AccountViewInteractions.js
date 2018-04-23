@@ -374,9 +374,11 @@ class AccountViewInteractions extends Component {
             <StyledShowAllInteractions onClick={this.onShowAllInteractions}>
               <StyledToggleIndicator show={this.state.showAllInteractions} />
               <p>
-                {!this.state.showAllInteractions
-                  ? lang.t('account.show_all')
-                  : lang.t('account.show_less')}
+                {`${
+                  !this.state.showAllInteractions
+                    ? lang.t('account.show_all')
+                    : lang.t('account.show_less')
+                } ${lang.t('account.tab_interactions').toLowerCase()}`}
               </p>
             </StyledShowAllInteractions>
           )}

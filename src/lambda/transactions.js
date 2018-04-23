@@ -241,20 +241,15 @@ const apiProxyGetAccountTransactions = async (
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
     );
     let transactions = await parseAccountTransactions(data, address, network);
-    console.log('lastTxHash', lastTxHash);
     if (lastTxHash) {
       let newTxs = true;
       transactions = transactions.filter(tx => {
-        console.log(tx.hash);
         if (tx.hash === lastTxHash && newTxs) {
           newTxs = false;
-          console.log('return false');
           return false;
         } else if (tx.hash !== lastTxHash && newTxs) {
-          console.log('return true');
           return true;
         } else {
-          console.log('return false');
           return false;
         }
       });

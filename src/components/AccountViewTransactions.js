@@ -32,7 +32,7 @@ const StyledRow = styled.div`
   padding: 20px;
   z-index: 0;
   background-color: rgb(${colors.white});
-  grid-template-columns: 2fr 1fr 2fr 2fr 2fr;
+  grid-template-columns: repeat(5, 1fr);
   min-height: 0;
   min-width: 0;
   & p {

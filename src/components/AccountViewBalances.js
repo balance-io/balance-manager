@@ -23,7 +23,7 @@ const StyledRow = styled.div`
   padding: 20px;
   z-index: 0;
   background-color: rgb(${colors.white});
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: 5fr repeat(4, 4fr);
   min-height: 0;
   min-width: 0;
   & p {
@@ -36,7 +36,7 @@ const StyledRow = styled.div`
     border-radius: 0 0 8px 8px;
   }
   @media screen and (${responsive.sm.max}) {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: 5fr repeat(4, 4fr);
     padding: 16px;
   }
   @media screen and (${responsive.xs.max}) {

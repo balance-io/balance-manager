@@ -197,6 +197,8 @@ class AccountView extends Component {
               <StyledTabsWrapper>
                 <Link to={this.props.match.url}>
                   <StyledTab
+                    data-toggle="tooltip"
+                    title={lang.t('account.tab_balances_tooltip')}
                     active={this.state.activeTab === 'BALANCES_TAB'}
                     icon={balancesTabIcon}
                     left
@@ -206,6 +208,8 @@ class AccountView extends Component {
                 </Link>
                 <Link to={`${this.props.match.url}/transactions`}>
                   <StyledTab
+                    data-toggle="tooltip"
+                    title={lang.t('account.tab_transactions_tooltip')}
                     active={this.state.activeTab === 'TRANSACTIONS_TAB'}
                     icon={transactionsTabIcon}
                     left
@@ -215,6 +219,8 @@ class AccountView extends Component {
                 </Link>
                 <Link to={`${this.props.match.url}/interactions`}>
                   <StyledTab
+                    data-toggle="tooltip"
+                    title={lang.t('account.tab_interactions_tooltip')}
                     active={this.state.activeTab === 'INTERACTIONS_TAB'}
                     icon={interactionsTabIcon}
                     left

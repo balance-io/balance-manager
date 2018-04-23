@@ -24,7 +24,7 @@ const parseHistoricalPrices = async transactions => {
           const response = await debounceRequest(
             apiGetHistoricalPrices,
             [assetSymbol, timestamp],
-            100 * idx
+            120 * idx
           );
 
           if (response.data.response === 'Error' || !response.data[assetSymbol]) {

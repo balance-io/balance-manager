@@ -383,12 +383,12 @@ class AccountViewInteractions extends Component {
         </StyledGrid>
       ) : (
         <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
-          <StyledMessage>{`Failed request, please refresh`}</StyledMessage>
+          <StyledMessage>{lang.t('account.message_failed_request')}</StyledMessage>
         </StyledCard>
       )
     ) : (
       <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
-        <StyledMessage>{`No transactions found for this account`}</StyledMessage>
+        <StyledMessage>{lang.t('account.message_no_interactions')}</StyledMessage>
       </StyledCard>
     );
   };

@@ -28,7 +28,10 @@
       "tx_pending": "Pending",
       "show_all": "Show all",
       "show_less": "Show less",
-      "unknown_token": "Unknown Token"
+      "unknown_token": "Unknown Token",
+      "message_failed_request": "Failed request, please refresh",
+      "message_no_transactions": "No transactions found for this account",
+      "message_no_interactions": "No interactions found for this account"
     },
     "button": {
       "connect_walletconnect": "Use WalletConnect",

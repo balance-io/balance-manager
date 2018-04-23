@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
 import AssetIcon from './AssetIcon';
-import balancesTabIcon from '../assets/balances-tab.svg';
+import ToggleIndicator from './ToggleIndicator';
 import { ellipseText } from '../helpers/utilities';
 import { convertStringToNumber, hasHighMarketValue, hasLowMarketValue } from '../helpers/bignumber';
 import { colors, fonts, shadows, responsive } from '../styles';
@@ -162,16 +162,6 @@ const StyledShowMoreTokens = styled(StyledToken)`
   color: rgb(${colors.grey});
   padding-left: 18px;
 
-  & div {
-    position: absolute;
-    position: absolute;
-    height: 14px;
-    width: 14px;
-    left: 0;
-    top: calc((100% - 16px) / 2);
-    mask: url(${balancesTabIcon}) center no-repeat;
-    background-color: rgb(${colors.grey});
-  }
   @media (hover: hover) {
     &:hover p {
       opacity: 0.7;
@@ -261,7 +251,7 @@ class AccountViewBalances extends Component {
         <StyledLastRow>
           {!!tokensWithLowMarketValue.length ? (
             <StyledShowMoreTokens onClick={this.onShowMoreTokens}>
-              <div />
+              <ToggleIndicator show={this.state.showMoreTokens} />
               {`${this.state.showMoreTokens ? lang.t('account.hide') : lang.t('account.show')} ${
                 tokensWithLowMarketValue.length
               } ${

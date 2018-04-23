@@ -9,6 +9,7 @@ import LineBreak from './LineBreak';
 import Blockie from './Blockie';
 import AssetIcon from './AssetIcon';
 import HoverWrapper from './HoverWrapper';
+import ToggleIndicator from './ToggleIndicator';
 import TransactionStatus from './TransactionStatus';
 import etherscanLogo from '../assets/etherscan-logo.svg';
 import ethplorerLogo from '../assets/ethplorer-logo.svg';
@@ -179,32 +180,25 @@ const StyledAsset = styled.div`
   }
 `;
 
+const StyledToggleIndicator = styled(ToggleIndicator)`
+  left: 18px;
+`;
+
 const StyledShowAllTransactions = styled(StyledRow)`
   grid-template-columns: auto;
   min-height: 0;
   min-width: 0;
   width: 100%;
   z-index: 2;
-  & div p {
-    font-weight: ${fonts.weight.medium};
-  }
-  & > p {
-    font-weight: ${fonts.weight.semibold};
-    font-family: ${fonts.family.SFMono};
-  }
   & p {
+    padding-left: 18px;
     cursor: pointer;
     text-align: left;
     justify-content: flex-start;
     font-family: ${fonts.family.SFProText};
-    font-weight: ${fonts.weight.semibold};
+    font-weight: ${fonts.weight.normal};
     font-size: ${fonts.size.h6};
     color: rgb(${colors.grey});
-  }
-  @media (hover: hover) {
-    &:hover p {
-      opacity: 0.7;
-    }
   }
 `;
 
@@ -377,11 +371,12 @@ class AccountViewTransactions extends Component {
             );
           })}
           <StyledShowAllTransactions onClick={this.onShowAllTransactions}>
+            <StyledToggleIndicator show={this.state.showAllTransactions} />
             <p>
               {!this.state.showAllTransactions
                 ? lang.t('account.show_all')
                 : lang.t('account.show_less')}
-            </p>{' '}
+            </p>
           </StyledShowAllTransactions>
         </StyledGrid>
       ) : (

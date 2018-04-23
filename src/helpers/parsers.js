@@ -505,8 +505,7 @@ export const parseAccountBalancesPrices = (account = null, nativePrices = null, 
           balance: { amount: balanceAmount, display: balanceDisplay },
           price: assetPrice,
           change:
-            asset.symbol === nativePrices.selected.currency ||
-            !Number(nativePrices[nativeSelected][asset.symbol].change.amount)
+            asset.symbol === nativePrices.selected.currency
               ? { amount: '0', display: '———' }
               : nativePrices[nativeSelected][asset.symbol].change
         }

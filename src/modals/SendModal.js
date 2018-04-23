@@ -533,15 +533,19 @@ class SendModal extends Component {
                   <StyledParagraph>
                     <span>{`${lang.t('modal.gas_fee')}: `}</span>
                     <span>{`${
-                      this.props.gasPrices[this.props.gasPriceOption]
-                        ? this.props.gasPrices[this.props.gasPriceOption].txFee.value.display
-                        : '0.000 ETH'
-                    } (${
                       this.props.gasPrices[this.props.gasPriceOption] &&
                       this.props.gasPrices[this.props.gasPriceOption].txFee.native
                         ? this.props.gasPrices[this.props.gasPriceOption].txFee.native.value.display
                         : '$0.00'
-                    })`}</span>
+                    }${
+                      this.props.nativeCurrency !== 'ETH'
+                        ? ` (${
+                            this.props.gasPrices[this.props.gasPriceOption]
+                              ? this.props.gasPrices[this.props.gasPriceOption].txFee.value.display
+                              : '0.000 ETH'
+                          })`
+                        : ''
+                    }`}</span>
                   </StyledParagraph>
                   <Button
                     left

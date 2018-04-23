@@ -49,11 +49,11 @@ const StyledRow = styled.div`
     justify-content: space-between;
   }
   & ${StyledAsset} {
-    width: 70%;
+    width: 60%;
     text-align: left;
   }
   & > div > p {
-    width: 30%;
+    width: 40%;
     text-align: right;
   }
   @media screen and (${responsive.xs.max}) {

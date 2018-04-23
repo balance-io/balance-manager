@@ -499,7 +499,7 @@ class SendModal extends Component {
                   onClick={() => this.props.sendUpdateGasPrice('average')}
                 >
                   <p>{`${lang.t('modal.gas_average')}: ${
-                    this.props.gasPrices.average && this.props.gasPrices.average.txFee
+                    this.props.gasPrices.average && this.props.gasPrices.average.txFee.native
                       ? this.props.gasPrices.average.txFee.native.value.display
                       : '$0.00'
                   }`}</p>

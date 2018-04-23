@@ -135,12 +135,15 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
         !accountLocal.transactions.length
     }
   });
-  apiGetAccountTransactions(accountAddress, network)
+  const lastTxHash = cachedTransactions.length ? cachedTransactions[0].hash : '';
+  apiGetAccountTransactions(accountAddress, network, lastTxHash)
     .then(transactions => {
-      let _transactions = transactions;
+      const address = getState().account.accountAddress;
+      let _transactions = [...transactions, ...cachedTransactions];
       if (accountLocal && accountLocal.pending) {
-        _transactions = _.unionBy(accountLocal.pending, transactions, 'hash');
+        _transactions = _.unionBy(accountLocal.pending, _transactions, 'hash');
       }
+      updateLocalTransactions(address, _transactions, network);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: _transactions });
     })
     .catch(error => {

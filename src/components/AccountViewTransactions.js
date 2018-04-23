@@ -370,14 +370,16 @@ class AccountViewTransactions extends Component {
               </StyledTransactionWrapper>
             );
           })}
-          <StyledShowAllTransactions onClick={this.onShowAllTransactions}>
-            <StyledToggleIndicator show={this.state.showAllTransactions} />
-            <p>
-              {!this.state.showAllTransactions
-                ? lang.t('account.show_all')
-                : lang.t('account.show_less')}
-            </p>
-          </StyledShowAllTransactions>
+          {_transactions.length > 10 && (
+            <StyledShowAllTransactions onClick={this.onShowAllTransactions}>
+              <StyledToggleIndicator show={this.state.showAllTransactions} />
+              <p>
+                {!this.state.showAllTransactions
+                  ? lang.t('account.show_all')
+                  : lang.t('account.show_less')}
+              </p>
+            </StyledShowAllTransactions>
+          )}
         </StyledGrid>
       ) : (
         <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>

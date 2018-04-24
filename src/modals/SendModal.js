@@ -267,6 +267,12 @@ class SendModal extends Component {
     if (value !== 'ETH') {
       selected = this.props.modalProps.assets.filter(asset => asset.symbol === value)[0];
     }
+    if (
+      this.props.prices[this.props.nativeCurrency] &&
+      this.props.prices[this.props.nativeCurrency][selected.symbol]
+    ) {
+      this.props.sendUpdateAssetAmount(this.props.assetAmount, selected);
+    }
     this.props.sendUpdateSelected(selected);
   };
   onAddressInputFocus = () => this.setState({ isValidAddress: true });

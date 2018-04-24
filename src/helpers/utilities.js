@@ -1,3 +1,5 @@
+import networkList from '../libraries/ethereum-networks.json';
+
 /**
  * @desc save to local storage
  * @param  {String}  [key='']
@@ -40,15 +42,37 @@ export const debounceRequest = (request, params, timeout) =>
   );
 
 /**
+ * @desc filter object by a set of allowed keys
+ * @param  {Function}  request
+ * @param  {Array}     params
+ * @param  {Number}    timeout
+ * @return {Promise}
+ */
+export const filterObjectByKeys = (object, allowedKeys) => {
+  const result = {};
+  const objectKeys = Object.keys(object);
+  objectKeys.forEach(key => {
+    if (allowedKeys.includes(key)) {
+      result[key] = object[key];
+    }
+  });
+  return result;
+};
+
+/**
  * @desc update local balances
  * @param  {Object}   [account]
  * @param  {String}   [network]
  * @return {Void}
  */
 export const updateLocalBalances = (account, network) => {
-  const accountLocal = getLocal(account.address) || {};
-  accountLocal.balances = { assets: account.assets, total: account.total || '———' };
-  accountLocal.network = network;
+  const networks = Object.keys(networkList);
+  let accountLocal = getLocal(account.address) || {};
+  accountLocal = filterObjectByKeys(accountLocal, networks);
+  if (!accountLocal[network]) {
+    accountLocal[network] = {};
+  }
+  accountLocal[network].balances = { assets: account.assets, total: account.total || '———' };
   saveLocal(account.address, accountLocal);
 };
 
@@ -60,7 +84,9 @@ export const updateLocalBalances = (account, network) => {
  * @return {Void}
  */
 export const updateLocalTransactions = (address, transactions, network) => {
-  const accountLocal = getLocal(address) || {};
+  const networks = Object.keys(networkList);
+  let accountLocal = getLocal(address) || {};
+  accountLocal = filterObjectByKeys(accountLocal, networks);
   const pending = [];
   const _transactions = [];
   transactions.forEach(tx => {
@@ -70,9 +96,11 @@ export const updateLocalTransactions = (address, transactions, network) => {
       _transactions.push(tx);
     }
   });
-  accountLocal.transactions = _transactions;
-  accountLocal.pending = pending;
-  accountLocal.network = network;
+  if (!accountLocal[network]) {
+    accountLocal[network] = {};
+  }
+  accountLocal[network].transactions = _transactions;
+  accountLocal[network].pending = pending;
   saveLocal(address, accountLocal);
 };
 

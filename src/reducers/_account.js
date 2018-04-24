@@ -113,15 +113,19 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { accountAddress, network } = getState().account;
   let cachedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
-  if (accountLocal && accountLocal.network === network) {
-    if (accountLocal && accountLocal.pending) {
-      cachedTransactions = [...accountLocal.pending];
-      accountLocal.pending.forEach(pendingTx =>
+  if (accountLocal && accountLocal[network]) {
+    if (accountLocal[network].pending) {
+      cachedTransactions = [...accountLocal[network].pending];
+      accountLocal[network].pending.forEach(pendingTx =>
         dispatch(accountCheckTransactionStatus(pendingTx.hash))
       );
     }
-    if (accountLocal && accountLocal.transactions) {
-      cachedTransactions = _.unionBy(cachedTransactions, accountLocal.transactions, 'hash');
+    if (accountLocal[network].transactions) {
+      cachedTransactions = _.unionBy(
+        cachedTransactions,
+        accountLocal[network].transactions,
+        'hash'
+      );
     }
   }
   dispatch({
@@ -129,10 +133,10 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
     payload: {
       transactions: cachedTransactions,
       fetchingTransactions:
-        (accountLocal && accountLocal.network !== network) ||
+        (accountLocal && !accountLocal[network]) ||
         !accountLocal ||
-        !accountLocal.transactions ||
-        !accountLocal.transactions.length
+        !accountLocal[network].transactions ||
+        !accountLocal[network].transactions.length
     }
   });
   const lastTxHash = cachedTransactions.length ? cachedTransactions[0].hash : '';
@@ -140,8 +144,8 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
     .then(transactions => {
       const address = getState().account.accountAddress;
       let _transactions = [...transactions, ...cachedTransactions];
-      if (accountLocal && accountLocal.pending) {
-        _transactions = _.unionBy(accountLocal.pending, _transactions, 'hash');
+      if (accountLocal && accountLocal[network] && accountLocal[network].pending) {
+        _transactions = _.unionBy(accountLocal[network].pending, _transactions, 'hash');
       }
       updateLocalTransactions(address, _transactions, network);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: _transactions });
@@ -158,19 +162,23 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
   let cachedAccount = { ...accountInfo };
   let cachedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
-  if (accountLocal && accountLocal.network === network) {
-    if (accountLocal && accountLocal.balances) {
+  if (accountLocal && accountLocal[network]) {
+    if (accountLocal[network].balances) {
       cachedAccount = {
         ...cachedAccount,
-        assets: accountLocal.balances.assets,
-        total: accountLocal.balances.total
+        assets: accountLocal[network].balances.assets,
+        total: accountLocal[network].balances.total
       };
     }
-    if (accountLocal && accountLocal.pending) {
-      cachedTransactions = [...accountLocal.pending];
+    if (accountLocal[network].pending) {
+      cachedTransactions = [...accountLocal[network].pending];
     }
-    if (accountLocal && accountLocal.transactions) {
-      cachedTransactions = _.unionBy(cachedTransactions, accountLocal.transactions, 'hash');
+    if (accountLocal[network].transactions) {
+      cachedTransactions = _.unionBy(
+        cachedTransactions,
+        accountLocal[network].transactions,
+        'hash'
+      );
     }
   }
   dispatch({
@@ -178,12 +186,13 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
     payload: {
       accountInfo: cachedAccount,
       transactions: cachedTransactions,
-      fetching: (accountLocal && accountLocal.network !== network) || !accountLocal
+      fetching: (accountLocal && !accountLocal[network]) || !accountLocal
     }
   });
   apiGetAccountBalances(accountAddress, network)
     .then(accountInfo => {
       accountInfo = { ...accountInfo, accountType };
+      updateLocalBalances(accountInfo, network);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS });
       dispatch(accountGetNativePrices(accountInfo));
     })

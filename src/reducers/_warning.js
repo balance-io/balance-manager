@@ -70,10 +70,12 @@ export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case WARNING_USER_IS_OFFLINE:
       return {
+        ...state,
         online: false
       };
     case WARNING_USER_IS_ONLINE:
       return {
+        ...state,
         online: true
       };
     case WARNING_PARSE:

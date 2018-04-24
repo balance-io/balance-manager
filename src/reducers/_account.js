@@ -2,7 +2,7 @@ import _ from 'lodash';
 import lang from '../languages';
 import {
   apiGetAccountBalances,
-  // apiGetAccountTransactions,
+  apiGetAccountTransactions,
   apiGetPrices,
   apiGetTransactionStatus
 } from '../helpers/api';
@@ -10,10 +10,10 @@ import {
   parseError,
   parseNewTransaction,
   parseAccountBalancesPrices,
+  parseHistoricalPrices,
   parsePricesObject,
   parseConfirmedTransaction
 } from '../helpers/parsers';
-import { apiProxyGetAccountTransactions } from '../lambda/transactions';
 import {
   saveLocal,
   getLocal,
@@ -139,7 +139,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
     }
   });
   const lastTxHash = cachedTransactions.length ? cachedTransactions[0].hash : '';
-  apiProxyGetAccountTransactions(accountAddress, network, lastTxHash)
+  apiGetAccountTransactions(accountAddress, network, lastTxHash)
     .then(transactions => {
       const address = getState().account.accountAddress;
       let _transactions = [...transactions, ...cachedTransactions];

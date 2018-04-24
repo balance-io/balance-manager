@@ -2,85 +2,9 @@ import axios from 'axios';
 import {
   multiply,
   convertAmountToDisplay,
-  convertAssetAmountToBigNumber,
-  convertAmountToBigNumber,
-  convertAssetAmountToNativeValue
+  convertAssetAmountToBigNumber
 } from '../helpers/bignumber';
 import { infuraGetTransactionCount } from '../helpers/infura';
-import { apiGetHistoricalPrices } from '../helpers/api';
-import { debounceRequest } from '../helpers/utilities';
-import nativeCurrencies from '../libraries/native-currencies.json';
-
-const parseHistoricalPrices = async transactions => {
-  const _transactions = await Promise.all(
-    transactions.map(async (tx, idx) => {
-      console.log('timestamp', tx.timestamp);
-      const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
-      let assetSymbol = tx.asset.symbol;
-      if (assetSymbol === 'WETH') {
-        assetSymbol = 'ETH';
-      }
-      if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
-        try {
-          const response = await debounceRequest(
-            apiGetHistoricalPrices,
-            [assetSymbol, timestamp],
-            100 * idx
-          );
-
-          if (response.data.response === 'Error' || !response.data[assetSymbol]) {
-            return tx;
-          }
-
-          Object.keys(nativeCurrencies).map(nativeCurrency => {
-            const assetPriceAmount = convertAmountToBigNumber(
-              response.data[assetSymbol][nativeCurrency]
-            );
-            let prices = { selected: nativeCurrencies[nativeCurrency] };
-            prices[nativeCurrency] = {};
-            prices[nativeCurrency][assetSymbol] = {
-              price: { amount: assetPriceAmount, display: null }
-            };
-            const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
-            prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
-            const assetPrice = prices[nativeCurrency][assetSymbol].price;
-            let asset = { ...tx.asset };
-            if (asset.symbol === 'WETH') {
-              asset.symbol = 'ETH';
-            }
-            const valuePriceAmount = convertAssetAmountToNativeValue(
-              tx.value.amount,
-              asset,
-              prices
-            );
-            const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
-            const valuePrice = !tx.error
-              ? { amount: valuePriceAmount, display: valuePriceDisplay }
-              : { amount: '', display: '' };
-            const txFeePriceAmount = convertAssetAmountToNativeValue(
-              tx.txFee.amount,
-              asset,
-              prices,
-              tx
-            );
-            const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
-            const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
-
-            tx.native[nativeCurrency] = {
-              price: assetPrice,
-              value: valuePrice,
-              txFee: txFeePrice
-            };
-          });
-        } catch (error) {
-          throw error;
-        }
-      }
-      return tx;
-    })
-  );
-  return _transactions;
-};
 
 const parseAccountTransactions = async (data = null, address = '', network = '') => {
   if (!data || !data.docs) return null;
@@ -92,7 +16,7 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
         secs: `${tx.timeStamp}`,
         ms: `${tx.timeStamp}000`
       };
-      const error = tx.isError === '1';
+      const error = !!tx.error;
       let interaction = false;
       let from = tx.from;
       let to = tx.to;
@@ -261,7 +185,6 @@ export const apiProxyGetAccountTransactions = async (
     );
     let transactions = await parseAccountTransactions(data, address, network);
     transactions = filterNewTransactions(transactions, lastTxHash);
-    transactions = await parseHistoricalPrices(transactions);
     return transactions;
   } catch (error) {
     throw error;

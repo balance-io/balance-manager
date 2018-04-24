@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { parseHistoricalPrices } from './parsers';
 import networkList from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
@@ -84,9 +85,10 @@ export const apiGetAccountTransactions = async (
   lastTxHash = ''
 ) => {
   try {
-    const { data } = await axios.get(
+    let { data } = await axios.get(
       `/.netlify/functions/transactions?address=${address}&network=${network}&lastTxHash=${lastTxHash}`
     );
+    data = await parseHistoricalPrices(data);
     return data;
   } catch (error) {
     throw error;

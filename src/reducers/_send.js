@@ -213,7 +213,7 @@ export const sendUpdateRecipient = recipient => dispatch => {
   }
 };
 
-export const sendUpdateAssetAmount = (assetAmount, selected, prices) => (dispatch, getState) => {
+export const sendUpdateAssetAmount = (assetAmount, selected) => (dispatch, getState) => {
   const { prices, nativeCurrency } = getState().account;
   const _assetAmount = assetAmount.replace(/[^0-9.]/g, '');
   let _nativeAmount = '';
@@ -230,7 +230,7 @@ export const sendUpdateAssetAmount = (assetAmount, selected, prices) => (dispatc
   });
 };
 
-export const sendUpdateNativeAmount = (nativeAmount, selected, prices) => (dispatch, getState) => {
+export const sendUpdateNativeAmount = (nativeAmount, selected) => (dispatch, getState) => {
   const { prices, nativeCurrency } = getState().account;
   const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
   let _assetAmount = '';

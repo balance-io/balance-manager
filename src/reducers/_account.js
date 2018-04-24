@@ -10,7 +10,6 @@ import {
   parseError,
   parseNewTransaction,
   parseAccountBalancesPrices,
-  parseHistoricalPrices,
   parsePricesObject,
   parseConfirmedTransaction
 } from '../helpers/parsers';

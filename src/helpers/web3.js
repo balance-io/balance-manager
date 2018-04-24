@@ -34,45 +34,6 @@ export const web3SetHttpProvider = provider => {
 };
 
 /**
- * @desc web3 websocket instance
- */
-export const web3WebSocket = new Web3(
-  new Web3.providers.WebsocketProvider(`wss://mainnet.infura.io/ws`)
-);
-
-/**
- * @desc set a different web3 provider
- * @param {String}
- */
-export const web3SetWebSocketProvider = provider => {
-  let providerObj = null;
-  if (provider.match(/(wss?:\/\/)(\w+.)+/g)) {
-    providerObj = new Web3.providers.WebsocketProvider(provider);
-  }
-  if (!providerObj) {
-    throw new Error(
-      'function web3SetWebSocketProvider requires provider to match a valid WS/WSS endpoint'
-    );
-  }
-  return web3WebSocket.setProvider(providerObj);
-};
-
-/**
- * @desc fetch pending transactions
- * @return {Promise}
- */
-export const web3WebSocketPendingTxs = () =>
-  new Promise((resolve, reject) => {
-    web3WebSocket.eth
-      .subscribe('pendingTransactions', (error, result) => {
-        if (!error) reject(error);
-      })
-      .on('data', txHash => {
-        web3WebSocket.eth.getTransaction(txHash).then(result => resolve(result));
-      });
-  });
-
-/**
  * @desc convert to checksum address
  * @param  {String} address
  * @return {String}

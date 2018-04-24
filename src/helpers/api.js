@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { updateLocalBalances, updateLocalTransactions } from './utilities';
 import networkList from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
@@ -67,8 +66,6 @@ export const apiGetAccountBalances = async (address = '', network = 'mainnet') =
     const { data } = await axios.get(
       `/.netlify/functions/balance?address=${address}&network=${network}`
     );
-    updateLocalBalances(data, network);
-
     return data;
   } catch (error) {
     throw error;
@@ -90,7 +87,6 @@ export const apiGetAccountTransactions = async (
     const { data } = await axios.get(
       `/.netlify/functions/transactions?address=${address}&network=${network}&lastTxHash=${lastTxHash}`
     );
-    updateLocalTransactions(address, data, network);
     return data;
   } catch (error) {
     throw error;

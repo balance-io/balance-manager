@@ -179,13 +179,16 @@ class AccountViewBalances extends Component {
   render() {
     if (!this.props.accountInfo.assets) return null;
     const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
-    const tokensWithHighMarketValue = this.props.accountInfo.assets.filter(
+    const tokens = this.props.accountInfo.assets.filter(
+      asset => asset.symbol !== 'ETH' && typeof asset === 'object' && !!asset
+    );
+    const tokensWithHighMarketValue = tokens.filter(
       asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
     );
-    let tokensWithLowMarketValue = this.props.accountInfo.assets.filter(
+    let tokensWithLowMarketValue = tokens.filter(
       asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
     );
-    const tokensWithNoMarketValue = this.props.accountInfo.assets.filter(asset => !asset.native);
+    const tokensWithNoMarketValue = tokens.filter(asset => !asset.native);
     tokensWithLowMarketValue = [...tokensWithLowMarketValue, ...tokensWithNoMarketValue];
     const allLowMarketTokensHaveNoValue =
       tokensWithNoMarketValue.length === tokensWithLowMarketValue.length;

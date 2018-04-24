@@ -14,6 +14,7 @@ import nativeCurrencies from '../libraries/native-currencies.json';
 const parseHistoricalPrices = async transactions => {
   const _transactions = await Promise.all(
     transactions.map(async (tx, idx) => {
+      console.log('timestamp', tx.timestamp);
       const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
       let assetSymbol = tx.asset.symbol;
       if (assetSymbol === 'WETH') {
@@ -88,7 +89,7 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
     data.docs.map(async (tx, idx) => {
       const hash = tx._id;
       const timestamp = {
-        secs: tx.timeStamp,
+        secs: `${tx.timeStamp}`,
         ms: `${tx.timeStamp}000`
       };
       const error = tx.isError === '1';
@@ -229,7 +230,7 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
   return _transactions;
 };
 
-const apiProxyGetAccountTransactions = async (
+export const apiProxyGetAccountTransactions = async (
   address = '',
   network = 'mainnet',
   lastTxHash = null

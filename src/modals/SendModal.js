@@ -499,7 +499,7 @@ class SendModal extends Component {
                   onClick={() => this.props.sendUpdateGasPrice('average')}
                 >
                   <p>{`${lang.t('modal.gas_average')}: ${
-                    this.props.gasPrices.average && this.props.gasPrices.average.txFee
+                    this.props.gasPrices.average && this.props.gasPrices.average.txFee.native
                       ? this.props.gasPrices.average.txFee.native.value.display
                       : '$0.00'
                   }`}</p>
@@ -533,15 +533,19 @@ class SendModal extends Component {
                   <StyledParagraph>
                     <span>{`${lang.t('modal.gas_fee')}: `}</span>
                     <span>{`${
-                      this.props.gasPrices[this.props.gasPriceOption]
-                        ? this.props.gasPrices[this.props.gasPriceOption].txFee.value.display
-                        : '0.000 ETH'
-                    } (${
                       this.props.gasPrices[this.props.gasPriceOption] &&
                       this.props.gasPrices[this.props.gasPriceOption].txFee.native
                         ? this.props.gasPrices[this.props.gasPriceOption].txFee.native.value.display
                         : '$0.00'
-                    })`}</span>
+                    }${
+                      this.props.nativeCurrency !== 'ETH'
+                        ? ` (${
+                            this.props.gasPrices[this.props.gasPriceOption]
+                              ? this.props.gasPrices[this.props.gasPriceOption].txFee.value.display
+                              : '0.000 ETH'
+                          })`
+                        : ''
+                    }`}</span>
                   </StyledParagraph>
                   <Button
                     left

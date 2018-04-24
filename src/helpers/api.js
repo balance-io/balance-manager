@@ -81,10 +81,14 @@ export const apiGetAccountBalances = async (address = '', network = 'mainnet') =
  * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
-export const apiGetAccountTransactions = async (address = '', network = 'mainnet') => {
+export const apiGetAccountTransactions = async (
+  address = '',
+  network = 'mainnet',
+  lastTxHash = ''
+) => {
   try {
     const { data } = await axios.get(
-      `/.netlify/functions/transactions?address=${address}&network=${network}`
+      `/.netlify/functions/transactions?address=${address}&network=${network}&lastTxHash=${lastTxHash}`
     );
     updateLocalTransactions(address, data, network);
     return data;

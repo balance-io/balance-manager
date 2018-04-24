@@ -229,7 +229,11 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
   return _transactions;
 };
 
-const apiProxyGetAccountTransactions = async (address = '', network = 'mainnet') => {
+const apiProxyGetAccountTransactions = async (
+  address = '',
+  network = 'mainnet',
+  lastTxHash = null
+) => {
   try {
     const { data } = await axios.get(
       `https://${
@@ -237,6 +241,19 @@ const apiProxyGetAccountTransactions = async (address = '', network = 'mainnet')
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
     );
     let transactions = await parseAccountTransactions(data, address, network);
+    if (lastTxHash) {
+      let newTxs = true;
+      transactions = transactions.filter(tx => {
+        if (tx.hash === lastTxHash && newTxs) {
+          newTxs = false;
+          return false;
+        } else if (tx.hash !== lastTxHash && newTxs) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+    }
     transactions = await parseHistoricalPrices(transactions);
     return transactions;
   } catch (error) {
@@ -245,12 +262,12 @@ const apiProxyGetAccountTransactions = async (address = '', network = 'mainnet')
 };
 
 export const handler = async (event, context, callback) => {
-  const { address, network } = event.queryStringParameters;
+  const { address, network, lastTxHash } = event.queryStringParameters;
   try {
     let transactions = [];
     const txCount = await infuraGetTransactionCount(address, network);
     if (Number(txCount)) {
-      transactions = await apiProxyGetAccountTransactions(address, network);
+      transactions = await apiProxyGetAccountTransactions(address, network, lastTxHash);
     }
     callback(null, {
       statusCode: 200,

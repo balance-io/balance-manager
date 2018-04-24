@@ -505,9 +505,9 @@ export const parseAccountBalancesPrices = (account = null, nativePrices = null, 
           balance: { amount: balanceAmount, display: balanceDisplay },
           price: assetPrice,
           change:
-            asset.symbol !== nativePrices.selected.currency
-              ? nativePrices[nativeSelected][asset.symbol].change
-              : { amount: '0', display: '0.00%' }
+            asset.symbol === nativePrices.selected.currency
+              ? { amount: '0', display: '———' }
+              : nativePrices[nativeSelected][asset.symbol].change
         }
       };
     });

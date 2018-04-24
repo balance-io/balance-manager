@@ -24,6 +24,7 @@ import { colors, fonts, responsive, shadows, transitions } from '../styles';
 
 const StyledAccountView = styled.div`
   width: 100%;
+  margin-bottom: 60px;
 `;
 
 const StyledFlex = styled.div`

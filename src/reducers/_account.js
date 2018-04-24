@@ -19,7 +19,7 @@ import {
   updateLocalTransactions,
   updateLocalBalances
 } from '../helpers/utilities';
-import { web3SetHttpProvider, web3SetWebSocketProvider } from '../helpers/web3';
+import { web3SetHttpProvider } from '../helpers/web3';
 import { notificationShow } from './_notification';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
@@ -52,8 +52,6 @@ const ACCOUNT_GET_NATIVE_PRICES_FAILURE = 'account/ACCOUNT_GET_NATIVE_PRICES_FAI
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 const ACCOUNT_UPDATE_WEB3_NETWORK = 'account/ACCOUNT_UPDATE_WEB3_NETWORK';
 const ACCOUNT_UPDATE_ACCOUNT_ADDRESS = 'account/ACCOUNT_UPDATE_ACCOUNT_ADDRESS';
-
-const ACCOUNT_UPDATE_OPEN_WEBSOCKETS = 'account/ACCOUNT_UPDATE_OPEN_WEBSOCKETS';
 
 const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 
@@ -223,7 +221,6 @@ export const accountUpdateBalances = () => (dispatch, getState) => {
 
 export const accountUpdateNetwork = network => dispatch => {
   web3SetHttpProvider(`https://${network}.infura.io/`);
-  web3SetWebSocketProvider(`wss://${network}.infura.io/ws`);
   dispatch({ type: ACCOUNT_UPDATE_WEB3_NETWORK, payload: network });
 };
 
@@ -321,7 +318,6 @@ const INITIAL_STATE = {
     total: '———'
   },
   transactions: [],
-  websockets: [],
   fetchingTransactions: false,
   fetching: false
 };
@@ -405,11 +401,6 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         network: action.payload
-      };
-    case ACCOUNT_UPDATE_OPEN_WEBSOCKETS:
-      return {
-        ...state,
-        websockets: [action.payload, ...state.websockets]
       };
     case ACCOUNT_CLEAR_STATE:
       return {

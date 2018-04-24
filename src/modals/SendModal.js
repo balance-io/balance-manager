@@ -32,7 +32,8 @@ import {
 } from '../reducers/_send';
 import { notificationShow } from '../reducers/_notification';
 import { isValidAddress } from '../helpers/validators';
-import { convertAmountFromBigNumber, capitalize } from '../helpers/utilities';
+import { convertAmountFromBigNumber } from '../helpers/bignumber';
+import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
 const StyledSuccessMessage = styled.div`
@@ -266,6 +267,12 @@ class SendModal extends Component {
     if (value !== 'ETH') {
       selected = this.props.modalProps.assets.filter(asset => asset.symbol === value)[0];
     }
+    if (
+      this.props.prices[this.props.nativeCurrency] &&
+      this.props.prices[this.props.nativeCurrency][selected.symbol]
+    ) {
+      this.props.sendUpdateAssetAmount(this.props.assetAmount, selected);
+    }
     this.props.sendUpdateSelected(selected);
   };
   onAddressInputFocus = () => this.setState({ isValidAddress: true });
@@ -498,7 +505,7 @@ class SendModal extends Component {
                   onClick={() => this.props.sendUpdateGasPrice('average')}
                 >
                   <p>{`${lang.t('modal.gas_average')}: ${
-                    this.props.gasPrices.average && this.props.gasPrices.average.txFee
+                    this.props.gasPrices.average && this.props.gasPrices.average.txFee.native
                       ? this.props.gasPrices.average.txFee.native.value.display
                       : '$0.00'
                   }`}</p>
@@ -532,15 +539,19 @@ class SendModal extends Component {
                   <StyledParagraph>
                     <span>{`${lang.t('modal.gas_fee')}: `}</span>
                     <span>{`${
-                      this.props.gasPrices[this.props.gasPriceOption]
-                        ? this.props.gasPrices[this.props.gasPriceOption].txFee.value.display
-                        : '0.000 ETH'
-                    } (${
                       this.props.gasPrices[this.props.gasPriceOption] &&
                       this.props.gasPrices[this.props.gasPriceOption].txFee.native
                         ? this.props.gasPrices[this.props.gasPriceOption].txFee.native.value.display
                         : '$0.00'
-                    })`}</span>
+                    }${
+                      this.props.nativeCurrency !== 'ETH'
+                        ? ` (${
+                            this.props.gasPrices[this.props.gasPriceOption]
+                              ? this.props.gasPrices[this.props.gasPriceOption].txFee.value.display
+                              : '0.000 ETH'
+                          })`
+                        : ''
+                    }`}</span>
                   </StyledParagraph>
                   <Button
                     left
@@ -604,7 +615,7 @@ class SendModal extends Component {
             <StyledParagraph>
               <a
                 href={`https://${
-                  this.props.web3Network !== 'mainnet' ? `${this.props.web3Network}.` : ''
+                  this.props.network !== 'mainnet' ? `${this.props.network}.` : ''
                 }etherscan.io/tx/${this.props.transaction}`}
                 target="_blank"
               >
@@ -651,7 +662,7 @@ SendModal.propTypes = {
   gasLimit: PropTypes.number.isRequired,
   gasPriceOption: PropTypes.string.isRequired,
   confirm: PropTypes.bool.isRequired,
-  web3Network: PropTypes.string.isRequired,
+  network: PropTypes.string.isRequired,
   prices: PropTypes.object.isRequired
 };
 
@@ -670,7 +681,7 @@ const reduxProps = ({ modal, send, account }) => ({
   gasLimit: send.gasLimit,
   gasPriceOption: send.gasPriceOption,
   confirm: send.confirm,
-  web3Network: account.web3Network,
+  network: account.network,
   nativeCurrency: account.nativeCurrency,
   prices: account.prices
 });

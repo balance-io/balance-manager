@@ -1,25 +1,20 @@
 import BigNumber from 'bignumber.js';
-import lang from '../languages';
 import {
-  debounceRequest,
-  hexToNumberString,
-  convertStringToNumber,
   convertAmountToBigNumber,
   convertAmountFromBigNumber,
   convertAmountToDisplay,
   convertAmountToDisplaySpecific,
   convertAssetAmountToBigNumber,
   convertAssetAmountToNativeValue,
-  convertAssetAmountToNativeAmount,
-  saveLocal,
-  getLocal
-} from './utilities';
+  convertAssetAmountToNativeAmount
+} from './bignumber';
+import { debounceRequest } from '../helpers/utilities';
+import { getTransactionCount } from './web3';
 import { getTimeString } from './time';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import ethUnits from '../libraries/ethereum-units.json';
-import smartContractMethods from '../libraries/smartcontract-methods.json';
 import timeUnits from '../libraries/time-units.json';
-import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
+import { apiGetHistoricalPrices } from './api';
 
 /**
  * @desc parse error code message
@@ -28,20 +23,23 @@ import { apiGetHistoricalPrices, apiGetEthplorerTokenInfo } from './api';
  */
 
 export const parseError = error => {
-  const msgEnd =
-    error.message.indexOf('\n') !== -1 ? error.message.indexOf('\n') : error.message.length;
-  let message = error.message.slice(0, msgEnd);
-  if (error.message.includes('MetaMask') || error.message.includes('Returned error:')) {
-    message = message
-      .replace('Error: ', '')
-      .replace('MetaMask ', '')
-      .replace('Returned error: ', '');
-    message = message.slice(0, 1).toUpperCase() + message.slice(1).toLowerCase();
-    console.error(new Error(message));
+  if (error) {
+    const msgEnd =
+      error.message.indexOf('\n') !== -1 ? error.message.indexOf('\n') : error.message.length;
+    let message = error.message.slice(0, msgEnd);
+    if (error.message.includes('MetaMask') || error.message.includes('Returned error:')) {
+      message = message
+        .replace('Error: ', '')
+        .replace('MetaMask ', '')
+        .replace('Returned error: ', '');
+      message = message.slice(0, 1).toUpperCase() + message.slice(1).toLowerCase();
+      console.error(new Error(message));
+      return message;
+    }
+    console.error(error);
     return message;
   }
-  console.error(error);
-  return message;
+  return `Something went wrong`;
 };
 
 /**
@@ -470,81 +468,17 @@ export const parsePricesObject = (data = null, assets = [], nativeSelected = 'US
       }
     });
   });
-  saveLocal('native_prices', prices);
   return prices;
-};
-
-/**
- * @desc parse ethplorer address info response
- * @param  {String}   [data = null]
- * @return {Promise}
- */
-export const parseEthplorerAddressInfo = (data = null) => {
-  const ethereumBalance =
-    data && data.ETH.balance ? convertAmountToBigNumber(data.ETH.balance) : '0';
-  const ethereum = {
-    name: 'Ethereum',
-    symbol: 'ETH',
-    address: null,
-    decimals: 18,
-    balance: {
-      amount: ethereumBalance,
-      display: convertAmountToDisplay(ethereumBalance, null, { symbol: 'ETH', decimals: 18 })
-    },
-    native: null
-  };
-
-  let assets = [ethereum];
-  if (data && data.tokens) {
-    const tokens = data.tokens.map(token => {
-      const asset = {
-        name: token.tokenInfo.name || lang.t('account.unknown_token'),
-        symbol: token.tokenInfo.symbol || '———',
-        address: token.tokenInfo.address || null,
-        decimals: convertStringToNumber(token.tokenInfo.decimals)
-      };
-      const allTokens = getLocal('token_info') || {};
-      if (asset.symbol === '———' && !allTokens[asset.address]) {
-        allTokens[asset.address] = asset;
-      } else if (!allTokens[asset.symbol]) {
-        allTokens[asset.symbol] = asset;
-      }
-      saveLocal('token_info', allTokens);
-      const assetBalance = convertAssetAmountToBigNumber(token.balance, asset.decimals);
-      return {
-        ...asset,
-        balance: {
-          amount: assetBalance,
-          display: convertAmountToDisplay(assetBalance, null, {
-            symbol: asset.symbol,
-            decimals: asset.decimals
-          })
-        },
-        native: null
-      };
-    });
-    assets = [...assets, ...tokens];
-
-    const accountLocal = getLocal(data.address) || {};
-    accountLocal.balances = { assets, total: '———' };
-    saveLocal(data.address, accountLocal);
-  }
-  return {
-    address: (data && data.address) || '',
-    type: '',
-    txCount: (data && data.countTxs) || 0,
-    assets: assets,
-    total: '———'
-  };
 };
 
 /**
  * @desc parse account balances from native prices
  * @param  {Object} [account=null]
  * @param  {Object} [prices=null]
+ * @param  {String} [network='']
  * @return {String}
  */
-export const parseAccountBalances = (account = null, nativePrices = null) => {
+export const parseAccountBalancesPrices = (account = null, nativePrices = null, network = '') => {
   let totalAmount = 0;
   let newAccount = {
     ...account
@@ -572,9 +506,9 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
           balance: { amount: balanceAmount, display: balanceDisplay },
           price: assetPrice,
           change:
-            asset.symbol !== nativePrices.selected.currency
-              ? nativePrices[nativeSelected][asset.symbol].change
-              : { amount: '0', display: '0.00%' }
+            asset.symbol === nativePrices.selected.currency
+              ? { amount: '0', display: '———' }
+              : nativePrices[nativeSelected][asset.symbol].change
         }
       };
     });
@@ -592,213 +526,8 @@ export const parseAccountBalances = (account = null, nativePrices = null) => {
       assets: newAssets,
       total: total
     };
-
-    const accountLocal = getLocal(account.address) || {};
-    accountLocal.balances = { assets: newAssets, total: total };
-    saveLocal(account.address, accountLocal);
   }
   return newAccount;
-};
-
-/**
- * @desc parse etherscan account transactions response
- * @param  {String}   [data = null]
- * @param  {String}   [address = '']
- * @return {Promise}
- */
-export const parseEtherscanAccountTransactions = async (data = null, address = '') => {
-  if (!data || !data.result) return null;
-
-  let transactions = await Promise.all(
-    data.result.map(async (tx, idx) => {
-      const hash = tx.hash;
-      const timestamp = {
-        secs: tx.timeStamp,
-        ms: `${tx.timeStamp}000`
-      };
-      const blockNumber = tx.blockNumber;
-      const error = tx.isError === '1';
-      let interaction = false;
-      const from = tx.from;
-      let to = tx.to;
-      let asset = {
-        name: 'Ethereum',
-        symbol: 'ETH',
-        address: null,
-        decimals: 18
-      };
-      let value = {
-        amount: tx.value,
-        display: convertAmountToDisplay(tx.value, null, {
-          symbol: 'ETH',
-          decimals: 18
-        })
-      };
-      let totalGas = BigNumber(`${tx.gasUsed}`)
-        .times(BigNumber(`${tx.gasPrice}`))
-        .toString();
-      let txFee = {
-        amount: totalGas,
-        display: convertAmountToDisplay(totalGas, null, {
-          symbol: 'ETH',
-          decimals: 18
-        })
-      };
-
-      if (tx.input.startsWith(smartContractMethods.token_transfer.hash)) {
-        const allTokens = getLocal('token_info') || {};
-        let foundToken = null;
-        Object.keys(allTokens).forEach(tokenSymbol => {
-          if (allTokens[tokenSymbol].address === tx.to) {
-            foundToken = allTokens[tokenSymbol];
-          }
-        });
-        if (tx.to === '0xc55cf4b03948d7ebc8b9e8bad92643703811d162') {
-          /* STT token on Ropsten */
-          asset = {
-            name: 'Status Test Token',
-            symbol: 'STT',
-            address: '0xc55cF4B03948D7EBc8b9E8BAD92643703811d162',
-            decimals: 18
-          };
-        } else if (foundToken) {
-          asset = foundToken;
-        } else {
-          const response = await apiGetEthplorerTokenInfo(tx.to);
-
-          asset = {
-            name: !response.data.error || response.data.name ? response.data.name : 'Unknown Token',
-            symbol: !response.data.error || response.data.symbol ? response.data.symbol : '———',
-            address: !response.data.error ? response.data.address : '',
-            decimals: !response.data.error ? convertStringToNumber(response.data.decimals) : 18
-          };
-
-          if (asset.symbol === '———' && !allTokens[asset.address]) {
-            allTokens[asset.address] = asset;
-          } else if (!allTokens[asset.symbol]) {
-            allTokens[asset.symbol] = asset;
-          }
-          saveLocal('token_info', allTokens);
-        }
-
-        to = `0x${tx.input.slice(34, 74)}`;
-        const hexResult = hexToNumberString(`${tx.input.slice(74)}`);
-        const amount = convertAssetAmountToBigNumber(hexResult, asset.decimals);
-        value = { amount, display: convertAmountToDisplay(amount, null, asset) };
-      } else if (tx.input !== '0x') {
-        interaction = true;
-      }
-
-      const result = {
-        hash,
-        timestamp,
-        blockNumber,
-        from,
-        to,
-        error,
-        interaction,
-        value,
-        txFee,
-        native: null,
-        pending: false,
-        asset
-      };
-      return result;
-    })
-  );
-
-  transactions = transactions.reverse();
-
-  const accountLocal = getLocal(address) || {};
-  accountLocal.transactions = transactions;
-  saveLocal(address, accountLocal);
-
-  return transactions;
-};
-
-/**
- * @desc parse transactions from native prices
- * @param  {Object} [transactions=null]
- * @param  {Object} [nativeCurrency='']
- * @param  {String} [address='']
- * @return {String}
- */
-export const parseTransactionsPrices = async (
-  transactions = null,
-  nativeSelected = '',
-  address = ''
-) => {
-  let _transactions = transactions;
-
-  if (_transactions && _transactions.length && nativeSelected) {
-    _transactions = await Promise.all(
-      _transactions.map(async (tx, idx) => {
-        const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
-        const assetSymbol = tx.asset.symbol;
-        if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
-          tx.native = { selected: nativeCurrencies[nativeSelected] };
-
-          const response = await debounceRequest(
-            apiGetHistoricalPrices,
-            [assetSymbol, timestamp],
-            100 * idx
-          );
-
-          if (response.data.response === 'Error' || !response.data[assetSymbol]) {
-            return tx;
-          }
-
-          await Promise.all(
-            Object.keys(nativeCurrencies).map(async nativeCurrency => {
-              const assetPriceAmount = convertAmountToBigNumber(
-                response.data[assetSymbol][nativeCurrency]
-              );
-              let prices = { selected: nativeCurrencies[nativeCurrency] };
-              prices[nativeCurrency] = {};
-              prices[nativeCurrency][assetSymbol] = {
-                price: { amount: assetPriceAmount, display: null }
-              };
-              const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
-              prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
-              const assetPrice = prices[nativeCurrency][assetSymbol].price;
-              const valuePriceAmount = convertAssetAmountToNativeValue(
-                tx.value.amount,
-                tx.asset,
-                prices
-              );
-              const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
-
-              const valuePrice = !tx.error
-                ? { amount: valuePriceAmount, display: valuePriceDisplay }
-                : { amount: '', display: '' };
-              const txFeePriceAmount = convertAssetAmountToNativeValue(
-                tx.txFee.amount,
-                tx.asset,
-                prices
-              );
-              const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
-              const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
-
-              tx.native[nativeCurrency] = {
-                price: assetPrice,
-                value: valuePrice,
-                txFee: txFeePrice
-              };
-            })
-          );
-        }
-        return tx;
-      })
-    );
-  }
-
-  const accountLocal = getLocal(address) || {};
-  accountLocal.transactions = _transactions;
-  const pending = _transactions ? _transactions.filter(tx => tx.pending) : [];
-  accountLocal.pending = pending;
-  saveLocal(address, accountLocal);
-
-  return _transactions;
 };
 
 /**
@@ -807,13 +536,13 @@ export const parseTransactionsPrices = async (
  * @param  {Object} [transactions=null]
  * @param  {Object} [nativeCurrency='']
  * @param  {String} [address='']
+ * @param  {String} [network='']
  * @return {String}
  */
 export const parseNewTransaction = async (
   txDetails = null,
   transactions = null,
-  nativeSelected = '',
-  address = ''
+  nativeSelected = ''
 ) => {
   let _transactions = [...transactions];
 
@@ -835,14 +564,15 @@ export const parseNewTransaction = async (
     amount = convertAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
   }
   const value = { amount, display: convertAmountToDisplay(amount, null, txDetails.asset) };
+  const nonce = txDetails.nonce || (await getTransactionCount(txDetails.from));
 
   let tx = {
     hash: txDetails.hash,
     timestamp: null,
-    blockNumber: null,
     from: txDetails.from,
     to: txDetails.to,
     error: false,
+    nonce: nonce,
     interaction: false,
     value: value,
     txFee: txFee,
@@ -892,11 +622,100 @@ export const parseNewTransaction = async (
 
   _transactions = [tx, ..._transactions];
 
-  const accountLocal = getLocal(address) || {};
-  accountLocal.transactions = _transactions;
-  const pending = _transactions.filter(tx => tx.pending);
-  accountLocal.pending = pending;
-  saveLocal(address, accountLocal);
+  return _transactions;
+};
 
+/**
+ * @desc parse confirmed transaction
+ * @param  {Object} [transactions=null]
+ * @param  {String} [hash='']
+ * @return {String}
+ */
+export const parseConfirmedTransaction = (transactions, hash, timestamp) => {
+  let _transactions = [];
+  transactions.forEach(tx => {
+    if (tx.hash === hash) {
+      tx.pending = false;
+      tx.timestamp = timestamp;
+    }
+    _transactions.push(tx);
+  });
+  return _transactions;
+};
+
+/**
+ * @desc parse transaction historical prices
+ * @param  {Object} [transactions=null]
+ * @return {Object}
+ */
+export const parseHistoricalPrices = async transactions => {
+  if (!transactions.length) return transactions;
+
+  const _transactions = await Promise.all(
+    transactions.map(async (tx, idx) => {
+      const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
+      let assetSymbol = tx.asset.symbol;
+      if (assetSymbol === 'WETH') {
+        assetSymbol = 'ETH';
+      }
+      if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
+        try {
+          const response = await debounceRequest(
+            apiGetHistoricalPrices,
+            [assetSymbol, timestamp],
+            100 * idx
+          );
+
+          if (response.data.response === 'Error' || !response.data[assetSymbol]) {
+            return tx;
+          }
+
+          Object.keys(nativeCurrencies).forEach(nativeCurrency => {
+            const assetPriceAmount = convertAmountToBigNumber(
+              response.data[assetSymbol][nativeCurrency]
+            );
+            let prices = { selected: nativeCurrencies[nativeCurrency] };
+            prices[nativeCurrency] = {};
+            prices[nativeCurrency][assetSymbol] = {
+              price: { amount: assetPriceAmount, display: null }
+            };
+            const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
+            prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
+            const assetPrice = prices[nativeCurrency][assetSymbol].price;
+            let asset = { ...tx.asset };
+            if (asset.symbol === 'WETH') {
+              asset.symbol = 'ETH';
+            }
+            const valuePriceAmount = convertAssetAmountToNativeValue(
+              tx.value.amount,
+              asset,
+              prices
+            );
+            const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
+            const valuePrice = !tx.error
+              ? { amount: valuePriceAmount, display: valuePriceDisplay }
+              : { amount: '', display: '' };
+            const txFeePriceAmount = convertAssetAmountToNativeValue(
+              tx.txFee.amount,
+              asset,
+              prices,
+              tx
+            );
+            const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
+            const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
+
+            tx.native[nativeCurrency] = {
+              price: assetPrice,
+              value: valuePrice,
+              txFee: txFeePrice
+            };
+          });
+        } catch (error) {
+          throw error;
+        }
+      }
+      return tx;
+    })
+  );
   return _transactions;
 };

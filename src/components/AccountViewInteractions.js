@@ -184,7 +184,7 @@ const StyledToggleIndicator = styled(ToggleIndicator)`
   left: 18px;
 `;
 
-const StyledShowAllTransactions = styled(StyledRow)`
+const StyledShowAllInteractions = styled(StyledRow)`
   grid-template-columns: auto;
   min-height: 0;
   min-width: 0;
@@ -214,10 +214,10 @@ const StyledMessage = styled.div`
   font-weight: ${fonts.weight.medium};
 `;
 
-class AccountViewTransactions extends Component {
+class AccountViewInteractions extends Component {
   state = {
     showTxDetails: null,
-    showAllTransactions: false
+    showAllInteractions: false
   };
   onShowTxDetails = hash => {
     if (this.state.showTxDetails === hash) {
@@ -226,16 +226,16 @@ class AccountViewTransactions extends Component {
       this.setState({ showTxDetails: hash });
     }
   };
-  onShowAllTransactions = () =>
-    this.setState({ showAllTransactions: !this.state.showAllTransactions });
+  onShowAllInteractions = () =>
+    this.setState({ showAllInteractions: !this.state.showAllInteractions });
 
   render = () => {
     const nativeCurrency = this.props.nativeCurrency;
-    let _transactions = [];
+    let interactions = [];
     if (this.props.transactions && this.props.transactions.length) {
-      _transactions = this.props.transactions.filter(tx => !tx.interaction);
+      interactions = this.props.transactions.filter(tx => tx.interaction);
     }
-    return !!_transactions.length ? (
+    return !!interactions.length ? (
       !this.props.fetchingTransactions ? (
         <StyledGrid>
           <StyledLabelsRow>
@@ -246,8 +246,8 @@ class AccountViewTransactions extends Component {
             <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
           </StyledLabelsRow>
 
-          {_transactions.map((tx, idx, arr) => {
-            if (!this.state.showAllTransactions && idx > 10) return null;
+          {interactions.map((tx, idx, arr) => {
+            if (!this.state.showAllInteractions && idx > 10) return null;
             return (
               <StyledTransactionWrapper
                 showTxDetails={this.state.showTxDetails === tx.hash}
@@ -370,17 +370,17 @@ class AccountViewTransactions extends Component {
               </StyledTransactionWrapper>
             );
           })}
-          {_transactions.length > 10 && (
-            <StyledShowAllTransactions onClick={this.onShowAllTransactions}>
-              <StyledToggleIndicator show={this.state.showAllTransactions} />
+          {interactions.length > 10 && (
+            <StyledShowAllInteractions onClick={this.onShowAllInteractions}>
+              <StyledToggleIndicator show={this.state.showAllInteractions} />
               <p>
                 {`${
-                  !this.state.showAllTransactions
+                  !this.state.showAllInteractions
                     ? lang.t('account.show_all')
                     : lang.t('account.show_less')
-                } ${lang.t('account.tab_transactions').toLowerCase()}`}
+                } ${lang.t('account.tab_interactions').toLowerCase()}`}
               </p>
-            </StyledShowAllTransactions>
+            </StyledShowAllInteractions>
           )}
         </StyledGrid>
       ) : (
@@ -390,13 +390,13 @@ class AccountViewTransactions extends Component {
       )
     ) : (
       <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
-        <StyledMessage>{lang.t('account.message_no_transactions')}</StyledMessage>
+        <StyledMessage>{lang.t('account.message_no_interactions')}</StyledMessage>
       </StyledCard>
     );
   };
 }
 
-AccountViewTransactions.propTypes = {
+AccountViewInteractions.propTypes = {
   transactions: PropTypes.array.isRequired,
   fetchingTransactions: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
@@ -413,4 +413,4 @@ const reduxProps = ({ account }) => ({
   nativeCurrency: account.nativeCurrency
 });
 
-export default connect(reduxProps, null)(AccountViewTransactions);
+export default connect(reduxProps, null)(AccountViewInteractions);

@@ -11,16 +11,14 @@ const StyledIcon = styled.img`
 
 class AssetIcon extends Component {
   state = {
-    imgSrc: null
+    imgSrc: erc20
   };
   updateIcon = props => {
     if (props.asset.toUpperCase() === 'ETH') {
       this.setState({ imgSrc: eth });
     } else {
       this.setState({
-        imgSrc: `https://raw.githubusercontent.com/TrustWallet/tokens/master/images/${
-          props.asset
-        }.png`
+        imgSrc: `/tokens/images/${props.asset}.png`
       });
     }
   };

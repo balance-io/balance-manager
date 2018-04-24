@@ -8,6 +8,7 @@ import { notificationShow } from '../reducers/_notification';
 import { fonts, colors, transitions, responsive } from '../styles';
 
 const StyledIcon = styled.img`
+  cursor: pointer;
   transition: ${transitions.base};
   position: absolute;
   right: -20px;
@@ -96,6 +97,16 @@ class CopyToClipboard extends Component {
     target.blur();
     this.props.notificationShow(lang.t('notification.info.address_copied_to_clipboard'));
   };
+  simulateCopyToClipboard = () => {
+    const str = this.props.text;
+    const element = document.createElement('textarea');
+    element.value = str;
+    document.body.appendChild(element);
+    element.select();
+    document.execCommand('copy');
+    document.body.removeChild(element);
+    this.props.notificationShow(lang.t('notification.info.address_copied_to_clipboard'));
+  };
   render() {
     const { notificationShow, iconOnHover, text, ...props } = this.props;
     return (
@@ -104,7 +115,7 @@ class CopyToClipboard extends Component {
           <StyledInvisible>{text}</StyledInvisible>
           <StyledInput value={text} onChange={() => {}} onClick={this.copyToCopyToClipboard} />
           <StyledText>{lang.t('message.click_to_copy_to_clipboard')}</StyledText>
-          <StyledIcon src={clipboardIcon} alt="copy" />
+          <StyledIcon src={clipboardIcon} alt="copy" onClick={this.simulateCopyToClipboard} />
         </StyledContainer>
       </StyledCopyToClipboard>
     );

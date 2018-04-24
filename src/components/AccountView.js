@@ -10,8 +10,10 @@ import Button from './Button';
 import CopyToClipboard from './CopyToClipboard';
 import AccountViewBalances from './AccountViewBalances';
 import AccountViewTransactions from './AccountViewTransactions';
+import AccountViewInteractions from './AccountViewInteractions';
 import balancesTabIcon from '../assets/balances-tab.svg';
 import transactionsTabIcon from '../assets/transactions-tab.svg';
+import interactionsTabIcon from '../assets/interactions-tab.svg';
 import LineBreak from '../components/LineBreak';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
@@ -22,6 +24,7 @@ import { colors, fonts, responsive, shadows, transitions } from '../styles';
 
 const StyledAccountView = styled.div`
   width: 100%;
+  margin-bottom: 60px;
 `;
 
 const StyledFlex = styled.div`
@@ -139,6 +142,9 @@ class AccountView extends Component {
       case '/transactions':
         this.setState({ activeTab: 'TRANSACTIONS_TAB' });
         break;
+      case '/interactions':
+        this.setState({ activeTab: 'INTERACTIONS_TAB' });
+        break;
       default:
         break;
     }
@@ -159,7 +165,7 @@ class AccountView extends Component {
       address: this.props.accountInfo.address
     });
   componentWillUnmount() {
-    this.props.accountClearState();
+    // this.props.accountClearState();
   }
   render() {
     return (
@@ -192,6 +198,8 @@ class AccountView extends Component {
               <StyledTabsWrapper>
                 <Link to={this.props.match.url}>
                   <StyledTab
+                    data-toggle="tooltip"
+                    title={lang.t('account.tab_balances_tooltip')}
                     active={this.state.activeTab === 'BALANCES_TAB'}
                     icon={balancesTabIcon}
                     left
@@ -201,11 +209,24 @@ class AccountView extends Component {
                 </Link>
                 <Link to={`${this.props.match.url}/transactions`}>
                   <StyledTab
+                    data-toggle="tooltip"
+                    title={lang.t('account.tab_transactions_tooltip')}
                     active={this.state.activeTab === 'TRANSACTIONS_TAB'}
                     icon={transactionsTabIcon}
                     left
                   >
                     {lang.t('account.tab_transactions')}
+                  </StyledTab>
+                </Link>
+                <Link to={`${this.props.match.url}/interactions`}>
+                  <StyledTab
+                    data-toggle="tooltip"
+                    title={lang.t('account.tab_interactions_tooltip')}
+                    active={this.state.activeTab === 'INTERACTIONS_TAB'}
+                    icon={interactionsTabIcon}
+                    left
+                  >
+                    {lang.t('account.tab_interactions')}
                   </StyledTab>
                 </Link>
               </StyledTabsWrapper>
@@ -216,6 +237,11 @@ class AccountView extends Component {
                 exact
                 path={`${this.props.match.url}/transactions`}
                 component={AccountViewTransactions}
+              />
+              <Route
+                exact
+                path={`${this.props.match.url}/interactions`}
+                component={AccountViewInteractions}
               />
               <Route render={() => <Redirect to={this.props.match.url} />} />
             </Switch>

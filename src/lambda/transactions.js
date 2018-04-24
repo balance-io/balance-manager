@@ -230,6 +230,24 @@ const parseAccountTransactions = async (data = null, address = '', network = '')
   return _transactions;
 };
 
+export const filterNewTransactions = (transactions, lastTxHash) => {
+  let result = transactions;
+  if (lastTxHash) {
+    let newTxs = true;
+    result = transactions.filter(tx => {
+      if (tx.hash === lastTxHash && newTxs) {
+        newTxs = false;
+        return false;
+      } else if (tx.hash !== lastTxHash && newTxs) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  }
+  return result;
+};
+
 export const apiProxyGetAccountTransactions = async (
   address = '',
   network = 'mainnet',
@@ -242,19 +260,7 @@ export const apiProxyGetAccountTransactions = async (
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
     );
     let transactions = await parseAccountTransactions(data, address, network);
-    if (lastTxHash) {
-      let newTxs = true;
-      transactions = transactions.filter(tx => {
-        if (tx.hash === lastTxHash && newTxs) {
-          newTxs = false;
-          return false;
-        } else if (tx.hash !== lastTxHash && newTxs) {
-          return true;
-        } else {
-          return false;
-        }
-      });
-    }
+    transactions = filterNewTransactions(transactions, lastTxHash);
     transactions = await parseHistoricalPrices(transactions);
     return transactions;
   } catch (error) {

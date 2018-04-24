@@ -670,7 +670,7 @@ export const parseHistoricalPrices = async transactions => {
             return tx;
           }
 
-          Object.keys(nativeCurrencies).map(nativeCurrency => {
+          Object.keys(nativeCurrencies).forEach(nativeCurrency => {
             const assetPriceAmount = convertAmountToBigNumber(
               response.data[assetSymbol][nativeCurrency]
             );

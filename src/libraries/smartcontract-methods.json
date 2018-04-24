@@ -2,5 +2,9 @@
   "token_transfer": {
     "method": "transfer(address,uint256)",
     "hash": "0xa9059cbb"
+  },
+  "token_balance": {
+    "method": "balanceOf(address)",
+    "hash": "0x70a08231"
   }
 }

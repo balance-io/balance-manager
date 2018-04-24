@@ -1,4 +1,4 @@
-import { isChecksumAddress } from './utilities';
+import { isChecksumAddress } from './web3';
 
 /**
  * @desc validate email

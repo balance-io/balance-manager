@@ -4,8 +4,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
 import AssetIcon from './AssetIcon';
-import balancesTabIcon from '../assets/balances-tab.svg';
-import { convertStringToNumber, hasHighMarketValue, hasLowMarketValue } from '../helpers/utilities';
+import ToggleIndicator from './ToggleIndicator';
+import { ellipseText } from '../helpers/utilities';
+import { convertStringToNumber, hasHighMarketValue, hasLowMarketValue } from '../helpers/bignumber';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
@@ -22,7 +23,7 @@ const StyledRow = styled.div`
   padding: 20px;
   z-index: 0;
   background-color: rgb(${colors.white});
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: 5fr repeat(4, 4fr);
   min-height: 0;
   min-width: 0;
   & p {
@@ -35,7 +36,7 @@ const StyledRow = styled.div`
     border-radius: 0 0 8px 8px;
   }
   @media screen and (${responsive.sm.max}) {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: 5fr repeat(4, 4fr);
     padding: 16px;
   }
   @media screen and (${responsive.xs.max}) {
@@ -95,6 +96,7 @@ const StyledToken = styled(StyledRow)`
 `;
 
 const StyledAsset = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -160,16 +162,6 @@ const StyledShowMoreTokens = styled(StyledToken)`
   color: rgb(${colors.grey});
   padding-left: 18px;
 
-  & div {
-    position: absolute;
-    position: absolute;
-    height: 14px;
-    width: 14px;
-    left: 0;
-    top: calc((100% - 16px) / 2);
-    mask: url(${balancesTabIcon}) center no-repeat;
-    background-color: rgb(${colors.grey});
-  }
   @media (hover: hover) {
     &:hover p {
       opacity: 0.7;
@@ -185,14 +177,18 @@ class AccountViewBalances extends Component {
     this.setState({ showMoreTokens: !this.state.showMoreTokens });
   };
   render() {
+    if (!this.props.accountInfo.assets) return null;
     const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
-    const tokensWithHighMarketValue = this.props.accountInfo.assets.filter(
+    const tokens = this.props.accountInfo.assets.filter(
+      asset => asset.symbol !== 'ETH' && typeof asset === 'object' && !!asset
+    );
+    const tokensWithHighMarketValue = tokens.filter(
       asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
     );
-    let tokensWithLowMarketValue = this.props.accountInfo.assets.filter(
+    let tokensWithLowMarketValue = tokens.filter(
       asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
     );
-    const tokensWithNoMarketValue = this.props.accountInfo.assets.filter(asset => !asset.native);
+    const tokensWithNoMarketValue = tokens.filter(asset => !asset.native);
     tokensWithLowMarketValue = [...tokensWithLowMarketValue, ...tokensWithNoMarketValue];
     const allLowMarketTokensHaveNoValue =
       tokensWithNoMarketValue.length === tokensWithLowMarketValue.length;
@@ -241,9 +237,9 @@ class AccountViewBalances extends Component {
           this.state.showMoreTokens &&
           tokensWithLowMarketValue.map(token => (
             <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
-              <StyledAsset>
+              <StyledAsset data-toggle="tooltip" title={token.name}>
                 <AssetIcon asset={token.address} />
-                <p>{token.name}</p>
+                <p>{ellipseText(token.name, 30)}</p>
               </StyledAsset>
               <p>{token.balance.display}</p>
               <p>{token.native ? token.native.price.display : '———'}</p>
@@ -258,7 +254,7 @@ class AccountViewBalances extends Component {
         <StyledLastRow>
           {!!tokensWithLowMarketValue.length ? (
             <StyledShowMoreTokens onClick={this.onShowMoreTokens}>
-              <div />
+              <ToggleIndicator show={this.state.showMoreTokens} />
               {`${this.state.showMoreTokens ? lang.t('account.hide') : lang.t('account.show')} ${
                 tokensWithLowMarketValue.length
               } ${

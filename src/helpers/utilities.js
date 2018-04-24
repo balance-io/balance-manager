@@ -1,8 +1,4 @@
-import BigNumber from 'bignumber.js';
-import uuidv4 from 'uuid/v4';
-import { web3Instance } from './web3';
-import nativeCurrencies from '../libraries/native-currencies.json';
-import ethUnits from '../libraries/ethereum-units.json';
+import networkList from '../libraries/ethereum-networks.json';
 
 /**
  * @desc save to local storage
@@ -28,12 +24,6 @@ export const getLocal = (key = '') =>
 export const removeLocal = (key = '') => localStorage.removeItem(key);
 
 /**
- * @desc generate random uuid
- * @return {String}
- */
-export const generateUUID = () => uuidv4();
-
-/**
  * @desc debounce api request
  * @param  {Function}  request
  * @param  {Array}     params
@@ -52,56 +42,66 @@ export const debounceRequest = (request, params, timeout) =>
   );
 
 /**
- * @desc create authenticated user session
- * @param  {String}   [token='']
- * @param  {String}   [email='']
- * @param  {Boolean}  [verified=false]
- * @param  {Boolean}  [twoFactor=false]
- * @param  {Date}     [expires=Date.now() + 180000]
- * @param  {Array}    [accounts=[]]
- * @param  {Array}    [asset=[]]
- * @param
- * @return {Session}
+ * @desc filter object by a set of allowed keys
+ * @param  {Function}  request
+ * @param  {Array}     params
+ * @param  {Number}    timeout
+ * @return {Promise}
  */
-export const setSession = ({
-  token = '',
-  email = '',
-  verified = false,
-  twoFactor = false,
-  expires = Date.now() + 1800000, // 30mins
-  accounts = [],
-  asset = []
-}) => {
-  const session = {
-    token,
-    email,
-    verified,
-    twoFactor,
-    expires,
-    accounts,
-    asset
-  };
-  setTimeout(() => window.browserHistory.push('/signout'), 1800000); // 30mins
-  localStorage.setItem('USER_SESSION', JSON.stringify(session));
+export const filterObjectByKeys = (object, allowedKeys) => {
+  const result = {};
+  const objectKeys = Object.keys(object);
+  objectKeys.forEach(key => {
+    if (allowedKeys.includes(key)) {
+      result[key] = object[key];
+    }
+  });
+  return result;
 };
 
 /**
- * @desc get session as an object
- * @return {Object}
+ * @desc update local balances
+ * @param  {Object}   [account]
+ * @param  {String}   [network]
+ * @return {Void}
  */
-export const getSession = () => {
-  const session = localStorage.getItem('USER_SESSION');
-  return JSON.parse(session);
+export const updateLocalBalances = (account, network) => {
+  const networks = Object.keys(networkList);
+  let accountLocal = getLocal(account.address) || {};
+  accountLocal = filterObjectByKeys(accountLocal, networks);
+  if (!accountLocal[network]) {
+    accountLocal[network] = {};
+  }
+  accountLocal[network].balances = { assets: account.assets, total: account.total || '———' };
+  saveLocal(account.address, accountLocal);
 };
 
 /**
- * @desc update with new session data
- * @param  {Session}  [updatedSession]
- * @return {Session}
+ * @desc update local transactions
+ * @param  {String}   [address]
+ * @param  {Array}    [transactions]
+ * @param  {String}   [network]
+ * @return {Void}
  */
-export const updateSession = updatedSession => {
-  const newSession = { ...getSession(), ...updatedSession };
-  return localStorage.setItem('USER_SESSION', JSON.stringify(newSession));
+export const updateLocalTransactions = (address, transactions, network) => {
+  const networks = Object.keys(networkList);
+  let accountLocal = getLocal(address) || {};
+  accountLocal = filterObjectByKeys(accountLocal, networks);
+  const pending = [];
+  const _transactions = [];
+  transactions.forEach(tx => {
+    if (tx.pending) {
+      pending.push(tx);
+    } else {
+      _transactions.push(tx);
+    }
+  });
+  if (!accountLocal[network]) {
+    accountLocal[network] = {};
+  }
+  accountLocal[network].transactions = _transactions;
+  accountLocal[network].pending = pending;
+  saveLocal(address, accountLocal);
 };
 
 /**
@@ -124,43 +124,6 @@ export const flattenTokens = accounts => {
 };
 
 /**
- * @desc update accounts
- * @param  {Object}  [account=null]
- * @param  {String}  [address='']
- * @return {Session}
- */
-export const updateAccounts = (account = null, address = '') => {
-  const accountAddress = account ? account.address : address;
-  const prevAccounts = getSession().accounts;
-  const accounts = [];
-  let isNew = true;
-  for (let i = 0; i < prevAccounts.length; i++) {
-    if (prevAccounts[i].address === accountAddress) {
-      if (account && !address) {
-        isNew = false;
-        accounts.push(account);
-      }
-    } else {
-      accounts.push(prevAccounts[i]);
-    }
-  }
-  if (account && isNew) {
-    accounts.push(account);
-  }
-  const asset = flattenTokens(accounts);
-  updateSession({ accounts, asset });
-  return { accounts, asset };
-};
-
-/**
- * @desc delete session
- * @return {Void}
- */
-export const deleteSession = () => {
-  localStorage.removeItem('USER_SESSION');
-};
-
-/**
  * @desc capitalize string
  * @param  {String} [string]
  * @return {String}
@@ -170,267 +133,6 @@ export const capitalize = string =>
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
-
-/**
- * @desc convert from number to string
- * @param  {Number}  value
- * @return {String}
- */
-export const convertNumberToString = value => BigNumber(`${value}`).toString();
-
-/**
- * @desc convert from string to number
- * @param  {String}  value
- * @return {Number}
- */
-export const convertStringToNumber = value => BigNumber(`${value}`).toNumber();
-
-/**
- * @desc convert from amount value to BigNumber format
- * @param  {String|Number}  value
- * @return {BigNumber}
- */
-export const convertAmountToBigNumber = value =>
-  BigNumber(`${value}`)
-    .times(ethUnits.ether)
-    .toString();
-
-/**
- * @desc convert to amount value from BigNumber format
- * @param  {BigNumber}  value
- * @return {String}
- */
-export const convertAmountFromBigNumber = value =>
-  BigNumber(`${value}`)
-    .dividedBy(ethUnits.ether)
-    .toString();
-
-/**
- * @desc handle signficant decimals in display format
- * @param  {String}   value
- * @param  {Number}   decimals
- * @param  {Number}   buffer
- * @return {String}
- */
-export const handleSignificantDecimals = (value, decimals, buffer) => {
-  if (!BigNumber(`${decimals}`).isInteger() || (buffer && !BigNumber(`${buffer}`).isInteger()))
-    return null;
-  buffer = buffer ? BigNumber(`${buffer}`).toNumber() : 3;
-  decimals = BigNumber(`${decimals}`).toNumber();
-  if (
-    BigNumber(`${value}`)
-      .abs()
-      .comparedTo(1) === -1
-  ) {
-    decimals =
-      value
-        .slice(2)
-        .slice('')
-        .search(/[^0]/g) + buffer;
-    decimals = decimals < 8 ? decimals : 8;
-  } else {
-    decimals = decimals < buffer ? decimals : buffer;
-  }
-  let result = BigNumber(`${value}`).toFixed(decimals);
-  result = BigNumber(`${result}`).toString();
-  return BigNumber(`${result}`).dp() <= 2
-    ? BigNumber(`${result}`).toFormat(2)
-    : BigNumber(`${result}`).toFormat();
-};
-
-/**
- * @desc convert from amount value to display formatted string
- * @param  {BigNumber}  value
- * @param  {Object}     nativePrices
- * @param  {Object}     asset
- * @param  {Number}     buffer
- * @return {String}
- */
-export const convertAmountToDisplay = (value, nativePrices, asset, buffer) => {
-  value = convertAmountFromBigNumber(value);
-  if (!nativePrices && !asset) {
-    const decimals = 2;
-    const display = handleSignificantDecimals(value, decimals, buffer);
-    return `${display}%`;
-  } else if (!nativePrices && asset) {
-    const decimals = asset.decimals;
-    const display = handleSignificantDecimals(value, decimals, buffer);
-    return `${display} ${asset.symbol}`;
-  } else if (nativePrices) {
-    const decimals = nativePrices.selected.decimals;
-    const display = handleSignificantDecimals(value, decimals, buffer);
-    if (nativePrices.selected.alignment === 'left') {
-      return `${nativePrices.selected.symbol}${display}`;
-    }
-    return `${display} ${nativePrices.selected.currency}`;
-  }
-  return value;
-};
-
-/**
- * @desc convert from amount value to display formatted string for specific currency
- * @param  {BigNumber}  value
- * @param  {Object}     nativePrices
- * @param  {Object}     asset
- * @return {String}
- */
-export const convertAmountToDisplaySpecific = (value, nativePrices, selected, buffer) => {
-  if (!nativePrices) return null;
-  value = convertAmountFromBigNumber(value);
-  const nativeSelected = nativeCurrencies[selected];
-  const decimals = nativeSelected.decimals;
-  const display = handleSignificantDecimals(value, decimals, buffer);
-  if (nativeSelected.alignment === 'left') {
-    return `${nativeSelected.symbol}${display}`;
-  }
-  return `${display} ${nativeSelected.currency}`;
-};
-
-/**
- * @desc convert from asset amount value to BigNumber format
- * @param  {String|Number}  value
- * @param  {Number}     decimals
- * @return {BigNumber}
- */
-export const convertAssetAmountToBigNumber = (value, decimals) => {
-  if (!BigNumber(`${decimals}`).isInteger()) return null;
-  decimals = BigNumber(`${decimals}`).toNumber();
-  value = BigNumber(`${value}`)
-    .dividedBy(BigNumber(10).pow(decimals))
-    .toString();
-  value = convertAmountToBigNumber(value);
-  return value;
-};
-
-/**
- * @desc convert to asset amount value from BigNumber format
- * @param  {BigNumber}  value
- * @param  {Number}     decimals
- * @return {String}
- */
-export const convertAssetAmountFromBigNumber = (value, decimals) => {
-  if (!BigNumber(`${decimals}`).isInteger()) return null;
-  decimals = BigNumber(`${decimals}`).toNumber();
-  value = convertAmountFromBigNumber(value);
-  value = BigNumber(`${value}`)
-    .times(BigNumber(10).pow(decimals))
-    .toString();
-  return value;
-};
-
-/**
- * @desc convert from asset amount units to native price value units
- * @param  {String}   value
- * @param  {Object}   asset
- * @param  {Object}   nativePrices
- * @return {String}
- */
-export const convertAssetAmountToNativeValue = (value, asset, nativePrices) => {
-  const nativeSelected = nativePrices.selected.currency;
-  const assetPriceUnit = convertAmountFromBigNumber(
-    nativePrices[nativeSelected][asset.symbol].price.amount
-  );
-  const assetNativePrice = BigNumber(value)
-    .times(BigNumber(assetPriceUnit))
-    .toString();
-  return assetNativePrice;
-};
-
-/**
- * @desc convert to asset amount units from native price value units
- * @param  {String}   value
- * @param  {Object}   asset
- * @param  {Object}   nativePrices
- * @return {String}
- */
-export const convertAssetAmountFromNativeValue = (value, asset, nativePrices) => {
-  const nativeSelected = nativePrices.selected.currency;
-  const assetPriceUnit = convertAmountFromBigNumber(
-    nativePrices[nativeSelected][asset.symbol].price.amount
-  );
-  const assetAmountUnit = BigNumber(value)
-    .dividedBy(BigNumber(assetPriceUnit))
-    .toString();
-  return assetAmountUnit;
-};
-
-/**
- * @desc convert from asset BigNumber amount to native price BigNumber amount
- * @param  {BigNumber}   value
- * @param  {Object}   asset
- * @param  {Object}   nativePrices
- * @return {BigNumber}
- */
-export const convertAssetAmountToNativeAmount = (value, asset, nativePrices) => {
-  const nativeSelected = nativePrices.selected.currency;
-  const _value = convertAmountFromBigNumber(`${value}`);
-  const assetPriceUnit = convertAmountFromBigNumber(
-    nativePrices[nativeSelected][asset.symbol].price.amount
-  );
-  const assetNativePrice = BigNumber(_value)
-    .times(BigNumber(assetPriceUnit))
-    .toString();
-  return convertAmountToBigNumber(assetNativePrice);
-};
-
-/**
- * @desc convert to asset BigNumber amount from native price BigNumber amount
- * @param  {BigNumber}   value
- * @param  {Object}   asset
- * @param  {Object}   nativePrices
- * @return {BigNumber}
- */
-export const convertAssetAmountFromNativeAmount = (value, asset, nativePrices) => {
-  const nativeSelected = nativePrices.selected.currency;
-  const _value = convertAmountFromBigNumber(`${value}`);
-  const assetPriceUnit = convertAmountFromBigNumber(
-    nativePrices[nativeSelected][asset.symbol].price.amount
-  );
-  const assetAmountUnit = BigNumber(_value)
-    .dividedBy(BigNumber(assetPriceUnit))
-    .toString();
-  return convertAmountToBigNumber(assetAmountUnit);
-};
-
-/**
- * @desc format value string to fixed decimals
- * @param  {String}   value
- * @param  {Number}   decimals
- * @return {String}
- */
-export const formatFixedDecimals = (value, decimals) =>
-  BigNumber(BigNumber(`${value}`).toFixed(BigNumber(`${decimals}`).toNumber()))
-    .toFormat()
-    .replace(',', '');
-
-/**
- * @desc count value's number of decimals places
- * @param  {String}   value
- * @return {String}
- */
-export const countDecimalPlaces = value => BigNumber(`${value}`).dp();
-
-/**
- * @desc checks if asset has a high market value
- * @param  {Object}   asset
- * @return {Boolean}
- */
-export const hasHighMarketValue = asset =>
-  asset.native &&
-  BigNumber(convertAmountFromBigNumber(asset.native.balance.amount)).comparedTo(
-    BigNumber(`${asset.native.selected.assetLimit}`)
-  ) === 1;
-
-/**
- * @desc checks if asset has a low market value
- * @param  {Object}   asset
- * @return {Boolean}
- */
-export const hasLowMarketValue = asset =>
-  asset.native &&
-  BigNumber(convertAmountFromBigNumber(asset.native.balance.amount)).comparedTo(
-    BigNumber(`${asset.native.selected.assetLimit}`)
-  ) === -1;
 
 /**
  * @desc pad string to specific width and padding
@@ -466,35 +168,6 @@ export const getDataString = (func, arrVals) => {
 export const getNakedAddress = address => address.toLowerCase().replace('0x', '');
 
 /**
- * @desc convert to checksum address
- * @param  {String} address
- * @return {String}
- */
-export const toChecksumAddress = address => {
-  if (typeof address === 'undefined') return '';
-
-  address = address.toLowerCase().replace('0x', '');
-  const addressHash = web3Instance.utils.sha3(address).replace('0x', '');
-  let checksumAddress = '0x';
-
-  for (let i = 0; i < address.length; i++) {
-    if (parseInt(addressHash[i], 16) > 7) {
-      checksumAddress += address[i].toUpperCase();
-    } else {
-      checksumAddress += address[i];
-    }
-  }
-  return checksumAddress;
-};
-
-/**
- * @desc check if address is checkum
- * @param  {String} address
- * @return {String}
- */
-export const isChecksumAddress = address => address === toChecksumAddress(address);
-
-/**
  * @desc sanitize hexadecimal string
  * @param  {String} address
  * @return {String}
@@ -505,40 +178,6 @@ export const sanitizeHex = hex => {
   hex = hex.length % 2 !== 0 ? '0' + hex : hex;
   return '0x' + hex;
 };
-
-/**
- * @desc convert from wei to ether
- * @param  {Number} wei
- * @return {BigNumber}
- */
-export const fromWei = wei =>
-  BigNumber(wei)
-    .dividedBy(ethUnits.ether)
-    .toString();
-
-/**
- * @desc convert from ether to wei
- * @param  {Number} ether
- * @return {BigNumber}
- */
-export const toWei = ether =>
-  BigNumber(ether)
-    .times(ethUnits.ether)
-    .toString();
-
-/**
- * @desc hash string with sha3
- * @param  {String} string
- * @return {String}
- */
-export const sha3 = string => web3Instance.utils.sha3(string);
-
-/**
- * @desc convert hex to number string
- * @param  {String} string
- * @return {String}
- */
-export const hexToNumberString = string => web3Instance.utils.hexToNumberString(string);
 
 /**
  * @desc returns url parameter value
@@ -567,4 +206,31 @@ export const bootIntercom = () => {
   const setup = () => window.Intercom('boot', { app_id: appID });
   if (typeof window.Intercom !== 'undefined') setup();
   else setTimeout(setup, 5000);
+};
+
+/**
+ * @desc ellipse text to max maxLength
+ * @param  {String}  [text = '']
+ * @param  {Number}  [maxLength = 9999]
+ * @return {Intercom}
+ */
+export const ellipseText = (text = '', maxLength = 9999) => {
+  if (text.length <= maxLength) return text;
+  const _maxLength = maxLength - 3;
+  let ellipse = false;
+  let currentLength = 0;
+  const result =
+    text
+      .split(' ')
+      .filter(word => {
+        currentLength += word.length;
+        if (ellipse || currentLength >= _maxLength) {
+          ellipse = true;
+          return false;
+        } else {
+          return true;
+        }
+      })
+      .join(' ') + '...';
+  return result;
 };

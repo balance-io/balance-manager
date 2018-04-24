@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { parseEthplorerAddressInfo, parseEtherscanAccountTransactions } from './parsers';
-import { testnetGetAddressInfo } from './testnet';
 import networkList from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
@@ -25,33 +23,9 @@ export const apiGetPrices = (assets = []) => {
  */
 export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now()) => {
   const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(/[[\]"]/gi, '');
-  return axios.get(
-    `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`
-  );
+  const url = `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`;
+  return axios.get(url);
 };
-
-/**
- * @desc get ethplorer address info
- * @param  {String}   [address = '']
- * @param  {String}   [network = 'mainnet']
- * @return {Promise}
- */
-export const apiGetEthplorerAddressInfo = (address = '', network = 'mainnet') => {
-  if (network !== 'mainnet') {
-    return testnetGetAddressInfo(address, network).then(data => parseEthplorerAddressInfo(data));
-  }
-  return axios
-    .get(`https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`)
-    .then(({ data }) => parseEthplorerAddressInfo(data));
-};
-
-/**
- * @desc get ethplorer token info
- * @param  {String}   [address = '']
- * @return {Promise}
- */
-export const apiGetEthplorerTokenInfo = (address = '') =>
-  axios.get(`https://api.ethplorer.io/getTokenInfo/${address}?apiKey=freekey`);
 
 /**
  * @desc get ethereum gas prices
@@ -69,6 +43,7 @@ export const apiGetMetamaskNetwork = () =>
     if (typeof window.web3 !== 'undefined') {
       window.web3.version.getNetwork((err, networkID) => {
         if (err) {
+          console.error(err);
           reject(err);
         }
         let networkIDList = {};
@@ -81,25 +56,58 @@ export const apiGetMetamaskNetwork = () =>
   });
 
 /**
- * @desc get ethplorer address info
+ * @desc get account balances
  * @param  {String}   [address = '']
  * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
-export const apiGetEtherscanAccountTransactions = (address = '', network = 'mainnet') => {
-  const subdomain = network === 'mainnet' ? `api` : `api-${network}`;
-  return new Promise((resolve, reject) => {
-    axios
-      .get(
-        `https://${subdomain}.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=8KDJ1H41UEGEA6CF4P8NEPUANQ3SE8HZGE`
-      )
-      .then(({ data }) =>
-        parseEtherscanAccountTransactions(data, address)
-          .then(transactions => resolve(transactions))
-          .catch(err => reject(err))
-      )
-      .catch(err => reject(err));
-  });
+export const apiGetAccountBalances = async (address = '', network = 'mainnet') => {
+  try {
+    const { data } = await axios.get(
+      `/.netlify/functions/balance?address=${address}&network=${network}`
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @desc get account transactions
+ * @param  {String}   [address = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetAccountTransactions = async (
+  address = '',
+  network = 'mainnet',
+  lastTxHash = ''
+) => {
+  try {
+    const { data } = await axios.get(
+      `/.netlify/functions/transactions?address=${address}&network=${network}&lastTxHash=${lastTxHash}`
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @desc get transaction status
+ * @param  {String}   [hash = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') => {
+  try {
+    const { data } = await axios.get(
+      `/.netlify/functions/transaction-status?hash=${hash}&network=${network}`
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 /**
@@ -135,9 +143,9 @@ export const apiWalletConnectGetAddress = (sessionToken = '') =>
  * @return {Promise}
  */
 export const apiWalletConnectInitiateTransaction = (
-  deviceUuid: '',
-  transactionDetails: '',
-  notificationDetails: {}
+  deviceUuid = '',
+  transactionDetails = '',
+  notificationDetails = {}
 ) =>
   walletConnect.post('/add-transaction-details', {
     deviceUuid,
@@ -150,10 +158,7 @@ export const apiWalletConnectInitiateTransaction = (
  * @param  {String}   [deviceUuid = '', transactionUuid = '']
  * @return {Promise}
  */
-export const apiWalletConnectGetTransactionStatus = (
-  deviceUuid: '',
-  transactionUuid: ''
-) =>
+export const apiWalletConnectGetTransactionStatus = (deviceUuid = '', transactionUuid = '') =>
   walletConnect.post('/get-transaction-status', {
     deviceUuid,
     transactionUuid

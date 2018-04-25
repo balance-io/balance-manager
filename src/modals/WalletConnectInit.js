@@ -48,8 +48,7 @@ class WalletConnectInit extends Component {
         {this.props.sessionId && (
           <StyledQRCodeDisplay
             data={`{"domain":"https://walletconnect.balance.io","sessionId":"${
-              this.props.sessionId
-            }","publicKey":"${this.props.keypair.publicKey}"}`}
+              this.props.sessionId }","sessionKey":"${this.props.sessionKey.key}"},"iv":"${this.props.sessionKey.iv}"`}
           />
         )}
         <StyledCenter>
@@ -71,7 +70,7 @@ WalletConnectInit.propTypes = {
 
 const reduxProps = ({ modal, walletconnect }) => ({
   sessionId: walletconnect.sessionId,
-  keypair: walletconnect.keypair
+  sessionKey: walletconnect.sessionKey
 });
 
 export default connect(reduxProps, {

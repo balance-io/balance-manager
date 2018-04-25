@@ -1,10 +1,9 @@
 import {
-  apiWalletConnectNewSession,
   apiWalletConnectGetSession,
   apiWalletConnectNewTransaction,
   apiWalletConnectGetTransactionStatus
 } from '../helpers/api';
-import { generateKeyPair, encryptMessage, decryptMessage } from '../helpers/rsa';
+import { encryptMessage, decryptMessage } from '../helpers/aes';
 import { saveLocal } from '../helpers/utilities';
 import { parseError } from '../helpers/parsers';
 import { notificationShow } from './_notification';
@@ -40,16 +39,18 @@ const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
 // -- Actions --------------------------------------------------------------- //
 
 let getSessionInterval = null;
+let getTransactionStatusInterval = null;
 
 export const walletConnectModalInit = () => async (dispatch, getState) => {
-  const keypair = await generateKeyPair();
-  dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST, payload: keypair });
-  apiWalletConnectNewSession()
-    .then(({ data }) => {
-      const sessionId = data ? data.sessionId : '';
+  dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST });
+  walletConnectWebConnector.createSession()
+    .then(({ session }) => {
+      const sessionId = session ? session.sessionId : '';
+      const sessionKey = session ? session.sessionKey : '';
+      console.log(`session key: ${sessionKey}`);
       dispatch({
         type: WALLET_CONNECT_NEW_SESSION_SUCCESS,
-        payload: sessionId
+        payload: { sessionId, sessionKey }
       });
       dispatch(walletConnectGetSession());
     })
@@ -63,18 +64,17 @@ export const walletConnectModalInit = () => async (dispatch, getState) => {
 
 export const walletConnectGetSession = () => (dispatch, getState) => {
   const sessionId = getState().walletconnect.sessionId;
-  const keypair = getState().walletconnect.keypair;
+  const sessionKey = getState().walletconnect.sessionKey;
   dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
   apiWalletConnectGetSession(sessionId)
     .then(({ data }) => {
       const encryptedDeviceDetails = data ? JSON.parse(data.data) : '';
       if (encryptedDeviceDetails) {
-        const deviceDetails = decryptMessage(encryptedDeviceDetails, keypair.privateKey);
-        const clientPublicKey = deviceDetails.publicKey;
+        const deviceDetails = decryptMessage(encryptedDeviceDetails, sessionKey);
         const addresses = deviceDetails.addresses;
         dispatch({
           type: WALLET_CONNECT_GET_SESSION_SUCCESS,
-          payload: { addresses, clientPublicKey }
+          payload: addresses
         });
         // Q: do I need to also saveLocal the device UUID?
         saveLocal('walletconnect', addresses);
@@ -98,9 +98,9 @@ export const walletConnectNewTransaction = (transactionDetails, dappName) => (
   dispatch,
   getState
 ) => {
+  const sessionKey = getState().walletconnect.sessionKey;
   const sessionId = getState().walletconnect.sessionId;
-  const clientPublicKey = getState().walletconnect.clientPublicKey;
-  const encryptedTransactionDetails = encryptMessage(transactionDetails, clientPublicKey);
+  const encryptedTransactionDetails = encryptMessage(transactionDetails, sessionKey);
   dispatch({ type: WALLET_CONNECT_NEW_TRANSACTION_REQUEST });
   apiWalletConnectNewTransaction(sessionId, encryptedTransactionDetails, dappName)
     .then(({ data }) => {
@@ -119,12 +119,13 @@ export const walletConnectNewTransaction = (transactionDetails, dappName) => (
 
 export const walletConnectGetTransactionStatus = transactionId => (dispatch, getState) => {
   const sessionId = getState().walletconnect.sessionId;
+  const sessionKey = getState().walletconnect.sessionKey;
   dispatch({ type: WALLET_CONNECT_GET_TRANSACTION_STATUS_REQUEST });
   apiWalletConnectGetTransactionStatus(sessionId, transactionId)
     .then(({ data }) => {
       const encryptedTransactionStatus = data ? data.data : '';
       if (encryptedTransactionStatus) {
-        const transactionStatus = decryptMessage(encryptedTransactionStatus);
+        const transactionStatus = decryptMessage(encryptedTransactionStatus, sessionKey);
         const transactionSuccess = transactionStatus.success;
         if (transactionSuccess) {
           const transactionHash = transactionStatus.transactionHash;
@@ -139,19 +140,20 @@ export const walletConnectGetTransactionStatus = transactionId => (dispatch, get
         }
         //Q: any specific check required?
       } else {
-        setTimeout(() => dispatch(walletConnectGetTransactionStatus(transactionId)), 500);
+        getTransactionStatusInterval = setTimeout(() => dispatch(walletConnectGetTransactionStatus(transactionId)), 500);
       }
     })
     .catch(error => {
       const message = parseError(error);
       dispatch(notificationShow(message), true);
       dispatch({ type: WALLET_CONNECT_GET_TRANSACTION_STATUS_FAILURE });
-      setTimeout(() => dispatch(walletConnectGetTransactionStatus(transactionId)), 500);
+      getTransactionStatusInterval = setTimeout(() => dispatch(walletConnectGetTransactionStatus(transactionId)), 500);
     });
 };
 
 export const walletConnectClearFields = () => (dispatch) => {
   clearTimeout(getSessionInterval);
+  clearTimeout(getTransactionStatusInterval);
   dispatch({ type: WALLET_CONNECT_CLEAR_FIELDS });
 }
 
@@ -161,8 +163,7 @@ const INITIAL_STATE = {
   sessionId: '',
   transactionId: '',
   addresses: [],
-  keypair: {},
-  clientPublicKey: ''
+  sessionKey: {},
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -170,14 +171,14 @@ export default (state = INITIAL_STATE, action) => {
     case WALLET_CONNECT_NEW_SESSION_REQUEST:
       return {
         ...state,
-        fetching: true,
-        keypair: action.payload
+        fetching: true
       };
     case WALLET_CONNECT_NEW_SESSION_SUCCESS:
       return {
         ...state,
         fetching: false,
-        sessionId: action.payload
+        sessionId: action.payload.sessionId,
+        sessionKey: action.payload.sessionKey
       };
     case WALLET_CONNECT_NEW_SESSION_FAILURE:
       return {
@@ -190,8 +191,7 @@ export default (state = INITIAL_STATE, action) => {
     case WALLET_CONNECT_GET_SESSION_SUCCESS:
       return {
         ...state,
-        addresses: action.payload.addresses,
-        clientPublicKey: action.payload.clientPublicKey,
+        addresses: action.payload,
         fetching: false
       };
     case WALLET_CONNECT_GET_SESSION_FAILURE:
@@ -200,7 +200,6 @@ export default (state = INITIAL_STATE, action) => {
         fetching: false,
         addresses: [],
         sessionId: '',
-        clientPublicKey: ''
       };
     case WALLET_CONNECT_NEW_TRANSACTION_REQUEST:
       return { ...state, fetching: true };

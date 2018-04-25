@@ -100,6 +100,9 @@ export const apiGetAccountTransactions = async (address = '', network = 'mainnet
   }
 };
 
+
+const walletConnectWebConnector = new WebConnector('https://walletconnect.balance.io');
+
 /**
  * Configuration for WalletConnect api instance
  * @type axios instance

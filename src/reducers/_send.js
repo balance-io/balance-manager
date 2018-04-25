@@ -8,16 +8,11 @@ import {
   convertAssetAmountToNativeValue,
   countDecimalPlaces,
   formatFixedDecimals
-} from '../helpers/utilities';
+} from '../helpers/bignumber';
 import { parseError, parseGasPrices, parseGasPricesTxFee } from '../helpers/parsers';
-import {
-  metamaskSendTransaction,
-  metamaskTransferToken,
-  estimateGasLimit,
-  fetchTx
-} from '../helpers/web3';
+import { metamaskSendTransaction, metamaskTransferToken, estimateGasLimit } from '../helpers/web3';
 import { notificationShow } from './_notification';
-import { accountUpdateTransactions, accountSetupWebSocket } from './_account';
+import { accountUpdateTransactions } from './_account';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -135,8 +130,6 @@ export const sendEtherMetamask = ({
     gasLimit: gasLimit
   })
     .then(txHash => {
-      fetchTx(txHash).then(console.log);
-      dispatch(accountSetupWebSocket(address));
       const txDetails = {
         hash: txHash,
         from: address,
@@ -179,6 +172,17 @@ export const sendTokenMetamask = ({
     gasLimit: gasLimit
   })
     .then(txHash => {
+      const txDetails = {
+        hash: txHash,
+        from: address,
+        to: recipient,
+        nonce: null,
+        value: amount,
+        gasPrice: gasPrice.value.amount,
+        gasLimit: gasLimit,
+        asset: selectedAsset
+      };
+      dispatch(accountUpdateTransactions(txDetails));
       dispatch({
         type: SEND_TOKEN_METAMASK_SUCCESS,
         payload: txHash
@@ -209,7 +213,7 @@ export const sendUpdateRecipient = recipient => dispatch => {
   }
 };
 
-export const sendUpdateAssetAmount = (assetAmount, selected, prices) => (dispatch, getState) => {
+export const sendUpdateAssetAmount = (assetAmount, selected) => (dispatch, getState) => {
   const { prices, nativeCurrency } = getState().account;
   const _assetAmount = assetAmount.replace(/[^0-9.]/g, '');
   let _nativeAmount = '';
@@ -226,7 +230,7 @@ export const sendUpdateAssetAmount = (assetAmount, selected, prices) => (dispatc
   });
 };
 
-export const sendUpdateNativeAmount = (nativeAmount, selected, prices) => (dispatch, getState) => {
+export const sendUpdateNativeAmount = (nativeAmount, selected) => (dispatch, getState) => {
   const { prices, nativeCurrency } = getState().account;
   const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
   let _assetAmount = '';

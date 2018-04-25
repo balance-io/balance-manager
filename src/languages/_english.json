@@ -3,6 +3,10 @@
     "account": {
       "tab_balances": "Balances",
       "tab_transactions": "Transactions",
+      "tab_interactions": "Interactions",
+      "tab_balances_tooltip": "Ethereum and Token Balances",
+      "tab_transactions_tooltip": "Transactions and Token Tranfers",
+      "tab_interactions_tooltip": "Smart Contract Interactions",
       "label_asset": "Asset",
       "label_quantity": "Quantity",
       "label_price": "Price",
@@ -25,8 +29,12 @@
       "tx_received": "Received",
       "tx_failed": "Failed",
       "tx_pending": "Pending",
-      "show_more": "Show more",
-      "unknown_token": "Unknown Token"
+      "show_all": "Show all",
+      "show_less": "Show less",
+      "unknown_token": "Unknown Token",
+      "message_failed_request": "Failed request, please refresh",
+      "message_no_transactions": "No transactions found for this account",
+      "message_no_interactions": "No interactions found for this account"
     },
     "button": {
       "connect_walletconnect": "Use WalletConnect",

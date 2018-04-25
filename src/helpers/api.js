@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { parseAccountBalances, parseAccountTransactions } from './parsers';
-import { updateLocalBalances, updateLocalTransactions } from './utilities';
+import { parseHistoricalPrices } from './parsers';
 import networkList from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
 
@@ -25,9 +24,8 @@ export const apiGetPrices = (assets = []) => {
  */
 export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now()) => {
   const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(/[[\]"]/gi, '');
-  return axios.get(
-    `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`
-  );
+  const url = `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`;
+  return axios.get(url);
 };
 
 /**
@@ -46,6 +44,7 @@ export const apiGetMetamaskNetwork = () =>
     if (typeof window.web3 !== 'undefined') {
       window.web3.version.getNetwork((err, networkID) => {
         if (err) {
+          console.error(err);
           reject(err);
         }
         let networkIDList = {};
@@ -66,14 +65,9 @@ export const apiGetMetamaskNetwork = () =>
 export const apiGetAccountBalances = async (address = '', network = 'mainnet') => {
   try {
     const { data } = await axios.get(
-      `https://${
-        network === 'mainnet' ? `api` : network
-      }.trustwalletapp.com/tokens?address=${address}`
+      `/.netlify/functions/balance?address=${address}&network=${network}`
     );
-    const account = await parseAccountBalances(data, address, network);
-    updateLocalBalances(account, network);
-
-    return account;
+    return data;
   } catch (error) {
     throw error;
   }
@@ -85,16 +79,34 @@ export const apiGetAccountBalances = async (address = '', network = 'mainnet') =
  * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
-export const apiGetAccountTransactions = async (address = '', network = 'mainnet') => {
+export const apiGetAccountTransactions = async (
+  address = '',
+  network = 'mainnet',
+  lastTxHash = ''
+) => {
+  try {
+    let { data } = await axios.get(
+      `/.netlify/functions/transactions?address=${address}&network=${network}&lastTxHash=${lastTxHash}`
+    );
+    data = await parseHistoricalPrices(data);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @desc get transaction status
+ * @param  {String}   [hash = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') => {
   try {
     const { data } = await axios.get(
-      `https://${
-        network === 'mainnet' ? `api` : network
-      }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
+      `/.netlify/functions/transaction-status?hash=${hash}&network=${network}`
     );
-    const transactions = await parseAccountTransactions(data, address, network);
-    updateLocalTransactions(address, transactions, network);
-    return transactions;
+    return data;
   } catch (error) {
     throw error;
   }

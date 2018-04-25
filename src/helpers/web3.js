@@ -3,15 +3,13 @@ import Tx from 'ethereumjs-tx';
 import BigNumber from 'bignumber.js';
 import ethUnits from '../libraries/ethereum-units.json';
 import { isValidAddress } from './validators';
+import { getDataString, getNakedAddress } from './utilities';
 import {
-  getDataString,
-  getNakedAddress,
-  toWei,
-  fromWei,
-  hexToNumberString,
   convertAmountToBigNumber,
-  convertAssetAmountFromBigNumber
-} from './utilities';
+  convertAssetAmountFromBigNumber,
+  convertHexToString
+} from './bignumber';
+import smartContractMethods from '../libraries/smartcontract-methods.json';
 
 /**
  * @desc web3 http instance
@@ -36,39 +34,54 @@ export const web3SetHttpProvider = provider => {
 };
 
 /**
- * @desc web3 websocket instance
+ * @desc convert to checksum address
+ * @param  {String} address
+ * @return {String}
  */
-export const web3WebSocket = new Web3(
-  new Web3.providers.WebsocketProvider(`wss://mainnet.infura.io/_ws`)
-);
+export const toChecksumAddress = address => {
+  if (typeof address === 'undefined') return '';
 
-/**
- * @desc set a different web3 provider
- * @param {String}
- */
-export const web3SetWebSocketProvider = provider => {
-  let providerObj = null;
-  if (provider.match(/(wss?:\/\/)(\w+.)+/g)) {
-    providerObj = new Web3.providers.WebsocketProvider(provider);
+  address = address.toLowerCase().replace('0x', '');
+  const addressHash = web3Instance.utils.sha3(address).replace('0x', '');
+  let checksumAddress = '0x';
+
+  for (let i = 0; i < address.length; i++) {
+    if (parseInt(addressHash[i], 16) > 7) {
+      checksumAddress += address[i].toUpperCase();
+    } else {
+      checksumAddress += address[i];
+    }
   }
-  if (!providerObj) {
-    throw new Error(
-      'function web3SetWebSocketProvider requires provider to match a valid WS/WSS endpoint'
-    );
-  }
-  return web3WebSocket.setProvider(providerObj);
+  return checksumAddress;
 };
 
-export const web3WebSocketPendingTxs = () =>
-  new Promise((resolve, reject) => {
-    web3WebSocket.eth
-      .subscribe('pendingTransactions', (error, result) => {
-        if (!error) reject(error);
-      })
-      .on('data', transaction => {
-        web3WebSocket.eth.getTransaction(transaction).then(result => resolve(result));
-      });
-  });
+/**
+ * @desc check if address is checkum
+ * @param  {String} address
+ * @return {String}
+ */
+export const isChecksumAddress = address => address === toChecksumAddress(address);
+
+/**
+ * @desc convert from wei to ether
+ * @param  {Number} wei
+ * @return {BigNumber}
+ */
+export const fromWei = wei => web3Instance.utils.fromWei(wei);
+
+/**
+ * @desc convert from ether to wei
+ * @param  {Number} ether
+ * @return {BigNumber}
+ */
+export const toWei = ether => web3Instance.utils.toWei(ether);
+
+/**
+ * @desc hash string with sha3
+ * @param  {String} string
+ * @return {String}
+ */
+export const sha3 = string => web3Instance.utils.sha3(string);
 
 /**
  * @desc get address transaction count
@@ -99,12 +112,12 @@ export const getAccountBalance = async address => {
  */
 export const getTokenBalanceOf = (accountAddress, tokenAddress) =>
   new Promise((resolve, reject) => {
-    const balanceHexMethod = web3Instance.utils.sha3('balanceOf(address)').substring(0, 10);
-    const dataString = getDataString(balanceHexMethod, [getNakedAddress(accountAddress)]);
+    const balanceMethodHash = smartContractMethods.token_balance.hash;
+    const dataString = getDataString(balanceMethodHash, [getNakedAddress(accountAddress)]);
     web3Instance.eth
       .call({ to: tokenAddress, data: dataString })
       .then(balanceHexResult => {
-        const balance = hexToNumberString(balanceHexResult);
+        const balance = convertHexToString(balanceHexResult);
         resolve(balance);
       })
       .catch(error => reject(error));
@@ -180,12 +193,12 @@ export const sendSignedTransaction = transaction =>
  */
 export const transferToken = transaction =>
   new Promise((resolve, reject) => {
-    const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
+    const transferMethodHash = smartContractMethods.token_transfer.hash;
     const value = BigNumber(transaction.amount)
       .times(BigNumber(10).pow(transaction.tokenObject.decimals))
       .toString(16);
     const recipient = getNakedAddress(transaction.to);
-    const dataString = getDataString(transferHexMethod, [recipient, value]);
+    const dataString = getDataString(transferMethodHash, [recipient, value]);
     sendSignedTransaction({
       from: transaction.from,
       to: transaction.tokenObject.address,
@@ -239,12 +252,12 @@ export const metamaskSendTransaction = transaction =>
  */
 export const metamaskTransferToken = transaction =>
   new Promise((resolve, reject) => {
-    const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
+    const transferMethodHash = smartContractMethods.token_transfer.hash;
     const value = BigNumber(transaction.amount)
       .times(BigNumber(10).pow(transaction.tokenObject.decimals))
       .toString(16);
     const recipient = getNakedAddress(transaction.to);
-    const dataString = getDataString(transferHexMethod, [recipient, value]);
+    const dataString = getDataString(transferMethodHash, [recipient, value]);
     metamaskSendTransaction({
       from: transaction.from,
       to: transaction.tokenObject.address,
@@ -272,10 +285,10 @@ export const estimateGasLimit = async ({ tokenObject, address, recipient, amount
       : '0x737e583620f4ac1842d4e354789ca0c5e0651fbb';
   let estimateGasData = { to: _recipient, data };
   if (tokenObject.symbol !== 'ETH') {
-    const transferHexMethod = web3Instance.utils.sha3('transfer(address,uint256)').substring(0, 10);
+    const transferMethodHash = smartContractMethods.token_transfer.hash;
     let value = convertAssetAmountFromBigNumber(_amount, tokenObject.decimals);
     value = BigNumber(value).toString(16);
-    data = getDataString(transferHexMethod, [getNakedAddress(_recipient), value]);
+    data = getDataString(transferMethodHash, [getNakedAddress(_recipient), value]);
     estimateGasData = { from: address, to: tokenObject.address, data, value: '0x0' };
     gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
   }

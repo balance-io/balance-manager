@@ -210,7 +210,8 @@ export const getTransferTokenTransaction = transaction => {
     from: transaction.from,
     to: transaction.tokenObject.address,
     data: dataString,
-    gasPrice: transaction.gasPrice
+    gasPrice: transaction.gasPrice,
+    gasLimit: transaction.gasLimit
   };
 };
 

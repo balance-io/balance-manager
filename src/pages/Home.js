@@ -62,10 +62,14 @@ class Home extends Component {
     <BaseLayout>
       <Card>
         <StyledCardContainer>
-          <StyledHardwareWallets>
-            <TrezorLogo />
-            <SubscribeForm />
-          </StyledHardwareWallets>
+          <StyledConnect>
+            <MetamaskLogo />
+            <Link to="/metamask">
+              <Button left color="orange" icon={metamaskWhite}>
+                {lang.t('button.connect_metamask')}
+              </Button>
+            </Link>
+          </StyledConnect>
 
           <StyledConnect>
             <LedgerLogo />
@@ -73,6 +77,11 @@ class Home extends Component {
               <Button color="dark">{lang.t('button.connect_ledger')}</Button>
             </Link>
           </StyledConnect>
+
+          <StyledHardwareWallets>
+            <TrezorLogo />
+            <SubscribeForm />
+          </StyledHardwareWallets>
 
           {/* <StyledConnect>
             <WalletConnectLogo />
@@ -85,15 +94,6 @@ class Home extends Component {
               {lang.t('button.connect_walletconnect')}
             </Button>
           </StyledConnect> */}
-
-          <StyledConnect>
-            <MetamaskLogo />
-            <Link to="/metamask">
-              <Button left color="orange" icon={metamaskWhite}>
-                {lang.t('button.connect_metamask')}
-              </Button>
-            </Link>
-          </StyledConnect>
         </StyledCardContainer>
       </Card>
     </BaseLayout>

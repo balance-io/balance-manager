@@ -25,7 +25,7 @@ const StyledCardContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  @media screen and (${responsive.sm.max}) {
+  @media screen and (${responsive.md.max}) {
     flex-direction: column;
     justify-content: ;
   }

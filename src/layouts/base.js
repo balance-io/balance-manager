@@ -19,13 +19,11 @@ import { colors, fonts, responsive } from '../styles';
 
 const StyledLayout = styled.div`
   position: relative;
+  width: 100%;
   height: 100%;
   min-height: 100vh;
-  width: 100vw;
   text-align: center;
-  @media screen and (${responsive.sm.max}) {
-    padding: 15px;
-  }
+  padding: 0 16px;
 `;
 
 const StyledContent = styled(Wrapper)`
@@ -38,10 +36,6 @@ const StyledHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  @media screen and (${responsive.sm.max}) {
-    margin: 0;
-    margin-bottom: 15px;
-  }
 `;
 
 const StyledBranding = styled.div`

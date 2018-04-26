@@ -4,10 +4,9 @@ import {
   convertAmountToDisplay,
   convertAssetAmountToBigNumber
 } from '../helpers/bignumber';
-import { infuraGetTransactionCount } from '../helpers/infura';
 
 const parseAccountTransactions = async (data = null, address = '', network = '') => {
-  if (!data || !data.docs) return null;
+  if (!data || !data.docs) return [];
 
   let transactions = await Promise.all(
     data.docs.map(async (tx, idx) => {
@@ -184,7 +183,9 @@ export const apiProxyGetAccountTransactions = async (
       }.trustwalletapp.com/transactions?address=${address}&limit=50&page=1`
     );
     let transactions = await parseAccountTransactions(data, address, network);
-    transactions = filterNewTransactions(transactions, lastTxHash);
+    if (transactions.length) {
+      transactions = filterNewTransactions(transactions, lastTxHash);
+    }
     return transactions;
   } catch (error) {
     throw error;
@@ -195,10 +196,7 @@ export const handler = async (event, context, callback) => {
   const { address, network, lastTxHash } = event.queryStringParameters;
   try {
     let transactions = [];
-    const txCount = await infuraGetTransactionCount(address, network);
-    if (Number(txCount)) {
-      transactions = await apiProxyGetAccountTransactions(address, network, lastTxHash);
-    }
+    transactions = await apiProxyGetAccountTransactions(address, network, lastTxHash);
     callback(null, {
       statusCode: 200,
       body: JSON.stringify(transactions)

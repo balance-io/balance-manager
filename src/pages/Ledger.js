@@ -49,7 +49,7 @@ class Ledger extends Component {
           {this.props.fetching || this.props.accounts.length ? (
             <AccountView
               fetchingWallet={this.props.fetching}
-              fetchingMessage={`Please connect and unlock Ledger and select Ethereum`}
+              fetchingMessage={`Please connect and unlock Ledger then select Ethereum`}
               match={this.props.match}
             />
           ) : (

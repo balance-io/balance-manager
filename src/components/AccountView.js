@@ -129,6 +129,14 @@ const StyledTab = styled(Button)`
   }
 `;
 
+const StyledMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(${colors.grey});
+  font-weight: ${fonts.weight.medium};
+`;
+
 class AccountView extends Component {
   state = {
     activeTab: 'BALANCES_TAB'
@@ -164,88 +172,91 @@ class AccountView extends Component {
         `${this.props.accountInfo.type}${lang.t('modal.default_wallet')}`,
       address: this.props.accountInfo.address
     });
-  componentWillUnmount() {
-    // this.props.accountClearState();
-  }
   render() {
     return (
       <StyledAccountView>
         <Card
-          fetching={this.props.fetching || this.props.fetchingMetamask}
+          fetching={this.props.fetching || this.props.fetchingWallet}
+          fetchingMessage={this.props.fetchingMessage}
           background={'lightGrey'}
+          minHeight={250}
         >
-          <StyledFlex>
-            <StyledTop>
-              <StyledAddressWrapper>
-                <h6>{capitalize(this.props.accountType)} </h6>
-                <CopyToClipboard
-                  iconOnHover
-                  text={this.props.accountInfo.address || this.props.accountAddress}
-                />
-              </StyledAddressWrapper>
+          {!!this.props.accountInfo.address || !!this.props.accountAddress ? (
+            <StyledFlex>
+              <StyledTop>
+                <StyledAddressWrapper>
+                  <h6>{capitalize(this.props.accountInfo.type || this.props.accountType)} </h6>
+                  <CopyToClipboard
+                    iconOnHover
+                    text={this.props.accountInfo.address || this.props.accountAddress}
+                  />
+                </StyledAddressWrapper>
 
-              <StyledActions>
-                <Button left color="blue" icon={qrCode} onClick={this.openReceiveModal}>
-                  {lang.t('button.receive')}
-                </Button>
-                <Button left color="blue" icon={arrowUp} onClick={this.openSendModal}>
-                  {lang.t('button.send')}
-                </Button>
-              </StyledActions>
-            </StyledTop>
-            <LineBreak noMargin />
-            <StyledTabMenu>
-              <StyledTabsWrapper>
-                <Link to={this.props.match.url}>
-                  <StyledTab
-                    data-toggle="tooltip"
-                    title={lang.t('account.tab_balances_tooltip')}
-                    active={this.state.activeTab === 'BALANCES_TAB'}
-                    icon={balancesTabIcon}
-                    left
-                  >
-                    {lang.t('account.tab_balances')}
-                  </StyledTab>
-                </Link>
-                <Link to={`${this.props.match.url}/transactions`}>
-                  <StyledTab
-                    data-toggle="tooltip"
-                    title={lang.t('account.tab_transactions_tooltip')}
-                    active={this.state.activeTab === 'TRANSACTIONS_TAB'}
-                    icon={transactionsTabIcon}
-                    left
-                  >
-                    {lang.t('account.tab_transactions')}
-                  </StyledTab>
-                </Link>
-                <Link to={`${this.props.match.url}/interactions`}>
-                  <StyledTab
-                    data-toggle="tooltip"
-                    title={lang.t('account.tab_interactions_tooltip')}
-                    active={this.state.activeTab === 'INTERACTIONS_TAB'}
-                    icon={interactionsTabIcon}
-                    left
-                  >
-                    {lang.t('account.tab_interactions')}
-                  </StyledTab>
-                </Link>
-              </StyledTabsWrapper>
-            </StyledTabMenu>
-            <Switch>
-              <Route exact path={this.props.match.url} component={AccountViewBalances} />
-              <Route
-                exact
-                path={`${this.props.match.url}/transactions`}
-                component={AccountViewTransactions}
-              />
-              <Route
-                exact
-                path={`${this.props.match.url}/interactions`}
-                component={AccountViewInteractions}
-              />
-              <Route render={() => <Redirect to={this.props.match.url} />} />
-            </Switch>
-          </StyledFlex>
+                <StyledActions>
+                  <Button left color="blue" icon={qrCode} onClick={this.openReceiveModal}>
+                    {lang.t('button.receive')}
+                  </Button>
+                  <Button left color="blue" icon={arrowUp} onClick={this.openSendModal}>
+                    {lang.t('button.send')}
+                  </Button>
+                </StyledActions>
+              </StyledTop>
+              <LineBreak noMargin />
+              <StyledTabMenu>
+                <StyledTabsWrapper>
+                  <Link to={this.props.match.url}>
+                    <StyledTab
+                      data-toggle="tooltip"
+                      title={lang.t('account.tab_balances_tooltip')}
+                      active={this.state.activeTab === 'BALANCES_TAB'}
+                      icon={balancesTabIcon}
+                      left
+                    >
+                      {lang.t('account.tab_balances')}
+                    </StyledTab>
+                  </Link>
+                  <Link to={`${this.props.match.url}/transactions`}>
+                    <StyledTab
+                      data-toggle="tooltip"
+                      title={lang.t('account.tab_transactions_tooltip')}
+                      active={this.state.activeTab === 'TRANSACTIONS_TAB'}
+                      icon={transactionsTabIcon}
+                      left
+                    >
+                      {lang.t('account.tab_transactions')}
+                    </StyledTab>
+                  </Link>
+                  <Link to={`${this.props.match.url}/interactions`}>
+                    <StyledTab
+                      data-toggle="tooltip"
+                      title={lang.t('account.tab_interactions_tooltip')}
+                      active={this.state.activeTab === 'INTERACTIONS_TAB'}
+                      icon={interactionsTabIcon}
+                      left
+                    >
+                      {lang.t('account.tab_interactions')}
+                    </StyledTab>
+                  </Link>
+                </StyledTabsWrapper>
+              </StyledTabMenu>
+              <Switch>
+                <Route exact path={this.props.match.url} component={AccountViewBalances} />
+                <Route
+                  exact
+                  path={`${this.props.match.url}/transactions`}
+                  component={AccountViewTransactions}
+                />
+                <Route
+                  exact
+                  path={`${this.props.match.url}/interactions`}
+                  component={AccountViewInteractions}
+                />
+                <Route render={() => <Redirect to={this.props.match.url} />} />
+              </Switch>
+            </StyledFlex>
+          ) : (
+            <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
+          )}
         </Card>
       </StyledAccountView>
     );
@@ -260,11 +271,13 @@ AccountView.propTypes = {
   accountInfo: PropTypes.object.isRequired,
   accountAddress: PropTypes.string.isRequired,
   accountType: PropTypes.string.isRequired,
-  fetchingMetamask: PropTypes.bool
+  fetchingWallet: PropTypes.bool,
+  fetchingMessage: PropTypes.string
 };
 
 AccountView.defaultProps = {
-  fetchingMetamask: false
+  fetchingWallet: false,
+  fetchingMessage: ''
 };
 
 const reduxProps = ({ account }) => ({

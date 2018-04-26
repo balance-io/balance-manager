@@ -10,7 +10,7 @@ import {
   formatFixedDecimals
 } from '../helpers/bignumber';
 import { parseError, parseGasPrices, parseGasPricesTxFee } from '../helpers/parsers';
-import { metamaskSendTransaction, metamaskTransferToken, estimateGasLimit } from '../helpers/web3';
+import { web3MetamaskSendTransaction, web3MetamaskTransferToken, estimateGasLimit } from '../helpers/web3';
 import { notificationShow } from './_notification';
 import { accountUpdateTransactions } from './_account';
 
@@ -122,7 +122,7 @@ export const sendEtherMetamask = ({
   gasLimit
 }) => (dispatch, getState) => {
   dispatch({ type: SEND_ETHER_METAMASK_REQUEST });
-  metamaskSendTransaction({
+  web3MetamaskSendTransaction({
     from: address,
     to: recipient,
     value: amount,
@@ -162,7 +162,7 @@ export const sendTokenMetamask = ({
   gasLimit
 }) => (dispatch, getState) => {
   dispatch({ type: SEND_TOKEN_METAMASK_REQUEST });
-  metamaskTransferToken({
+  web3MetamaskTransferToken({
     tokenObject: selectedAsset,
     from: address,
     to: recipient,

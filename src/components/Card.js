@@ -39,6 +39,7 @@ const StyledFetching = styled.div`
   left: 0;
   right: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   transition: ${transitions.short};
@@ -47,9 +48,27 @@ const StyledFetching = styled.div`
   pointer-events: ${({ fetching }) => (fetching ? 'auto' : 'none')};
 `;
 
-const Card = ({ fetching, background, maxWidth, minHeight, children, ...props }) => (
+const StyledMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(${colors.grey});
+  font-weight: ${fonts.weight.medium};
+  margin: 20px;
+`;
+
+const Card = ({
+  fetching,
+  fetchingMessage,
+  background,
+  maxWidth,
+  minHeight,
+  children,
+  ...props
+}) => (
   <StyledCard background={background} maxWidth={maxWidth} {...props}>
     <StyledFetching fetching={fetching}>
+      <StyledMessage>{fetchingMessage}</StyledMessage>
       <Loader color="darkGrey" background={background} />
     </StyledFetching>
     <StyledContent minHeight={minHeight} fetching={fetching}>
@@ -61,12 +80,14 @@ const Card = ({ fetching, background, maxWidth, minHeight, children, ...props })
 Card.propTypes = {
   children: PropTypes.node.isRequired,
   fetching: PropTypes.bool,
+  fetchingMessage: PropTypes.string,
   background: PropTypes.string,
   maxWidth: PropTypes.number
 };
 
 Card.defaultProps = {
   fetching: false,
+  fetchingMessage: '',
   background: 'white',
   maxWidth: null,
   minHeight: null

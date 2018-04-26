@@ -385,12 +385,12 @@ class AccountViewTransactions extends Component {
         </StyledGrid>
       ) : (
         <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
-          <StyledMessage>{lang.t('account.message_failed_request')}</StyledMessage>
+          <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
         </StyledCard>
       )
     ) : (
       <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
-        <StyledMessage>{lang.t('account.message_no_transactions')}</StyledMessage>
+        <StyledMessage>{lang.t('message.no_transactions')}</StyledMessage>
       </StyledCard>
     );
   };

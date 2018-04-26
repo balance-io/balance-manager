@@ -94,7 +94,8 @@ const StyledVerticalLine = styled.div`
 const BaseLayout = ({
   children,
   fetching,
-  account,
+  accountType,
+  accountAddress,
   accountChangeNativeCurrency,
   nativeCurrency,
   network,
@@ -102,7 +103,11 @@ const BaseLayout = ({
   online,
   ...props
 }) => {
-  const showToolbar = window.location.pathname !== '/' && !fetching && web3Available && network;
+  const showToolbar =
+    window.location.pathname !== '/' &&
+    !fetching &&
+    ((accountType === 'METAMASK' && web3Available) || accountType !== 'METAMASK') &&
+    accountAddress;
   return (
     <StyledLayout>
       <Background />
@@ -142,7 +147,8 @@ const BaseLayout = ({
 BaseLayout.propTypes = {
   children: PropTypes.node.isRequired,
   fetching: PropTypes.bool.isRequired,
-  account: PropTypes.object.isRequired,
+  accountType: PropTypes.string.isRequired,
+  accountAddress: PropTypes.string.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
   network: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
@@ -150,7 +156,8 @@ BaseLayout.propTypes = {
 };
 
 const reduxProps = ({ account, metamask, warning }) => ({
-  account: account.accountInfo,
+  accountType: account.accountType,
+  accountAddress: account.accountAddress,
   nativeCurrency: account.nativeCurrency,
   fetching: metamask.fetching,
   network: metamask.network,

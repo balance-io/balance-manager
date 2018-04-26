@@ -72,6 +72,7 @@ export const updateLocalBalances = (account, network) => {
   if (!accountLocal[network]) {
     accountLocal[network] = {};
   }
+  accountLocal[network].type = account.type;
   accountLocal[network].balances = { assets: account.assets, total: account.total || '———' };
   saveLocal(account.address, accountLocal);
 };

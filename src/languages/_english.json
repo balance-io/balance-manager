@@ -31,12 +31,10 @@
       "tx_pending": "Pending",
       "show_all": "Show all",
       "show_less": "Show less",
-      "unknown_token": "Unknown Token",
-      "message_failed_request": "Failed request, please refresh",
-      "message_no_transactions": "No transactions found for this account",
-      "message_no_interactions": "No interactions found for this account"
+      "unknown_token": "Unknown Token"
     },
     "button": {
+      "connect_ledger": "Connect to Ledger",
       "connect_walletconnect": "Use WalletConnect",
       "connect_metamask": "Connect to Metamask",
       "send": "Send",
@@ -45,7 +43,8 @@
       "cancel": "Cancel",
       "go_back": "Go Back",
       "send_another": "Send Another",
-      "notify_me": "Notify me"
+      "notify_me": "Notify me",
+      "try_again": "Try again"
     },
     "input": {
       "recipient_address": "Recipient Address",
@@ -103,10 +102,15 @@
       "web3_unknown_network": "Unknown network, please switch to another one",
       "page_not_found": "404 Page Not Found",
       "coming_soon": "Coming soon..",
-      "click_to_copy_to_clipboard": "Click to copy to clipboard"
+      "click_to_copy_to_clipboard": "Click to copy to clipboard",
+      "failed_request": "Failed request, please refresh",
+      "failed_ledger_connection": "Failed to connect to Ledger, please check your device",
+      "no_transactions": "No transactions found for this account",
+      "no_interactions": "No interactions found for this account"
     },
     "notification": {
       "error": {
+        "no_accounts_found": "No Ethereum Accounts Found",
         "invalid_address": "Address is invalid, please check again",
         "insufficient_balance": "Insufficient balance in this account",
         "insufficient_for_fees": "Insufficient balance to cover transaction fees",

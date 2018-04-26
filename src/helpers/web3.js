@@ -1,7 +1,10 @@
 import Web3 from 'web3';
 import Tx from 'ethereumjs-tx';
 import BigNumber from 'bignumber.js';
-import ethUnits from '../libraries/ethereum-units.json';
+import TransportU2F from '@ledgerhq/hw-transport-u2f';
+import createLedgerSubprovider from '@ledgerhq/web3-subprovider';
+import ProviderEngine from 'web3-provider-engine';
+import FetchSubprovider from 'web3-provider-engine/subproviders/fetch';
 import { isValidAddress } from './validators';
 import { getDataString, getNakedAddress } from './utilities';
 import {
@@ -9,6 +12,8 @@ import {
   convertAssetAmountFromBigNumber,
   convertHexToString
 } from './bignumber';
+import ethUnits from '../libraries/ethereum-units.json';
+import ethereumNetworks from '../libraries/ethereum-networks.json';
 import smartContractMethods from '../libraries/smartcontract-methods.json';
 
 /**
@@ -32,6 +37,50 @@ export const web3SetHttpProvider = provider => {
   }
   return web3Instance.setProvider(providerObj);
 };
+
+/**
+ * @desc web3 Ledger instance
+ */
+export let web3LedgerInstance = null;
+
+/**
+ * @desc init web3 Ledger instance
+ * @param  {String} network
+ * @return {Object}
+ */
+export const web3LedgerInit = async network => {
+  try {
+    const networkId = ethereumNetworks[network].id;
+    const rpcUrl = `https://${network}.infura.io/`;
+    const engine = new ProviderEngine();
+    const getTransport = () => TransportU2F.create();
+    const ledger = createLedgerSubprovider(getTransport, {
+      networkId,
+      accountsLength: 5
+    });
+    engine.addProvider(ledger);
+    engine.addProvider(new FetchSubprovider({ rpcUrl }));
+    engine.start();
+    web3LedgerInstance = new Web3(engine);
+    return web3LedgerInstance;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @desc get web3 Ledger accounts
+ * @param  {String} address
+ * @return {Array}
+ */
+export const web3LedgerAccounts = () =>
+  new Promise((resolve, reject) => {
+    web3LedgerInstance.eth.getAccounts((error, accounts) => {
+      if (error) console.error(error);
+      if (error) reject(error);
+      else resolve(accounts);
+    });
+  });
 
 /**
  * @desc convert to checksum address
@@ -164,7 +213,7 @@ export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }
  * @param  {Object}  transaction { from, to, value, data, gasPrice, privateKey}
  * @return {Promise}
  */
-export const sendSignedTransaction = transaction =>
+export const web3SendSignedTransaction = transaction =>
   new Promise((resolve, reject) => {
     const from =
       transaction.from.substr(0, 2) === '0x' ? transaction.from : `0x${transaction.from}`;
@@ -179,7 +228,7 @@ export const sendSignedTransaction = transaction =>
       .then(txDetails => {
         const signedTx = signTx(txDetails, privateKey);
         web3Instance.eth
-          .sendSignedTransaction(signedTx)
+          .web3SendSignedTransaction(signedTx)
           .once('transactionHash', txHash => resolve(txHash))
           .catch(error => reject(error));
       })
@@ -191,7 +240,7 @@ export const sendSignedTransaction = transaction =>
  * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice, privateKey}
  * @return {Promise}
  */
-export const transferToken = transaction =>
+export const web3TransferToken = transaction =>
   new Promise((resolve, reject) => {
     const transferMethodHash = smartContractMethods.token_transfer.hash;
     const value = BigNumber(transaction.amount)
@@ -199,7 +248,7 @@ export const transferToken = transaction =>
       .toString(16);
     const recipient = getNakedAddress(transaction.to);
     const dataString = getDataString(transferMethodHash, [recipient, value]);
-    sendSignedTransaction({
+    web3SendSignedTransaction({
       from: transaction.from,
       to: transaction.tokenObject.address,
       data: dataString,
@@ -215,7 +264,7 @@ export const transferToken = transaction =>
  * @param  {Object}  transaction { from, to, value, data, gasPrice}
  * @return {Promise}
  */
-export const metamaskSendTransaction = transaction =>
+export const web3MetamaskSendTransaction = transaction =>
   new Promise((resolve, reject) => {
     const from =
       transaction.from.substr(0, 2) === '0x' ? transaction.from : `0x${transaction.from}`;
@@ -250,7 +299,7 @@ export const metamaskSendTransaction = transaction =>
  * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
  * @return {Promise}
  */
-export const metamaskTransferToken = transaction =>
+export const web3MetamaskTransferToken = transaction =>
   new Promise((resolve, reject) => {
     const transferMethodHash = smartContractMethods.token_transfer.hash;
     const value = BigNumber(transaction.amount)
@@ -258,7 +307,7 @@ export const metamaskTransferToken = transaction =>
       .toString(16);
     const recipient = getNakedAddress(transaction.to);
     const dataString = getDataString(transferMethodHash, [recipient, value]);
-    metamaskSendTransaction({
+    web3MetamaskSendTransaction({
       from: transaction.from,
       to: transaction.tokenObject.address,
       data: dataString,

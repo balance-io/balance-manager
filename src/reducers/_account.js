@@ -168,6 +168,9 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
         total: accountLocal[network].balances.total
       };
     }
+    if (accountLocal[network].type && !cachedAccount.type) {
+      cachedAccount.type = accountLocal[network].type;
+    }
     if (accountLocal[network].pending) {
       cachedTransactions = [...accountLocal[network].pending];
     }
@@ -182,6 +185,7 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
   dispatch({
     type: ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST,
     payload: {
+      accountType: cachedAccount.type || accountType,
       accountInfo: cachedAccount,
       transactions: cachedTransactions,
       fetching: (accountLocal && !accountLocal[network]) || !accountLocal
@@ -189,7 +193,7 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
   });
   apiGetAccountBalances(accountAddress, network)
     .then(accountInfo => {
-      accountInfo = { ...accountInfo, accountType };
+      accountInfo = { ...accountInfo, type: accountType };
       updateLocalBalances(accountInfo, network);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS });
       dispatch(accountGetNativePrices(accountInfo));
@@ -207,9 +211,12 @@ export const accountUpdateBalances = () => (dispatch, getState) => {
   apiGetAccountBalances(accountAddress, network)
     .then(accountInfo => {
       const prices = getState().account.prices;
-      accountInfo = { ...accountInfo, accountType };
+      accountInfo = { ...accountInfo, type: accountType };
       const parsedAccountInfo = parseAccountBalancesPrices(accountInfo, prices, network);
-      dispatch({ type: ACCOUNT_UPDATE_BALANCES_SUCCESS, payload: parsedAccountInfo });
+      dispatch({
+        type: ACCOUNT_UPDATE_BALANCES_SUCCESS,
+        payload: parsedAccountInfo
+      });
       dispatch(accountGetNativePrices(accountInfo));
     })
     .catch(error => {
@@ -289,7 +296,10 @@ export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState
   });
 };
 
-export const accountClearState = () => ({ type: ACCOUNT_CLEAR_STATE });
+export const accountClearState = () => dispatch => {
+  clearInterval(getPricesInterval);
+  dispatch({ type: ACCOUNT_CLEAR_STATE });
+};
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
@@ -301,7 +311,7 @@ const INITIAL_STATE = {
   accountAddress: '',
   accountInfo: {
     address: '',
-    type: '',
+    accountType: '',
     assets: [
       {
         name: 'Ethereum',
@@ -364,6 +374,7 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: action.payload.fetching,
+        accountType: action.payload.accountType,
         accountInfo: action.payload.accountInfo,
         transactions: action.payload.transactions
       };

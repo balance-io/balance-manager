@@ -75,7 +75,11 @@ const proxyGetAccountBalances = async (address = '', network = 'mainnet') => {
 
 export const handler = async (event, context, callback) => {
   const { address, network } = event.queryStringParameters;
-  console.log(event.headers);
+  console.log('\n----------------- CONTEXT -----------------');
+  console.log(context);
+
+  console.log('\n-----------------  EVENT  -----------------');
+  console.log(event);
   try {
     const data = await proxyGetAccountBalances(address, network);
     callback(null, {

@@ -1,9 +1,5 @@
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
-import TransportU2F from '@ledgerhq/hw-transport-u2f';
-import createLedgerSubprovider from '@ledgerhq/web3-subprovider';
-import ProviderEngine from 'web3-provider-engine';
-import FetchSubprovider from 'web3-provider-engine/subproviders/fetch';
 import { isValidAddress } from './validators';
 import { getDataString, getNakedAddress } from './utilities';
 import {
@@ -11,8 +7,8 @@ import {
   convertAssetAmountFromBigNumber,
   convertHexToString
 } from './bignumber';
+import { ledgerEthSignTransaction } from './ledger-eth';
 import ethUnits from '../libraries/ethereum-units.json';
-import ethereumNetworks from '../libraries/ethereum-networks.json';
 import smartContractMethods from '../libraries/smartcontract-methods.json';
 
 /**
@@ -36,50 +32,6 @@ export const web3SetHttpProvider = provider => {
   }
   return web3Instance.setProvider(providerObj);
 };
-
-/**
- * @desc web3 Ledger instance
- */
-export let web3LedgerInstance = null;
-
-/**
- * @desc init web3 Ledger instance
- * @param  {String} network
- * @return {Object}
- */
-export const web3LedgerInit = async network => {
-  try {
-    const networkId = ethereumNetworks[network].id;
-    const rpcUrl = `https://${network}.infura.io/`;
-    const engine = new ProviderEngine();
-    const getTransport = () => TransportU2F.create();
-    const ledger = createLedgerSubprovider(getTransport, {
-      networkId,
-      accountsLength: 5
-    });
-    engine.addProvider(ledger);
-    engine.addProvider(new FetchSubprovider({ rpcUrl }));
-    engine.start();
-    web3LedgerInstance = new Web3(engine);
-    return web3LedgerInstance;
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * @desc get web3 Ledger accounts
- * @param  {String} address
- * @return {Array}
- */
-export const web3LedgerAccounts = () =>
-  new Promise((resolve, reject) => {
-    web3LedgerInstance.eth.getAccounts((error, accounts) => {
-      if (error) console.error(error);
-      if (error) reject(error);
-      else resolve(accounts);
-    });
-  });
 
 /**
  * @desc convert to checksum address
@@ -222,9 +174,10 @@ export const getTransferTokenTransaction = transaction => {
  */
 export const web3SendSignedTransaction = signedTx =>
   new Promise((resolve, reject) => {
-    console.log('web3SendSignedTransaction', signedTx);
+    const serializedTx = typeof signedTx === 'string' ? signedTx : signedTx.raw;
+    console.log('serializedTx', serializedTx);
     web3Instance.eth
-      .sendSignedTransaction(signedTx.raw)
+      .sendSignedTransaction(serializedTx)
       .once('transactionHash', txHash => resolve(txHash))
       .catch(error => reject(error));
   });
@@ -284,14 +237,6 @@ export const web3MetamaskTransferToken = transaction =>
   });
 
 /**
- * @desc ledger request sign transaction
- * @param  {Object}  transaction { from, to, value, data, gasPrice}
- * @return {Promise}
- */
-export const web3LedgerSignTransaction = transaction =>
-  web3LedgerInstance.eth.signTransaction(transaction);
-
-/**
  * @desc ledger send transaction
  * @param  {Object}  transaction { from, to, value, data, gasPrice}
  * @return {Promise}
@@ -314,7 +259,7 @@ export const web3LedgerSendTransaction = transaction =>
     })
       .then(txDetails => {
         console.log('txDetails', txDetails);
-        web3LedgerSignTransaction(txDetails)
+        ledgerEthSignTransaction(txDetails)
           .then(signedTx =>
             web3SendSignedTransaction(signedTx)
               .then(txHash => resolve(txHash))

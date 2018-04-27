@@ -250,3 +250,20 @@ export const ellipseText = (text = '', maxLength = 9999) => {
       .join(' ') + '...';
   return result;
 };
+
+/**
+ * @desc obtain path components from derivation path
+ * @param  {String}  [derivationPath = '']
+ * @return {Object}
+ */
+export const obtainPathComponentsFromDerivationPath = (derivationPath = '') => {
+  const regExp = /^(44'\/6[0|1]'\/\d+'?\/)(\d+)$/;
+  const matchResult = regExp.exec(derivationPath);
+  if (matchResult === null) {
+    throw new Error(
+      "To get multiple accounts your derivation path must follow pattern 44'/60|61'/x'/n "
+    );
+  }
+  console.log('matchResult', matchResult);
+  return { basePath: matchResult[1], index: parseInt(matchResult[2], 10) };
+};

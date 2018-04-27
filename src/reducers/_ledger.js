@@ -1,7 +1,7 @@
 import lang from '../languages';
 import { parseError } from '../helpers/parsers';
 import { accountUpdateAccountAddress } from './_account';
-import { web3LedgerInit, web3LedgerAccounts } from '../helpers/web3';
+import { ledgerEthInit, ledgerEthAccounts } from '../helpers/ledger-eth';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //
@@ -14,13 +14,13 @@ const LEDGER_CONNECT_FAILURE = 'ledger/LEDGER_CONNECT_FAILURE';
 export const ledgerConnectInit = () => async (dispatch, getState) => {
   const network = getState().ledger.network;
   dispatch({ type: LEDGER_CONNECT_REQUEST });
-  web3LedgerInit(network)
+  ledgerEthInit(network)
     .then(() => {
-      web3LedgerAccounts()
+      ledgerEthAccounts()
         .then(accounts => {
           if (accounts.length) {
             dispatch({ type: LEDGER_CONNECT_SUCCESS, payload: accounts });
-            dispatch(accountUpdateAccountAddress(accounts[0], 'LEDGER'));
+            dispatch(accountUpdateAccountAddress(accounts[0].address, 'LEDGER'));
           } else {
             dispatch(notificationShow(lang.t('notification.error.no_accounts_found'), true));
             dispatch({ type: LEDGER_CONNECT_FAILURE });

@@ -23,6 +23,8 @@ import {
   sendUpdateGasPrice,
   sendEtherMetamask,
   sendTokenMetamask,
+  sendEtherLedger,
+  sendTokenLedger,
   sendClearFields,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
@@ -303,6 +305,7 @@ class SendModal extends Component {
     this.props.sendModalInit(this.props.modalProps.address, selected);
   };
   onSubmit = e => {
+    console.log('this.props.modalProps.accountType', this.props.modalProps.accountType);
     e.preventDefault();
     const request = {
       address: this.props.modalProps.address,
@@ -313,6 +316,7 @@ class SendModal extends Component {
       gasLimit: this.props.gasLimit
     };
     if (!this.props.gasPrice.txFee) {
+      this.props.notificationShow(lang.t('notification.error.generic_error'), true);
       return;
     }
     if (!this.props.confirm) {
@@ -336,7 +340,17 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
-        this.props.sendEtherMetamask(request);
+        switch (this.props.modalProps.accountType) {
+          case 'METAMASK':
+            this.props.sendEtherMetamask(request);
+            break;
+          case 'LEDGER':
+            this.props.sendEtherLedger(request);
+            break;
+          default:
+            this.props.sendEtherMetamask(request);
+            break;
+        }
       } else {
         const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
         const etherBalanceAmount = ethereum.balance.amount;
@@ -352,11 +366,20 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
-        this.props.sendTokenMetamask(request);
+        switch (this.props.modalProps.accountType) {
+          case 'METAMASK':
+            this.props.sendTokenMetamask(request);
+            break;
+          case 'LEDGER':
+            this.props.sendTokenLedger(request);
+            break;
+          default:
+            this.props.sendTokenMetamask(request);
+            break;
+        }
       }
-
-      this.props.sendToggleConfirmationView(true);
     }
+    this.props.sendToggleConfirmationView(true);
   };
   toggleQRCodeReader = target =>
     this.setState({ showQRCodeReader: !this.state.showQRCodeReader, QRCodeReaderTarget: target });
@@ -385,7 +408,7 @@ class SendModal extends Component {
   render = () => {
     return (
       <Card background="lightGrey">
-        {!this.props.transaction ? (
+        {!this.props.txHash ? (
           !this.props.confirm ? (
             <Form onSubmit={this.onSubmit}>
               <StyledSubTitle>
@@ -610,13 +633,13 @@ class SendModal extends Component {
               <StyledParagraph>
                 <strong>{`${lang.t('modal.tx_hash')}:`}</strong>
               </StyledParagraph>
-              <StyledHash>{` ${this.props.transaction}`}</StyledHash>
+              <StyledHash>{` ${this.props.txHash}`}</StyledHash>
             </div>
             <StyledParagraph>
               <a
                 href={`https://${
                   this.props.network !== 'mainnet' ? `${this.props.network}.` : ''
-                }etherscan.io/tx/${this.props.transaction}`}
+                }etherscan.io/tx/${this.props.txHash}`}
                 target="_blank"
               >
                 {lang.t('modal.tx_verify')}
@@ -640,6 +663,8 @@ SendModal.propTypes = {
   sendUpdateGasPrice: PropTypes.func.isRequired,
   sendEtherMetamask: PropTypes.func.isRequired,
   sendTokenMetamask: PropTypes.func.isRequired,
+  sendEtherLedger: PropTypes.func.isRequired,
+  sendTokenLedger: PropTypes.func.isRequired,
   sendClearFields: PropTypes.func.isRequired,
   sendUpdateRecipient: PropTypes.func.isRequired,
   sendUpdateNativeAmount: PropTypes.func.isRequired,
@@ -653,7 +678,7 @@ SendModal.propTypes = {
   recipient: PropTypes.string.isRequired,
   nativeAmount: PropTypes.string.isRequired,
   assetAmount: PropTypes.string.isRequired,
-  transaction: PropTypes.string.isRequired,
+  txHash: PropTypes.string.isRequired,
   address: PropTypes.string.isRequired,
   selected: PropTypes.object.isRequired,
   fetchingGasPrices: PropTypes.bool.isRequired,
@@ -672,7 +697,7 @@ const reduxProps = ({ modal, send, account }) => ({
   recipient: send.recipient,
   nativeAmount: send.nativeAmount,
   assetAmount: send.assetAmount,
-  transaction: send.transaction,
+  txHash: send.txHash,
   address: send.address,
   selected: send.selected,
   fetchingGasPrices: send.fetchingGasPrices,
@@ -692,6 +717,8 @@ export default connect(reduxProps, {
   sendUpdateGasPrice,
   sendEtherMetamask,
   sendTokenMetamask,
+  sendEtherLedger,
+  sendTokenLedger,
   sendClearFields,
   sendUpdateRecipient,
   sendUpdateNativeAmount,

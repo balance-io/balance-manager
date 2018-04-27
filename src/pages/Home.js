@@ -16,9 +16,8 @@ import metamaskWhite from '../assets/metamask-white.png';
 // import WalletConnectLogo from '../components/WalletConnectLogo';
 // import walletConnectWhite from '../assets/walletconnect-white.svg';
 import { getLocal } from '../helpers/utilities';
-import { accountUpdateAccountAddress } from '../reducers/_account';
-import { metamaskConnectMetamask } from '../reducers/_metamask';
 import { modalOpen } from '../reducers/_modal';
+import { accountUpdateAccountAddress } from '../reducers/_account';
 import { responsive } from '../styles';
 
 const StyledCardContainer = styled.div`
@@ -26,25 +25,18 @@ const StyledCardContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  @media screen and (${responsive.sm.max}) {
+  @media screen and (${responsive.md.max}) {
     flex-direction: column;
     justify-content: ;
   }
 `;
 
-const StyledMetamaskConnect = styled(Column)`
+const StyledConnect = styled(Column)`
   padding: 15px;
   & > * {
     margin: 24px;
   }
 `;
-
-// const StyledWalletConnect = styled(Column)`
-//   padding: 15px;
-//   & > * {
-//     margin: 24px;
-//   }
-// `;
 
 const StyledHardwareWallets = styled(Column)`
   padding: 15px;
@@ -70,13 +62,28 @@ class Home extends Component {
     <BaseLayout>
       <Card>
         <StyledCardContainer>
-          <StyledHardwareWallets>
+          <StyledConnect>
+            <MetamaskLogo />
+            <Link to="/metamask">
+              <Button left color="orange" icon={metamaskWhite}>
+                {lang.t('button.connect_metamask')}
+              </Button>
+            </Link>
+          </StyledConnect>
+
+          <StyledConnect>
             <LedgerLogo />
+            <Link to="/ledger">
+              <Button color="dark">{lang.t('button.connect_ledger')}</Button>
+            </Link>
+          </StyledConnect>
+
+          <StyledHardwareWallets>
             <TrezorLogo />
             <SubscribeForm />
           </StyledHardwareWallets>
 
-          {/* <StyledWalletConnect>
+          {/* <StyledConnect>
             <WalletConnectLogo />
             <Button
               left
@@ -86,21 +93,7 @@ class Home extends Component {
             >
               {lang.t('button.connect_walletconnect')}
             </Button>
-          </StyledWalletConnect> */}
-
-          <StyledMetamaskConnect>
-            <MetamaskLogo />
-            <Link to="/metamask">
-              <Button
-                left
-                color="orange"
-                icon={metamaskWhite}
-                onClick={this.props.metamaskConnectMetamask}
-              >
-                {lang.t('button.connect_metamask')}
-              </Button>
-            </Link>
-          </StyledMetamaskConnect>
+          </StyledConnect> */}
         </StyledCardContainer>
       </Card>
     </BaseLayout>
@@ -108,13 +101,11 @@ class Home extends Component {
 }
 
 Home.propTypes = {
-  metamaskConnectMetamask: PropTypes.func.isRequired,
-  accountUpdateAccountAddress: PropTypes.func.isRequired,
-  modalOpen: PropTypes.func.isRequired
+  modalOpen: PropTypes.func.isRequired,
+  accountUpdateAccountAddress: PropTypes.func.isRequired
 };
 
 export default connect(null, {
   modalOpen,
-  metamaskConnectMetamask,
   accountUpdateAccountAddress
 })(Home);

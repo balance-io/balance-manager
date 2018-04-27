@@ -113,7 +113,12 @@ class CopyToClipboard extends Component {
       <StyledCopyToClipboard {...props}>
         <StyledContainer iconOnHover={iconOnHover}>
           <StyledInvisible>{text}</StyledInvisible>
-          <StyledInput value={text} onChange={() => {}} onClick={this.copyToCopyToClipboard} />
+          <StyledInput
+            value={text}
+            spellCheck={false}
+            onChange={() => {}}
+            onClick={this.copyToCopyToClipboard}
+          />
           <StyledText>{lang.t('message.click_to_copy_to_clipboard')}</StyledText>
           <StyledIcon src={clipboardIcon} alt="copy" onClick={this.simulateCopyToClipboard} />
         </StyledContainer>

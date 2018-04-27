@@ -48,6 +48,7 @@ export const debounceRequest = (request, params, timeout) =>
  */
 export const lambdaAllowedAccess = event => {
   const referer = event.headers.referer;
+  if (!referer) return false;
   const allowed =
     referer.indexOf('balance-manager.netlify.com') !== -1 ||
     referer.indexOf('manager.balance.io') !== -1;

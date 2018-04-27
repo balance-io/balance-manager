@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { infuraGetEthereumBalance, infuraCallTokenBalance } from '../helpers/infura';
+import { lambdaAllowedAccess } from '../helpers/utilities';
 import {
   convertStringToNumber,
   convertAmountToDisplay,
@@ -75,11 +76,12 @@ const proxyGetAccountBalances = async (address = '', network = 'mainnet') => {
 
 export const handler = async (event, context, callback) => {
   const { address, network } = event.queryStringParameters;
-  console.log('\n----------------- CONTEXT -----------------');
-  console.log(context);
-
-  console.log('\n-----------------  EVENT  -----------------');
-  console.log(event);
+  if (!lambdaAllowedAccess(event)) {
+    callback(null, {
+      statusCode: 500,
+      body: 'Something went wrong'
+    });
+  }
   try {
     const data = await proxyGetAccountBalances(address, network);
     callback(null, {

@@ -42,6 +42,19 @@ export const debounceRequest = (request, params, timeout) =>
   );
 
 /**
+ * @desc check if lambda request has allowed access
+ * @param  {Object}  request
+ * @return {Boolean}
+ */
+export const lambdaAllowedAccess = event => {
+  const referer = event.headers.referer;
+  const allowed =
+    referer.indexOf('balance-manager.netlify.com') !== -1 ||
+    referer.indexOf('manager.balance.io') !== -1;
+  return allowed;
+};
+
+/**
  * @desc filter object by a set of allowed keys
  * @param  {Function}  request
  * @param  {Array}     params

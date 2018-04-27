@@ -4,6 +4,7 @@ import {
   convertAmountToDisplay,
   convertAssetAmountToBigNumber
 } from '../helpers/bignumber';
+import { lambdaAllowedAccess } from '../helpers/utilities';
 import { infuraGetTransactionCount } from '../helpers/infura';
 
 const parseAccountTransactions = async (data = null, address = '', network = '') => {
@@ -193,6 +194,12 @@ export const apiProxyGetAccountTransactions = async (
 
 export const handler = async (event, context, callback) => {
   const { address, network, lastTxHash } = event.queryStringParameters;
+  if (!lambdaAllowedAccess(event)) {
+    callback(null, {
+      statusCode: 500,
+      body: 'Something went wrong'
+    });
+  }
   try {
     let transactions = [];
     const txCount = await infuraGetTransactionCount(address, network);

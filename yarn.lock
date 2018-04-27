@@ -8776,7 +8776,7 @@ web3-provider-engine@^13.3.2:
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-web3-provider-engine@^14.0.2:
+web3-provider-engine@^14.0.2, web3-provider-engine@^14.0.5:
   version "14.0.5"
   resolved "https://registry.yarnpkg.com/web3-provider-engine/-/web3-provider-engine-14.0.5.tgz#0283f880724af32970ecda473ac9382b6ff96e0a"
   dependencies:

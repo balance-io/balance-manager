@@ -14,9 +14,9 @@ import AccountViewInteractions from './AccountViewInteractions';
 import balancesTabIcon from '../assets/balances-tab.svg';
 import transactionsTabIcon from '../assets/transactions-tab.svg';
 import interactionsTabIcon from '../assets/interactions-tab.svg';
-import LineBreak from '../components/LineBreak';
 import arrowUp from '../assets/arrow-up.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
+import tabBackground from '../assets/tab-background.png';
 import { accountClearState } from '../reducers/_account';
 import { modalOpen } from '../reducers/_modal';
 import { capitalize } from '../helpers/utilities';
@@ -38,9 +38,10 @@ const StyledTop = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 15px 20px 12px;
+  padding: 16px 16px 13px 20px;
   & h6 {
-    color: rgba(${colors.darkGrey}, 0.5);
+    margin-bottom: 2px;
+    color: rgba(${colors.headerTitle});
     font-size: ${fonts.size.small};
     font-weight: ${fonts.weight.semibold};
   }
@@ -71,35 +72,60 @@ const StyledActions = styled.div`
 `;
 
 const StyledTabMenu = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px 0;
+  z-index: 10;
 `;
 
 const StyledTabsWrapper = styled.div`
   grid-template-columns: auto;
   box-shadow: none;
   display: flex;
-  & :nth-child(n + 2) {
-    margin-left: 10px;
+
+  & a:nth-child(2) button {
+    padding-left: 35px;
+    margin-left: 4px;
+  }
+
+  & a:nth-child(3) button {
+    padding-left: 38px;
+    margin-left: 8px;
   }
 `;
 
+const StyledTabBackground = styled.div`
+  width: 181px;
+  height: 46px;
+  position: absolute;
+  top: -1px;
+  left: 0;
+  transform: ${({ position }) => `translate3d(${position}px, 0, 0)`};
+  background: url(${tabBackground}) no-repeat;
+  background-size: 100%;
+  transition: ease 0.2s;
+`;
+
 const StyledTab = styled(Button)`
-  height: 100%;
+  height: 45px;
+  font-weight: ${fonts.weight.medium};
   border-radius: 0;
   border: none;
-  background-color: ${({ active }) => (active ? `rgb(${colors.white})` : 'transparent')};
-  color: ${({ active }) => (active ? `rgb(${colors.fadedBlue})` : `rgb(${colors.darkGrey})`)};
+  background: none;
+  color: ${({ active }) =>
+    active ? `rgb(${colors.blue})` : `rgba(${colors.purpleTextTransparent})`};
   -webkit-box-shadow: ${shadows.medium};
   box-shadow: ${shadows.medium};
-  border-radius: 6px 6px 0 0;
   margin: 0;
   display: flex;
   opacity: 1 !important;
+  padding-top: 12.5px;
+  padding-left: 34px;
   outline: none !important;
   box-shadow: none !important;
+  background-size: 181px 46px !important;
+  background-position: -47px 0;
 
   &:hover,
   &:active,
@@ -107,26 +133,29 @@ const StyledTab = styled(Button)`
     opacity: 1 !important;
     outline: none !important;
     box-shadow: none !important;
+    background: none;
+    transform: none;
+    color: ${({ active }) =>
+      active ? `rgb(${colors.blue})` : `rgba(${colors.purpleTextTransparent})`};
+
+    & > div {
+      opacity: 1 !important;
+    }
   }
 
   & > div {
     transition: ${transitions.base};
     -webkit-mask-size: auto !important;
     mask-size: auto !important;
+    margin: 1px 0 0 16px;
     background-color: ${({ active }) =>
-      active ? `rgb(${colors.fadedBlue})` : `rgb(${colors.darkGrey})`} !important;
+      active ? `rgb(${colors.blue})` : `rgb(${colors.purpleTextTransparent})`} !important;
   }
+`;
 
-  @media (hover: hover) {
-    &:hover {
-      color: ${({ active }) =>
-        active ? `rgb(${colors.fadedBlue}, 0.7)` : `rgb(${colors.darkGrey}, 0.7)`};
-      & > div {
-        background-color: ${({ active }) =>
-          active ? `rgba(${colors.fadedBlue}, 0.7)` : `rgba(${colors.darkGrey}, 0.7)`} !important;
-      }
-    }
-  }
+const StyledSwitchWrapper = styled.div`
+  box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
+    0 3px 6px 0 rgba(0, 0, 0, 0.06);
 `;
 
 const StyledMessage = styled.div`
@@ -139,19 +168,20 @@ const StyledMessage = styled.div`
 
 class AccountView extends Component {
   state = {
-    activeTab: 'BALANCES_TAB'
+    activeTab: 'BALANCES_TAB',
+    tabPosition: 40
   };
   componentWillReceiveProps(newProps) {
     const tabRoute = window.browserHistory.location.pathname.replace(newProps.match.url, '') || '/';
     switch (tabRoute) {
       case '/':
-        this.setState({ activeTab: 'BALANCES_TAB' });
+        this.setState({ activeTab: 'BALANCES_TAB', tabPosition: -47 });
         break;
       case '/transactions':
-        this.setState({ activeTab: 'TRANSACTIONS_TAB' });
+        this.setState({ activeTab: 'TRANSACTIONS_TAB', tabPosition: 91 });
         break;
       case '/interactions':
-        this.setState({ activeTab: 'INTERACTIONS_TAB' });
+        this.setState({ activeTab: 'INTERACTIONS_TAB', tabPosition: 229 });
         break;
       default:
         break;
@@ -193,16 +223,30 @@ class AccountView extends Component {
                 </StyledAddressWrapper>
 
                 <StyledActions>
-                  <Button left color="blue" icon={qrCode} onClick={this.openReceiveModal}>
+                  <Button
+                    left
+                    color="blue"
+                    hoverColor="blueHover"
+                    activeColor="blueActive"
+                    icon={qrCode}
+                    onClick={this.openReceiveModal}
+                  >
                     {lang.t('button.receive')}
                   </Button>
-                  <Button left color="blue" icon={arrowUp} onClick={this.openSendModal}>
+                  <Button
+                    left
+                    color="blue"
+                    hoverColor="blueHover"
+                    activeColor="blueActive"
+                    icon={arrowUp}
+                    onClick={this.openSendModal}
+                  >
                     {lang.t('button.send')}
                   </Button>
                 </StyledActions>
               </StyledTop>
-              <LineBreak noMargin />
               <StyledTabMenu>
+                <StyledTabBackground position={this.state.tabPosition} />
                 <StyledTabsWrapper>
                   <Link to={this.props.match.url}>
                     <StyledTab
@@ -239,20 +283,22 @@ class AccountView extends Component {
                   </Link>
                 </StyledTabsWrapper>
               </StyledTabMenu>
-              <Switch>
-                <Route exact path={this.props.match.url} component={AccountViewBalances} />
-                <Route
-                  exact
-                  path={`${this.props.match.url}/transactions`}
-                  component={AccountViewTransactions}
-                />
-                <Route
-                  exact
-                  path={`${this.props.match.url}/interactions`}
-                  component={AccountViewInteractions}
-                />
-                <Route render={() => <Redirect to={this.props.match.url} />} />
-              </Switch>
+              <StyledSwitchWrapper>
+                <Switch>
+                  <Route exact path={this.props.match.url} component={AccountViewBalances} />
+                  <Route
+                    exact
+                    path={`${this.props.match.url}/transactions`}
+                    component={AccountViewTransactions}
+                  />
+                  <Route
+                    exact
+                    path={`${this.props.match.url}/interactions`}
+                    component={AccountViewInteractions}
+                  />
+                  <Route render={() => <Redirect to={this.props.match.url} />} />
+                </Switch>
+              </StyledSwitchWrapper>
             </StyledFlex>
           ) : (
             <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>

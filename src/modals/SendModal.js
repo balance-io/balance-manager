@@ -151,6 +151,8 @@ const StyledGasOptions = styled.div`
     &:focus {
       box-shadow: none !important;
       outline: none !important;
+      background-color: transparent !important;
+      color: rgb(${colors.darkGrey}) !important;
     }
   }
 `;

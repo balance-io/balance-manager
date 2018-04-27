@@ -13,7 +13,7 @@ const StyledIcon = styled.div`
 `;
 
 const StyledButton = styled.button`
-  transition: ${transitions.base};
+  transition: ${transitions.button};
   position: relative;
   border: none;
   border-style: none;
@@ -22,25 +22,38 @@ const StyledButton = styled.button`
   border: ${({ outline, color }) => (outline ? `1px solid rgb(${colors[color]})` : 'none')};
   color: ${({ outline, color }) => (outline ? `rgb(${colors[color]})` : `rgb(${colors.white})`)};
   box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)};
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: ${fonts.size.h6};
   font-weight: ${fonts.weight.semibold};
   padding: ${({ icon, left }) =>
-    icon ? (left ? '8px 12px 8px 28px' : '8px 28px 8px 12px') : '8px 12px'};
-  margin: 5px;
-  height: 30px;
+    icon ? (left ? '7px 12px 8px 28px' : '8px 28px 8px 12px') : '8px 12px'};
+  margin-left: 8px;
+  height: 32px;
   cursor: ${({ disabled }) => (disabled ? 'auto' : 'pointer')};
   will-change: transform;
 
   &:disabled {
     opacity: 0.6;
-    box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)} !important;
+    box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)};
   }
 
-  &:active,
-  &:focus {
-    opacity: 1;
-    box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)} !important;
+  @media (hover: hover) {
+    &:hover {
+      transform: ${({ disabled }) => !disabled ? 'translateY(-1px)' : 'none'};
+      background-color: ${({ disabled, hoverColor, color }) => !disabled ? hoverColor ? `rgb(${colors[hoverColor]})` : `rgb(${colors[color]})` : `rgb(${colors[color]})`};
+      box-shadow: ${({ disabled, outline }) => (!disabled ? outline ? 'none' : `${shadows.hover}` : `${shadows.soft}`)};
+    }
+  }
+
+  &:active {
+    transform: ${({ disabled }) => !disabled ? 'translateY(1px)' : 'none'};
+    background-color: ${({ disabled, activeColor, color }) => !disabled ? activeColor ? `rgb(${colors[activeColor]})` : `rgb(${colors[color]})` : `rgb(${colors[color]})`};
+    box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)};
+    color: ${({ outline, color }) => (outline ? `rgb(${colors[color]})` : `rgba(${colors.whiteTransparent})`)};
+
+    & ${StyledIcon} {
+      opacity: 0.8;
+    }
   }
 
   & ${StyledIcon} {
@@ -48,16 +61,9 @@ const StyledButton = styled.button`
     left: ${({ left }) => (left ? '0' : 'auto')};
     display: ${({ icon }) => (icon ? 'block' : 'none')};
     mask: ${({ icon }) => (icon ? `url(${icon}) center no-repeat` : 'none')};
-    mask-size: 90%;
     background-color: ${({ outline, color }) =>
       outline ? `rgb(${colors[color]})` : `rgb(${colors.white})`};
-  }
-
-  @media (hover: hover) {
-    &:hover {
-      opacity: 0.6;
-      box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)} !important;
-    }
+    transition: 0.15s ease;
   }
 `;
 
@@ -67,6 +73,8 @@ const Button = ({
   outline,
   type,
   color,
+  hoverColor,
+  activeColor,
   disabled,
   icon,
   left,
@@ -77,6 +85,8 @@ const Button = ({
     type={type}
     outline={outline}
     color={color}
+    hoverColor={hoverColor}
+    activeColor={activeColor}
     disabled={disabled}
     icon={icon}
     left={left}
@@ -93,6 +103,8 @@ Button.propTypes = {
   outline: PropTypes.bool,
   type: PropTypes.string,
   color: PropTypes.string,
+  hoverColor: PropTypes.string,
+  activeColor: PropTypes.string,
   disabled: PropTypes.bool,
   icon: PropTypes.any,
   left: PropTypes.bool
@@ -103,6 +115,8 @@ Button.defaultProps = {
   outline: false,
   type: 'button',
   color: 'darkGrey',
+  hoverColor: 'darkGrey',
+  activeColor: 'darkGrey',
   disabled: false,
   icon: null,
   left: false

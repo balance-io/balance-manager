@@ -14,11 +14,12 @@ const StyledCard = styled.div`
   color: rgb(${colors.dark});
   background-color: ${({ background }) => `rgb(${colors[background]})`};
   box-shadow: ${shadows.soft};
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: ${fonts.size.medium};
   font-weight: ${fonts.weight.normal};
   margin: 0 auto;
   text-align: left;
+  overflow: hidden;
 `;
 
 const StyledContent = styled.div`

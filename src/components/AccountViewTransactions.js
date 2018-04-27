@@ -22,7 +22,7 @@ const StyledGrid = styled.div`
   position: relative;
   z-index: 0;
   background-color: rgb(${colors.white});
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 10px 10px;
 `;
 
 const StyledRow = styled.div`
@@ -42,7 +42,7 @@ const StyledRow = styled.div`
     font-size: ${fonts.size.h6};
   }
   &:last-child {
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 10px 10px;
   }
   @media screen and (${responsive.sm.max}) {
     grid-template-columns: repeat(5, 1fr);
@@ -77,7 +77,8 @@ const StyledLabels = styled.p`
   text-transform: uppercase;
   font-size: ${fonts.size.small} !important;
   font-weight: ${fonts.weight.semibold};
-  color: rgba(${colors.darkGrey}, 0.7);
+  color: rgb(${colors.mediumGrey});
+  letter-spacing: 0.46px;
 `;
 
 const StyledTransactionWrapper = styled.div`
@@ -146,7 +147,7 @@ const StyledTransactionTopDetails = styled(StyledTransactionDetails)`
 `;
 
 const StyledTransactionBottomDetails = styled(StyledTransactionDetails)`
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 10px 10px;
   grid-template-columns: 3fr 1fr;
 `;
 

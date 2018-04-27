@@ -33,7 +33,7 @@ const StyledRow = styled.div`
     font-size: ${fonts.size.h6};
   }
   &:last-child {
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 10px 10px;
   }
   @media screen and (${responsive.sm.max}) {
     grid-template-columns: 5fr repeat(4, 4fr);
@@ -62,7 +62,8 @@ const StyledLabels = styled.p`
   text-transform: uppercase;
   font-size: ${fonts.size.small} !important;
   font-weight: ${fonts.weight.semibold};
-  color: rgba(${colors.darkGrey}, 0.7);
+  color: rgb(${colors.mediumGrey});
+  letter-spacing: 0.46px;
 `;
 
 const StyledEthereum = styled(StyledRow)`
@@ -81,7 +82,7 @@ const StyledEthereum = styled(StyledRow)`
 const StyledToken = styled(StyledRow)`
   width: 100%;
   & > * {
-    font-weight: ${fonts.weight.medium};
+    font-weight: ${fonts.weight.regular};
     color: rgba(${colors.dark}, 0.6);
   }
   & > p:first-child {

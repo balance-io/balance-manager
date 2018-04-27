@@ -11,11 +11,11 @@ import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
 import Notification from '../components/Notification';
 import Warning from '../components/Warning';
-import balanceLogo from '../assets/balance-logo.svg';
+import balanceManagerLogo from '../assets/balance-manager-logo.svg';
 import ethereumNetworks from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
 import { accountChangeNativeCurrency } from '../reducers/_account';
-import { colors, fonts, responsive } from '../styles';
+import { colors, responsive } from '../styles';
 
 const StyledLayout = styled.div`
   position: relative;
@@ -31,8 +31,10 @@ const StyledContent = styled(Wrapper)`
 `;
 
 const StyledHeader = styled.div`
+  margin-top: -1px;
+  margin-bottom: 1px;
   width: 100%;
-  margin: 42px 0 16px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -43,26 +45,11 @@ const StyledBranding = styled.div`
   align-items: center;
 `;
 
-const StyledHero = styled.h1`
-  margin-left: 4px;
-  font-family: ${fonts.family.FFMarkPro} !important;
-  font-size: ${fonts.size.h4};
-  font-weight: normal;
-  & strong {
-    font-weight: bold;
-  }
-  & span {
-    opacity: 0.5;
-  }
+const StyledBalanceLogo = styled.div`
+  width: 198px;
+  height: 23px;
+  background: url(${balanceManagerLogo}) no-repeat;
   @media screen and (${responsive.sm.max}) {
-    font-size: ${fonts.size.medium};
-  }
-`;
-
-const StyledBalanceLogo = styled.img`
-  width: 105px;
-  @media screen and (${responsive.sm.max}) {
-    width: 84px;
   }
 `;
 
@@ -109,10 +96,7 @@ const BaseLayout = ({
         <StyledHeader>
           <Link to="/">
             <StyledBranding>
-              <StyledBalanceLogo src={balanceLogo} alt="Balance" />
-              <StyledHero>
-                <span>{` Manager`}</span>
-              </StyledHero>
+              <StyledBalanceLogo alt="Balance" />
             </StyledBranding>
           </Link>
           <StyledIndicators show={showToolbar}>

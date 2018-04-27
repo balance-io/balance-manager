@@ -4,15 +4,15 @@ import PropTypes from 'prop-types';
 import jsonp from 'jsonp';
 import lang from '../languages';
 import Button from './Button';
-import arrowLeft from '../assets/arrow-left.svg';
-import { fonts, colors, responsive, shadows, transitions } from '../styles';
+import { fonts, colors, responsive, transitions } from '../styles';
 
 const SFormWrapper = styled.div`
   position: relative;
+  float: right;
+  margin: 29px 29px 0 0;
   width: 100%;
-  max-width: 320px;
+  max-width: 400px;
   border-radius: 8px;
-  box-shadow: ${({ success }) => (success ? `none` : `${shadows.medium}`)};
 `;
 
 const SMessage = styled.p`
@@ -24,36 +24,46 @@ const SMessage = styled.p`
 
 const SSuccess = styled.p`
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: ${fonts.weight.medium};
+  top: -60px;
+  right: -20px;
+  padding: 11px 15px 0 15px;
+  height: 44px;
+  background: #d9dce3;
+  color: #fff !important;
+  border-radius: 8px;
+  font-size: ${fonts.size.medium} !important;
+  font-weight: ${fonts.weight.semibold} !important;
   transition: ${transitions.base};
 `;
 
 const StyledSubmit = styled(Button)`
   position: absolute;
-  margin: 0;
-  top: calc(50% - 15px);
-  right: 8px;
-}`;
+  right: 0;
+  padding: 0 15px 2px 15px;
+  height: 44px;
+  border-radius: 8px;
+  font-size: ${fonts.size.medium};
+  &:disabled {
+    opacity: 1;
+    background-color: rgba(185, 189, 198, 0.8) !important;
+  }
+`;
 
 const SForm = styled.form`
   & input {
     outline: none;
     margin: 0;
-    font-size: ${fonts.size.large};
-    padding: 12px;
-    width: 100%;
-    border-radius: 4px;
+    font-size: ${fonts.size.medium} !important;
+    font-weight: ${fonts.weight.medium};
+    padding: 11px 14px 14px 14px;
+    width: 268px;
+    border-radius: 8px;
     background: rgb(${colors.white});
-    color: rgb(${colors.dark});
+    color: rgb(${colors.ledger});
     border: none;
     border-style: none;
+    box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
+      0 3px 6px 0 rgba(0, 0, 0, 0.06);
     transition: ${transitions.short};
     opacity: ${({ success }) => (success ? '0' : '1')};
     pointer-events: ${({ success }) => (success ? 'none' : 'auto')};
@@ -63,7 +73,7 @@ const SForm = styled.form`
     }
   }
   & input::placeholder {
-    color: rgba(${colors.dark}, 0.5);
+    color: rgba(161, 162, 169, 0.6);
   }
   & ${SSuccess} {
     opacity: ${({ success }) => (success ? '1' : '0')};
@@ -157,7 +167,13 @@ class SubscribeForm extends Component {
             placeholder={lang.t('input.email_placeholder')}
           />
           {this.state.status !== 'success' && (
-            <StyledSubmit color="blue" icon={arrowLeft} type="submit">
+            <StyledSubmit
+              disabled={!this.state.input}
+              color="blue"
+              hoverColor="blueHover"
+              activeColor="blueActive"
+              type="submit"
+            >
               {lang.t('button.notify_me')}
             </StyledSubmit>
           )}

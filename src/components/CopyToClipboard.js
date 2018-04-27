@@ -51,7 +51,7 @@ const StyledContainer = styled.div`
 const StyledInputText = styled.input`
   background-color: transparent;
   color: transparent;
-  text-shadow: 0 0 0 rgba(${colors.darkGrey}, 0.8);
+  text-shadow: 0 0 0 rgb(${colors.mediumGrey});
   font-style: normal;
   font-stretch: normal;
   line-height: normal;

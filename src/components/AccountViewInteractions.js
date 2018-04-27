@@ -77,7 +77,8 @@ const StyledLabels = styled.p`
   text-transform: uppercase;
   font-size: ${fonts.size.small} !important;
   font-weight: ${fonts.weight.semibold};
-  color: rgba(${colors.darkGrey}, 0.7);
+  color: rgb(${colors.mediumGrey});
+  letter-spacing: 0.46px;
 `;
 
 const StyledTransactionWrapper = styled.div`

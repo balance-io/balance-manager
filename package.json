@@ -33,7 +33,8 @@
   },
   "scripts": {
     "remove-sourcemaps": "rm -rf build/static/js/*.map",
-    "start": "concurrently \"react-scripts start\" \"netlify-lambda serve src/lambda\"",
+    "start":
+      "NODE_ENV=development concurrently \"react-scripts start\" \"netlify-lambda serve src/lambda\"",
     "build": "react-scripts build && yarn run remove-sourcemaps",
     "build:lambda": "netlify-lambda build src/lambda",
     "test": "react-scripts test --env=jsdom",

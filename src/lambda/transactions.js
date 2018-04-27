@@ -193,14 +193,15 @@ export const apiProxyGetAccountTransactions = async (
 };
 
 export const handler = async (event, context, callback) => {
-  const { address, network, lastTxHash } = event.queryStringParameters;
-  if (!lambdaAllowedAccess(event)) {
-    callback(null, {
-      statusCode: 500,
-      body: 'Something went wrong'
-    });
-  }
   try {
+    const { address, network, lastTxHash } = event.queryStringParameters;
+    if (!lambdaAllowedAccess(event)) {
+      callback(null, {
+        statusCode: 500,
+        body: 'Something went wrong'
+      });
+      return;
+    }
     let transactions = [];
     const txCount = await infuraGetTransactionCount(address, network);
     if (Number(txCount)) {
@@ -214,7 +215,7 @@ export const handler = async (event, context, callback) => {
     console.error(error);
     callback(null, {
       statusCode: 500,
-      body: error
+      body: 'Something went wrong'
     });
   }
 };

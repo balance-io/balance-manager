@@ -34,14 +34,15 @@ const checkTransactionStatus = async (hash = '', network = 'mainnet') => {
 };
 
 export const handler = async (event, context, callback) => {
-  const { hash, network } = event.queryStringParameters;
-  if (!lambdaAllowedAccess(event)) {
-    callback(null, {
-      statusCode: 500,
-      body: 'Something went wrong'
-    });
-  }
   try {
+    const { hash, network } = event.queryStringParameters;
+    if (!lambdaAllowedAccess(event)) {
+      callback(null, {
+        statusCode: 500,
+        body: 'Something went wrong'
+      });
+      return;
+    }
     const result = await checkTransactionStatus(hash, network);
     callback(null, {
       statusCode: 200,
@@ -51,7 +52,7 @@ export const handler = async (event, context, callback) => {
     console.error(error);
     callback(null, {
       statusCode: 500,
-      body: error
+      body: 'Something went wrong'
     });
   }
 };

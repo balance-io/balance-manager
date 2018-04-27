@@ -47,6 +47,7 @@ export const debounceRequest = (request, params, timeout) =>
  * @return {Boolean}
  */
 export const lambdaAllowedAccess = event => {
+  if (process.env.NODE_ENV === 'development') return true;
   const referer = event.headers.referer;
   if (!referer) return false;
   const allowed =

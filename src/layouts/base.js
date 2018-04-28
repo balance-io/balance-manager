@@ -55,13 +55,15 @@ const StyledBalanceLogo = styled.div`
 `;
 
 const StyledBeta = styled.div`
-  margin: 4px;
+  margin: 0;
   position: absolute;
-  top: -6px;
+  top: 5.5px;
   right: -36px;
+  width: 28px;
+  letter-spacing: .3px;
   font-size: 8px;
   font-weight: 500;
-  padding: 2px 4px;
+  padding: 2px 3.5px;
   border-radius: 4px;
   background: rgba(${colors.white}, 0.5);
   color: rgb(${colors.bodyBackground});
@@ -111,7 +113,7 @@ const BaseLayout = ({
           <Link to="/">
             <StyledBranding>
               <StyledBalanceLogo alt="Balance" />
-              <StyledBeta>{'Beta'}</StyledBeta>
+              <StyledBeta>{'BETA'}</StyledBeta>
             </StyledBranding>
           </Link>
           <StyledIndicators show={showToolbar}>

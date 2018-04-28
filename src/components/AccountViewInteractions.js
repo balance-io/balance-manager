@@ -21,6 +21,8 @@ const StyledGrid = styled.div`
   text-align: right;
   position: relative;
   z-index: 0;
+  box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
+    0 3px 6px 0 rgba(0, 0, 0, 0.06);
   background-color: rgb(${colors.white});
   border-radius: 0 0 8px 8px;
 `;

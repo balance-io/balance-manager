@@ -14,6 +14,8 @@ const StyledGrid = styled.div`
   text-align: right;
   position: relative;
   z-index: 0;
+  box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
+    0 3px 6px 0 rgba(0, 0, 0, 0.06);
 `;
 
 const StyledRow = styled.div`
@@ -172,6 +174,7 @@ const StyledShowMoreTokens = styled(StyledToken)`
 
 class AccountViewBalances extends Component {
   state = {
+    disableToggle: false,
     showMoreTokens: false
   };
   onShowMoreTokens = () => {
@@ -183,16 +186,24 @@ class AccountViewBalances extends Component {
     const tokens = this.props.accountInfo.assets.filter(
       asset => asset.symbol !== 'ETH' && typeof asset === 'object' && !!asset
     );
+    if (tokens.length && tokens.length < 5 && !this.state.disableToggle) {
+      this.setState({ disableToggle: true });
+    }
     const tokensWithHighMarketValue = tokens.filter(
       asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
     );
-    let tokensWithLowMarketValue = tokens.filter(
+    const tokensWithLowMarketValue = tokens.filter(
       asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
     );
     const tokensWithNoMarketValue = tokens.filter(asset => !asset.native);
-    tokensWithLowMarketValue = [...tokensWithLowMarketValue, ...tokensWithNoMarketValue];
+    let tokensAlwaysDisplay = tokensWithHighMarketValue;
+    let tokensToggleDisplay = [...tokensWithLowMarketValue, ...tokensWithNoMarketValue];
+    if (this.state.disableToggle) {
+      tokensAlwaysDisplay = [...tokensAlwaysDisplay, ...tokensToggleDisplay];
+      tokensToggleDisplay = [];
+    }
     const allLowMarketTokensHaveNoValue =
-      tokensWithNoMarketValue.length === tokensWithLowMarketValue.length;
+      tokensWithNoMarketValue.length === tokensToggleDisplay.length;
     return (
       <StyledGrid>
         <StyledLabelsRow>
@@ -217,8 +228,8 @@ class AccountViewBalances extends Component {
           </StyledPercentage>
           <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
         </StyledEthereum>
-        {!!tokensWithHighMarketValue &&
-          tokensWithHighMarketValue.map(token => (
+        {!!tokensAlwaysDisplay &&
+          tokensAlwaysDisplay.map(token => (
             <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
               <StyledAsset>
                 <AssetIcon asset={token.address} />
@@ -234,9 +245,9 @@ class AccountViewBalances extends Component {
               <p>{token.native ? token.native.balance.display : '———'}</p>
             </StyledToken>
           ))}
-        {!!tokensWithLowMarketValue.length &&
+        {!!tokensToggleDisplay.length &&
           this.state.showMoreTokens &&
-          tokensWithLowMarketValue.map(token => (
+          tokensToggleDisplay.map(token => (
             <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
               <StyledAsset data-toggle="tooltip" title={token.name}>
                 <AssetIcon asset={token.address} />
@@ -253,13 +264,13 @@ class AccountViewBalances extends Component {
             </StyledToken>
           ))}
         <StyledLastRow>
-          {!!tokensWithLowMarketValue.length ? (
+          {!!tokensToggleDisplay.length && !this.state.disableToggle ? (
             <StyledShowMoreTokens onClick={this.onShowMoreTokens}>
               <ToggleIndicator show={this.state.showMoreTokens} />
               {`${this.state.showMoreTokens ? lang.t('account.hide') : lang.t('account.show')} ${
-                tokensWithLowMarketValue.length
+                tokensToggleDisplay.length
               } ${
-                tokensWithLowMarketValue.length === 1
+                tokensToggleDisplay.length === 1
                   ? lang.t('account.token')
                   : lang.t('account.tokens')
               } ${

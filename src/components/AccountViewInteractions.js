@@ -122,13 +122,13 @@ const StyledTransactionMainRow = styled(StyledTransaction)`
   cursor: pointer;
   border-radius: ${({ showTxDetails }) => (showTxDetails ? '8px 8px 0 0' : `8px`)};
   &:nth-child(n + 3) {
-    border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
+    border-top: 1px solid rgba(${colors.rowDivider});
   }
 `;
 
 const StyledTransactionDetails = styled(StyledTransaction)`
   transition: ${transitions.long};
-  border-top-color: rgba(${colors.darkGrey}, 0.1);
+  border-top-color: rgba(${colors.rowDivider});
   border-top-style: solid;
   border-top-width: ${({ showTxDetails }) => (showTxDetails ? `1px` : '0')};
   max-height: ${({ showTxDetails }) => (showTxDetails ? '80px' : '0')};
@@ -154,7 +154,7 @@ const StyledTransactionBottomDetails = styled(StyledTransactionDetails)`
 `;
 
 const StyledLineBreak = styled(LineBreak)`
-  border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
+  border-top: 1px solid rgba(${colors.rowDivider});
   opacity: ${({ showTxDetails }) => (showTxDetails ? '0' : '1')};
 `;
 
@@ -194,13 +194,14 @@ const StyledShowAllInteractions = styled(StyledRow)`
   width: 100%;
   z-index: 2;
   & p {
-    padding-left: 18px;
+    padding-left: 17px;
+    margin-top: -3px;
     cursor: pointer;
     text-align: left;
     justify-content: flex-start;
     font-family: ${fonts.family.SFProText};
-    font-weight: ${fonts.weight.normal};
-    font-size: ${fonts.size.h6};
+    font-weight: ${fonts.weight.medium};
+    font-size: 13px;
     color: rgb(${colors.grey});
   }
 `;

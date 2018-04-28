@@ -17,14 +17,16 @@ export const colors = {
   fadedBlue: '103, 129, 230',
   gold: '250, 188, 45',
   orange: '246, 133, 27',
-  green: '79, 180, 128',
+  green: '0, 153, 77',
   lightGreen: '84, 209, 146',
-  red: '222, 75, 57',
+  red: '214, 75, 71',
   ethplorer: '80, 102, 133',
   etherscan: '2, 92, 144',
   walletconnect: '64, 153, 255',
   ledger: '47, 49, 55',
-  bodyBackground: '44,47,56'
+  bodyBackground: '44,47,56',
+  darkText: '43,45,51',
+  rowDivider: '224,224,224,0.24',
 };
 
 export const fonts = {

@@ -52,7 +52,7 @@ const StyledRow = styled.div`
 const StyledLabelsRow = styled(StyledRow)`
   width: 100%;
   border-width: 0 0 2px 0;
-  border-color: rgba(${colors.lightGrey}, 0.4);
+  border-color: rgba(136,136,136,0.03);
   border-style: solid;
   padding: 12px 20px;
   & p:first-child {
@@ -71,13 +71,15 @@ const StyledLabels = styled.p`
 const StyledEthereum = styled(StyledRow)`
   width: 100%;
   z-index: 2;
-  box-shadow: ${shadows.medium};
   & div p {
     font-weight: ${fonts.weight.medium};
   }
   & > p {
-    font-weight: ${fonts.weight.semibold};
+    font-weight: ${fonts.weight.regular};
     font-family: ${fonts.family.SFMono};
+  }
+  & p:last-child {
+    font-weight: ${fonts.weight.medium};
   }
 `;
 
@@ -85,7 +87,7 @@ const StyledToken = styled(StyledRow)`
   width: 100%;
   & > * {
     font-weight: ${fonts.weight.regular};
-    color: rgba(${colors.dark}, 0.6);
+    color: rgb(${colors.darkText});
   }
   & > p:first-child {
     justify-content: flex-start;
@@ -94,7 +96,7 @@ const StyledToken = styled(StyledRow)`
     font-family: ${fonts.family.SFMono};
   }
   &:nth-child(n + 3) {
-    border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
+    border-top: 1px solid rgba(${colors.rowDivider});
   }
 `;
 
@@ -133,7 +135,7 @@ const StyledLastRow = styled(StyledRow)`
   grid-template-columns: 3fr 1fr;
   min-height: 0;
   min-width: 0;
-  border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
+  border-top: 1px solid rgba(${colors.rowDivider});
   & > p {
     font-size: ${fonts.size.medium};
     font-weight: ${fonts.weight.semibold};
@@ -160,10 +162,11 @@ const StyledShowMoreTokens = styled(StyledToken)`
   text-align: left;
   justify-content: flex-start;
   font-family: ${fonts.family.SFProText};
-  font-weight: ${fonts.weight.normal};
-  font-size: ${fonts.size.h6};
+  font-weight: ${fonts.weight.medium};
+  font-size: 13px;
   color: rgb(${colors.grey});
-  padding-left: 18px;
+  margin-top: -1px;
+  padding-left: 19px;
 
   @media (hover: hover) {
     &:hover p {

@@ -264,6 +264,5 @@ export const obtainPathComponentsFromDerivationPath = (derivationPath = '') => {
       "To get multiple accounts your derivation path must follow pattern 44'/60|61'/x'/n "
     );
   }
-  console.log('matchResult', matchResult);
   return { basePath: matchResult[1], index: parseInt(matchResult[2], 10) };
 };

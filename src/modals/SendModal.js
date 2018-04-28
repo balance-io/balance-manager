@@ -307,7 +307,6 @@ class SendModal extends Component {
     this.props.sendModalInit(this.props.modalProps.address, selected);
   };
   onSubmit = e => {
-    console.log('this.props.modalProps.accountType', this.props.modalProps.accountType);
     e.preventDefault();
     const request = {
       address: this.props.modalProps.address,

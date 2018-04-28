@@ -38,7 +38,6 @@ export const parseError = error => {
       console.error(new Error(message));
       return message;
     } else if (message.indexOf('0x6801') !== -1) {
-      console.log(message);
       message = lang.t('notification.error.generic_error');
     }
     console.error(error);

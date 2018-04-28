@@ -175,7 +175,6 @@ export const getTransferTokenTransaction = transaction => {
 export const web3SendSignedTransaction = signedTx =>
   new Promise((resolve, reject) => {
     const serializedTx = typeof signedTx === 'string' ? signedTx : signedTx.raw;
-    console.log('serializedTx', serializedTx);
     web3Instance.eth
       .sendSignedTransaction(serializedTx)
       .once('transactionHash', txHash => resolve(txHash))
@@ -243,7 +242,6 @@ export const web3MetamaskTransferToken = transaction =>
  */
 export const web3LedgerSendTransaction = transaction =>
   new Promise((resolve, reject) => {
-    console.log('web3LedgerSendTransaction', transaction);
     const from =
       transaction.from.substr(0, 2) === '0x' ? transaction.from : `0x${transaction.from}`;
     const to = transaction.to.substr(0, 2) === '0x' ? transaction.to : `0x${transaction.to}`;
@@ -258,7 +256,6 @@ export const web3LedgerSendTransaction = transaction =>
       gasLimit: transaction.gasLimit
     })
       .then(txDetails => {
-        console.log('txDetails', txDetails);
         ledgerEthSignTransaction(txDetails)
           .then(signedTx =>
             web3SendSignedTransaction(signedTx)

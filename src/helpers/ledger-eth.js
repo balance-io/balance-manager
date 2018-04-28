@@ -64,7 +64,6 @@ export const ledgerEthAccounts = async () => {
  * @return {String}
  */
 export const ledgerEthSignTransaction = async transaction => {
-  console.log('transaction', transaction);
   let accounts = ledgerEthInstance.accounts;
   if (!accounts.length) {
     accounts = await ledgerEthAccounts();
@@ -72,24 +71,19 @@ export const ledgerEthSignTransaction = async transaction => {
   const account = accounts.filter(
     account => account.address.toLowerCase() === transaction.from.toLowerCase()
   )[0];
-  console.log('account', account);
   if (!account) throw new Error("address unknown '" + transaction.from + "'");
   const path = account.path;
-  console.log('account.path', account.path);
   const transport = await ledgerEthInstance.getTransport();
   try {
     const tx = new EthereumTx(transaction);
-    console.log('new EthereumTx(transaction)', tx);
 
     tx.raw[6] = Buffer.from([ledgerEthInstance.networkId]); // v
     tx.raw[7] = Buffer.from([]); // r
     tx.raw[8] = Buffer.from([]); // s
-    console.log(ledgerEthInstance.eth.signTransaction);
     const result = await ledgerEthInstance.eth.signTransaction(
       path,
       tx.serialize().toString('hex')
     );
-    console.log('result', result);
 
     tx.v = Buffer.from(result.v, 'hex');
     tx.r = Buffer.from(result.r, 'hex');
@@ -118,7 +112,6 @@ export const ledgerEthSignTransaction = async transaction => {
  * @return {String}
  */
 export const signPersonalMessage = async message => {
-  console.log('message', message);
   let accounts = ledgerEthInstance.accounts;
   if (!accounts.length) {
     accounts = await ledgerEthAccounts();
@@ -126,10 +119,8 @@ export const signPersonalMessage = async message => {
   const account = accounts.filter(
     account => account.address.toLowerCase() === message.from.toLowerCase()
   )[0];
-  console.log('account', account);
   if (!account) throw new Error("address unknown '" + message.from + "'");
   const path = account.path;
-  console.log('account.path', account.path);
   const transport = await ledgerEthInstance.getTransport();
   try {
     const result = await ledgerEthInstance.eth.signPersonalMessage(

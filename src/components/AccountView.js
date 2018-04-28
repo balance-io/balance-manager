@@ -92,7 +92,6 @@ class AccountView extends Component {
       address: this.props.accountInfo.address
     });
   render() {
-    console.log(this.props);
     return (
       <StyledAccountView>
         <Card

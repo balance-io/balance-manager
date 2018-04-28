@@ -43,6 +43,7 @@ const StyledHeader = styled.div`
 const StyledBranding = styled.div`
   display: flex;
   align-items: center;
+  position: relative;
 `;
 
 const StyledBalanceLogo = styled.div`
@@ -51,6 +52,19 @@ const StyledBalanceLogo = styled.div`
   background: url(${balanceManagerLogo}) no-repeat;
   @media screen and (${responsive.sm.max}) {
   }
+`;
+
+const StyledBeta = styled.div`
+  margin: 4px;
+  position: absolute;
+  top: -6px;
+  right: -36px;
+  font-size: 8px;
+  font-weight: 500;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: rgba(${colors.white}, 0.5);
+  color: rgb(${colors.bodyBackground});
 `;
 
 const StyledIndicators = styled.div`
@@ -97,6 +111,7 @@ const BaseLayout = ({
           <Link to="/">
             <StyledBranding>
               <StyledBalanceLogo alt="Balance" />
+              <StyledBeta>{'Beta'}</StyledBeta>
             </StyledBranding>
           </Link>
           <StyledIndicators show={showToolbar}>

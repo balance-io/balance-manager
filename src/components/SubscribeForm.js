@@ -4,36 +4,33 @@ import PropTypes from 'prop-types';
 import jsonp from 'jsonp';
 import lang from '../languages';
 import Button from './Button';
-import { fonts, colors, responsive, transitions } from '../styles';
+import { fonts, colors, transitions } from '../styles';
 
-const SFormWrapper = styled.div`
+const SForm = styled.form`
   position: relative;
   float: right;
   margin: 29px 29px 0 0;
   width: 100%;
   max-width: 400px;
   border-radius: 8px;
-`;
-
-const SMessage = styled.p`
-  position: absolute;
-  text-align: center;
-  margin-top: 10px;
-  font-size: ${fonts.size.h6};
-`;
-
-const SSuccess = styled.p`
-  position: absolute;
-  top: -60px;
-  right: -20px;
-  padding: 11px 15px 0 15px;
-  height: 44px;
-  background: #d9dce3;
-  color: #fff !important;
-  border-radius: 8px;
-  font-size: ${fonts.size.medium} !important;
-  font-weight: ${fonts.weight.semibold} !important;
-  transition: ${transitions.base};
+  & input {
+    outline: none;
+    margin: 0;
+    font-size: ${fonts.size.medium} !important;
+    font-weight: ${fonts.weight.medium};
+    padding: 11px 14px 14px 14px;
+    width: 268px;
+    border-radius: 8px;
+    background: rgb(${colors.white});
+    color: rgb(${colors.ledger});
+    border: none;
+    border-style: none;
+    box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
+      0 3px 6px 0 rgba(0, 0, 0, 0.06);
+  }
+  & input::placeholder {
+    color: rgba(161, 162, 169, 0.6);
+  }
 `;
 
 const StyledSubmit = styled(Button)`
@@ -49,38 +46,19 @@ const StyledSubmit = styled(Button)`
   }
 `;
 
-const SForm = styled.form`
-  & input {
-    outline: none;
-    margin: 0;
-    font-size: ${fonts.size.medium} !important;
-    font-weight: ${fonts.weight.medium};
-    padding: 11px 14px 14px 14px;
-    width: 268px;
-    border-radius: 8px;
-    background: rgb(${colors.white});
-    color: rgb(${colors.ledger});
-    border: none;
-    border-style: none;
-    box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
-      0 3px 6px 0 rgba(0, 0, 0, 0.06);
-    transition: ${transitions.short};
-    opacity: ${({ success }) => (success ? '0' : '1')};
-    pointer-events: ${({ success }) => (success ? 'none' : 'auto')};
-    visibility: ${({ success }) => (success ? 'hidden' : 'visible')};
-    @media screen and (${responsive.sm.max}) {
-      width: 100%;
-    }
-  }
-  & input::placeholder {
-    color: rgba(161, 162, 169, 0.6);
-  }
-  & ${SSuccess} {
-    opacity: ${({ success }) => (success ? '1' : '0')};
-    pointer-events: ${({ success }) => (success ? 'auto' : 'none')};
-    visibility: ${({ success }) => (success ? 'visible' : 'hidden')};
-  }
+const SMessage = styled.p`
+  position: absolute;
+  text-align: center;
+  padding: 0;
+  margin: 5px 0 !important;
+  font-size: ${fonts.size.h6};
+  transition: ${transitions.base};
+  opacity: ${({ show }) => (show ? 0.8 : 0)};
+  visibility: ${({ show }) => (show ? 'visible' : 'hidden')};
+  pointer-events: ${({ show }) => (show ? 'auto' : 'none')};
 `;
+
+let messageTimeout = null;
 
 class SubscribeForm extends Component {
   state = {
@@ -88,112 +66,129 @@ class SubscribeForm extends Component {
     message: null,
     input: ''
   };
+  onChange = ({ target }) => {
+    this.setState({ input: target.value });
+  };
+  onStatusChange = (state, callback) => {
+    clearTimeout(messageTimeout);
+    this.setState(state);
+    if (state.status !== 'sending') {
+      messageTimeout = setTimeout(
+        () =>
+          this.setState({
+            status: '',
+            message: ''
+          }),
+        3000
+      );
+    }
+    if (callback) callback();
+  };
   onSubmit = e => {
     const options = this.props.options;
     e.preventDefault();
     if (!this.state.input || this.state.input.length < 5 || this.state.input.indexOf('@') === -1) {
-      this.setState({
-        status: 'error'
+      this.onStatusChange({
+        status: 'error',
+        message: 'Email is invalid'
       });
       return;
     }
     const url = `//${options.server}.list-manage.com/subscribe/post-json?u=${options.userId}&id=${
       options.listId
     }&ORIGIN=${options.origin}&EMAIL=${encodeURIComponent(this.state.input)}`;
-    this.setState(
+    this.onStatusChange(
       {
         status: 'sending',
-        message: null
+        message: ''
       },
       () =>
         jsonp(url, { param: 'c' }, (err, data) => {
           let error = null;
           let result = null;
           if (err) {
-            this.setState({
+            this.onStatusChange({
               status: 'error'
             });
           } else if (data.result !== 'success') {
             if (data.msg.includes('already subscribed')) {
-              error = { message: 'EMAIL_ALREADY_SUBSCRIBED' };
-              this.setState({
+              error = { message: 'EMAIL_ALREADY_SUBCRIBED' };
+              this.onStatusChange({
                 status: 'error',
-                message: lang.t('subscribe_form.email_already_subscribed')
+                message: `Sorry, you've already signed up with this email`
               });
             } else if (data.msg.includes('too many recent signup requests')) {
               error = { message: 'TOO_MANY_SIGNUP_REQUESTS' };
-              this.setState({
+              this.onStatusChange({
                 status: 'error',
-                message: lang.t('subscribe_form.email_already_subscribed')
+                message: `Too many signup requests, please try again later`
               });
             } else {
               error = { message: 'UNKNOWN_ERROR' };
-              this.setState({
+              this.onStatusChange({
                 status: 'error'
               });
             }
           } else {
             result = { email: this.state.input };
-            this.setState({
+            this.onStatusChange({
               status: 'success'
             });
           }
-          this.props.callback(error, result);
+          if (this.props.options.callback) this.props.options.callback(error, result);
         })
     );
   };
-  getEmailClient = () => this.state.input.match(/@(\w|.)+/gi)[0].replace('@', '');
+  renderMessage = () => {
+    if (!this.state.message) {
+      switch (this.state.status) {
+        case 'error':
+          return lang.t('subscribe_form.generic_error');
+        case 'success':
+          return lang.t('subscribe_form.successful');
+        case 'sending':
+          return lang.t('subscribe_form.sending');
+        default:
+          return '';
+      }
+    }
+    return this.state.message;
+  };
   render() {
     return (
-      <SFormWrapper success={this.state.status === 'success'}>
-        <SForm
-          success={this.state.status === 'success'}
-          onSubmit={this.onSubmit}
-          method="POST"
-          noValidate
+      <SForm noValidate success={this.state.status === 'success'} onSubmit={this.onSubmit}>
+        <input
+          required
+          spellCheck={false}
+          type="email"
+          placeholder={lang.t('input.email_placeholder')}
+          value={this.state.input}
+          onFocus={this.onFocus}
+          onBlur={this.onBlur}
+          onChange={this.onChange}
+        />
+        <StyledSubmit
+          disabled={!this.state.input}
+          color="blue"
+          hoverColor="blueHover"
+          activeColor="blueActive"
+          type="submit"
         >
-          {this.state.status === 'success' && (
-            <SSuccess>
-              <a href={`https://${this.getEmailClient()}`} target="_blank">
-                {lang.t('subscribe_form.successful')}
-              </a>
-            </SSuccess>
-          )}
-          <input
-            value={this.state.input}
-            onChange={e => this.setState({ status: null, input: e.target.value })}
-            type="email"
-            required
-            placeholder={lang.t('input.email_placeholder')}
-          />
-          {this.state.status !== 'success' && (
-            <StyledSubmit
-              disabled={!this.state.input}
-              color="blue"
-              hoverColor="blueHover"
-              activeColor="blueActive"
-              type="submit"
-            >
-              {lang.t('button.notify_me')}
-            </StyledSubmit>
-          )}
-          {this.state.status === 'sending' && (
-            <SMessage color={colors.white}>{lang.t('subscribe_form.sending')}</SMessage>
-          )}
-          {this.state.status === 'error' && (
-            <SMessage color={colors.red}>
-              {this.state.message ? this.state.message : lang.t('subscribe_form.generic_error')}
-            </SMessage>
-          )}
-        </SForm>
-      </SFormWrapper>
+          {lang.t('button.notify_me')}
+        </StyledSubmit>
+        <SMessage
+          color={this.state.status === 'error' ? colors.red : colors.white}
+          show={this.state.status}
+        >
+          {this.renderMessage()}
+        </SMessage>
+      </SForm>
     );
   }
 }
 
 SubscribeForm.propTypes = {
-  options: PropTypes.objectOf(PropTypes.string),
-  callback: PropTypes.func
+  options: PropTypes.objectOf(PropTypes.string)
 };
 
 SubscribeForm.defaultProps = {
@@ -202,8 +197,7 @@ SubscribeForm.defaultProps = {
     userId: 'a3f87e208a9f9896949b4f336',
     listId: '3985713da6',
     origin: ''
-  },
-  callback: () => {}
+  }
 };
 
 export default SubscribeForm;

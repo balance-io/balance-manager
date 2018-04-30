@@ -7,7 +7,7 @@ import AssetIcon from './AssetIcon';
 import ToggleIndicator from './ToggleIndicator';
 import { ellipseText } from '../helpers/utilities';
 import { convertStringToNumber, hasHighMarketValue, hasLowMarketValue } from '../helpers/bignumber';
-import { colors, fonts, shadows, responsive } from '../styles';
+import { colors, fonts, responsive } from '../styles';
 
 const StyledGrid = styled.div`
   width: 100%;
@@ -52,7 +52,7 @@ const StyledRow = styled.div`
 const StyledLabelsRow = styled(StyledRow)`
   width: 100%;
   border-width: 0 0 2px 0;
-  border-color: rgba(136,136,136,0.03);
+  border-color: rgba(136, 136, 136, 0.03);
   border-style: solid;
   padding: 12px 20px;
   & p:first-child {

@@ -16,6 +16,7 @@ const StyledWrapper = styled.div`
   animation: ${fadeIn} 0.7s ease 0s normal 1;
   min-height: 200px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: ${({ center }) => (center ? `center` : `flex-start`)};
 `;

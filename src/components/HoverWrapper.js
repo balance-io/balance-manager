@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { shadows, transitions } from '../styles';
+import { shadows } from '../styles';
 
 const StyledHoverWrapper = styled.div`
   position: relative;
@@ -12,12 +12,10 @@ const StyledHoverWrapper = styled.div`
 
 const StyledRelative = styled.div`
   width: 100%;
-  transition: ${transitions.base};
   position: relative;
 `;
 const StyledHover = styled.div`
   width: 100%;
-  transition: ${transitions.base};
   position: absolute;
 `;
 

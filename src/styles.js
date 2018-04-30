@@ -1,28 +1,40 @@
 export const colors = {
   white: '255, 255, 255',
+  whiteTransparent: '255, 255, 255, 0.8',
+  purpleText: '50, 50, 93',
+  purpleTextTransparent: '50, 50, 93, 0.7',
   black: '0, 0, 0',
   dark: '12, 12, 13',
   darkGrey: '113, 119, 138',
+  mediumGrey: '161, 165, 179',
+  headerTitle: '170, 175, 189',
   grey: '169, 169, 188',
-  lightGrey: '245, 246, 250',
-  blue: '89, 131, 255',
+  lightGrey: '247, 248, 252',
+  blue: '101, 127, 230',
+  blueHover: '108, 135, 245',
+  blueActive: '90, 113, 204',
   lightBlue: '197, 242, 255',
   fadedBlue: '103, 129, 230',
   gold: '250, 188, 45',
   orange: '246, 133, 27',
-  green: '79, 180, 128',
+  green: '0, 153, 77',
   lightGreen: '84, 209, 146',
-  red: '222, 75, 57',
+  red: '214, 75, 71',
   ethplorer: '80, 102, 133',
   etherscan: '2, 92, 144',
-  walletconnect: '64, 153, 255'
+  walletconnect: '64, 153, 255',
+  ledger: '47, 49, 55',
+  bodyBackground: '44,47,56',
+  darkText: '43,45,51',
+  rowDivider: '224,224,224,0.24',
 };
 
 export const fonts = {
   size: {
     tiny: '10px',
     small: '12px',
-    medium: '16px',
+    smedium: '14px',
+    medium: '15px',
     large: '18px',
     big: '22px',
     h1: '42px',
@@ -47,16 +59,21 @@ export const fonts = {
 };
 
 export const shadows = {
-  soft: '0 2px 6px 0 rgba(2, 2, 3, 0.04), 0 1px 3px 0 rgba(2, 2, 3, 0.06)',
+  soft:
+    '0 4px 6px 0 rgba(50, 50, 93, 0.11), 0 1px 3px 0 rgba(0, 0, 0, 0.08), inset 0 0 1px 0 rgba(0, 0, 0, 0.06)',
   medium:
     '0 3px 6px 0 rgba(0, 0, 0, 0.06), 0 0 1px 0 rgba(50, 50, 93, 0.02), 0 5px 10px 0 rgba(59, 59, 92, 0.08)',
-  big: '0 15px 35px 0 rgba(50, 50, 93, 0.06), 0 5px 15px 0 rgba(50, 50, 93, 0.15)'
+  big: '0 15px 35px 0 rgba(50, 50, 93, 0.06), 0 5px 15px 0 rgba(50, 50, 93, 0.15)',
+  hover:
+    '0 7px 14px 0 rgba(50, 50, 93, 0.1), 0 3px 6px 0 rgba(0, 0, 0, 0.08), inset 0 0 1px 0 rgba(0, 0, 0, 0.06)'
 };
 
 export const transitions = {
   short: 'all 0.1s ease-in-out',
   base: 'all 0.2s ease-in-out',
-  long: 'all 0.3s ease-in-out'
+  long: 'all 0.3s ease-in-out',
+  button: '0.15s ease',
+  buttonPress: '0.15s ease'
 };
 
 export const responsive = {
@@ -240,9 +257,7 @@ export const globalStyles = `
     -webkit-overflow-scrolling: touch;
   }
 
-  button:active,
-  button:focus,
-  button.active {
+  button {
     background-image: none;
     outline: 0;
     -webkit-box-shadow: none;

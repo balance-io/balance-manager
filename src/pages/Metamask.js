@@ -6,9 +6,10 @@ import lang from '../languages';
 import BaseLayout from '../layouts/base';
 import AccountView from '../components/AccountView';
 import Card from '../components/Card';
+import { accountClearState } from '../reducers/_account';
 import {
   metamaskUpdateMetamaskAccount,
-  metamaskConnectMetamask,
+  metamaskConnectInit,
   metamaskClearIntervals
 } from '../reducers/_metamask';
 import { fonts, colors } from '../styles';
@@ -27,7 +28,8 @@ const StyledMessage = styled.div`
 
 class Metamask extends Component {
   componentDidMount() {
-    this.props.metamaskConnectMetamask();
+    if (this.props.accountType !== 'METMASK') this.props.accountClearState();
+    this.props.metamaskConnectInit();
   }
   renderMessage() {
     if (!this.props.web3Available) return lang.t('message.web3_not_available');
@@ -42,9 +44,9 @@ class Metamask extends Component {
       <StyledWrapper>
         {this.props.fetching ||
         (this.props.network && this.props.accountAddress && this.props.web3Available) ? (
-          <AccountView fetchingMetamask={this.props.fetching} match={this.props.match} />
+          <AccountView fetchingWallet={this.props.fetching} match={this.props.match} />
         ) : (
-          <Card minHeight={180} fetching={this.props.fetching}>
+          <Card minHeight={200} fetching={this.props.fetching}>
             <StyledMessage>{this.renderMessage()}</StyledMessage>
           </Card>
         )}
@@ -55,7 +57,7 @@ class Metamask extends Component {
 
 Metamask.propTypes = {
   metamaskUpdateMetamaskAccount: PropTypes.func.isRequired,
-  metamaskConnectMetamask: PropTypes.func.isRequired,
+  metamaskConnectInit: PropTypes.func.isRequired,
   metamaskClearIntervals: PropTypes.func.isRequired,
   web3Available: PropTypes.bool.isRequired,
   network: PropTypes.string.isRequired,
@@ -68,7 +70,8 @@ Metamask.defaultProps = {
   accountAddress: null
 };
 
-const reduxProps = ({ metamask }) => ({
+const reduxProps = ({ account, metamask }) => ({
+  accountType: account.accountType,
   web3Available: metamask.web3Available,
   network: metamask.network,
   accountAddress: metamask.accountAddress,
@@ -76,7 +79,8 @@ const reduxProps = ({ metamask }) => ({
 });
 
 export default connect(reduxProps, {
+  accountClearState,
   metamaskUpdateMetamaskAccount,
-  metamaskConnectMetamask,
+  metamaskConnectInit,
   metamaskClearIntervals
 })(Metamask);

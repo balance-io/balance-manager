@@ -14,15 +14,17 @@ import TransactionStatus from './TransactionStatus';
 import etherscanLogo from '../assets/etherscan-logo.svg';
 import ethplorerLogo from '../assets/ethplorer-logo.svg';
 import { getLocalTimeDate } from '../helpers/time';
-import { colors, fonts, shadows, responsive, transitions } from '../styles';
+import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
   width: 100%;
   text-align: right;
   position: relative;
   z-index: 0;
+  box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
+    0 3px 6px 0 rgba(0, 0, 0, 0.06);
   background-color: rgb(${colors.white});
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 10px 10px;
 `;
 
 const StyledRow = styled.div`
@@ -42,7 +44,7 @@ const StyledRow = styled.div`
     font-size: ${fonts.size.h6};
   }
   &:last-child {
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 10px 10px;
   }
   @media screen and (${responsive.sm.max}) {
     grid-template-columns: repeat(5, 1fr);
@@ -77,7 +79,8 @@ const StyledLabels = styled.p`
   text-transform: uppercase;
   font-size: ${fonts.size.small} !important;
   font-weight: ${fonts.weight.semibold};
-  color: rgba(${colors.darkGrey}, 0.7);
+  color: rgb(${colors.mediumGrey});
+  letter-spacing: 0.46px;
 `;
 
 const StyledTransactionWrapper = styled.div`
@@ -87,7 +90,7 @@ const StyledTransactionWrapper = styled.div`
   border-radius: 8px;
   z-index: 0;
   & > div {
-    transition: ${transitions.base};
+    transition: box-shadow 0.2s ease-in-out;
     border-radius: 8px;
     @media (hover: hover) {
       &:hover {
@@ -100,7 +103,6 @@ const StyledTransactionWrapper = styled.div`
 `;
 
 const StyledTransaction = styled(StyledRow)`
-  transition: ${transitions.base};
   width: 100%;
   box-shadow: none;
   & > * {
@@ -119,13 +121,12 @@ const StyledTransactionMainRow = styled(StyledTransaction)`
   cursor: pointer;
   border-radius: ${({ showTxDetails }) => (showTxDetails ? '8px 8px 0 0' : `8px`)};
   &:nth-child(n + 3) {
-    border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
+    border-top: 1px solid rgba(${colors.rowDivider});
   }
 `;
 
 const StyledTransactionDetails = styled(StyledTransaction)`
-  transition: ${transitions.long};
-  border-top-color: rgba(${colors.darkGrey}, 0.1);
+  border-top-color: rgba(${colors.rowDivider});
   border-top-style: solid;
   border-top-width: ${({ showTxDetails }) => (showTxDetails ? `1px` : '0')};
   max-height: ${({ showTxDetails }) => (showTxDetails ? '80px' : '0')};
@@ -151,7 +152,7 @@ const StyledTransactionBottomDetails = styled(StyledTransactionDetails)`
 `;
 
 const StyledLineBreak = styled(LineBreak)`
-  border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
+  border-top: 1px solid rgba(${colors.rowDivider});
   opacity: ${({ showTxDetails }) => (showTxDetails ? '0' : '1')};
 `;
 
@@ -191,13 +192,14 @@ const StyledShowAllInteractions = styled(StyledRow)`
   width: 100%;
   z-index: 2;
   & p {
-    padding-left: 18px;
+    padding-left: 17px;
+    margin-top: -3px;
     cursor: pointer;
     text-align: left;
     justify-content: flex-start;
     font-family: ${fonts.family.SFProText};
-    font-weight: ${fonts.weight.normal};
-    font-size: ${fonts.size.h6};
+    font-weight: ${fonts.weight.medium};
+    font-size: 13px;
     color: rgb(${colors.grey});
   }
 `;
@@ -385,12 +387,12 @@ class AccountViewInteractions extends Component {
         </StyledGrid>
       ) : (
         <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
-          <StyledMessage>{lang.t('account.message_failed_request')}</StyledMessage>
+          <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
         </StyledCard>
       )
     ) : (
       <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
-        <StyledMessage>{lang.t('account.message_no_interactions')}</StyledMessage>
+        <StyledMessage>{lang.t('message.no_interactions')}</StyledMessage>
       </StyledCard>
     );
   };

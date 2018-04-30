@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import lang from '../languages';
 import {
   convertAmountToBigNumber,
   convertAmountFromBigNumber,
@@ -33,13 +34,16 @@ export const parseError = error => {
         .replace('MetaMask ', '')
         .replace('Returned error: ', '');
       message = message.slice(0, 1).toUpperCase() + message.slice(1).toLowerCase();
+
       console.error(new Error(message));
       return message;
+    } else if (message.indexOf('0x6801') !== -1) {
+      message = lang.t('notification.error.generic_error');
     }
     console.error(error);
     return message;
   }
-  return `Something went wrong`;
+  return lang.t('notification.error.generic_error');
 };
 
 /**

@@ -6,37 +6,77 @@ import lang from '../languages';
 import Link from '../components/Link';
 import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
-import Column from '../components/Column';
 import SubscribeForm from '../components/SubscribeForm';
 import Button from '../components/Button';
-import MetamaskLogo from '../components/MetamaskLogo';
-import LedgerLogo from '../components/LedgerLogo';
-import TrezorLogo from '../components/TrezorLogo';
-import metamaskWhite from '../assets/metamask-white.png';
+import metamaskLogoImage from '../assets/metamask-logo.png';
+import ledgerLogoImage from '../assets/ledger-logo.svg';
+import trezorLogoImage from '../assets/trezor-logo.svg';
 // import WalletConnectLogo from '../components/WalletConnectLogo';
 // import walletConnectWhite from '../assets/walletconnect-white.svg';
-import { getLocal } from '../helpers/utilities';
 import { accountUpdateAccountAddress } from '../reducers/_account';
-import { metamaskConnectMetamask } from '../reducers/_metamask';
+import { getLocal } from '../helpers/utilities';
 import { modalOpen } from '../reducers/_modal';
-import { responsive } from '../styles';
+import { fonts, responsive } from '../styles';
+
+const StyledCard = styled(Card)`
+  width: 100%;
+  height: 102px;
+  margin-bottom: 18px;
+  background: #f5f6fa;
+  display: block;
+  overflow: visible;
+`;
+
+const StyledCardMetaMask = StyledCard.extend`
+  border-radius: 14px 10px 10px 14px;
+`;
+
+const StyledCardTrezor = StyledCard.extend`
+  @media screen and (max-width: 620px) {
+    & div:nth-child(3) {
+      display: none;
+    }
+  }
+`;
 
 const StyledCardContainer = styled.div`
   width: 100%;
-  display: flex;
   align-items: center;
   justify-content: space-between;
+
+  & p {
+    font-size: ${fonts.size.smedium};
+    font-weight: ${fonts.weight.medium};
+    color: #a1a2a9;
+  }
+
   @media screen and (${responsive.sm.max}) {
     flex-direction: column;
     justify-content: ;
   }
 `;
 
-const StyledMetamaskConnect = styled(Column)`
-  padding: 15px;
-  & > * {
-    margin: 24px;
+const StyledMetamaskConnect = styled.div`
+  & p {
+    margin: 43px 20px 0 196px;
   }
+
+  @media screen and (max-width: 736px) {
+    & p {
+      display: none;
+    }
+  }
+`;
+
+const StyledMetamaskLogo = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 173px;
+  height: 102px;
+  background: url(${metamaskLogoImage});
+  background-size: 100%;
+  border-radius: 10px 0 0 10px;
 `;
 
 // const StyledWalletConnect = styled(Column)`
@@ -46,13 +86,81 @@ const StyledMetamaskConnect = styled(Column)`
 //   }
 // `;
 
-const StyledHardwareWallets = styled(Column)`
-  padding: 15px;
-  & > * {
-    margin: 10px;
+const StyledHardwareWallets = styled.div`
+  & p {
+    margin: 60px 20px 0 28px;
+    color: #a1a2a9;
   }
-  & > div:last-child {
-    margin-top: 32px;
+
+  @media screen and (${responsive.sm.max}) {
+    & p {
+      display: none;
+    }
+  }
+`;
+
+const StyledHardwareWalletsTrezor = StyledHardwareWallets.extend`
+  & p {
+    position: absolute;
+    opacity: 0.7;
+  }
+
+  @media screen and (${responsive.sm.max}) {
+    & p {
+      display: block;
+    }
+  }
+`;
+
+const StyledLedgerLogo = styled.div`
+  position: absolute;
+  top: 27px;
+  left: 28px;
+  width: 100px;
+  height: 28px;
+  background: url(${ledgerLogoImage});
+  background-size: 100%;
+
+  @media screen and (${responsive.sm.max}) {
+    top: 38px;
+  }
+`;
+
+const StyledTrezorLogo = styled.div`
+  position: absolute;
+  top: 22px;
+  left: 28px;
+  width: 109px;
+  height: 31px;
+  background: url(${trezorLogoImage});
+  background-size: 100%;
+`;
+
+const StyledConnectButton = styled(Button)`
+  position: absolute;
+  right: 29px;
+  top: 29px;
+  padding: 0 15px 2px 15px;
+  height: 44px;
+  border-radius: 8px;
+  font-size: ${fonts.size.medium};
+`;
+
+const StyledMetamaskButton = StyledConnectButton.extend`
+  &:hover {
+    background: #ff932e;
+  }
+  &:active {
+    background: #f07f16;
+  }
+`;
+
+const StyledLedgerButton = StyledConnectButton.extend`
+  &:hover {
+    background: #454852;
+  }
+  &:active {
+    background: #2b2d33;
   }
 `;
 
@@ -68,15 +176,45 @@ class Home extends Component {
   };
   render = () => (
     <BaseLayout>
-      <Card>
+      <StyledCardMetaMask>
+        <StyledCardContainer>
+          <StyledMetamaskConnect>
+            <StyledMetamaskLogo />
+            <p>Connect to the MetaMask Chrome extension.</p>
+            <Link to="/metamask">
+              <StyledMetamaskButton left color="orange">
+                {lang.t('button.connect_metamask')}
+              </StyledMetamaskButton>
+            </Link>
+          </StyledMetamaskConnect>
+        </StyledCardContainer>
+      </StyledCardMetaMask>
+
+      <StyledCard>
         <StyledCardContainer>
           <StyledHardwareWallets>
-            <LedgerLogo />
-            <TrezorLogo />
-            <SubscribeForm />
+            <StyledLedgerLogo />
+            <p>Connect and sign with your Ledger hardware wallet.</p>
+            <Link to="/ledger">
+              <StyledLedgerButton left color="ledger">
+                {lang.t('button.connect_ledger')}
+              </StyledLedgerButton>
+            </Link>
           </StyledHardwareWallets>
+        </StyledCardContainer>
+      </StyledCard>
 
-          {/* <StyledWalletConnect>
+      <StyledCardTrezor>
+        <StyledCardContainer>
+          <StyledHardwareWalletsTrezor>
+            <StyledTrezorLogo />
+            <p>Coming soon.</p>
+            <SubscribeForm />
+          </StyledHardwareWalletsTrezor>
+        </StyledCardContainer>
+      </StyledCardTrezor>
+
+      {/* <StyledConnect>
             <WalletConnectLogo />
             <Button
               left
@@ -86,35 +224,17 @@ class Home extends Component {
             >
               {lang.t('button.connect_walletconnect')}
             </Button>
-          </StyledWalletConnect> */}
-
-          <StyledMetamaskConnect>
-            <MetamaskLogo />
-            <Link to="/metamask">
-              <Button
-                left
-                color="orange"
-                icon={metamaskWhite}
-                onClick={this.props.metamaskConnectMetamask}
-              >
-                {lang.t('button.connect_metamask')}
-              </Button>
-            </Link>
-          </StyledMetamaskConnect>
-        </StyledCardContainer>
-      </Card>
+          </StyledConnect> */}
     </BaseLayout>
   );
 }
 
 Home.propTypes = {
-  metamaskConnectMetamask: PropTypes.func.isRequired,
-  accountUpdateAccountAddress: PropTypes.func.isRequired,
-  modalOpen: PropTypes.func.isRequired
+  modalOpen: PropTypes.func.isRequired,
+  accountUpdateAccountAddress: PropTypes.func.isRequired
 };
 
 export default connect(null, {
   modalOpen,
-  metamaskConnectMetamask,
   accountUpdateAccountAddress
 })(Home);

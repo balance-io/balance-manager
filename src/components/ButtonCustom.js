@@ -25,13 +25,13 @@ const StyledButton = styled.button`
   background-color: ${({ bgColor }) => `rgb(${colors[bgColor]})`};
   color: ${({ txtColor }) => `rgb(${colors[txtColor]})`};
   box-shadow: ${shadows.soft};
-  border-radius: 6px;
-  font-size: ${fonts.size.h6};
+  border-radius: 7px;
+  font-size: 0.75em;
   font-weight: ${fonts.weight.semibold};
   padding: ${({ img, left }) =>
     img ? (left ? '8px 12px 8px 28px' : '8px 28px 8px 12px') : '8px 12px'};
   margin: 5px;
-  height: 30px;
+  height: 27px;
   cursor: ${({ disabled }) => (disabled ? 'auto' : 'pointer')};
   will-change: transform;
 

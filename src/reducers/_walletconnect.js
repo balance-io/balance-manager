@@ -39,7 +39,7 @@ const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
-export const walletConnectModalInit = () => async (dispatch, getState) => {
+export const walletConnectInit = () => async (dispatch, getState) => {
   const keypair = await generateKeyPair();
   dispatch({ type: WALLET_CONNECT_SEND_TOKEN_REQUEST, payload: keypair });
   apiWalletConnectInit()

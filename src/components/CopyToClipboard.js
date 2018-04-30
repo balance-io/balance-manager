@@ -32,6 +32,7 @@ const StyledText = styled.p`
 
 const StyledCopyToClipboard = styled.div`
   width: 100%;
+  min-height: 20px;
   position: relative;
 `;
 

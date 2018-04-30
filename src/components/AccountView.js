@@ -100,14 +100,14 @@ class AccountView extends Component {
           background={'lightGrey'}
           minHeight={200}
         >
-          {!!this.props.accountInfo.address || !!this.props.accountAddress ? (
+          {!!this.props.accountAddress || !!this.props.accountInfo.address ? (
             <StyledFlex>
               <StyledTop>
                 <StyledAddressWrapper>
-                  <h6>{capitalize(this.props.accountInfo.type || this.props.accountType)} </h6>
+                  <h6>{capitalize(this.props.accountType || this.props.accountInfo.type)} </h6>
                   <CopyToClipboard
                     iconOnHover
-                    text={this.props.accountInfo.address || this.props.accountAddress}
+                    text={this.props.accountAddress || this.props.accountInfo.address}
                   />
                 </StyledAddressWrapper>
 

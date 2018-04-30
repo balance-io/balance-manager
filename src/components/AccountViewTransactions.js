@@ -14,7 +14,7 @@ import TransactionStatus from './TransactionStatus';
 import etherscanLogo from '../assets/etherscan-logo.svg';
 import ethplorerLogo from '../assets/ethplorer-logo.svg';
 import { getLocalTimeDate } from '../helpers/time';
-import { colors, fonts, shadows, responsive, transitions } from '../styles';
+import { colors, fonts, shadows, responsive } from '../styles';
 
 const StyledGrid = styled.div`
   width: 100%;
@@ -90,7 +90,7 @@ const StyledTransactionWrapper = styled.div`
   border-radius: 8px;
   z-index: 0;
   & > div {
-    transition: ${transitions.base};
+    transition: box-shadow 0.2s ease-in-out;
     border-radius: 8px;
     @media (hover: hover) {
       &:hover {
@@ -103,7 +103,6 @@ const StyledTransactionWrapper = styled.div`
 `;
 
 const StyledTransaction = styled(StyledRow)`
-  transition: ${transitions.base};
   width: 100%;
   box-shadow: none;
   & > * {
@@ -127,7 +126,6 @@ const StyledTransactionMainRow = styled(StyledTransaction)`
 `;
 
 const StyledTransactionDetails = styled(StyledTransaction)`
-  transition: ${transitions.long};
   border-top-color: rgba(${colors.darkGrey}, 0.1);
   border-top-style: solid;
   border-top-width: ${({ showTxDetails }) => (showTxDetails ? `1px` : '0')};

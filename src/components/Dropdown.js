@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import caret from '../assets/caret.svg';
 import circle from '../assets/circle.svg';
-import { fonts, colors, shadows, responsive, transitions } from '../styles';
+import { fonts, colors, shadows, transitions } from '../styles';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -33,7 +33,7 @@ const StyledIcon = styled.div`
   background-color: ${({ iconColor }) => (iconColor ? `rgb(${colors[iconColor]})` : 'transparent')};
 `;
 
-const StyledRow = styled.div`
+const StyledRowWrapper = styled.div`
   min-width: 70px;
   border-radius: 6px;
   position: relative;
@@ -42,6 +42,16 @@ const StyledRow = styled.div`
   font-weight: ${fonts.weight.medium};
   text-align: center;
   outline: none;
+  & p {
+    margin: 0 4px;
+  }
+`;
+
+const StyledSelectedWrapper = styled(StyledRowWrapper)`
+  outline: none;
+  background: transparent;
+  color: ${({ dark }) => (dark ? `rgb(${colors.dark})` : `rgba(${colors.white}, 0.8)`)};
+  border-radius: 6px;
   & > div {
     cursor: ${({ noOptions }) => (noOptions ? 'auto' : 'pointer')};
     padding: ${({ noOptions }) => (noOptions ? `8px` : `8px 26px 8px 8px`)};
@@ -50,27 +60,12 @@ const StyledRow = styled.div`
     align-items: center;
     justify-content: space-between;
   }
-  & p {
-    margin: 0 4px;
-  }
-  @media screen and (${responsive.xs.max}) {
-    & p {
-      font-size: ${fonts.size.tiny};
-    }
-  }
-`;
-
-const StyledSelected = styled(StyledRow)`
-  outline: none;
-  background: transparent;
-  color: ${({ dark }) => (dark ? `rgb(${colors.dark})` : `rgba(${colors.white}, 0.8)`)};
-  border-radius: 6px;
   & ${StyledCaret} {
     opacity: ${({ noOptions }) => (noOptions ? 0 : 1)};
   }
 `;
 
-const StyledDropdown = styled(StyledRow)`
+const StyledDropdownWrapper = styled(StyledRowWrapper)`
   position: absolute;
   background: rgb(${colors.white});
   color: rgb(${colors.darkGrey});
@@ -82,26 +77,21 @@ const StyledDropdown = styled(StyledRow)`
   pointer-events: ${({ show }) => (show ? 'auto' : 'none')};
   -webkit-box-shadow: ${shadows.medium};
   box-shadow: ${shadows.medium};
-
   max-height: 280px;
   overflow: scroll;
+`;
 
-  & > div {
-    transition: ${transitions.base};
-    border-top: 1px solid rgba(${colors.lightGrey}, 0.7);
-
-    padding: 6px;
-    width: auto;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-      opacity: 0.6;
-    }
-  }
-  & ${StyledIcon} {
-    background-color: ${({ icon }) => (icon ? `rgb(${colors.darkGrey})` : 'none')};
+const StyledRow = styled.div`
+  transition: ${transitions.base};
+  border-top: 1px solid rgba(${colors.lightGrey}, 0.7);
+  font-weight: ${({ selected }) => (selected ? fonts.weight.bold : fonts.weight.normal)};
+  padding: 6px;
+  width: auto;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    opacity: 0.6;
   }
 `;
 
@@ -126,7 +116,7 @@ class Dropdown extends Component {
     if (!options[_selected]) return null;
     return (
       <StyledWrapper {...props}>
-        <StyledSelected
+        <StyledSelectedWrapper
           dark={dark}
           show={this.state.showDropdown}
           noOptions={!onChange || Object.keys(options).length < 2}
@@ -137,21 +127,22 @@ class Dropdown extends Component {
             <p>{options[_selected][displayKey]}</p>
           </div>
           <StyledCaret dark={dark} />
-        </StyledSelected>
-        <StyledDropdown
+        </StyledSelectedWrapper>
+        <StyledDropdownWrapper
           show={this.state.showDropdown}
           noOptions={!onChange || Object.keys(options).length < 2}
         >
           {onChange &&
-            Object.keys(options)
-              .filter(key => key !== _selected)
-              .map(key => (
-                <div key={options[key][displayKey]} onClick={() => this.onChangeSelected(key)}>
-                  {/* <StyledIcon iconColor={iconColor} icon={options[key].icon} /> */}
-                  <p>{options[key][displayKey]}</p>
-                </div>
-              ))}
-        </StyledDropdown>
+            Object.keys(options).map(key => (
+              <StyledRow
+                selected={key === _selected}
+                key={options[key][displayKey]}
+                onClick={() => this.onChangeSelected(key)}
+              >
+                <p>{options[key][displayKey]}</p>
+              </StyledRow>
+            ))}
+        </StyledDropdownWrapper>
       </StyledWrapper>
     );
   }

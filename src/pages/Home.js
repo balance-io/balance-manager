@@ -102,7 +102,7 @@ const StyledHardwareWallets = styled.div`
 const StyledHardwareWalletsTrezor = StyledHardwareWallets.extend`
   & p {
     position: absolute;
-    opacity: 0.6;
+    opacity: 0.7;
   }
 
   @media screen and (${responsive.sm.max}) {

@@ -63,7 +63,7 @@ const StyledBeta = styled.div`
   letter-spacing: .3px;
   font-size: 8px;
   font-weight: 500;
-  padding: 2px 3.5px;
+  padding: 2px 3px;
   border-radius: 4px;
   background: rgba(${colors.white}, 0.5);
   color: rgb(${colors.bodyBackground});

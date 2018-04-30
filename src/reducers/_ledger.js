@@ -37,7 +37,6 @@ export const ledgerConnectInit = () => (dispatch, getState) => {
 };
 
 export const ledgerUpdateNetwork = network => (dispatch, getState) => {
-  console.log('network', network);
   const accountAddress = getState().account.accountAddress;
   dispatch({ type: LEDGER_UPDATE_NETWORK, payload: network });
   dispatch(accountUpdateNetwork(network));

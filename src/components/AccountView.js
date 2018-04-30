@@ -80,8 +80,8 @@ class AccountView extends Component {
     this.props.modalOpen('SEND_MODAL', {
       name:
         this.props.accountInfo.name || `${this.props.accountType}${lang.t('modal.default_wallet')}`,
-      address: this.props.accountInfo.address,
-      accountType: this.props.accountType,
+      address: this.props.accountAddress || this.props.accountInfo.address,
+      accountType: this.props.accountType || this.props.accountInfo.type,
       assets: this.props.accountInfo.assets
     });
   openReceiveModal = () =>

@@ -34,7 +34,6 @@
       "unknown_token": "Unknown Token"
     },
     "button": {
-      "connect_ledger": "Connect to Ledger",
       "connect_walletconnect": "Use WalletConnect",
       "connect_metamask": "Connect to MetaMask",
       "connect_ledger": "Connect to Ledger",
@@ -107,7 +106,8 @@
       "failed_request": "Failed request, please refresh",
       "failed_ledger_connection": "Failed to connect to Ledger, please check your device",
       "no_transactions": "No transactions found for this account",
-      "no_interactions": "No interactions found for this account"
+      "no_interactions": "No interactions found for this account",
+      "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum"
     },
     "notification": {
       "error": {

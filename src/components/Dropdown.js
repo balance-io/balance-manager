@@ -112,8 +112,6 @@ class Dropdown extends Component {
   onChangeSelected = selected => {
     this.setState({ showDropdown: false });
     if (this.props.onChange) {
-      console.log('onChangeSelected', selected);
-      console.log('this.props.onChange', this.props.onChange);
       this.props.onChange(selected);
     }
   };

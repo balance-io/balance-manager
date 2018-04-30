@@ -49,7 +49,9 @@ class Ledger extends Component {
           {this.props.fetching || this.props.accounts.length ? (
             <AccountView
               fetchingWallet={this.props.fetching}
-              fetchingMessage={`Please connect and unlock Ledger then select Ethereum`}
+              fetchingMessage={
+                !this.props.accounts.length ? lang.t('message.please_connect_ledger') : ''
+              }
               match={this.props.match}
             />
           ) : (

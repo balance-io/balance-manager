@@ -98,7 +98,7 @@ class AccountView extends Component {
           fetching={this.props.fetching || this.props.fetchingWallet}
           fetchingMessage={this.props.fetchingMessage}
           background={'lightGrey'}
-          minHeight={250}
+          minHeight={200}
         >
           {!!this.props.accountInfo.address || !!this.props.accountAddress ? (
             <StyledFlex>

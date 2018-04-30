@@ -53,7 +53,7 @@ class Ledger extends Component {
               match={this.props.match}
             />
           ) : (
-            <Card minHeight={250} fetching={this.props.fetching}>
+            <Card minHeight={200} fetching={this.props.fetching}>
               <StyledCardContainer>
                 <StyledMessage>{lang.t('message.failed_ledger_connection')}</StyledMessage>
                 <StyledButton color="grey" onClick={this.connectLedger}>

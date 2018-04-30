@@ -105,7 +105,7 @@ const StyledDropdown = styled(StyledRow)`
   }
 `;
 
-class DropdownNative extends Component {
+class DropdownSimple extends Component {
   state = {
     showDropdown: false
   };
@@ -121,8 +121,8 @@ class DropdownNative extends Component {
     }
   };
   render() {
-    const { options, dark, iconColor, selected, onChange, ...props } = this.props;
-    const _selected = selected || options[Object.keys(options)[0]].currency;
+    const { options, dark, iconColor, selected, displayKey, onChange, ...props } = this.props;
+    const _selected = selected || options[Object.keys(options)[0]][displayKey];
     if (!options[_selected]) return null;
     return (
       <StyledWrapper {...props}>
@@ -134,7 +134,7 @@ class DropdownNative extends Component {
         >
           <div>
             <StyledIcon iconColor={iconColor} icon={options[_selected].icon} />
-            <p>{options[_selected].currency}</p>
+            <p>{options[_selected][displayKey]}</p>
           </div>
           <StyledCaret dark={dark} />
         </StyledSelected>
@@ -147,11 +147,11 @@ class DropdownNative extends Component {
               .filter(key => key !== _selected)
               .map(key => (
                 <div
-                  key={options[key].currency}
-                  onClick={() => this.onChangeSelected(options[key].currency)}
+                  key={options[key][displayKey]}
+                  onClick={() => this.onChangeSelected(options[key][displayKey])}
                 >
                   <StyledIcon iconColor={iconColor} icon={options[key].icon} />
-                  <p>{options[key].currency}</p>
+                  <p>{options[key][displayKey]}</p>
                 </div>
               ))}
         </StyledDropdown>
@@ -160,19 +160,20 @@ class DropdownNative extends Component {
   }
 }
 
-DropdownNative.propTypes = {
+DropdownSimple.propTypes = {
   options: PropTypes.object.isRequired,
+  displayKey: PropTypes.string.isRequired,
   dark: PropTypes.bool,
   selected: PropTypes.string,
   onChange: PropTypes.func,
   iconColor: PropTypes.string
 };
 
-DropdownNative.defaultProps = {
+DropdownSimple.defaultProps = {
   dark: false,
   selected: null,
   onChange: null,
   iconColor: 'dark'
 };
 
-export default DropdownNative;
+export default DropdownSimple;

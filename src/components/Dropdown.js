@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import caret from '../assets/caret.svg';
+import circle from '../assets/circle.svg';
 import { fonts, colors, shadows, responsive, transitions } from '../styles';
 
 const StyledWrapper = styled.div`
@@ -26,11 +27,10 @@ const StyledCaret = styled.img`
 const StyledIcon = styled.div`
   height: 15px;
   width: 15px;
-  mask: ${({ icon }) => (icon ? `url(${icon}) center no-repeat` : 'none')};
+  mask: url(${circle}) center no-repeat;
   mask-size: 60%;
-  display: ${({ icon }) => (icon ? 'block' : 'none')};
-  background-color: ${({ icon, iconColor }) =>
-    icon && iconColor ? `rgb(${colors[iconColor]})` : 'none'};
+  display: ${({ iconColor }) => (iconColor ? 'block' : 'none')};
+  background-color: ${({ iconColor }) => (iconColor ? `rgb(${colors[iconColor]})` : 'transparent')};
 `;
 
 const StyledRow = styled.div`
@@ -44,7 +44,7 @@ const StyledRow = styled.div`
   outline: none;
   & > div {
     cursor: ${({ noOptions }) => (noOptions ? 'auto' : 'pointer')};
-    padding: ${({ noOptions, icon }) => (noOptions ? `8px` : `8px 26px 8px 8px`)};
+    padding: ${({ noOptions }) => (noOptions ? `8px` : `8px 26px 8px 8px`)};
     background-size: 8px;
     display: flex;
     align-items: center;
@@ -105,13 +105,15 @@ const StyledDropdown = styled(StyledRow)`
   }
 `;
 
-class DropdownSimple extends Component {
+class Dropdown extends Component {
   state = {
     showDropdown: false
   };
   onChangeSelected = selected => {
     this.setState({ showDropdown: false });
     if (this.props.onChange) {
+      console.log('onChangeSelected', selected);
+      console.log('this.props.onChange', this.props.onChange);
       this.props.onChange(selected);
     }
   };
@@ -133,7 +135,7 @@ class DropdownSimple extends Component {
           onClick={this.toggleDropdown}
         >
           <div>
-            <StyledIcon iconColor={iconColor} icon={options[_selected].icon} />
+            <StyledIcon iconColor={options[_selected].color || iconColor} />
             <p>{options[_selected][displayKey]}</p>
           </div>
           <StyledCaret dark={dark} />
@@ -146,11 +148,8 @@ class DropdownSimple extends Component {
             Object.keys(options)
               .filter(key => key !== _selected)
               .map(key => (
-                <div
-                  key={options[key][displayKey]}
-                  onClick={() => this.onChangeSelected(options[key][displayKey])}
-                >
-                  <StyledIcon iconColor={iconColor} icon={options[key].icon} />
+                <div key={options[key][displayKey]} onClick={() => this.onChangeSelected(key)}>
+                  {/* <StyledIcon iconColor={iconColor} icon={options[key].icon} /> */}
                   <p>{options[key][displayKey]}</p>
                 </div>
               ))}
@@ -160,7 +159,7 @@ class DropdownSimple extends Component {
   }
 }
 
-DropdownSimple.propTypes = {
+Dropdown.propTypes = {
   options: PropTypes.object.isRequired,
   displayKey: PropTypes.string.isRequired,
   dark: PropTypes.bool,
@@ -169,11 +168,11 @@ DropdownSimple.propTypes = {
   iconColor: PropTypes.string
 };
 
-DropdownSimple.defaultProps = {
+Dropdown.defaultProps = {
   dark: false,
   selected: null,
   onChange: null,
-  iconColor: 'dark'
+  iconColor: ''
 };
 
-export default DropdownSimple;
+export default Dropdown;

@@ -1,5 +1,5 @@
 import lang from '../languages';
-import { accountUpdateAccountAddress } from './_account';
+import { accountUpdateAccountAddress, accountUpdateNetwork } from './_account';
 import { ledgerEthInit, ledgerEthAccounts } from '../helpers/ledger-eth';
 import { notificationShow } from './_notification';
 
@@ -8,9 +8,11 @@ const LEDGER_CONNECT_REQUEST = 'ledger/LEDGER_CONNECT_REQUEST';
 const LEDGER_CONNECT_SUCCESS = 'ledger/LEDGER_CONNECT_SUCCESS';
 const LEDGER_CONNECT_FAILURE = 'ledger/LEDGER_CONNECT_FAILURE';
 
+const LEDGER_UPDATE_NETWORK = 'ledger/LEDGER_UPDATE_NETWORK';
+
 // -- Actions --------------------------------------------------------------- //
 
-export const ledgerConnectInit = () => async (dispatch, getState) => {
+export const ledgerConnectInit = () => (dispatch, getState) => {
   const network = getState().ledger.network;
   dispatch({ type: LEDGER_CONNECT_REQUEST });
   ledgerEthInit(network)
@@ -32,6 +34,14 @@ export const ledgerConnectInit = () => async (dispatch, getState) => {
     .catch(error => {
       dispatch({ type: LEDGER_CONNECT_FAILURE });
     });
+};
+
+export const ledgerUpdateNetwork = network => (dispatch, getState) => {
+  console.log('network', network);
+  const accountAddress = getState().account.accountAddress;
+  dispatch({ type: LEDGER_UPDATE_NETWORK, payload: network });
+  dispatch(accountUpdateNetwork(network));
+  dispatch(accountUpdateAccountAddress(accountAddress, 'LEDGER'));
 };
 
 // -- Reducer --------------------------------------------------------------- //

@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import Link from '../components/Link';
 import Modal from '../components/Modal';
-import Indicator from '../components/Indicator';
-import DropdownSimple from '../components/DropdownSimple';
+import Dropdown from '../components/Dropdown';
 import Background from '../components/Background';
 import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
@@ -14,6 +13,7 @@ import Warning from '../components/Warning';
 import balanceManagerLogo from '../assets/balance-manager-logo.svg';
 import ethereumNetworks from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
+import { ledgerUpdateNetwork } from '../reducers/_ledger';
 import { accountChangeNativeCurrency, accountUpdateAccountAddress } from '../reducers/_account';
 import { colors, responsive } from '../styles';
 
@@ -81,8 +81,6 @@ const StyledIndicators = styled.div`
   }
 `;
 
-const StyledNetworkStatus = styled(Indicator)``;
-
 const StyledVerticalLine = styled.div`
   height: 17px;
   border-left: 2px solid rgba(${colors.lightGrey}, 0.1);
@@ -90,10 +88,12 @@ const StyledVerticalLine = styled.div`
 
 const BaseLayout = ({
   children,
-  fetching,
+  metamaskFetching,
+  ledgerFetching,
   accountType,
   accountAddress,
   ledgerAccounts,
+  ledgerUpdateNetwork,
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
   nativeCurrency,
@@ -110,7 +110,7 @@ const BaseLayout = ({
   }
   const showToolbar =
     window.location.pathname !== '/' &&
-    !fetching &&
+    (!metamaskFetching || !ledgerFetching) &&
     ((accountType === 'METAMASK' && web3Available) || accountType !== 'METAMASK') &&
     accountAddress;
   return (
@@ -128,7 +128,7 @@ const BaseLayout = ({
             {accountType === 'LEDGER' &&
               !!Object.keys(addresses).length && (
                 <Fragment>
-                  <DropdownSimple
+                  <Dropdown
                     displayKey={`address`}
                     selected={accountAddress}
                     options={addresses}
@@ -137,13 +137,15 @@ const BaseLayout = ({
                   <StyledVerticalLine />
                 </Fragment>
               )}
-            <StyledNetworkStatus
+            <Dropdown
+              displayKey={`value`}
               selected={network}
               iconColor={online ? 'green' : 'red'}
               options={ethereumNetworks}
+              onChange={accountType === 'LEDGER' ? ledgerUpdateNetwork : null}
             />
             <StyledVerticalLine />
-            <DropdownSimple
+            <Dropdown
               displayKey={`currency`}
               selected={nativeCurrency}
               options={nativeCurrencies}
@@ -162,7 +164,9 @@ const BaseLayout = ({
 
 BaseLayout.propTypes = {
   children: PropTypes.node.isRequired,
-  fetching: PropTypes.bool.isRequired,
+  metamaskFetching: PropTypes.bool.isRequired,
+  ledgerFetching: PropTypes.bool.isRequired,
+  ledgerUpdateNetwork: PropTypes.func.isRequired,
   accountChangeNativeCurrency: PropTypes.func.isRequired,
   accountUpdateAccountAddress: PropTypes.func.isRequired,
   accountType: PropTypes.string.isRequired,
@@ -177,13 +181,16 @@ const reduxProps = ({ account, ledger, metamask, warning }) => ({
   accountType: account.accountType,
   accountAddress: account.accountAddress,
   nativeCurrency: account.nativeCurrency,
-  fetching: metamask.fetching,
-  network: metamask.network,
+  metamaskFetching: metamask.fetching,
+  ledgerFetching: ledger.fetching,
+  network: account.network,
   ledgerAccounts: ledger.accounts,
   web3Available: metamask.web3Available,
   online: warning.online
 });
 
-export default connect(reduxProps, { accountChangeNativeCurrency, accountUpdateAccountAddress })(
-  BaseLayout
-);
+export default connect(reduxProps, {
+  ledgerUpdateNetwork,
+  accountChangeNativeCurrency,
+  accountUpdateAccountAddress
+})(BaseLayout);

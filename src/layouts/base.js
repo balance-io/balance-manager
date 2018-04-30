@@ -60,7 +60,7 @@ const StyledBeta = styled.div`
   top: 5.5px;
   right: -36px;
   width: 28px;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
   font-size: 8px;
   font-weight: 500;
   padding: 2px 3px;

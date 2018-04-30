@@ -13,11 +13,13 @@ const StyledLineBreakWrapper = styled.div`
 `;
 
 const StyledLineBreakFiller = styled.div`
-  transition: ${transitions.long};
+  transition: 0.32s cubic-bezier(0.77, 0, 0.175, 1);
   position: absolute;
   left: 0;
   bottom: 0;
-  width: ${({ percentage }) => `${percentage}%`};
+  width: 100%;
+  transform-origin: 0;
+  transform: ${({ percentage }) => `scale3d(${percentage / 100}, 1, 1)`};
   border-top: ${({ color }) =>
     color ? `2px solid rgb(${colors[color]})` : `2px solid rgb(241, 242, 246)`};
 `;

@@ -1,5 +1,4 @@
 import lang from '../languages';
-import { parseError } from '../helpers/parsers';
 import { accountUpdateAccountAddress } from './_account';
 import { ledgerEthInit, ledgerEthAccounts } from '../helpers/ledger-eth';
 import { notificationShow } from './_notification';
@@ -27,14 +26,10 @@ export const ledgerConnectInit = () => async (dispatch, getState) => {
           }
         })
         .catch(error => {
-          const message = parseError(error);
-          dispatch(notificationShow(message, true));
           dispatch({ type: LEDGER_CONNECT_FAILURE });
         });
     })
     .catch(error => {
-      const message = parseError(error);
-      dispatch(notificationShow(message, true));
       dispatch({ type: LEDGER_CONNECT_FAILURE });
     });
 };

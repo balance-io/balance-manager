@@ -27,7 +27,7 @@ const StyledMessage = styled.div`
 `;
 
 class Metamask extends Component {
-  componentWillMount() {
+  componentDidMount() {
     if (this.props.accountType !== 'METMASK') this.props.accountClearState();
     this.props.metamaskConnectInit();
   }

@@ -37,7 +37,7 @@ const StyledButton = styled(Button)`
 `;
 
 class Ledger extends Component {
-  componentWillMount() {
+  componentDidMount() {
     if (this.props.accountType !== 'LEDGER') this.props.accountClearState();
     this.connectLedger();
   }

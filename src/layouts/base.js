@@ -129,6 +129,7 @@ const BaseLayout = ({
               !!Object.keys(addresses).length && (
                 <Fragment>
                   <Dropdown
+                    monospace
                     displayKey={`address`}
                     selected={accountAddress}
                     options={addresses}

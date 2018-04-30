@@ -40,6 +40,7 @@ const StyledRowWrapper = styled.div`
   color: rgb(${colors.dark});
   font-size: ${fonts.size.small};
   font-weight: ${fonts.weight.medium};
+  font-family: ${({ monospace }) => (monospace ? `${fonts.family.SFMono}` : `inherit`)};
   text-align: center;
   outline: none;
   & p {
@@ -82,6 +83,7 @@ const StyledDropdownWrapper = styled(StyledRowWrapper)`
 `;
 
 const StyledRow = styled.div`
+  cursor: pointer;
   transition: ${transitions.base};
   border-top: 1px solid rgba(${colors.lightGrey}, 0.7);
   font-weight: ${({ selected }) => (selected ? fonts.weight.bold : fonts.weight.normal)};
@@ -111,12 +113,22 @@ class Dropdown extends Component {
     }
   };
   render() {
-    const { options, dark, iconColor, selected, displayKey, onChange, ...props } = this.props;
+    const {
+      options,
+      dark,
+      iconColor,
+      monospace,
+      selected,
+      displayKey,
+      onChange,
+      ...props
+    } = this.props;
     const _selected = selected || options[Object.keys(options)[0]][displayKey];
     if (!options[_selected]) return null;
     return (
       <StyledWrapper {...props}>
         <StyledSelectedWrapper
+          monospace={monospace}
           dark={dark}
           show={this.state.showDropdown}
           noOptions={!onChange || Object.keys(options).length < 2}
@@ -129,6 +141,7 @@ class Dropdown extends Component {
           <StyledCaret dark={dark} />
         </StyledSelectedWrapper>
         <StyledDropdownWrapper
+          monospace={monospace}
           show={this.state.showDropdown}
           noOptions={!onChange || Object.keys(options).length < 2}
         >
@@ -152,6 +165,7 @@ Dropdown.propTypes = {
   options: PropTypes.object.isRequired,
   displayKey: PropTypes.string.isRequired,
   dark: PropTypes.bool,
+  monospace: PropTypes.bool,
   selected: PropTypes.string,
   onChange: PropTypes.func,
   iconColor: PropTypes.string
@@ -159,6 +173,7 @@ Dropdown.propTypes = {
 
 Dropdown.defaultProps = {
   dark: false,
+  monospace: false,
   selected: null,
   onChange: null,
   iconColor: ''

@@ -10,7 +10,13 @@ import {
   formatFixedDecimals
 } from '../helpers/bignumber';
 import { parseError, parseGasPrices, parseGasPricesTxFee } from '../helpers/parsers';
-import { metamaskSendTransaction, metamaskTransferToken, estimateGasLimit } from '../helpers/web3';
+import {
+  web3MetamaskSendTransaction,
+  web3MetamaskTransferToken,
+  web3LedgerSendTransaction,
+  web3LedgerTransferToken,
+  estimateGasLimit
+} from '../helpers/web3';
 import { notificationShow } from './_notification';
 import { accountUpdateTransactions } from './_account';
 
@@ -31,6 +37,14 @@ const SEND_ETHER_METAMASK_FAILURE = 'send/SEND_ETHER_METAMASK_FAILURE';
 const SEND_TOKEN_METAMASK_REQUEST = 'send/SEND_TOKEN_METAMASK_REQUEST';
 const SEND_TOKEN_METAMASK_SUCCESS = 'send/SEND_TOKEN_METAMASK_SUCCESS';
 const SEND_TOKEN_METAMASK_FAILURE = 'send/SEND_TOKEN_METAMASK_FAILURE';
+
+const SEND_ETHER_LEDGER_REQUEST = 'send/SEND_ETHER_LEDGER_REQUEST';
+const SEND_ETHER_LEDGER_SUCCESS = 'send/SEND_ETHER_LEDGER_SUCCESS';
+const SEND_ETHER_LEDGER_FAILURE = 'send/SEND_ETHER_LEDGER_FAILURE';
+
+const SEND_TOKEN_LEDGER_REQUEST = 'send/SEND_TOKEN_LEDGER_REQUEST';
+const SEND_TOKEN_LEDGER_SUCCESS = 'send/SEND_TOKEN_LEDGER_SUCCESS';
+const SEND_TOKEN_LEDGER_FAILURE = 'send/SEND_TOKEN_LEDGER_FAILURE';
 
 const SEND_TOGGLE_CONFIRMATION_VIEW = 'send/SEND_TOGGLE_CONFIRMATION_VIEW';
 
@@ -122,7 +136,7 @@ export const sendEtherMetamask = ({
   gasLimit
 }) => (dispatch, getState) => {
   dispatch({ type: SEND_ETHER_METAMASK_REQUEST });
-  metamaskSendTransaction({
+  web3MetamaskSendTransaction({
     from: address,
     to: recipient,
     value: amount,
@@ -162,7 +176,7 @@ export const sendTokenMetamask = ({
   gasLimit
 }) => (dispatch, getState) => {
   dispatch({ type: SEND_TOKEN_METAMASK_REQUEST });
-  metamaskTransferToken({
+  web3MetamaskTransferToken({
     tokenObject: selectedAsset,
     from: address,
     to: recipient,
@@ -192,6 +206,88 @@ export const sendTokenMetamask = ({
       const message = parseError(error);
       dispatch(notificationShow(message, true));
       dispatch({ type: SEND_TOKEN_METAMASK_FAILURE });
+    });
+};
+
+export const sendEtherLedger = ({
+  address,
+  recipient,
+  amount,
+  selectedAsset,
+  gasPrice,
+  gasLimit
+}) => (dispatch, getState) => {
+  dispatch({ type: SEND_ETHER_LEDGER_REQUEST });
+  web3LedgerSendTransaction({
+    from: address,
+    to: recipient,
+    value: amount,
+    gasPrice: gasPrice.value.amount,
+    gasLimit: gasLimit
+  })
+    .then(txHash => {
+      const txDetails = {
+        hash: txHash,
+        from: address,
+        to: recipient,
+        nonce: null,
+        value: amount,
+        gasPrice: gasPrice.value.amount,
+        gasLimit: gasLimit,
+        asset: selectedAsset
+      };
+      dispatch(accountUpdateTransactions(txDetails));
+      dispatch({
+        type: SEND_ETHER_LEDGER_SUCCESS,
+        payload: txHash
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: SEND_ETHER_LEDGER_FAILURE });
+    });
+};
+
+export const sendTokenLedger = ({
+  address,
+  recipient,
+  amount,
+  selectedAsset,
+  gasPrice,
+  gasLimit
+}) => (dispatch, getState) => {
+  dispatch({ type: SEND_TOKEN_LEDGER_REQUEST });
+  web3LedgerTransferToken({
+    tokenObject: selectedAsset,
+    from: address,
+    to: recipient,
+    nonce: null,
+    amount: amount,
+    gasPrice: gasPrice.value.amount,
+    gasLimit: gasLimit
+  })
+    .then(txHash => {
+      const txDetails = {
+        hash: txHash,
+        from: address,
+        to: recipient,
+        nonce: null,
+        value: amount,
+        gasPrice: gasPrice.value.amount,
+        gasLimit: gasLimit,
+        asset: selectedAsset
+      };
+      dispatch(accountUpdateTransactions(txDetails));
+      dispatch({
+        type: SEND_TOKEN_LEDGER_SUCCESS,
+        payload: txHash
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: SEND_TOKEN_LEDGER_FAILURE });
     });
 };
 
@@ -261,7 +357,7 @@ const INITIAL_STATE = {
   recipient: '',
   nativeAmount: '',
   assetAmount: '',
-  transaction: '',
+  txHash: '',
   confirm: false,
   selected: { symbol: 'ETH' }
 };
@@ -305,21 +401,27 @@ export default (state = INITIAL_STATE, action) => {
       };
     case SEND_ETHER_METAMASK_REQUEST:
     case SEND_TOKEN_METAMASK_REQUEST:
+    case SEND_ETHER_LEDGER_REQUEST:
+    case SEND_TOKEN_LEDGER_REQUEST:
       return { ...state, fetching: true };
     case SEND_ETHER_METAMASK_SUCCESS:
     case SEND_TOKEN_METAMASK_SUCCESS:
+    case SEND_ETHER_LEDGER_SUCCESS:
+    case SEND_TOKEN_LEDGER_SUCCESS:
       return {
         ...state,
         fetching: false,
         gasPrices: {},
-        transaction: action.payload
+        txHash: action.payload
       };
     case SEND_ETHER_METAMASK_FAILURE:
     case SEND_TOKEN_METAMASK_FAILURE:
+    case SEND_ETHER_LEDGER_FAILURE:
+    case SEND_TOKEN_LEDGER_FAILURE:
       return {
         ...state,
         fetching: false,
-        transaction: '',
+        txHash: '',
         confirm: false
       };
     case SEND_TOGGLE_CONFIRMATION_VIEW:

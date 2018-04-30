@@ -12,6 +12,7 @@ const slideDown = keyframes`
 const StyledWrapper = styled.div`
   position: absolute;
   top: 0;
+  left: 0;
   z-index: 2;
   opacity: ${({ show }) => (show ? 1 : 0)};
   visibility: ${({ show }) => (show ? 'visible' : 'hidden')};

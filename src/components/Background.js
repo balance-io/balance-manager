@@ -1,9 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import trianglesBlue from '../assets/triangles-blue.png';
+import trianglesBlue from '../assets/triangles-light.svg';
 
 const StyledBackgroundFixed = styled.div`
   position: fixed;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
   z-index: -99999;
@@ -16,12 +18,11 @@ const StyledBackgroundRelative = styled.div`
 `;
 
 const StyledBackgroundBlue = styled.div`
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
-  z-index: 2;
   width: 150px;
-  transform: rotate(180deg);
+  height: 225px;
   & img {
     width: 100%;
   }
@@ -31,7 +32,6 @@ const Background = () => (
   <StyledBackgroundFixed>
     <StyledBackgroundRelative>
       <StyledBackgroundBlue>
-        <img src={trianglesBlue} alt="background blue" />
       </StyledBackgroundBlue>
     </StyledBackgroundRelative>
   </StyledBackgroundFixed>

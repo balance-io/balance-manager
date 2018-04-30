@@ -26,7 +26,9 @@ export const metamaskUpdateMetamaskAccount = () => (dispatch, getState) => {
   }
 };
 
-export const metamaskConnectMetamask = () => (dispatch, getState) => {
+export const metamaskConnectInit = () => (dispatch, getState) => {
+  const accountAddress = getState().metamask.accountAddress;
+  if (accountAddress) dispatch(accountUpdateAccountAddress(accountAddress, 'METAMASK'));
   dispatch({ type: METAMASK_CONNECT_REQUEST });
   if (typeof window.web3 !== 'undefined') {
     apiGetMetamaskNetwork()

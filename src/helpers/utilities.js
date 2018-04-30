@@ -42,6 +42,21 @@ export const debounceRequest = (request, params, timeout) =>
   );
 
 /**
+ * @desc check if lambda request has allowed access
+ * @param  {Object}  request
+ * @return {Boolean}
+ */
+export const lambdaAllowedAccess = event => {
+  if (process.env.NODE_ENV === 'development') return true;
+  const referer = event.headers.referer;
+  if (!referer) return false;
+  const allowed =
+    referer.indexOf('balance-manager.netlify.com') !== -1 ||
+    referer.indexOf('manager.balance.io') !== -1;
+  return allowed;
+};
+
+/**
  * @desc filter object by a set of allowed keys
  * @param  {Function}  request
  * @param  {Array}     params
@@ -72,6 +87,7 @@ export const updateLocalBalances = (account, network) => {
   if (!accountLocal[network]) {
     accountLocal[network] = {};
   }
+  accountLocal[network].type = account.type;
   accountLocal[network].balances = { assets: account.assets, total: account.total || '———' };
   saveLocal(account.address, accountLocal);
 };
@@ -233,4 +249,20 @@ export const ellipseText = (text = '', maxLength = 9999) => {
       })
       .join(' ') + '...';
   return result;
+};
+
+/**
+ * @desc obtain path components from derivation path
+ * @param  {String}  [derivationPath = '']
+ * @return {Object}
+ */
+export const obtainPathComponentsFromDerivationPath = (derivationPath = '') => {
+  const regExp = /^(44'\/6[0|1]'\/\d+'?\/)(\d+)$/;
+  const matchResult = regExp.exec(derivationPath);
+  if (matchResult === null) {
+    throw new Error(
+      "To get multiple accounts your derivation path must follow pattern 44'/60|61'/x'/n "
+    );
+  }
+  return { basePath: matchResult[1], index: parseInt(matchResult[2], 10) };
 };

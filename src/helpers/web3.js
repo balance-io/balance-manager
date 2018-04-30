@@ -1,7 +1,5 @@
 import Web3 from 'web3';
-import Tx from 'ethereumjs-tx';
 import BigNumber from 'bignumber.js';
-import ethUnits from '../libraries/ethereum-units.json';
 import { isValidAddress } from './validators';
 import { getDataString, getNakedAddress } from './utilities';
 import {
@@ -9,6 +7,8 @@ import {
   convertAssetAmountFromBigNumber,
   convertHexToString
 } from './bignumber';
+import { ledgerEthSignTransaction } from './ledger-eth';
+import ethUnits from '../libraries/ethereum-units.json';
 import smartContractMethods from '../libraries/smartcontract-methods.json';
 
 /**
@@ -124,20 +124,6 @@ export const getTokenBalanceOf = (accountAddress, tokenAddress) =>
   });
 
 /**
- * @desc sign transaction
- * @param {Object} txDetails
- * @param {String} privateKey
- * @return {String}
- */
-export const signTx = (txDetails, privateKey) => {
-  const tx = new Tx(txDetails);
-  const key = Buffer.from(privateKey, 'hex');
-  tx.sign(key);
-  const serializedTx = `0x${tx.serialize().toString('hex')}`;
-  return serializedTx;
-};
-
-/**
  * @desc get transaction details
  * @param  {Object} transaction { from, to, data, value, gasPrice, gasLimit }
  * @return {Object}
@@ -148,65 +134,50 @@ export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }
   const _gasLimit = gasLimit || (await web3Instance.eth.estimateGas(estimateGasData));
   const nonce = await getTransactionCount(from);
   const tx = {
+    from: from,
+    to: to,
     nonce: web3Instance.utils.toHex(nonce),
     gasPrice: web3Instance.utils.toHex(_gasPrice),
     gasLimit: web3Instance.utils.toHex(_gasLimit),
     gas: web3Instance.utils.toHex(_gasLimit),
     value: web3Instance.utils.toHex(value),
-    data: data,
-    to
+    data: data
   };
   return tx;
 };
 
 /**
- * @desc send signed transaction
- * @param  {Object}  transaction { from, to, value, data, gasPrice, privateKey}
- * @return {Promise}
+ * @desc get transfer token transaction
+ * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
+ * @return {Object}
  */
-export const sendSignedTransaction = transaction =>
-  new Promise((resolve, reject) => {
-    const from =
-      transaction.from.substr(0, 2) === '0x' ? transaction.from : `0x${transaction.from}`;
-    const to = transaction.to.substr(0, 2) === '0x' ? transaction.to : `0x${transaction.to}`;
-    const value = transaction.value ? toWei(transaction.value) : '0x00';
-    const data = transaction.data ? transaction.data : '0x';
-    const privateKey =
-      transaction.privateKey.substr(0, 2) === '0x'
-        ? transaction.privateKey.substr(2)
-        : transaction.privateKey;
-    getTxDetails(from, to, data, value, transaction.gasPrice)
-      .then(txDetails => {
-        const signedTx = signTx(txDetails, privateKey);
-        web3Instance.eth
-          .sendSignedTransaction(signedTx)
-          .once('transactionHash', txHash => resolve(txHash))
-          .catch(error => reject(error));
-      })
-      .catch(error => reject(error));
-  });
+export const getTransferTokenTransaction = transaction => {
+  const transferMethodHash = smartContractMethods.token_transfer.hash;
+  const value = BigNumber(transaction.amount)
+    .times(BigNumber(10).pow(transaction.tokenObject.decimals))
+    .toString(16);
+  const recipient = getNakedAddress(transaction.to);
+  const dataString = getDataString(transferMethodHash, [recipient, value]);
+  return {
+    from: transaction.from,
+    to: transaction.tokenObject.address,
+    data: dataString,
+    gasPrice: transaction.gasPrice,
+    gasLimit: transaction.gasLimit
+  };
+};
 
 /**
- * @desc transfer token
- * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice, privateKey}
+ * @desc send signed transaction
+ * @param  {String}  signedTx
  * @return {Promise}
  */
-export const transferToken = transaction =>
+export const web3SendSignedTransaction = signedTx =>
   new Promise((resolve, reject) => {
-    const transferMethodHash = smartContractMethods.token_transfer.hash;
-    const value = BigNumber(transaction.amount)
-      .times(BigNumber(10).pow(transaction.tokenObject.decimals))
-      .toString(16);
-    const recipient = getNakedAddress(transaction.to);
-    const dataString = getDataString(transferMethodHash, [recipient, value]);
-    sendSignedTransaction({
-      from: transaction.from,
-      to: transaction.tokenObject.address,
-      data: dataString,
-      gasPrice: transaction.gasPrice,
-      privateKey: transaction.privateKey
-    })
-      .then(txHash => resolve(txHash))
+    const serializedTx = typeof signedTx === 'string' ? signedTx : signedTx.raw;
+    web3Instance.eth
+      .sendSignedTransaction(serializedTx)
+      .once('transactionHash', txHash => resolve(txHash))
       .catch(error => reject(error));
   });
 
@@ -215,7 +186,7 @@ export const transferToken = transaction =>
  * @param  {Object}  transaction { from, to, value, data, gasPrice}
  * @return {Promise}
  */
-export const metamaskSendTransaction = transaction =>
+export const web3MetamaskSendTransaction = transaction =>
   new Promise((resolve, reject) => {
     const from =
       transaction.from.substr(0, 2) === '0x' ? transaction.from : `0x${transaction.from}`;
@@ -250,18 +221,64 @@ export const metamaskSendTransaction = transaction =>
  * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
  * @return {Promise}
  */
-export const metamaskTransferToken = transaction =>
+export const web3MetamaskTransferToken = transaction =>
   new Promise((resolve, reject) => {
-    const transferMethodHash = smartContractMethods.token_transfer.hash;
-    const value = BigNumber(transaction.amount)
-      .times(BigNumber(10).pow(transaction.tokenObject.decimals))
-      .toString(16);
-    const recipient = getNakedAddress(transaction.to);
-    const dataString = getDataString(transferMethodHash, [recipient, value]);
-    metamaskSendTransaction({
+    transaction = getTransferTokenTransaction(transaction);
+    web3MetamaskSendTransaction({
       from: transaction.from,
-      to: transaction.tokenObject.address,
-      data: dataString,
+      to: transaction.to,
+      data: transaction.data,
+      gasPrice: transaction.gasPrice,
+      gasLimit: transaction.gasLimit
+    })
+      .then(txHash => resolve(txHash))
+      .catch(error => reject(error));
+  });
+
+/**
+ * @desc ledger send transaction
+ * @param  {Object}  transaction { from, to, value, data, gasPrice}
+ * @return {Promise}
+ */
+export const web3LedgerSendTransaction = transaction =>
+  new Promise((resolve, reject) => {
+    const from =
+      transaction.from.substr(0, 2) === '0x' ? transaction.from : `0x${transaction.from}`;
+    const to = transaction.to.substr(0, 2) === '0x' ? transaction.to : `0x${transaction.to}`;
+    const value = transaction.value ? toWei(transaction.value) : '0x00';
+    const data = transaction.data ? transaction.data : '0x';
+    getTxDetails({
+      from,
+      to,
+      data,
+      value,
+      gasPrice: transaction.gasPrice,
+      gasLimit: transaction.gasLimit
+    })
+      .then(txDetails => {
+        ledgerEthSignTransaction(txDetails)
+          .then(signedTx =>
+            web3SendSignedTransaction(signedTx)
+              .then(txHash => resolve(txHash))
+              .catch(error => reject(error))
+          )
+          .catch(error => reject(error));
+      })
+      .catch(error => reject(error));
+  });
+
+/**
+ * @desc ledger transfer token
+ * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
+ * @return {Promise}
+ */
+export const web3LedgerTransferToken = transaction =>
+  new Promise((resolve, reject) => {
+    transaction = getTransferTokenTransaction(transaction);
+    web3LedgerSendTransaction({
+      from: transaction.from,
+      to: transaction.to,
+      data: transaction.data,
       gasPrice: transaction.gasPrice,
       gasLimit: transaction.gasLimit
     })
@@ -294,10 +311,3 @@ export const estimateGasLimit = async ({ tokenObject, address, recipient, amount
   }
   return gasLimit;
 };
-
-/**
- * @desc fetch transaction status/information
- * @param  {String} txHash
- * @return {Object}
- */
-export const fetchTx = txHash => web3Instance.eth.getTransaction(txHash);

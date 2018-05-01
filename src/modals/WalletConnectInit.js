@@ -45,10 +45,10 @@ class WalletConnectInit extends Component {
   render = () => (
     <Card maxWidth={400} background="white">
       <StyledContainer>
-        {this.props.sessionId && (
+        {this.props.webConnector && (
           <StyledQRCodeDisplay
             data={`{"domain":"https://walletconnect.balance.io","sessionId":"${
-              this.props.sessionId }","sessionKey":"${this.props.sessionKey.key}"},"iv":"${this.props.sessionKey.iv}"`}
+              this.props.webConnector.sessionId }","sharedKey":"${this.props.webConnector.sharedKey}", "dappName":"${this.props.webConnector.dappName}"}`}
           />
         )}
         <StyledCenter>
@@ -64,13 +64,11 @@ class WalletConnectInit extends Component {
 WalletConnectInit.propTypes = {
   walletConnectModalInit: PropTypes.func.isRequired,
   walletConnectGetSession: PropTypes.func.isRequired,
-  modalClose: PropTypes.func.isRequired,
-  sessionId: PropTypes.string.isRequired
+  modalClose: PropTypes.func.isRequired
 };
 
 const reduxProps = ({ modal, walletconnect }) => ({
-  sessionId: walletconnect.sessionId,
-  sessionKey: walletconnect.sessionKey
+  webConnector: walletconnect.webConnector,
 });
 
 export default connect(reduxProps, {

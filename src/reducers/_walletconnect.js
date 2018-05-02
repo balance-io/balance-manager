@@ -64,18 +64,17 @@ export const walletConnectGetSession = () => (dispatch, getState) => {
       const message = parseError(error);
       dispatch(notificationShow(message), true);
       dispatch({ type: WALLET_CONNECT_GET_SESSION_FAILURE });
-      getSessionInterval = setTimeout(() => dispatch(walletConnectGetSession()), 500);
     }
     else if (data) {
         dispatch({
           type: WALLET_CONNECT_GET_SESSION_SUCCESS,
-          payload: data.addresses
+          payload: data.address
         });
         // Q: do I need to also saveLocal the device UUID?
-        saveLocal('walletconnect', data.addresses);
+        saveLocal('walletconnect', data.address);
         dispatch(modalClose());
         // Q: do I need to add account update wallet connect for device UUID?
-        dispatch(accountUpdateAccountAddress(data.addresses[0], 'WALLETCONNECT'));
+        dispatch(accountUpdateAccountAddress(data.address, 'WALLETCONNECT'));
         window.browserHistory.push('/wallet');
     }
   })
@@ -140,7 +139,7 @@ export const walletConnectClearFields = () => (dispatch) => {
 const INITIAL_STATE = {
   fetching: false,
   transactionId: '',
-  addresses: [],
+  address: '',
   webConnector: null
 };
 
@@ -168,14 +167,14 @@ export default (state = INITIAL_STATE, action) => {
     case WALLET_CONNECT_GET_SESSION_SUCCESS:
       return {
         ...state,
-        addresses: action.payload,
+        address: action.payload,
         fetching: false
       };
     case WALLET_CONNECT_GET_SESSION_FAILURE:
       return {
         ...state,
         fetching: false,
-        addresses: [],
+        address: '',
         webConnector: null,
       };
     case WALLET_CONNECT_NEW_TRANSACTION_REQUEST:

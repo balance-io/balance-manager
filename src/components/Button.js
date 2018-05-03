@@ -26,7 +26,7 @@ const StyledButton = styled.button`
   font-size: ${fonts.size.h6};
   font-weight: ${fonts.weight.semibold};
   padding: ${({ icon, left }) =>
-    icon ? (left ? '7px 12px 8px 28px' : '8px 28px 8px 12px') : '8px 12px'};
+    icon ? (left ? '7px 12px 8px 28px' : '7px 28px 8px 12px') : '8px 12px'};
   margin-left: 8px;
   height: 32px;
   cursor: ${({ disabled }) => (disabled ? 'auto' : 'pointer')};

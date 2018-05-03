@@ -32,7 +32,6 @@ const Background = () => (
   <StyledBackgroundFixed>
     <StyledBackgroundRelative>
       <StyledBackgroundBlue>
-        <img src={trianglesBlue} alt="background blue" />
       </StyledBackgroundBlue>
     </StyledBackgroundRelative>
   </StyledBackgroundFixed>

@@ -7,13 +7,15 @@ import AssetIcon from './AssetIcon';
 import ToggleIndicator from './ToggleIndicator';
 import { ellipseText } from '../helpers/utilities';
 import { convertStringToNumber, hasHighMarketValue, hasLowMarketValue } from '../helpers/bignumber';
-import { colors, fonts, shadows, responsive } from '../styles';
+import { colors, fonts, responsive } from '../styles';
 
 const StyledGrid = styled.div`
   width: 100%;
   text-align: right;
   position: relative;
   z-index: 0;
+  box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
+    0 3px 6px 0 rgba(0, 0, 0, 0.06);
 `;
 
 const StyledRow = styled.div`
@@ -33,7 +35,7 @@ const StyledRow = styled.div`
     font-size: ${fonts.size.h6};
   }
   &:last-child {
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 10px 10px;
   }
   @media screen and (${responsive.sm.max}) {
     grid-template-columns: 5fr repeat(4, 4fr);
@@ -50,7 +52,7 @@ const StyledRow = styled.div`
 const StyledLabelsRow = styled(StyledRow)`
   width: 100%;
   border-width: 0 0 2px 0;
-  border-color: rgba(${colors.lightGrey}, 0.4);
+  border-color: rgba(136, 136, 136, 0.03);
   border-style: solid;
   padding: 12px 20px;
   & p:first-child {
@@ -62,27 +64,30 @@ const StyledLabels = styled.p`
   text-transform: uppercase;
   font-size: ${fonts.size.small} !important;
   font-weight: ${fonts.weight.semibold};
-  color: rgba(${colors.darkGrey}, 0.7);
+  color: rgb(${colors.mediumGrey});
+  letter-spacing: 0.46px;
 `;
 
 const StyledEthereum = styled(StyledRow)`
   width: 100%;
   z-index: 2;
-  box-shadow: ${shadows.medium};
   & div p {
     font-weight: ${fonts.weight.medium};
   }
   & > p {
-    font-weight: ${fonts.weight.semibold};
+    font-weight: ${fonts.weight.regular};
     font-family: ${fonts.family.SFMono};
+  }
+  & p:last-child {
+    font-weight: ${fonts.weight.medium};
   }
 `;
 
 const StyledToken = styled(StyledRow)`
   width: 100%;
   & > * {
-    font-weight: ${fonts.weight.medium};
-    color: rgba(${colors.dark}, 0.6);
+    font-weight: ${fonts.weight.regular};
+    color: rgb(${colors.darkText});
   }
   & > p:first-child {
     justify-content: flex-start;
@@ -91,7 +96,7 @@ const StyledToken = styled(StyledRow)`
     font-family: ${fonts.family.SFMono};
   }
   &:nth-child(n + 3) {
-    border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
+    border-top: 1px solid rgba(${colors.rowDivider});
   }
 `;
 
@@ -130,7 +135,7 @@ const StyledLastRow = styled(StyledRow)`
   grid-template-columns: 3fr 1fr;
   min-height: 0;
   min-width: 0;
-  border-top: 1px solid rgba(${colors.darkGrey}, 0.1);
+  border-top: 1px solid rgba(${colors.rowDivider});
   & > p {
     font-size: ${fonts.size.medium};
     font-weight: ${fonts.weight.semibold};
@@ -157,10 +162,11 @@ const StyledShowMoreTokens = styled(StyledToken)`
   text-align: left;
   justify-content: flex-start;
   font-family: ${fonts.family.SFProText};
-  font-weight: ${fonts.weight.normal};
-  font-size: ${fonts.size.h6};
+  font-weight: ${fonts.weight.medium};
+  font-size: 13px;
   color: rgb(${colors.grey});
-  padding-left: 18px;
+  margin-top: -1px;
+  padding-left: 19px;
 
   @media (hover: hover) {
     &:hover p {
@@ -171,6 +177,7 @@ const StyledShowMoreTokens = styled(StyledToken)`
 
 class AccountViewBalances extends Component {
   state = {
+    disableToggle: false,
     showMoreTokens: false
   };
   onShowMoreTokens = () => {
@@ -182,16 +189,24 @@ class AccountViewBalances extends Component {
     const tokens = this.props.accountInfo.assets.filter(
       asset => asset.symbol !== 'ETH' && typeof asset === 'object' && !!asset
     );
+    if (tokens.length && tokens.length < 5 && !this.state.disableToggle) {
+      this.setState({ disableToggle: true });
+    }
     const tokensWithHighMarketValue = tokens.filter(
       asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
     );
-    let tokensWithLowMarketValue = tokens.filter(
+    const tokensWithLowMarketValue = tokens.filter(
       asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
     );
     const tokensWithNoMarketValue = tokens.filter(asset => !asset.native);
-    tokensWithLowMarketValue = [...tokensWithLowMarketValue, ...tokensWithNoMarketValue];
+    let tokensAlwaysDisplay = tokensWithHighMarketValue;
+    let tokensToggleDisplay = [...tokensWithLowMarketValue, ...tokensWithNoMarketValue];
+    if (this.state.disableToggle) {
+      tokensAlwaysDisplay = [...tokensAlwaysDisplay, ...tokensToggleDisplay];
+      tokensToggleDisplay = [];
+    }
     const allLowMarketTokensHaveNoValue =
-      tokensWithNoMarketValue.length === tokensWithLowMarketValue.length;
+      tokensWithNoMarketValue.length === tokensToggleDisplay.length;
     return (
       <StyledGrid>
         <StyledLabelsRow>
@@ -216,8 +231,8 @@ class AccountViewBalances extends Component {
           </StyledPercentage>
           <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
         </StyledEthereum>
-        {!!tokensWithHighMarketValue &&
-          tokensWithHighMarketValue.map(token => (
+        {!!tokensAlwaysDisplay &&
+          tokensAlwaysDisplay.map(token => (
             <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
               <StyledAsset>
                 <AssetIcon asset={token.address} />
@@ -233,9 +248,9 @@ class AccountViewBalances extends Component {
               <p>{token.native ? token.native.balance.display : '———'}</p>
             </StyledToken>
           ))}
-        {!!tokensWithLowMarketValue.length &&
+        {!!tokensToggleDisplay.length &&
           this.state.showMoreTokens &&
-          tokensWithLowMarketValue.map(token => (
+          tokensToggleDisplay.map(token => (
             <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
               <StyledAsset data-toggle="tooltip" title={token.name}>
                 <AssetIcon asset={token.address} />
@@ -252,13 +267,13 @@ class AccountViewBalances extends Component {
             </StyledToken>
           ))}
         <StyledLastRow>
-          {!!tokensWithLowMarketValue.length ? (
+          {!!tokensToggleDisplay.length && !this.state.disableToggle ? (
             <StyledShowMoreTokens onClick={this.onShowMoreTokens}>
               <ToggleIndicator show={this.state.showMoreTokens} />
               {`${this.state.showMoreTokens ? lang.t('account.hide') : lang.t('account.show')} ${
-                tokensWithLowMarketValue.length
+                tokensToggleDisplay.length
               } ${
-                tokensWithLowMarketValue.length === 1
+                tokensToggleDisplay.length === 1
                   ? lang.t('account.token')
                   : lang.t('account.tokens')
               } ${

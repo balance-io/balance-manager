@@ -1,31 +1,29 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import Link from '../components/Link';
 import Modal from '../components/Modal';
-import Indicator from '../components/Indicator';
-import DropdownNative from '../components/DropdownNative';
+import Dropdown from '../components/Dropdown';
 import Background from '../components/Background';
 import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
 import Notification from '../components/Notification';
 import Warning from '../components/Warning';
-import balanceLogo from '../assets/balance-logo.svg';
+import balanceManagerLogo from '../assets/balance-manager-logo.svg';
 import ethereumNetworks from '../libraries/ethereum-networks.json';
 import nativeCurrencies from '../libraries/native-currencies.json';
-import { accountChangeNativeCurrency } from '../reducers/_account';
-import { colors, fonts, responsive } from '../styles';
+import { ledgerUpdateNetwork } from '../reducers/_ledger';
+import { accountChangeNativeCurrency, accountUpdateAccountAddress } from '../reducers/_account';
+import { colors, responsive } from '../styles';
 
 const StyledLayout = styled.div`
   position: relative;
+  width: 100%;
   height: 100%;
   min-height: 100vh;
-  width: 100vw;
   text-align: center;
-  @media screen and (${responsive.sm.max}) {
-    padding: 15px;
-  }
+  padding: 0 16px;
 `;
 
 const StyledContent = styled(Wrapper)`
@@ -33,43 +31,42 @@ const StyledContent = styled(Wrapper)`
 `;
 
 const StyledHeader = styled.div`
+  margin-top: -1px;
+  margin-bottom: 1px;
   width: 100%;
-  margin: 42px 0 16px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  @media screen and (${responsive.sm.max}) {
-    margin: 0;
-    margin-bottom: 15px;
-  }
 `;
 
 const StyledBranding = styled.div`
   display: flex;
   align-items: center;
+  position: relative;
 `;
 
-const StyledHero = styled.h1`
-  margin-left: 4px;
-  font-family: ${fonts.family.FFMarkPro} !important;
-  font-size: ${fonts.size.h4};
-  font-weight: normal;
-  & strong {
-    font-weight: bold;
-  }
-  & span {
-    opacity: 0.5;
-  }
+const StyledBalanceLogo = styled.div`
+  width: 198px;
+  height: 23px;
+  background: url(${balanceManagerLogo}) no-repeat;
   @media screen and (${responsive.sm.max}) {
-    font-size: ${fonts.size.medium};
   }
 `;
 
-const StyledBalanceLogo = styled.img`
-  width: 105px;
-  @media screen and (${responsive.sm.max}) {
-    width: 84px;
-  }
+const StyledBeta = styled.div`
+  margin: 0;
+  position: absolute;
+  top: 5.5px;
+  right: -36px;
+  width: 28px;
+  letter-spacing: 0.4px;
+  font-size: 8px;
+  font-weight: 500;
+  padding: 2px 3px;
+  border-radius: 4px;
+  background: rgba(${colors.white}, 0.5);
+  color: rgb(${colors.bodyBackground});
 `;
 
 const StyledIndicators = styled.div`
@@ -84,8 +81,6 @@ const StyledIndicators = styled.div`
   }
 `;
 
-const StyledNetworkStatus = styled(Indicator)``;
-
 const StyledVerticalLine = styled.div`
   height: 17px;
   border-left: 2px solid rgba(${colors.lightGrey}, 0.1);
@@ -93,16 +88,31 @@ const StyledVerticalLine = styled.div`
 
 const BaseLayout = ({
   children,
-  fetching,
-  account,
+  metamaskFetching,
+  ledgerFetching,
+  accountType,
+  accountAddress,
+  ledgerAccounts,
+  ledgerUpdateNetwork,
   accountChangeNativeCurrency,
+  accountUpdateAccountAddress,
   nativeCurrency,
   network,
   web3Available,
   online,
   ...props
 }) => {
-  const showToolbar = window.location.pathname !== '/' && !fetching && web3Available && network;
+  const addresses = {};
+  if (accountType === 'LEDGER') {
+    ledgerAccounts.forEach(account => {
+      addresses[account.address] = account;
+    });
+  }
+  const showToolbar =
+    window.location.pathname !== '/' &&
+    (!metamaskFetching || !ledgerFetching) &&
+    ((accountType === 'METAMASK' && web3Available) || accountType !== 'METAMASK') &&
+    accountAddress;
   return (
     <StyledLayout>
       <Background />
@@ -110,20 +120,34 @@ const BaseLayout = ({
         <StyledHeader>
           <Link to="/">
             <StyledBranding>
-              <StyledBalanceLogo src={balanceLogo} alt="Balance" />
-              <StyledHero>
-                <span>{` Manager`}</span>
-              </StyledHero>
+              <StyledBalanceLogo alt="Balance" />
+              <StyledBeta>{'BETA'}</StyledBeta>
             </StyledBranding>
           </Link>
           <StyledIndicators show={showToolbar}>
-            <StyledNetworkStatus
+            {accountType === 'LEDGER' &&
+              !!Object.keys(addresses).length && (
+                <Fragment>
+                  <Dropdown
+                    monospace
+                    displayKey={`address`}
+                    selected={accountAddress}
+                    options={addresses}
+                    onChange={address => accountUpdateAccountAddress(address, 'LEDGER')}
+                  />
+                  <StyledVerticalLine />
+                </Fragment>
+              )}
+            <Dropdown
+              displayKey={`value`}
               selected={network}
               iconColor={online ? 'green' : 'red'}
               options={ethereumNetworks}
+              onChange={accountType === 'LEDGER' ? ledgerUpdateNetwork : null}
             />
             <StyledVerticalLine />
-            <DropdownNative
+            <Dropdown
+              displayKey={`currency`}
               selected={nativeCurrency}
               options={nativeCurrencies}
               onChange={accountChangeNativeCurrency}
@@ -141,21 +165,33 @@ const BaseLayout = ({
 
 BaseLayout.propTypes = {
   children: PropTypes.node.isRequired,
-  fetching: PropTypes.bool.isRequired,
-  account: PropTypes.object.isRequired,
+  metamaskFetching: PropTypes.bool.isRequired,
+  ledgerFetching: PropTypes.bool.isRequired,
+  ledgerUpdateNetwork: PropTypes.func.isRequired,
+  accountChangeNativeCurrency: PropTypes.func.isRequired,
+  accountUpdateAccountAddress: PropTypes.func.isRequired,
+  accountType: PropTypes.string.isRequired,
+  accountAddress: PropTypes.string.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
   network: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
   online: PropTypes.bool.isRequired
 };
 
-const reduxProps = ({ account, metamask, warning }) => ({
-  account: account.accountInfo,
+const reduxProps = ({ account, ledger, metamask, warning }) => ({
+  accountType: account.accountType,
+  accountAddress: account.accountAddress,
   nativeCurrency: account.nativeCurrency,
-  fetching: metamask.fetching,
-  network: metamask.network,
+  metamaskFetching: metamask.fetching,
+  ledgerFetching: ledger.fetching,
+  network: account.network,
+  ledgerAccounts: ledger.accounts,
   web3Available: metamask.web3Available,
   online: warning.online
 });
 
-export default connect(reduxProps, { accountChangeNativeCurrency })(BaseLayout);
+export default connect(reduxProps, {
+  ledgerUpdateNetwork,
+  accountChangeNativeCurrency,
+  accountUpdateAccountAddress
+})(BaseLayout);

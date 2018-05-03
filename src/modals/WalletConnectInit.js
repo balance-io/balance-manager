@@ -8,7 +8,7 @@ import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import { modalClose } from '../reducers/_modal';
 import {
-  walletConnectModalInit,
+  walletConnectInit,
   walletConnectGetSession,
   walletConnectClearFields
 } from '../reducers/_walletconnect';
@@ -36,7 +36,7 @@ const StyledCenter = styled.div`
 
 class WalletConnectInit extends Component {
   componentDidMount() {
-    this.props.walletConnectModalInit();
+    this.props.walletConnectInit();
   }
   onClose = () => {
     this.props.modalClose();
@@ -62,9 +62,9 @@ class WalletConnectInit extends Component {
 }
 
 WalletConnectInit.propTypes = {
-  walletConnectModalInit: PropTypes.func.isRequired,
+  walletConnectInit: PropTypes.func.isRequired,
   walletConnectGetSession: PropTypes.func.isRequired,
-  modalClose: PropTypes.func.isRequired
+  modalClose: PropTypes.func.isRequired,
 };
 
 const reduxProps = ({ modal, walletconnect }) => ({
@@ -73,7 +73,7 @@ const reduxProps = ({ modal, walletconnect }) => ({
 
 export default connect(reduxProps, {
   modalClose,
-  walletConnectModalInit,
+  walletConnectInit,
   walletConnectGetSession,
   walletConnectClearFields
 })(WalletConnectInit);

@@ -32,6 +32,7 @@ const StyledText = styled.p`
 
 const StyledCopyToClipboard = styled.div`
   width: 100%;
+  min-height: 20px;
   position: relative;
 `;
 
@@ -51,7 +52,7 @@ const StyledContainer = styled.div`
 const StyledInputText = styled.input`
   background-color: transparent;
   color: transparent;
-  text-shadow: 0 0 0 rgba(${colors.darkGrey}, 0.8);
+  text-shadow: 0 0 0 rgb(${colors.mediumGrey});
   font-style: normal;
   font-stretch: normal;
   line-height: normal;
@@ -113,7 +114,12 @@ class CopyToClipboard extends Component {
       <StyledCopyToClipboard {...props}>
         <StyledContainer iconOnHover={iconOnHover}>
           <StyledInvisible>{text}</StyledInvisible>
-          <StyledInput value={text} onChange={() => {}} onClick={this.copyToCopyToClipboard} />
+          <StyledInput
+            value={text}
+            spellCheck={false}
+            onChange={() => {}}
+            onClick={this.copyToCopyToClipboard}
+          />
           <StyledText>{lang.t('message.click_to_copy_to_clipboard')}</StyledText>
           <StyledIcon src={clipboardIcon} alt="copy" onClick={this.simulateCopyToClipboard} />
         </StyledContainer>

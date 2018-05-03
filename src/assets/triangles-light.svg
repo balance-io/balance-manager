@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="150px" height="225px" viewBox="0 0 150 225" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>triangles</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.900000036">
+        <g id="managerTransactions-Copy" transform="translate(0.000000, -635.000000)">
+            <g id="triangles" transform="translate(0.000000, 635.000000)">
+                <g id="triangles-right-1-copy-3" opacity="0.100000001" transform="translate(75.000000, 112.500000) scale(1, -1) translate(-75.000000, -112.500000) ">
+                    <path d="M75,225 L0,225 L0,75 L75,0 L75,225 Z" id="Combined-Shape" fill="#606A83"></path>
+                    <path d="M150,225 L75,150 L50.25,109.5 L0,75 L0,0 L150,0 L150,225 Z" id="Combined-Shape" fill="#030405"></path>
+                </g>
+                <path d="M0,150 L75,75 L75,225 L0,150 Z" id="Combined-Shape" fill="#5983FF"></path>
+            </g>
+        </g>
+    </g>
+</svg>

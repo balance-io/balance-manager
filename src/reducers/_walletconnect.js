@@ -36,7 +36,7 @@ const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
 let getSessionInterval = null;
 let getTransactionStatusInterval = null;
 
-export const walletConnectModalInit = () => async (dispatch, getState) => {
+export const walletConnectInit = () => async (dispatch, getState) => {
   // Q: dapp name
   const webConnector = new WebConnector("https://walletconnect.balance.io", { "dappName": "Balance Manager" });
   dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST });

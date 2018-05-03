@@ -222,7 +222,7 @@ class Home extends Component {
 
       <StyledCard>
         <StyledCardContainer>
-          <StyledHardwareWallet>
+          <StyledHardwareWallets>
             <StyledLedgerLogo />
             <p>Connect and sign with your Ledger hardware wallet.</p>
             <Link to="/ledger">
@@ -230,7 +230,7 @@ class Home extends Component {
                 {lang.t('button.connect_ledger')}
               </StyledLedgerButton>
             </Link>
-          </StyledHardwareWallet>
+          </StyledHardwareWallets>
         </StyledCardContainer>
       </StyledCard>
 

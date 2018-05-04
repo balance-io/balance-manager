@@ -14,12 +14,14 @@ class AssetIcon extends Component {
     imgSrc: erc20
   };
   updateIcon = props => {
-    if (props.asset.toUpperCase() === 'ETH') {
-      this.setState({ imgSrc: eth });
-    } else {
-      this.setState({
-        imgSrc: `/tokens/images/${props.asset}.png`
-      });
+    if (props.asset) {
+      if (props.asset.toUpperCase() === 'ETH') {
+        this.setState({ imgSrc: eth });
+      } else {
+        this.setState({
+          imgSrc: `/tokens/images/${props.asset}.png`
+        });
+      }
     }
   };
   componentWillMount() {
@@ -30,18 +32,20 @@ class AssetIcon extends Component {
   }
   onError = () => this.setState({ imgSrc: erc20 });
   render() {
-    return (
-      <StyledIcon size={this.props.size} src={this.state.imgSrc || erc20} onError={this.onError} />
-    );
+    const { size, image } = this.props;
+    const { imgSrc } = this.state;
+    return <StyledIcon size={size} src={image || imgSrc || erc20} onError={this.onError} />;
   }
 }
 
 AssetIcon.propTypes = {
   asset: PropTypes.string.isRequired,
+  image: PropTypes.string,
   size: PropTypes.number
 };
 
 AssetIcon.defaultProps = {
+  iamge: '',
   size: 20
 };
 

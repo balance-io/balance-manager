@@ -53,16 +53,19 @@ const SEND_UPDATE_NATIVE_AMOUNT = 'send/SEND_UPDATE_NATIVE_AMOUNT';
 const SEND_UPDATE_RECIPIENT = 'send/SEND_UPDATE_RECIPIENT';
 const SEND_UPDATE_CRYPTO_AMOUNT = 'send/SEND_UPDATE_CRYPTO_AMOUNT';
 const SEND_UPDATE_SELECTED = 'send/SEND_UPDATE_SELECTED';
-const SEND_UPDATE_PRIVATE_KEY = 'send/SEND_UPDATE_PRIVATE_KEY';
 
 const SEND_CLEAR_FIELDS = 'send/SEND_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
 export const sendModalInit = (address, selected) => (dispatch, getState) => {
-  dispatch({ type: SEND_GET_GAS_PRICES_REQUEST, payload: { address, selected } });
   const { prices } = getState().account;
   const { gasLimit } = getState().send;
+  const fallbackGasPrices = parseGasPrices(null, prices, gasLimit);
+  dispatch({
+    type: SEND_GET_GAS_PRICES_REQUEST,
+    payload: { address, selected, gasPrices: fallbackGasPrices }
+  });
   apiGetGasPrices()
     .then(({ data }) => {
       const gasPrices = parseGasPrices(data, prices, gasLimit);
@@ -73,7 +76,7 @@ export const sendModalInit = (address, selected) => (dispatch, getState) => {
     })
     .catch(error => {
       console.error(error);
-      const fallbackGasPrices = parseGasPrices(null, prices, gasLimit);
+
       dispatch({ type: SEND_GET_GAS_PRICES_FAILURE, payload: fallbackGasPrices });
     });
 };
@@ -367,9 +370,12 @@ export default (state = INITIAL_STATE, action) => {
     case SEND_GET_GAS_PRICES_REQUEST:
       return {
         ...state,
+        fetchingGasPrices: true,
         address: action.payload.address,
         selected: action.payload.selected,
-        fetchingGasPrices: true
+        gasPrice: action.payload.gasPrices.average,
+        gasPrices: action.payload.gasPrices,
+        gasPriceOption: action.payload.gasPrices.average.option
       };
     case SEND_GET_GAS_PRICES_SUCCESS:
       return {
@@ -440,11 +446,6 @@ export default (state = INITIAL_STATE, action) => {
       };
     case SEND_UPDATE_SELECTED:
       return { ...state, selected: action.payload };
-    case SEND_UPDATE_PRIVATE_KEY:
-      return {
-        ...state,
-        privateKey: action.payload
-      };
     case SEND_CLEAR_FIELDS:
       return { ...state, ...INITIAL_STATE };
     default:

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Column from '../components/Column';
+import ExchangeModal from '../modals/ExchangeModal';
 import SendModal from '../modals/SendModal';
 import ReceiveModal from '../modals/ReceiveModal';
 import WalletConnectInit from '../modals/WalletConnectInit';
@@ -44,6 +45,8 @@ const StyledContainer = styled.div`
 class Modal extends Component {
   modalController = () => {
     switch (this.props.modal) {
+      case 'EXCHANGE_MODAL':
+        return <ExchangeModal />;
       case 'SEND_MODAL':
         return <SendModal />;
       case 'RECEIVE_MODAL':

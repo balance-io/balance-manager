@@ -37,6 +37,7 @@
       "connect_walletconnect": "Use WalletConnect",
       "connect_metamask": "Connect to MetaMask",
       "connect_ledger": "Connect to Ledger",
+      "exchange": "Exchange",
       "send": "Send",
       "receive": "Receive",
       "close": "Close",
@@ -47,6 +48,8 @@
       "try_again": "Try again"
     },
     "input": {
+      "pay": "Pay",
+      "get": "Get",
       "recipient_address": "Recipient Address",
       "private_key": "Private Key",
       "asset_amount": "Amount",
@@ -59,6 +62,7 @@
     },
     "modal": {
       "receive_title": "Receive to {{walletName}}",
+      "exchange_title": "Exchange from {{walletName}}",
       "send_title": "Send from {{walletName}}",
       "approve_tx": "Approve transaction on {{walletType}}",
       "confirm_tx": "Confirm transaction from {{walletName}}",

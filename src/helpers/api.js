@@ -32,8 +32,7 @@ export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now())
  * @desc get ethereum gas prices
  * @return {Promise}
  */
-export const apiGetGasPrices = () =>
-  axios.get(`https://ethgasstation.info/json/ethgasAPI.json`, { timeout: 10000 });
+export const apiGetGasPrices = () => axios.get(`https://ethgasstation.info/json/ethgasAPI.json`);
 
 /**
  * @desc get metmask selected network
@@ -101,16 +100,16 @@ export const apiGetAccountTransactions = async (
  * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
-export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') => {
-  try {
-    const { data } = await axios.get(
-      `/.netlify/functions/transaction-status?hash=${hash}&network=${network}`
-    );
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
+export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') =>
+  axios.get(`/.netlify/functions/transaction-status?hash=${hash}&network=${network}`);
+
+/**
+ * @desc shapeshift get coins
+ * @param  {String}   [address = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiShapeshiftGetCoins = () => axios.get(`/.netlify/functions/shapeshift-getcoins`);
 
 /**
  * Configuration for WalletConnect api instance

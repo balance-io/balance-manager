@@ -12,6 +12,7 @@ import AccountViewBalances from './AccountViewBalances';
 import AccountViewTransactions from './AccountViewTransactions';
 import AccountViewInteractions from './AccountViewInteractions';
 import arrowUp from '../assets/arrow-up.svg';
+import convertSymbol from '../assets/convert-symbol.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
 import { accountClearState } from '../reducers/_account';
 import { modalOpen } from '../reducers/_modal';
@@ -76,6 +77,14 @@ const StyledMessage = styled.div`
 `;
 
 class AccountView extends Component {
+  openExchangeModal = () =>
+    this.props.modalOpen('EXCHANGE_MODAL', {
+      name:
+        this.props.accountInfo.name || `${this.props.accountType}${lang.t('modal.default_wallet')}`,
+      address: this.props.accountAddress || this.props.accountInfo.address,
+      accountType: this.props.accountType || this.props.accountInfo.type,
+      assets: this.props.accountInfo.assets
+    });
   openSendModal = () =>
     this.props.modalOpen('SEND_MODAL', {
       name:
@@ -105,13 +114,20 @@ class AccountView extends Component {
               <StyledTop>
                 <StyledAddressWrapper>
                   <h6>{capitalize(this.props.accountType || this.props.accountInfo.type)} </h6>
-                  <CopyToClipboard
-                    iconOnHover
-                    text={this.props.accountAddress || this.props.accountInfo.address}
-                  />
+                  <CopyToClipboard iconOnHover text={this.props.accountAddress} />
                 </StyledAddressWrapper>
 
                 <StyledActions>
+                  <Button
+                    left
+                    color="brightGreen"
+                    hoverColor="brightGreenHover"
+                    activeColor="brightGreenHover"
+                    icon={convertSymbol}
+                    onClick={this.openExchangeModal}
+                  >
+                    {lang.t('button.exchange')}
+                  </Button>
                   <Button
                     left
                     color="blue"

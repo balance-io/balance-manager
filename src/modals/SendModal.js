@@ -689,6 +689,7 @@ SendModal.propTypes = {
   gasPriceOption: PropTypes.string.isRequired,
   confirm: PropTypes.bool.isRequired,
   network: PropTypes.string.isRequired,
+  nativeCurrency: PropTypes.string.isRequired,
   prices: PropTypes.object.isRequired
 };
 

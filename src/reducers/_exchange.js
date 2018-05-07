@@ -1,11 +1,5 @@
-import { apiShapeshiftGetCoins } from '../helpers/api';
+import { apiShapeshiftGetCoins, apiShapeshiftGetMarketInfo } from '../helpers/api';
 import ethTokens from '../libraries/coinwoke-tokens.json';
-import {
-  convertAssetAmountFromNativeValue,
-  convertAssetAmountToNativeValue,
-  countDecimalPlaces,
-  formatFixedDecimals
-} from '../helpers/bignumber';
 import { parseError } from '../helpers/parsers';
 import { notificationShow } from './_notification';
 
@@ -14,6 +8,10 @@ import { notificationShow } from './_notification';
 const EXCHANGE_GET_AVAILABLE_REQUEST = 'exchange/EXCHANGE_GET_AVAILABLE_REQUEST';
 const EXCHANGE_GET_AVAILABLE_SUCCESS = 'exchange/EXCHANGE_GET_AVAILABLE_SUCCESS';
 const EXCHANGE_GET_AVAILABLE_FAILURE = 'exchange/EXCHANGE_GET_AVAILABLE_FAILURE';
+
+const EXCHANGE_GET_MARKET_INFO_REQUEST = 'exchange/EXCHANGE_GET_MARKET_INFO_REQUEST';
+const EXCHANGE_GET_MARKET_INFO_SUCCESS = 'exchange/EXCHANGE_GET_MARKET_INFO_SUCCESS';
+const EXCHANGE_GET_MARKET_INFO_FAILURE = 'exchange/EXCHANGE_GET_MARKET_INFO_FAILURE';
 
 const EXCHANGE_TOGGLE_CONFIRMATION_VIEW = 'exchange/EXCHANGE_TOGGLE_CONFIRMATION_VIEW';
 
@@ -26,6 +24,21 @@ const EXCHANGE_UPDATE_WITHDRAWAL_SELECTED = 'exchange/EXCHANGE_UPDATE_WITHDRAWAL
 const EXCHANGE_CLEAR_FIELDS = 'exchange/EXCHANGE_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
+
+export const exchangeUpdateExchangeRate = () => (dispatch, getState) => {
+  const { withdrawalSelected, depositSelected } = getState().exchange;
+  const exchangePair = `${withdrawalSelected.symbol}_${depositSelected.symbol}`.toLowerCase();
+  dispatch({ type: EXCHANGE_GET_MARKET_INFO_REQUEST });
+  apiShapeshiftGetMarketInfo(exchangePair)
+    .then(({ data }) => {
+      dispatch({ type: EXCHANGE_GET_MARKET_INFO_SUCCESS, payload: data });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: EXCHANGE_GET_MARKET_INFO_FAILURE });
+    });
+};
 
 export const exchangeModalInit = (address, depositSelected) => (dispatch, getState) => {
   dispatch({ type: EXCHANGE_GET_AVAILABLE_REQUEST, payload: { address, depositSelected } });
@@ -43,6 +56,7 @@ export const exchangeModalInit = (address, depositSelected) => (dispatch, getSta
         type: EXCHANGE_GET_AVAILABLE_SUCCESS,
         payload: { availableAssets, withdrawalSelected: availableAssets[1] }
       });
+      dispatch(exchangeUpdateExchangeRate());
     })
     .catch(error => {
       const message = parseError(error);
@@ -53,10 +67,12 @@ export const exchangeModalInit = (address, depositSelected) => (dispatch, getSta
 
 export const exchangeUpdateDepositSelected = depositSelected => (dispatch, getState) => {
   dispatch({ type: EXCHANGE_UPDATE_DEPOSIT_SELECTED, payload: depositSelected });
+  dispatch(exchangeUpdateExchangeRate());
 };
 
 export const exchangeUpdateWithdrawalSelected = withdrawalSelected => (dispatch, getState) => {
   dispatch({ type: EXCHANGE_UPDATE_WITHDRAWAL_SELECTED, payload: withdrawalSelected });
+  dispatch(exchangeUpdateExchangeRate());
 };
 
 export const exchangeToggleConfirmationView = boolean => (dispatch, getState) => {
@@ -67,40 +83,21 @@ export const exchangeToggleConfirmationView = boolean => (dispatch, getState) =>
   dispatch({ type: EXCHANGE_TOGGLE_CONFIRMATION_VIEW, payload: confirm });
 };
 
-export const exchangeUpdateAssetAmount = (assetAmount, depositSelected) => (dispatch, getState) => {
-  const { prices, nativeCurrency } = getState().account;
-  const _assetAmount = assetAmount.replace(/[^0-9.]/g, '');
-  let _nativeAmount = '';
-  if (_assetAmount.length && prices[nativeCurrency][depositSelected.symbol]) {
-    const _assetAmountDecimalPlaces = countDecimalPlaces(_assetAmount);
-    const nativeAmount = convertAssetAmountToNativeValue(_assetAmount, depositSelected, prices);
-    const _nativeAmountDecimalPlaces =
-      _assetAmountDecimalPlaces > 8 ? _assetAmountDecimalPlaces : 8;
-    _nativeAmount = formatFixedDecimals(nativeAmount, _nativeAmountDecimalPlaces);
-  }
+export const exchangeUpdateDepositAmount = depositAmount => (dispatch, getState) => {
+  const { exchangeDetails } = getState().exchange;
+  const withdrawalAmount = `${depositAmount / exchangeDetails.rate}`;
   dispatch({
     type: EXCHANGE_UPDATE_CRYPTO_AMOUNT,
-    payload: { assetAmount: _assetAmount, nativeAmount: _nativeAmount }
+    payload: { depositAmount, withdrawalAmount }
   });
 };
 
-export const exchangeUpdateNativeAmount = (nativeAmount, depositSelected) => (
-  dispatch,
-  getState
-) => {
-  const { prices, nativeCurrency } = getState().account;
-  const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
-  let _assetAmount = '';
-  if (_nativeAmount.length && prices[nativeCurrency][depositSelected.symbol]) {
-    const _nativeAmountDecimalPlaces = countDecimalPlaces(_nativeAmount);
-    const assetAmount = convertAssetAmountFromNativeValue(_nativeAmount, depositSelected, prices);
-    const _assetAmountDecimalPlaces =
-      _nativeAmountDecimalPlaces > 8 ? _nativeAmountDecimalPlaces : 8;
-    _assetAmount = formatFixedDecimals(assetAmount, _assetAmountDecimalPlaces);
-  }
+export const exchangeUpdateWithdrawalAmount = withdrawalAmount => (dispatch, getState) => {
+  const { exchangeDetails } = getState().exchange;
+  const depositAmount = `${withdrawalAmount * exchangeDetails.rate}`;
   dispatch({
     type: EXCHANGE_UPDATE_CRYPTO_AMOUNT,
-    payload: { assetAmount: _assetAmount, nativeAmount: _nativeAmount }
+    payload: { depositAmount, withdrawalAmount }
   });
 };
 
@@ -111,13 +108,14 @@ const INITIAL_STATE = {
   fetching: false,
   address: '',
   recipient: '',
-  nativeAmount: '',
-  assetAmount: '',
   availableAssets: [],
+  exchangeDetails: {},
   txHash: '',
   confirm: false,
   depositSelected: { symbol: 'ETH' },
-  withdrawalSelected: { symbol: 'ZRX' }
+  withdrawalSelected: { symbol: 'ZRX' },
+  depositAmount: '',
+  withdrawalAmount: ''
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -140,7 +138,12 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: false,
-        availableAssets: {}
+        availableAssets: []
+      };
+    case EXCHANGE_GET_MARKET_INFO_SUCCESS:
+      return {
+        ...state,
+        exchangeDetails: action.payload
       };
     case EXCHANGE_TOGGLE_CONFIRMATION_VIEW:
       return {
@@ -151,8 +154,8 @@ export default (state = INITIAL_STATE, action) => {
     case EXCHANGE_UPDATE_CRYPTO_AMOUNT:
       return {
         ...state,
-        assetAmount: action.payload.assetAmount,
-        nativeAmount: action.payload.nativeAmount
+        depositAmount: action.payload.depositAmount,
+        withdrawalAmount: action.payload.withdrawalAmount
       };
     case EXCHANGE_UPDATE_DEPOSIT_SELECTED:
       return { ...state, depositSelected: action.payload };

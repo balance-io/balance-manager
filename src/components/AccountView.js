@@ -12,7 +12,7 @@ import AccountViewBalances from './AccountViewBalances';
 import AccountViewTransactions from './AccountViewTransactions';
 import AccountViewInteractions from './AccountViewInteractions';
 import arrowUp from '../assets/arrow-up.svg';
-import convertSymbol from '../assets/convert-symbol.svg';
+import exchangeIcon from '../assets/exchange-icon.svg';
 import qrCode from '../assets/qr-code-transparent.svg';
 import { accountClearState } from '../reducers/_account';
 import { modalOpen } from '../reducers/_modal';
@@ -123,7 +123,7 @@ class AccountView extends Component {
                     color="brightGreen"
                     hoverColor="brightGreenHover"
                     activeColor="brightGreenHover"
-                    icon={convertSymbol}
+                    icon={exchangeIcon}
                     onClick={this.openExchangeModal}
                   >
                     {lang.t('button.exchange')}

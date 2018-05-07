@@ -48,8 +48,6 @@
       "try_again": "Try again"
     },
     "input": {
-      "pay": "Pay",
-      "get": "Get",
       "recipient_address": "Recipient Address",
       "private_key": "Private Key",
       "asset_amount": "Amount",
@@ -78,7 +76,11 @@
       "tx_confirm_amount": "Amount",
       "tx_confirm_fee": "Transaction Fee",
       "tx_hash": "Transaction Hash",
-      "tx_verify": "Verify your transaction here"
+      "tx_verify": "Verify your transaction here",
+      "deposit_dropdown_label": "Exchange my",
+      "withdrawal_dropdown_label": "for",
+      "deposit_input_label": "Pay",
+      "withdrawal_input_label": "Get"
     },
     "time": {
       "ms": "ms",

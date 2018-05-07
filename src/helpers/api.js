@@ -105,11 +105,17 @@ export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') =>
 
 /**
  * @desc shapeshift get coins
- * @param  {String}   [address = '']
- * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
 export const apiShapeshiftGetCoins = () => axios.get(`/.netlify/functions/shapeshift-getcoins`);
+
+/**
+ * @desc shapeshift get market info
+ * @param  {String}   [exchangePair = '']
+ * @return {Promise}
+ */
+export const apiShapeshiftGetMarketInfo = (exchangePair = '') =>
+  axios.get(`/.netlify/functions/shapeshift-marketinfo?exchangePair=${exchangePair}`);
 
 /**
  * Configuration for WalletConnect api instance

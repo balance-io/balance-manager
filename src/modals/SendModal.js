@@ -14,7 +14,7 @@ import Form from '../components/Form';
 import MetamaskLogo from '../components/MetamaskLogo';
 import LedgerLogo from '../components/LedgerLogo';
 import TrezorLogo from '../components/TrezorLogo';
-import convertSymbol from '../assets/convert-symbol.svg';
+import convertIcon from '../assets/convert-icon.svg';
 import arrowUp from '../assets/arrow-up.svg';
 import qrIcon from '../assets/qr-code-bnw.png';
 import { modalClose } from '../reducers/_modal';
@@ -124,11 +124,11 @@ const StyledAmountCurrency = styled.div`
   opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
 `;
 
-const StyledConversionSymbol = styled.div`
+const StyledConversionIcon = styled.div`
   width: 46px;
   position: relative;
   & img {
-    width: 20px;
+    width: 15px;
     position: absolute;
     bottom: 12px;
     left: calc(50% - 10px);
@@ -468,9 +468,9 @@ class SendModal extends Component {
                   <StyledAmountCurrency>{this.props.selected.symbol}</StyledAmountCurrency>
                 </StyledFlex>
                 <StyledFlex>
-                  <StyledConversionSymbol>
-                    <img src={convertSymbol} alt="conversion" />
-                  </StyledConversionSymbol>
+                  <StyledConversionIcon>
+                    <img src={convertIcon} alt="≈" />
+                  </StyledConversionIcon>
                 </StyledFlex>
                 <StyledFlex>
                   <Input

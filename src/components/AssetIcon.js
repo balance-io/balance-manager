@@ -39,13 +39,14 @@ class AssetIcon extends Component {
 }
 
 AssetIcon.propTypes = {
-  asset: PropTypes.string.isRequired,
+  asset: PropTypes.string,
   image: PropTypes.string,
   size: PropTypes.number
 };
 
 AssetIcon.defaultProps = {
-  iamge: '',
+  asset: null,
+  image: '',
   size: 20
 };
 

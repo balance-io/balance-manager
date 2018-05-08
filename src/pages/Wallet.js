@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
-import { getLocal } from '../handlers/utilities';
+import { getLocal } from '../helpers/utilities';
 import { accountUpdateAccountAddress, accountClearState } from '../reducers/_account';
 
 const StyledWrapper = styled.div`

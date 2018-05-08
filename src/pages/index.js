@@ -13,7 +13,7 @@ import ledgerLogoImage from '../assets/ledger-logo.svg';
 // import walletConnectLogoImage from '../assets/walletconnect-blue.svg';
 import trezorLogoImage from '../assets/trezor-logo.svg';
 import { accountUpdateAccountAddress } from '../reducers/_account';
-import { getLocal } from '../handlers/utilities';
+import { getLocal } from '../helpers/utilities';
 import { modalOpen } from '../reducers/_modal';
 import { fonts, responsive } from '../styles';
 

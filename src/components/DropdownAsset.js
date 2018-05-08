@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import AssetIcon from '../components/AssetIcon';
 import selector from '../assets/selector-grey.svg';
-import { ellipseText } from '../handlers/utilities';
+import { ellipseText } from '../helpers/utilities';
 import { fonts, colors, shadows, responsive, transitions } from '../styles';
 
 const StyledWrapper = styled.div`

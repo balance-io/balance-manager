@@ -1,4 +1,4 @@
-import { saveLocal } from '../handlers/utilities';
+import { saveLocal } from '../helpers/utilities';
 import { parseError } from '../handlers/parsers';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';

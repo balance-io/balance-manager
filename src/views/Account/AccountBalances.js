@@ -5,12 +5,12 @@ import styled from 'styled-components';
 import lang from '../../languages';
 import AssetIcon from '../../components/AssetIcon';
 import ToggleIndicator from '../../components/ToggleIndicator';
-import { ellipseText } from '../../handlers/utilities';
+import { ellipseText } from '../../helpers/utilities';
 import {
   convertStringToNumber,
   hasHighMarketValue,
   hasLowMarketValue
-} from '../../handlers/bignumber';
+} from '../../helpers/bignumber';
 import { colors, fonts, responsive } from '../../styles';
 
 const StyledGrid = styled.div`

@@ -18,7 +18,7 @@ import {
   getLocal,
   updateLocalTransactions,
   updateLocalBalances
-} from '../handlers/utilities';
+} from '../helpers/utilities';
 import { web3SetHttpProvider } from '../handlers/web3';
 import { notificationShow } from './_notification';
 import nativeCurrencies from '../references/native-currencies.json';

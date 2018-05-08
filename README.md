@@ -1,6 +1,6 @@
 ## Balance Manager
 
-#### Ethereum Wallet Manager Interface for MetaMask, Ledger, Trezor and Balance Wallet
+#### Ethereum Wallet Manager Interface for MetaMask, Ledger, Trezor and WalletConnect
 
 For development
 

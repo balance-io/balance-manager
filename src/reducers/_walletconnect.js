@@ -3,7 +3,7 @@ import { parseError } from '../handlers/parsers';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
 import { accountUpdateAccountAddress } from './_account';
-import { walletConnectEthInit, walletConnectEthAccounts } from '../helpers/walletconnect';
+import { walletConnectEthInit, walletConnectEthAccounts } from '../handlers/walletconnect';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -25,7 +25,7 @@ let getTransactionStatusInterval = null;
 export const walletConnectInit = () => async (dispatch, getState) => {
   dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST });
   walletConnectEthInit()
-    .then((walletConnectInstance) => {
+    .then(walletConnectInstance => {
       dispatch({
         type: WALLET_CONNECT_NEW_SESSION_SUCCESS,
         payload: walletConnectInstance.webConnector
@@ -47,25 +47,24 @@ export const walletConnectGetSession = () => (dispatch, getState) => {
       const message = parseError(error);
       dispatch(notificationShow(message), true);
       dispatch({ type: WALLET_CONNECT_GET_SESSION_FAILURE });
+    } else if (data) {
+      dispatch({
+        type: WALLET_CONNECT_GET_SESSION_SUCCESS
+      });
+      const accountAddress = data.address.toLowerCase();
+      saveLocal('walletconnect', accountAddress);
+      dispatch(accountUpdateAccountAddress(accountAddress, 'WALLETCONNECT'));
+      dispatch(modalClose());
+      window.browserHistory.push('/wallet');
     }
-    else if (data) {
-        dispatch({
-          type: WALLET_CONNECT_GET_SESSION_SUCCESS
-        });
-        const accountAddress = data.address.toLowerCase();
-        saveLocal('walletconnect', accountAddress);
-        dispatch(accountUpdateAccountAddress(accountAddress, 'WALLETCONNECT'));
-        dispatch(modalClose());
-        window.browserHistory.push('/wallet');
-    }
-  })
+  });
 };
 
-export const walletConnectClearFields = () => (dispatch) => {
+export const walletConnectClearFields = () => dispatch => {
   clearTimeout(getSessionInterval);
   clearTimeout(getTransactionStatusInterval);
   dispatch({ type: WALLET_CONNECT_CLEAR_FIELDS });
-}
+};
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {

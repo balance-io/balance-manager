@@ -37,6 +37,7 @@
       "connect_walletconnect": "Utilizar WalletConnect",
       "connect_metamask": "Conectar a MetaMask",
       "connect_ledger": "Conectar a Ledger",
+      "exchange": "Cambiar",
       "send": "Enviar",
       "receive": "Recibir",
       "close": "Cerrar",
@@ -59,7 +60,8 @@
     },
     "modal": {
       "receive_title": "Recibir a {{walletName}}",
-      "send_title": "Enviar para {{walletName}}",
+      "exchange_title": "Cambiar de {{walletName}}",
+      "send_title": "Enviar de {{walletName}}",
       "approve_tx": "Aprobar transacción en {{walletType}}",
       "confirm_tx": "Confirmar transacción de {{walletName}}",
       "invalid_address": "Dirección inválida",
@@ -74,27 +76,11 @@
       "tx_confirm_amount": "Cantidad",
       "tx_confirm_fee": "Tarifa de transacción",
       "tx_hash": "Transaction Hash",
-      "tx_verify": "Verifique su transacción aquí"
-    },
-    "time": {
-      "ms": "ms",
-      "milisecond": "milisegundo",
-      "miliseconds": "milisegundos",
-      "s": "s",
-      "sec": "seg",
-      "secs": "segs",
-      "second": "segundo",
-      "seconds": "segundos",
-      "min": "min",
-      "mins": "mins",
-      "minute": "minuto",
-      "minutes": "minutos",
-      "hr": "hr",
-      "hrs": "hrs",
-      "hour": "hora",
-      "hours": "horas",
-      "day": "dia",
-      "days": "dias"
+      "tx_verify": "Verifique su transacción aquí",
+      "deposit_dropdown_label": "Cambiar mi",
+      "withdrawal_dropdown_label": "por",
+      "deposit_input_label": "Pagar",
+      "withdrawal_input_label": "Obtener"
     },
     "message": {
       "web3_not_available": "Instala la Chrome extension de MetaMask",
@@ -137,6 +123,26 @@
       "successful": "Verifica tu email",
       "sending": "Enviando...",
       "generic_error": "Huy! Algo salió mal"
+    },
+    "time": {
+      "ms": "ms",
+      "milisecond": "milisegundo",
+      "miliseconds": "milisegundos",
+      "s": "s",
+      "sec": "seg",
+      "secs": "segs",
+      "second": "segundo",
+      "seconds": "segundos",
+      "min": "min",
+      "mins": "mins",
+      "minute": "minuto",
+      "minutes": "minutos",
+      "hr": "hr",
+      "hrs": "hrs",
+      "hour": "hora",
+      "hours": "horas",
+      "day": "dia",
+      "days": "dias"
     }
   }
 }

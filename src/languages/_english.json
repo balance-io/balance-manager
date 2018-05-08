@@ -82,26 +82,6 @@
       "deposit_input_label": "Pay",
       "withdrawal_input_label": "Get"
     },
-    "time": {
-      "ms": "ms",
-      "milisecond": "milisecond",
-      "miliseconds": "miliseconds",
-      "s": "s",
-      "sec": "sec",
-      "secs": "secs",
-      "second": "second",
-      "seconds": "seconds",
-      "min": "min",
-      "mins": "mins",
-      "minute": "minute",
-      "minutes": "minutes",
-      "hr": "hr",
-      "hrs": "hrs",
-      "hour": "hour",
-      "hours": "hours",
-      "day": "day",
-      "days": "days"
-    },
     "message": {
       "web3_not_available": "Please install the MetaMask Chrome extension",
       "web3_not_unlocked": "Please unlock your MetaMask wallet",
@@ -143,6 +123,26 @@
       "successful": "Check your email",
       "sending": "Sending...",
       "generic_error": "Oops, something went wrong"
+    },
+    "time": {
+      "ms": "ms",
+      "milisecond": "milisecond",
+      "miliseconds": "miliseconds",
+      "s": "s",
+      "sec": "sec",
+      "secs": "secs",
+      "second": "second",
+      "seconds": "seconds",
+      "min": "min",
+      "mins": "mins",
+      "minute": "minute",
+      "minutes": "minutes",
+      "hr": "hr",
+      "hrs": "hrs",
+      "hour": "hour",
+      "hours": "hours",
+      "day": "day",
+      "days": "days"
     }
   }
 }

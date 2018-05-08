@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import lang from '../languages';
-import timeUnits from '../libraries/time-units.json';
+import timeUnits from '../references/time-units.json';
 
 /**
  * @desc get time zone code

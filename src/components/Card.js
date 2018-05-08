@@ -19,7 +19,7 @@ const StyledCard = styled.div`
   font-weight: ${fonts.weight.normal};
   margin: 0 auto;
   text-align: left;
-  overflow: hidden;
+  overflow: ${({ allowOverflow }) => (allowOverflow ? 'visible' : 'hidden')};
 `;
 
 const StyledContent = styled.div`
@@ -61,13 +61,14 @@ const StyledMessage = styled.div`
 const Card = ({
   fetching,
   fetchingMessage,
+  allowOverflow,
   background,
   maxWidth,
   minHeight,
   children,
   ...props
 }) => (
-  <StyledCard background={background} maxWidth={maxWidth} {...props}>
+  <StyledCard allowOverflow={allowOverflow} background={background} maxWidth={maxWidth} {...props}>
     <StyledFetching fetching={fetching}>
       <StyledMessage>{fetchingMessage}</StyledMessage>
       <Loader color="darkGrey" background={background} />
@@ -81,6 +82,7 @@ const Card = ({
 Card.propTypes = {
   children: PropTypes.node.isRequired,
   fetching: PropTypes.bool,
+  allowOverflow: PropTypes.bool,
   fetchingMessage: PropTypes.string,
   background: PropTypes.string,
   maxWidth: PropTypes.number
@@ -88,6 +90,7 @@ Card.propTypes = {
 
 Card.defaultProps = {
   fetching: false,
+  allowOverflow: false,
   fetchingMessage: '',
   background: 'white',
   maxWidth: null,

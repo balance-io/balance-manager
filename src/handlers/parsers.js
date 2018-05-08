@@ -539,14 +539,12 @@ export const parseAccountBalancesPrices = (account = null, nativePrices = null, 
  * @param  {Object} [txDetails=null]
  * @param  {Object} [transactions=null]
  * @param  {Object} [nativeCurrency='']
- * @param  {String} [address='']
- * @param  {String} [network='']
  * @return {String}
  */
 export const parseNewTransaction = async (
   txDetails = null,
   transactions = null,
-  nativeSelected = ''
+  nativeCurrency = ''
 ) => {
   let _transactions = [...transactions];
 
@@ -587,42 +585,42 @@ export const parseNewTransaction = async (
 
   const timestamp = Date.now();
   const assetSymbol = tx.asset.symbol;
-  tx.native = { selected: nativeCurrencies[nativeSelected] };
+  tx.native = { selected: nativeCurrencies[nativeCurrency] };
 
   const response = await apiGetHistoricalPrices(assetSymbol, timestamp);
 
-  if (response.data.response === 'Error' || !response.data[assetSymbol]) {
-    return tx;
+  if (response.data.response !== 'Error' || response.data[assetSymbol]) {
+    await Promise.all(
+      Object.keys(nativeCurrencies).map(async nativeCurrency => {
+        const assetPriceAmount = convertAmountToBigNumber(
+          response.data[assetSymbol][nativeCurrency]
+        );
+        let prices = { selected: nativeCurrencies[nativeCurrency] };
+        prices[nativeCurrency] = {};
+        prices[nativeCurrency][assetSymbol] = {
+          price: { amount: assetPriceAmount, display: null }
+        };
+        const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
+        prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
+        const assetPrice = prices[nativeCurrency][assetSymbol].price;
+        const valuePriceAmount = convertAssetAmountToNativeValue(tx.value.amount, tx.asset, prices);
+        const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
+
+        const valuePrice = !tx.error
+          ? { amount: valuePriceAmount, display: valuePriceDisplay }
+          : { amount: '', display: '' };
+        const txFeePriceAmount = convertAssetAmountToNativeValue(tx.txFee.amount, tx.asset, prices);
+        const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
+        const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
+
+        tx.native[nativeCurrency] = {
+          price: assetPrice,
+          value: valuePrice,
+          txFee: txFeePrice
+        };
+      })
+    );
   }
-
-  await Promise.all(
-    Object.keys(nativeCurrencies).map(async nativeCurrency => {
-      const assetPriceAmount = convertAmountToBigNumber(response.data[assetSymbol][nativeCurrency]);
-      let prices = { selected: nativeCurrencies[nativeCurrency] };
-      prices[nativeCurrency] = {};
-      prices[nativeCurrency][assetSymbol] = {
-        price: { amount: assetPriceAmount, display: null }
-      };
-      const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
-      prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
-      const assetPrice = prices[nativeCurrency][assetSymbol].price;
-      const valuePriceAmount = convertAssetAmountToNativeValue(tx.value.amount, tx.asset, prices);
-      const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
-
-      const valuePrice = !tx.error
-        ? { amount: valuePriceAmount, display: valuePriceDisplay }
-        : { amount: '', display: '' };
-      const txFeePriceAmount = convertAssetAmountToNativeValue(tx.txFee.amount, tx.asset, prices);
-      const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
-      const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
-
-      tx.native[nativeCurrency] = {
-        price: assetPrice,
-        value: valuePrice,
-        txFee: txFeePrice
-      };
-    })
-  );
 
   _transactions = [tx, ..._transactions];
 

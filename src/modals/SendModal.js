@@ -247,8 +247,8 @@ const StyledActions = styled.div`
 
 class SendModal extends Component {
   componentDidMount() {
-    const selected = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
-    this.props.sendModalInit(this.props.modalProps.address, selected);
+    const selected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+    this.props.sendModalInit(this.props.accountInfo.address, selected);
   }
   state = {
     isValidAddress: true,
@@ -267,9 +267,9 @@ class SendModal extends Component {
     }
   }
   onChangeSelected = value => {
-    let selected = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+    let selected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
     if (value !== 'ETH') {
-      selected = this.props.modalProps.assets.filter(asset => asset.symbol === value)[0];
+      selected = this.props.accountInfo.assets.filter(asset => asset.symbol === value)[0];
     }
     if (
       this.props.prices[this.props.nativeCurrency] &&
@@ -285,7 +285,7 @@ class SendModal extends Component {
   onGoBack = () => this.props.sendToggleConfirmationView(false);
   onSendEntireBalance = () => {
     if (this.props.selected.symbol === 'ETH') {
-      const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+      const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
       const balanceAmount = ethereum.balance.amount;
       const txFeeAmount = this.props.gasPrice.txFee.value.amount;
       const remaining = BigNumber(balanceAmount)
@@ -303,13 +303,13 @@ class SendModal extends Component {
   onSendAnother = () => {
     this.props.sendToggleConfirmationView(false);
     this.props.sendClearFields();
-    const selected = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
-    this.props.sendModalInit(this.props.modalProps.address, selected);
+    const selected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+    this.props.sendModalInit(this.props.accountInfo.address, selected);
   };
   onSubmit = e => {
     e.preventDefault();
     const request = {
-      address: this.props.modalProps.address,
+      address: this.props.accountInfo.address,
       recipient: this.props.recipient,
       amount: this.props.assetAmount,
       selectedAsset: this.props.selected,
@@ -325,7 +325,7 @@ class SendModal extends Component {
         this.props.notificationShow(lang.t('notification.error.invalid_address'), true);
         return;
       } else if (this.props.selected.symbol === 'ETH') {
-        const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+        const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
         const balanceAmount = ethereum.balance.amount;
         const balance = convertAmountFromBigNumber(balanceAmount);
         const requestedAmount = BigNumber(`${this.props.assetAmount}`).toString();
@@ -341,7 +341,7 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
-        switch (this.props.modalProps.accountType) {
+        switch (this.props.accountType) {
           case 'METAMASK':
             this.props.sendEtherMetamask(request);
             break;
@@ -353,7 +353,7 @@ class SendModal extends Component {
             break;
         }
       } else {
-        const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+        const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
         const etherBalanceAmount = ethereum.balance.amount;
         const etherBalance = convertAmountFromBigNumber(etherBalanceAmount);
         const tokenBalanceAmount = this.props.selected.balance.amount;
@@ -367,7 +367,7 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
-        switch (this.props.modalProps.accountType) {
+        switch (this.props.accountType) {
           case 'METAMASK':
             this.props.sendTokenMetamask(request);
             break;
@@ -415,14 +415,16 @@ class SendModal extends Component {
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
                 {lang.t('modal.send_title', {
-                  walletName: capitalize(this.props.modalProps.name)
+                  walletName: capitalize(
+                    `${this.props.accountType}${lang.t('modal.default_wallet')}`
+                  )
                 })}
               </StyledSubTitle>
 
               <div>
                 <DropdownAsset
                   selected={this.props.selected.symbol}
-                  assets={this.props.modalProps.assets}
+                  assets={this.props.accountInfo.assets}
                   onChange={this.onChangeSelected}
                 />
               </div>
@@ -603,7 +605,7 @@ class SendModal extends Component {
           ) : (
             <StyledApproveTransaction>
               {(() => {
-                switch (this.props.modalProps.accountType) {
+                switch (this.props.accountType) {
                   case 'METAMASK':
                     return <MetamaskLogo />;
                   case 'LEDGER':
@@ -616,7 +618,7 @@ class SendModal extends Component {
               })()}
               <StyledParagraph>
                 {lang.t('modal.approve_tx', {
-                  walletType: capitalize(this.props.modalProps.accountType)
+                  walletType: capitalize(this.props.accountType)
                 })}
               </StyledParagraph>
               <StyledActions single>
@@ -674,7 +676,6 @@ SendModal.propTypes = {
   sendToggleConfirmationView: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
   modalClose: PropTypes.func.isRequired,
-  modalProps: PropTypes.object.isRequired,
   fetching: PropTypes.bool.isRequired,
   recipient: PropTypes.string.isRequired,
   nativeAmount: PropTypes.string.isRequired,
@@ -688,13 +689,14 @@ SendModal.propTypes = {
   gasLimit: PropTypes.number.isRequired,
   gasPriceOption: PropTypes.string.isRequired,
   confirm: PropTypes.bool.isRequired,
+  accountInfo: PropTypes.object.isRequired,
+  accountType: PropTypes.string.isRequired,
   network: PropTypes.string.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
   prices: PropTypes.object.isRequired
 };
 
 const reduxProps = ({ modal, send, account }) => ({
-  modalProps: modal.modalProps,
   fetching: send.fetching,
   recipient: send.recipient,
   nativeAmount: send.nativeAmount,
@@ -708,6 +710,8 @@ const reduxProps = ({ modal, send, account }) => ({
   gasLimit: send.gasLimit,
   gasPriceOption: send.gasPriceOption,
   confirm: send.confirm,
+  accountInfo: account.accountInfo,
+  accountType: account.accountType,
   network: account.network,
   nativeCurrency: account.nativeCurrency,
   prices: account.prices

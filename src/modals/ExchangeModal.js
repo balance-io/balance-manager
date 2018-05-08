@@ -173,13 +173,15 @@ const StyledActions = styled.div`
 
 class ExchangeModal extends Component {
   componentDidMount() {
-    const depositSelected = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
-    this.props.exchangeModalInit(this.props.modalProps.address, depositSelected);
+    const depositSelected = this.props.accountInfo.assets.filter(
+      asset => asset.symbol === 'ETH'
+    )[0];
+    this.props.exchangeModalInit(this.props.accountInfo.address, depositSelected);
   }
   onChangeDepositSelected = value => {
-    let depositSelected = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+    let depositSelected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
     if (value !== 'ETH') {
-      depositSelected = this.props.modalProps.assets.filter(asset => asset.symbol === value)[0];
+      depositSelected = this.props.accountInfo.assets.filter(asset => asset.symbol === value)[0];
     }
     this.props.exchangeUpdateDepositSelected(depositSelected);
   };
@@ -194,13 +196,15 @@ class ExchangeModal extends Component {
   onExchangeAnother = () => {
     this.props.exchangeToggleConfirmationView(false);
     this.props.exchangeClearFields();
-    const depositSelected = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
-    this.props.exchangeModalInit(this.props.modalProps.address, depositSelected);
+    const depositSelected = this.props.accountInfo.assets.filter(
+      asset => asset.symbol === 'ETH'
+    )[0];
+    this.props.exchangeModalInit(this.props.accountInfo.address, depositSelected);
   };
   onSubmit = e => {
     e.preventDefault();
     const request = {
-      address: this.props.modalProps.address,
+      address: this.props.accountInfo.address,
       recipient: this.props.recipient,
       amount: this.props.depositAmount,
       depositSelectedAsset: this.props.depositSelected,
@@ -216,7 +220,7 @@ class ExchangeModal extends Component {
         this.props.notificationShow(lang.t('notification.error.invalid_address'), true);
         return;
       } else if (this.props.depositSelected.symbol === 'ETH') {
-        const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+        const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
         const balanceAmount = ethereum.balance.amount;
         const balance = convertAmountFromBigNumber(balanceAmount);
         const requestedAmount = BigNumber(`${this.props.depositAmount}`).toString();
@@ -232,7 +236,7 @@ class ExchangeModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
-        switch (this.props.modalProps.accountType) {
+        switch (this.props.accountType) {
           case 'METAMASK':
             this.props.exchangeEtherMetamask(request);
             break;
@@ -244,7 +248,7 @@ class ExchangeModal extends Component {
             break;
         }
       } else {
-        const ethereum = this.props.modalProps.assets.filter(asset => asset.symbol === 'ETH')[0];
+        const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
         const etherBalanceAmount = ethereum.balance.amount;
         const etherBalance = convertAmountFromBigNumber(etherBalanceAmount);
         const tokenBalanceAmount = this.props.depositSelected.balance.amount;
@@ -258,7 +262,7 @@ class ExchangeModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
-        switch (this.props.modalProps.accountType) {
+        switch (this.props.accountType) {
           case 'METAMASK':
             this.props.exchangeTokenMetamask(request);
             break;
@@ -281,7 +285,7 @@ class ExchangeModal extends Component {
     const availableSymbols = this.props.availableAssets.map(
       availableAsset => availableAsset.symbol
     );
-    const filteredAvailableAssets = this.props.modalProps.assets.filter(
+    const filteredAvailableAssets = this.props.accountInfo.assets.filter(
       asset => availableSymbols.indexOf(asset.symbol) !== -1
     );
     return (
@@ -292,7 +296,9 @@ class ExchangeModal extends Component {
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
                 {lang.t('modal.exchange_title', {
-                  walletName: capitalize(this.props.modalProps.name)
+                  walletName: capitalize(
+                    `${this.props.accountType}${lang.t('modal.default_wallet')}`
+                  )
                 })}
               </StyledSubTitle>
 
@@ -415,7 +421,7 @@ class ExchangeModal extends Component {
           ) : (
             <StyledApproveTransaction>
               {(() => {
-                switch (this.props.modalProps.accountType) {
+                switch (this.props.accountType) {
                   case 'METAMASK':
                     return <MetamaskLogo />;
                   case 'LEDGER':
@@ -428,7 +434,7 @@ class ExchangeModal extends Component {
               })()}
               <StyledParagraph>
                 {lang.t('modal.approve_tx', {
-                  walletType: capitalize(this.props.modalProps.accountType)
+                  walletType: capitalize(this.props.accountType)
                 })}
               </StyledParagraph>
               <StyledActions single>
@@ -481,7 +487,6 @@ ExchangeModal.propTypes = {
   exchangeToggleConfirmationView: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
   modalClose: PropTypes.func.isRequired,
-  modalProps: PropTypes.object.isRequired,
   fetching: PropTypes.bool.isRequired,
   address: PropTypes.string.isRequired,
   recipient: PropTypes.string.isRequired,
@@ -492,12 +497,13 @@ ExchangeModal.propTypes = {
   confirm: PropTypes.bool.isRequired,
   depositSelected: PropTypes.object.isRequired,
   withdrawalSelected: PropTypes.object.isRequired,
+  accountInfo: PropTypes.object.isRequired,
+  accountType: PropTypes.string.isRequired,
   network: PropTypes.string.isRequired,
   nativeCurrency: PropTypes.string.isRequired
 };
 
 const reduxProps = ({ modal, exchange, account }) => ({
-  modalProps: modal.modalProps,
   fetching: exchange.fetching,
   address: exchange.address,
   recipient: exchange.recipient,
@@ -508,6 +514,8 @@ const reduxProps = ({ modal, exchange, account }) => ({
   confirm: exchange.confirm,
   depositSelected: exchange.depositSelected,
   withdrawalSelected: exchange.withdrawalSelected,
+  accountInfo: account.accountInfo,
+  accountType: account.accountType,
   network: account.network,
   nativeCurrency: account.nativeCurrency
 });

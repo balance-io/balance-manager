@@ -77,29 +77,9 @@ const StyledMessage = styled.div`
 `;
 
 class AccountView extends Component {
-  openExchangeModal = () =>
-    this.props.modalOpen('EXCHANGE_MODAL', {
-      name:
-        this.props.accountInfo.name || `${this.props.accountType}${lang.t('modal.default_wallet')}`,
-      address: this.props.accountAddress || this.props.accountInfo.address,
-      accountType: this.props.accountType || this.props.accountInfo.type,
-      assets: this.props.accountInfo.assets
-    });
-  openSendModal = () =>
-    this.props.modalOpen('SEND_MODAL', {
-      name:
-        this.props.accountInfo.name || `${this.props.accountType}${lang.t('modal.default_wallet')}`,
-      address: this.props.accountAddress || this.props.accountInfo.address,
-      accountType: this.props.accountType || this.props.accountInfo.type,
-      assets: this.props.accountInfo.assets
-    });
-  openReceiveModal = () =>
-    this.props.modalOpen('RECEIVE_MODAL', {
-      name:
-        this.props.accountInfo.name ||
-        `${this.props.accountInfo.type}${lang.t('modal.default_wallet')}`,
-      address: this.props.accountInfo.address
-    });
+  openExchangeModal = () => this.props.modalOpen('EXCHANGE_MODAL');
+  openSendModal = () => this.props.modalOpen('SEND_MODAL');
+  openReceiveModal = () => this.props.modalOpen('RECEIVE_MODAL');
   render() {
     return (
       <StyledAccountView>
@@ -109,11 +89,11 @@ class AccountView extends Component {
           background={'lightGrey'}
           minHeight={200}
         >
-          {!!this.props.accountAddress || !!this.props.accountInfo.address ? (
+          {!!this.props.accountAddress ? (
             <StyledFlex>
               <StyledTop>
                 <StyledAddressWrapper>
-                  <h6>{capitalize(this.props.accountType || this.props.accountInfo.type)} </h6>
+                  <h6>{capitalize(this.props.accountType)} </h6>
                   <CopyToClipboard iconOnHover text={this.props.accountAddress} />
                 </StyledAddressWrapper>
 

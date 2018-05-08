@@ -252,7 +252,6 @@ export const web3WalletConnectSendTransaction = transaction =>
       .then(txDetails => {
         walletConnectSignTransaction(txDetails)
           .then(txHash => {
-            console.log('txhash', txHash);
             if (txHash) {
               resolve(txHash);
             } else {

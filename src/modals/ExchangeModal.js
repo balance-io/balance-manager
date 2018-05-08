@@ -175,20 +175,8 @@ class ExchangeModal extends Component {
   componentDidMount() {
     this.props.exchangeModalInit();
   }
-  onChangeDepositSelected = value => {
-    let depositSelected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
-    if (value !== 'ETH') {
-      depositSelected = this.props.accountInfo.assets.filter(asset => asset.symbol === value)[0];
-    }
-    this.props.exchangeUpdateDepositSelected(depositSelected);
-  };
-  onChangeWithdrawalSelected = value => {
-    let withdrawalSelected = this.props.availableAssets.filter(asset => asset.symbol === 'ETH')[0];
-    if (value !== 'ETH') {
-      withdrawalSelected = this.props.availableAssets.filter(asset => asset.symbol === value)[0];
-    }
-    this.props.exchangeUpdateWithdrawalSelected(withdrawalSelected);
-  };
+  onChangeDepositSelected = value => this.props.exchangeUpdateDepositSelected(value)
+  onChangeWithdrawalSelected = value => this.props.exchangeUpdateWithdrawalSelected(value);
   onGoBack = () => this.props.exchangeToggleConfirmationView(false);
   onExchangeAnother = () => {
     this.props.exchangeToggleConfirmationView(false);
@@ -276,12 +264,6 @@ class ExchangeModal extends Component {
     this.props.modalClose();
   };
   render = () => {
-    const availableSymbols = this.props.availableAssets.map(
-      availableAsset => availableAsset.symbol
-    );
-    const filteredAvailableAssets = this.props.accountInfo.assets.filter(
-      asset => availableSymbols.indexOf(asset.symbol) !== -1
-    );
     return (
       <Card allowOverflow background="lightGrey" fetching={this.props.fetching}>
         {!this.props.txHash ? (
@@ -304,7 +286,7 @@ class ExchangeModal extends Component {
                   <DropdownAsset
                     noBalance
                     selected={this.props.depositSelected.symbol}
-                    assets={filteredAvailableAssets}
+                    assets={this.props.depositAssets}
                     onChange={this.onChangeDepositSelected}
                   />
                   <StyledHelperText>
@@ -330,7 +312,7 @@ class ExchangeModal extends Component {
                   <DropdownAsset
                     noBalance
                     selected={this.props.withdrawalSelected.symbol}
-                    assets={this.props.availableAssets}
+                    assets={this.props.withdrawalAssets}
                     onChange={this.onChangeWithdrawalSelected}
                   />
                   <StyledHelperText>
@@ -486,9 +468,10 @@ ExchangeModal.propTypes = {
   recipient: PropTypes.string.isRequired,
   depositAmount: PropTypes.string.isRequired,
   withdrawalAmount: PropTypes.string.isRequired,
-  availableAssets: PropTypes.array.isRequired,
   txHash: PropTypes.string.isRequired,
   confirm: PropTypes.bool.isRequired,
+  depositAssets: PropTypes.array.isRequired,
+  withdrawalAssets: PropTypes.array.isRequired,
   depositSelected: PropTypes.object.isRequired,
   withdrawalSelected: PropTypes.object.isRequired,
   accountInfo: PropTypes.object.isRequired,
@@ -503,9 +486,10 @@ const reduxProps = ({ modal, exchange, account }) => ({
   recipient: exchange.recipient,
   depositAmount: exchange.depositAmount,
   withdrawalAmount: exchange.withdrawalAmount,
-  availableAssets: exchange.availableAssets,
   txHash: exchange.txHash,
   confirm: exchange.confirm,
+  depositAssets: exchange.depositAssets,
+  withdrawalAssets: exchange.withdrawalAssets,
   depositSelected: exchange.depositSelected,
   withdrawalSelected: exchange.withdrawalSelected,
   accountInfo: account.accountInfo,

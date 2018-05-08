@@ -5,7 +5,6 @@ import {
   convertAmountFromBigNumber,
   convertAmountToDisplay,
   convertAmountToDisplaySpecific,
-  convertAssetAmountToBigNumber,
   convertAssetAmountToNativeValue,
   convertAssetAmountToNativeAmount
 } from '../helpers/bignumber';
@@ -561,12 +560,7 @@ export const parseNewTransaction = async (
     })
   };
 
-  let amount = '';
-  if (txDetails.asset.symbol !== 'ETH') {
-    amount = convertAssetAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
-  } else {
-    amount = convertAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
-  }
+  const amount = convertAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
   const value = { amount, display: convertAmountToDisplay(amount, null, txDetails.asset) };
   const nonce = txDetails.nonce || (await getTransactionCount(txDetails.from));
 

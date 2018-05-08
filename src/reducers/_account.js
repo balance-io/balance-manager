@@ -63,11 +63,11 @@ export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
   const network = getState().account.network;
   dispatch({ type: ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST });
   apiGetTransactionStatus(txHash, network)
-    .then(txObj => {
-      if (txObj) {
+    .then(({ data }) => {
+      if (data) {
         const address = getState().account.accountInfo.address;
         const transactions = getState().account.transactions;
-        const _transactions = parseConfirmedTransaction(transactions, txHash, txObj.timestamp);
+        const _transactions = parseConfirmedTransaction(transactions, txHash, data.timestamp);
         updateLocalTransactions(address, _transactions, network);
         dispatch({
           type: ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS,

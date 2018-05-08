@@ -44,21 +44,27 @@ export const exchangeModalInit = (address, depositSelected) => (dispatch, getSta
   const { accountInfo } = getState().account;
   const depositSelected = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
   const address = accountInfo.address;
-
   dispatch({ type: EXCHANGE_GET_AVAILABLE_REQUEST, payload: { address, depositSelected } });
   apiShapeshiftGetCoins()
     .then(({ data }) => {
-      const availableAssets = [{ name: 'Ethereum', symbol: 'ETH', image: null, imageSmall: null }];
+      const withdrawalAssets = [{ name: 'Ethereum', symbol: 'ETH', image: null, imageSmall: null }];
       if (data) {
         Object.keys(data).forEach(key => {
           if (data[key].status === 'available' && ethTokens.indexOf(key) !== -1) {
-            availableAssets.push(data[key]);
+            withdrawalAssets.push(data[key]);
           }
         });
       }
+      const availableSymbols = withdrawalAssets.map(
+        availableAsset => availableAsset.symbol
+      );
+      const depositAssets = accountInfo.assets.filter(
+        asset => availableSymbols.indexOf(asset.symbol) !== -1
+      );
+
       dispatch({
         type: EXCHANGE_GET_AVAILABLE_SUCCESS,
-        payload: { availableAssets, withdrawalSelected: availableAssets[1] }
+        payload: { withdrawalAssets, depositAssets, withdrawalSelected: withdrawalAssets[1] }
       });
       dispatch(exchangeUpdateExchangeRate());
     })
@@ -69,13 +75,37 @@ export const exchangeModalInit = (address, depositSelected) => (dispatch, getSta
     });
 };
 
-export const exchangeUpdateDepositSelected = depositSelected => (dispatch, getState) => {
-  dispatch({ type: EXCHANGE_UPDATE_DEPOSIT_SELECTED, payload: depositSelected });
+export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
+  const { withdrawalAssets, depositAssets } = getState().exchange;
+  let { withdrawalSelected, depositSelected } = getState().exchange;
+  if (value === withdrawalSelected.symbol) {
+    withdrawalSelected = withdrawalAssets.filter(asset => asset.symbol === depositSelected.symbol)[0];
+    if (!withdrawalSelected) {
+      withdrawalSelected = withdrawalAssets.filter(asset => asset.symbol !== value)[0];
+    }
+  }
+  depositSelected = depositAssets.filter(asset => asset.symbol === 'ETH')[0];
+  if (value !== 'ETH') {
+    depositSelected = depositAssets.filter(asset => asset.symbol === value)[0];
+  }
+  dispatch({ type: EXCHANGE_UPDATE_DEPOSIT_SELECTED, payload: {depositSelected, withdrawalSelected} });
   dispatch(exchangeUpdateExchangeRate());
 };
 
-export const exchangeUpdateWithdrawalSelected = withdrawalSelected => (dispatch, getState) => {
-  dispatch({ type: EXCHANGE_UPDATE_WITHDRAWAL_SELECTED, payload: withdrawalSelected });
+export const exchangeUpdateWithdrawalSelected = value => (dispatch, getState) => {
+  const { withdrawalAssets, depositAssets } = getState().exchange;
+  let { withdrawalSelected, depositSelected } = getState().exchange;
+  if (value === depositSelected.symbol) {
+    depositSelected = depositAssets.filter(asset => asset.symbol === withdrawalSelected.symbol)[0];
+    if (!depositSelected) {
+      depositSelected = depositAssets.filter(asset => asset.symbol !== value)[0];
+    }
+  }
+  withdrawalSelected = withdrawalAssets.filter(asset => asset.symbol === 'ETH')[0];
+  if (value !== 'ETH') {
+    withdrawalSelected = withdrawalAssets.filter(asset => asset.symbol === value)[0];
+  }
+  dispatch({ type: EXCHANGE_UPDATE_WITHDRAWAL_SELECTED, payload: {depositSelected, withdrawalSelected} });
   dispatch(exchangeUpdateExchangeRate());
 };
 
@@ -112,10 +142,11 @@ const INITIAL_STATE = {
   fetching: false,
   address: '',
   recipient: '',
-  availableAssets: [],
   exchangeDetails: {},
   txHash: '',
   confirm: false,
+  depositAssets: [],
+  withdrawalAssets: [],
   depositSelected: { symbol: 'ETH' },
   withdrawalSelected: { symbol: 'ZRX' },
   depositAmount: '',
@@ -135,14 +166,15 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: false,
-        availableAssets: action.payload.availableAssets,
+        withdrawalAssets: action.payload.withdrawalAssets,
+        depositAssets: action.payload.depositAssets,
         withdrawalSelected: action.payload.withdrawalSelected
       };
     case EXCHANGE_GET_AVAILABLE_FAILURE:
       return {
         ...state,
         fetching: false,
-        availableAssets: []
+        withdrawalAssets: []
       };
     case EXCHANGE_GET_MARKET_INFO_SUCCESS:
       return {
@@ -162,9 +194,9 @@ export default (state = INITIAL_STATE, action) => {
         withdrawalAmount: action.payload.withdrawalAmount
       };
     case EXCHANGE_UPDATE_DEPOSIT_SELECTED:
-      return { ...state, depositSelected: action.payload };
+      return { ...state, depositSelected: action.payload.depositSelected, withdrawalSelected: action.payload.withdrawalSelected };
     case EXCHANGE_UPDATE_WITHDRAWAL_SELECTED:
-      return { ...state, withdrawalSelected: action.payload };
+      return { ...state, depositSelected: action.payload.depositSelected, withdrawalSelected: action.payload.withdrawalSelected };
 
     case EXCHANGE_CLEAR_FIELDS:
       return { ...state, ...INITIAL_STATE };

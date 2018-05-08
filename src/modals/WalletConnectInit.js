@@ -39,7 +39,6 @@ class WalletConnectInit extends Component {
     this.props.walletConnectInit();
   }
   onClose = () => {
-    this.props.modalClose();
     this.props.walletConnectClearFields();
   };
   render = () => (

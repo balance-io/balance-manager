@@ -58,9 +58,11 @@ const SEND_CLEAR_FIELDS = 'send/SEND_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
-export const sendModalInit = (address, selected) => (dispatch, getState) => {
-  const { prices } = getState().account;
+export const sendModalInit = () => (dispatch, getState) => {
+  const { accountInfo, prices } = getState().account;
   const { gasLimit } = getState().send;
+  const selected = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+  const address = accountInfo.address;
   const fallbackGasPrices = parseGasPrices(null, prices, gasLimit);
   dispatch({
     type: SEND_GET_GAS_PRICES_REQUEST,

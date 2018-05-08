@@ -235,7 +235,11 @@ export const accountClearIntervals = () => dispatch => {
   clearInterval(getPricesInterval);
 };
 
-export const accountUpdateAccountAddress = (accountAddress, accountType) => dispatch => {
+export const accountUpdateAccountAddress = (accountAddress, accountType) => (
+  dispatch,
+  getState
+) => {
+  if (getState().account.accountType !== accountType) dispatch(accountClearState());
   dispatch({
     type: ACCOUNT_UPDATE_ACCOUNT_ADDRESS,
     payload: { accountAddress, accountType }

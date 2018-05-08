@@ -247,8 +247,7 @@ const StyledActions = styled.div`
 
 class SendModal extends Component {
   componentDidMount() {
-    const selected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
-    this.props.sendModalInit(this.props.accountInfo.address, selected);
+    this.props.sendModalInit();
   }
   state = {
     isValidAddress: true,
@@ -303,8 +302,7 @@ class SendModal extends Component {
   onSendAnother = () => {
     this.props.sendToggleConfirmationView(false);
     this.props.sendClearFields();
-    const selected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
-    this.props.sendModalInit(this.props.accountInfo.address, selected);
+    this.props.sendModalInit();
   };
   onSubmit = e => {
     e.preventDefault();

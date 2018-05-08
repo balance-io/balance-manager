@@ -173,10 +173,7 @@ const StyledActions = styled.div`
 
 class ExchangeModal extends Component {
   componentDidMount() {
-    const depositSelected = this.props.accountInfo.assets.filter(
-      asset => asset.symbol === 'ETH'
-    )[0];
-    this.props.exchangeModalInit(this.props.accountInfo.address, depositSelected);
+    this.props.exchangeModalInit();
   }
   onChangeDepositSelected = value => {
     let depositSelected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
@@ -196,10 +193,7 @@ class ExchangeModal extends Component {
   onExchangeAnother = () => {
     this.props.exchangeToggleConfirmationView(false);
     this.props.exchangeClearFields();
-    const depositSelected = this.props.accountInfo.assets.filter(
-      asset => asset.symbol === 'ETH'
-    )[0];
-    this.props.exchangeModalInit(this.props.accountInfo.address, depositSelected);
+    this.props.exchangeModalInit();
   };
   onSubmit = e => {
     e.preventDefault();

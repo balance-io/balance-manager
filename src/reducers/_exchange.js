@@ -41,6 +41,10 @@ export const exchangeUpdateExchangeRate = () => (dispatch, getState) => {
 };
 
 export const exchangeModalInit = (address, depositSelected) => (dispatch, getState) => {
+  const { accountInfo } = getState().account;
+  const depositSelected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+  const address = accountInfo.address;
+
   dispatch({ type: EXCHANGE_GET_AVAILABLE_REQUEST, payload: { address, depositSelected } });
   apiShapeshiftGetCoins()
     .then(({ data }) => {

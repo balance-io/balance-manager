@@ -12,7 +12,7 @@ import AccountBalances from './AccountBalances';
 import AccountTransactions from './AccountTransactions';
 import AccountInteractions from './AccountInteractions';
 import arrowUp from '../../assets/arrow-up.svg';
-import exchangeIcon from '../../assets/exchange-icon.svg';
+// import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { accountClearState } from '../../reducers/_account';
 import { modalOpen } from '../../reducers/_modal';
@@ -98,7 +98,7 @@ class Account extends Component {
                 </StyledAddressWrapper>
 
                 <StyledActions>
-                  <Button
+                  {/* <Button
                     left
                     color="brightGreen"
                     hoverColor="brightGreenHover"
@@ -107,7 +107,7 @@ class Account extends Component {
                     onClick={this.openExchangeModal}
                   >
                     {lang.t('button.exchange')}
-                  </Button>
+                  </Button> */}
                   <Button
                     left
                     color="blue"

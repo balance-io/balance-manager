@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { lambdaAllowedAccess } from '../handlers/utilities';
+import { lambdaAllowedAccess } from '../helpers/utilities';
 
 const getMarketInfo = async (exchangePair = 'zrx_eth') => {
   try {

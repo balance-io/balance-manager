@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import jsonp from 'jsonp';
 import lang from '../languages';
 import Button from './Button';
+import { isValidEmail } from '../helpers/validators';
 import { fonts, colors, transitions } from '../styles';
 
 const SForm = styled.form`
@@ -87,7 +88,7 @@ class SubscribeForm extends Component {
   onSubmit = e => {
     const options = this.props.options;
     e.preventDefault();
-    if (!this.state.input || this.state.input.length < 5 || this.state.input.indexOf('@') === -1) {
+    if (!isValidEmail(this.state.input)) {
       this.onStatusChange({
         status: 'error',
         message: 'Email is invalid'

@@ -2,7 +2,7 @@ import EthereumTx from 'ethereumjs-tx';
 import TransportU2F from '@ledgerhq/hw-transport-u2f';
 import AppEth from '@ledgerhq/hw-app-eth';
 import ethereumNetworks from '../references/ethereum-networks.json';
-import { getNakedAddress, obtainPathComponentsFromDerivationPath } from './utilities';
+import { getNakedAddress, obtainPathComponentsFromDerivationPath } from '../helpers/utilities';
 
 /**
  * @desc Ledger ETH App instance

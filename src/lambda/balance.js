@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { infuraGetEthereumBalance, infuraCallTokenBalance } from '../handlers/infura';
-import { lambdaAllowedAccess } from '../handlers/utilities';
+import { lambdaAllowedAccess } from '../helpers/utilities';
 import {
   convertStringToNumber,
   convertAmountToDisplay,
   convertAssetAmountToBigNumber
-} from '../handlers/bignumber';
+} from '../helpers/bignumber';
 
 const proxyGetAccountBalances = async (address = '', network = 'mainnet') => {
   try {

@@ -1,12 +1,12 @@
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
-import { isValidAddress } from './validators';
-import { getDataString, getNakedAddress } from './utilities';
+import { isValidAddress } from '../helpers/validators';
+import { getDataString, getNakedAddress } from '../helpers/utilities';
 import {
   convertAmountToBigNumber,
   convertAssetAmountFromBigNumber,
   convertHexToString
-} from './bignumber';
+} from '../helpers/bignumber';
 import { ledgerEthSignTransaction } from './ledger-eth';
 import { walletConnectSignTransaction } from './walletconnect';
 import ethUnits from '../references/ethereum-units.json';
@@ -55,13 +55,6 @@ export const toChecksumAddress = address => {
   }
   return checksumAddress;
 };
-
-/**
- * @desc check if address is checkum
- * @param  {String} address
- * @return {String}
- */
-export const isChecksumAddress = address => address === toChecksumAddress(address);
 
 /**
  * @desc convert from wei to ether

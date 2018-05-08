@@ -8,10 +8,10 @@ import {
   convertAssetAmountToBigNumber,
   convertAssetAmountToNativeValue,
   convertAssetAmountToNativeAmount
-} from './bignumber';
-import { debounceRequest } from '../handlers/utilities';
+} from '../helpers/bignumber';
+import { debounceRequest } from '../helpers/utilities';
 import { getTransactionCount } from './web3';
-import { getTimeString } from './time';
+import { getTimeString } from '../helpers/time';
 import nativeCurrencies from '../references/native-currencies.json';
 import ethUnits from '../references/ethereum-units.json';
 import timeUnits from '../references/time-units.json';

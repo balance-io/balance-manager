@@ -3,7 +3,7 @@
   "description": "Balance Manager",
   "version": "1.0.0",
   "author": "Pedro Gomes <pedro@balance.io>",
-  "license": "MIT",
+  "license": "GPL-3",
   "bugs": {
     "url": "https://github.com/balance-io/balance-manager/issues"
   },

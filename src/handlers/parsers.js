@@ -559,12 +559,7 @@ export const parseNewTransaction = async (
     })
   };
 
-  let amount = '';
-  if (txDetails.asset.symbol !== 'ETH') {
-    amount = convertAssetAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
-  } else {
-    amount = convertAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
-  }
+  const amount = convertAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
   const value = { amount, display: convertAmountToDisplay(amount, null, txDetails.asset) };
   const nonce = txDetails.nonce || (await getTransactionCount(txDetails.from));
 
@@ -589,7 +584,7 @@ export const parseNewTransaction = async (
 
   const response = await apiGetHistoricalPrices(assetSymbol, timestamp);
 
-  if (response.data.response !== 'Error' || response.data[assetSymbol]) {
+  if (response.data.response !== 'Error' && response.data[assetSymbol]) {
     await Promise.all(
       Object.keys(nativeCurrencies).map(async nativeCurrency => {
         const assetPriceAmount = convertAmountToBigNumber(

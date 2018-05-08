@@ -17,7 +17,6 @@ export const walletConnectEthInit = async () => {
   const webConnector = new WebConnector(walletConnectInstance.bridgeDomain, {"dappName": walletConnectInstance.dappName });
   await webConnector.createSession();
   walletConnectInstance.webConnector = webConnector;
-  console.log('walletConnectInstance webConnector', walletConnectInstance.webConnector);
   return walletConnectInstance;
 };
 

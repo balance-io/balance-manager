@@ -380,8 +380,10 @@ class ExchangeModal extends Component {
                   <Button onClick={this.onClose}>{lang.t('button.cancel')}</Button>
                   <Button
                     left
-                    color="blue"
-                    icon={arrowUp}
+                    color="brightGreen"
+                    hoverColor="brightGreenHover"
+                    activeColor="brightGreenHover"
+                    icon={exchangeIcon}
                     disabled={
                       this.props.recipient.length !== 42 ||
                       (this.props.depositSelected.symbol !== 'ETH' &&

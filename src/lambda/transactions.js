@@ -3,8 +3,8 @@ import {
   multiply,
   convertAmountToDisplay,
   convertAssetAmountToBigNumber
-} from '../helpers/bignumber';
-import { lambdaAllowedAccess } from '../helpers/utilities';
+} from '../handlers/bignumber';
+import { lambdaAllowedAccess } from '../handlers/utilities';
 
 const parseAccountTransactions = async (data = null, address = '', network = '') => {
   if (!data || !data.docs) return [];

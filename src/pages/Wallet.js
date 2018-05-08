@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
-import AccountView from '../components/AccountView';
+import Account from '../views/Account';
 import Card from '../components/Card';
-import { getLocal } from '../helpers/utilities';
+import { getLocal } from '../handlers/utilities';
 import { accountUpdateAccountAddress, accountClearState } from '../reducers/_account';
 
 const StyledWrapper = styled.div`
@@ -28,7 +28,7 @@ class Wallet extends Component {
     <BaseLayout>
       <StyledWrapper>
         {this.props.fetching || this.props.accountAddress ? (
-          <AccountView match={this.props.match} />
+          <Account match={this.props.match} />
         ) : (
           <Card fetching={this.props.fetching}>
             <div />

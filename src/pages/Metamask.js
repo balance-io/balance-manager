@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import lang from '../languages';
 import BaseLayout from '../layouts/base';
-import AccountView from '../components/AccountView';
+import Account from '../views/Account';
 import Card from '../components/Card';
 import { accountClearState } from '../reducers/_account';
 import {
@@ -28,7 +28,6 @@ const StyledMessage = styled.div`
 
 class Metamask extends Component {
   componentDidMount() {
-    if (this.props.accountType !== 'METMASK') this.props.accountClearState();
     this.props.metamaskConnectInit();
   }
   renderMessage() {
@@ -44,7 +43,7 @@ class Metamask extends Component {
       <StyledWrapper>
         {this.props.fetching ||
         (this.props.network && this.props.accountAddress && this.props.web3Available) ? (
-          <AccountView fetchingWallet={this.props.fetching} match={this.props.match} />
+          <Account fetchingWallet={this.props.fetching} match={this.props.match} />
         ) : (
           <Card minHeight={200} fetching={this.props.fetching}>
             <StyledMessage>{this.renderMessage()}</StyledMessage>

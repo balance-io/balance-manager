@@ -9,7 +9,7 @@ import Button from '../components/Button';
 import { modalClose } from '../reducers/_modal';
 import {
   walletConnectInit,
-  walletConnectGetAddress,
+  walletConnectGetSession,
   walletConnectClearFields
 } from '../reducers/_walletconnect';
 import { responsive } from '../styles';
@@ -39,17 +39,15 @@ class WalletConnectInit extends Component {
     this.props.walletConnectInit();
   }
   onClose = () => {
-    this.props.modalClose();
     this.props.walletConnectClearFields();
   };
   render = () => (
     <Card maxWidth={400} background="white">
       <StyledContainer>
-        {this.props.sessionToken && (
+        {this.props.webConnector && (
           <StyledQRCodeDisplay
-            data={`{"domain":"https://walletconnect.balance.io","sessionToken":"${
-              this.props.sessionToken
-            }","publicKey":"${this.props.keypair.publicKey}"}`}
+            data={`{"domain":"https://walletconnect.balance.io","sessionId":"${
+              this.props.webConnector.sessionId }","sharedKey":"${this.props.webConnector.sharedKey}", "dappName":"${this.props.webConnector.dappName}"}`}
           />
         )}
         <StyledCenter>
@@ -64,18 +62,17 @@ class WalletConnectInit extends Component {
 
 WalletConnectInit.propTypes = {
   walletConnectInit: PropTypes.func.isRequired,
-  walletConnectGetAddress: PropTypes.func.isRequired,
+  walletConnectGetSession: PropTypes.func.isRequired,
   modalClose: PropTypes.func.isRequired,
-  sessionToken: PropTypes.string.isRequired
 };
 
 const reduxProps = ({ modal, walletconnect }) => ({
-  sessionToken: walletconnect.sessionToken
+  webConnector: walletconnect.webConnector,
 });
 
 export default connect(reduxProps, {
   modalClose,
   walletConnectInit,
-  walletConnectGetAddress,
+  walletConnectGetSession,
   walletConnectClearFields
 })(WalletConnectInit);

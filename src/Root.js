@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 import ReduxThunk from 'redux-thunk';
-import ReduxReset from './helpers/reduxReset';
+import ReduxReset from './handlers/reduxReset';
 import reducers from './reducers';
 import Router from './Router';
 

@@ -1,6 +1,6 @@
 import lang from '../languages';
 import { accountUpdateAccountAddress, accountUpdateNetwork } from './_account';
-import { ledgerEthInit, ledgerEthAccounts } from '../helpers/ledger-eth';
+import { ledgerEthInit, ledgerEthAccounts } from '../handlers/ledger-eth';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //

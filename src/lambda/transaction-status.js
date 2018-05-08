@@ -1,6 +1,6 @@
-import { infuraGetTransactionByHash, infuraGetBlockByHash } from '../helpers/infura';
-import { lambdaAllowedAccess } from '../helpers/utilities';
-import { convertHexToString } from '../helpers/bignumber';
+import { infuraGetTransactionByHash, infuraGetBlockByHash } from '../handlers/infura';
+import { lambdaAllowedAccess } from '../handlers/utilities';
+import { convertHexToString } from '../handlers/bignumber';
 
 const getBlockTimestamp = async (blockHash = '', network = 'mainnet') => {
   try {

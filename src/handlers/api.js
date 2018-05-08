@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { parseHistoricalPrices } from './parsers';
-import networkList from '../libraries/ethereum-networks.json';
-import nativeCurrencies from '../libraries/native-currencies.json';
+import networkList from '../references/ethereum-networks.json';
+import nativeCurrencies from '../references/native-currencies.json';
 
 /**
  * @desc get prices
@@ -32,8 +32,7 @@ export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now())
  * @desc get ethereum gas prices
  * @return {Promise}
  */
-export const apiGetGasPrices = () =>
-  axios.get(`https://ethgasstation.info/json/ethgasAPI.json`, { timeout: 10000 });
+export const apiGetGasPrices = () => axios.get(`https://ethgasstation.info/json/ethgasAPI.json`);
 
 /**
  * @desc get metmask selected network
@@ -101,13 +100,19 @@ export const apiGetAccountTransactions = async (
  * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
-export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') => {
-  try {
-    const { data } = await axios.get(
-      `/.netlify/functions/transaction-status?hash=${hash}&network=${network}`
-    );
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
+export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') =>
+  axios.get(`/.netlify/functions/transaction-status?hash=${hash}&network=${network}`);
+
+/**
+ * @desc shapeshift get coins
+ * @return {Promise}
+ */
+export const apiShapeshiftGetCoins = () => axios.get(`/.netlify/functions/shapeshift-getcoins`);
+
+/**
+ * @desc shapeshift get market info
+ * @param  {String}   [exchangePair = '']
+ * @return {Promise}
+ */
+export const apiShapeshiftGetMarketInfo = (exchangePair = '') =>
+  axios.get(`/.netlify/functions/shapeshift-marketinfo?exchangePair=${exchangePair}`);

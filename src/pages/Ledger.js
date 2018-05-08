@@ -6,7 +6,7 @@ import lang from '../languages';
 import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import AccountView from '../components/AccountView';
+import Account from '../views/Account';
 import { accountClearState } from '../reducers/_account';
 import { ledgerConnectInit } from '../reducers/_ledger';
 import { fonts, colors } from '../styles';
@@ -38,7 +38,6 @@ const StyledButton = styled(Button)`
 
 class Ledger extends Component {
   componentDidMount() {
-    if (this.props.accountType !== 'LEDGER') this.props.accountClearState();
     this.connectLedger();
   }
   connectLedger = () => this.props.ledgerConnectInit();
@@ -47,7 +46,7 @@ class Ledger extends Component {
       <BaseLayout>
         <StyledWrapper>
           {this.props.fetching || this.props.accounts.length ? (
-            <AccountView
+            <Account
               fetchingWallet={this.props.fetching}
               fetchingMessage={
                 !this.props.accounts.length ? lang.t('message.please_connect_ledger') : ''

@@ -8,7 +8,7 @@ import {
   convertAssetAmountToNativeValue,
   countDecimalPlaces,
   formatFixedDecimals
-} from '../handlers/bignumber';
+} from '../helpers/bignumber';
 import { parseError, parseGasPrices, parseGasPricesTxFee } from '../handlers/parsers';
 import {
   web3MetamaskSendTransaction,

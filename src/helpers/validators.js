@@ -1,4 +1,4 @@
-import { isChecksumAddress } from './web3';
+import { toChecksumAddress } from '../handlers/web3';
 
 /**
  * @desc validate email
@@ -19,5 +19,5 @@ export const isValidAddress = address => {
   if (address.substring(0, 2) !== '0x') return false;
   else if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) return false;
   else if (/^(0x)?[0-9a-f]{40}$/.test(address) || /^(0x)?[0-9A-F]{40}$/.test(address)) return true;
-  else return isChecksumAddress(address);
+  else return address === toChecksumAddress(address);
 };

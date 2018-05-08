@@ -16,7 +16,7 @@ import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { accountClearState } from '../../reducers/_account';
 import { modalOpen } from '../../reducers/_modal';
-import { capitalize } from '../../handlers/utilities';
+import { capitalize } from '../../helpers/utilities';
 import { colors, fonts, responsive } from '../../styles';
 
 const StyledAccount = styled.div`

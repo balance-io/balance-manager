@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { convertHexToString } from '../handlers/bignumber';
-import { getNakedAddress, getDataString } from '../handlers/utilities';
+import { convertHexToString } from '../helpers/bignumber';
+import { getNakedAddress, getDataString } from '../helpers/utilities';
 import smartContractMethods from '../references/smartcontract-methods.json';
 
 /**

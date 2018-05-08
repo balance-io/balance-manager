@@ -9,7 +9,7 @@ import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import arrowUp from '../assets/arrow-up.svg';
 import { modalClose } from '../reducers/_modal';
-import { capitalize } from '../handlers/utilities';
+import { capitalize } from '../helpers/utilities';
 import { fonts, colors, responsive } from '../styles';
 
 const StyledContainer = styled.div`

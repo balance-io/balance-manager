@@ -25,6 +25,8 @@ import {
   sendTokenMetamask,
   sendEtherLedger,
   sendTokenLedger,
+  sendEtherWalletConnect,
+  sendTokenWalletConnect,
   sendClearFields,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
@@ -348,6 +350,9 @@ class SendModal extends Component {
           case 'LEDGER':
             this.props.sendEtherLedger(request);
             break;
+          case 'WALLETCONNECT':
+            this.props.sendEtherWalletConnect(request);
+            break;
           default:
             this.props.sendEtherMetamask(request);
             break;
@@ -373,6 +378,9 @@ class SendModal extends Component {
             break;
           case 'LEDGER':
             this.props.sendTokenLedger(request);
+            break;
+          case 'WALLETCONNECT':
+            this.props.sendTokenWalletConnect(request);
             break;
           default:
             this.props.sendTokenMetamask(request);
@@ -666,6 +674,8 @@ SendModal.propTypes = {
   sendTokenMetamask: PropTypes.func.isRequired,
   sendEtherLedger: PropTypes.func.isRequired,
   sendTokenLedger: PropTypes.func.isRequired,
+  sendEtherWalletConnect: PropTypes.func.isRequired,
+  sendTokenWalletConnect: PropTypes.func.isRequired,
   sendClearFields: PropTypes.func.isRequired,
   sendUpdateRecipient: PropTypes.func.isRequired,
   sendUpdateNativeAmount: PropTypes.func.isRequired,
@@ -720,6 +730,8 @@ export default connect(reduxProps, {
   sendTokenMetamask,
   sendEtherLedger,
   sendTokenLedger,
+  sendEtherWalletConnect,
+  sendTokenWalletConnect,
   sendClearFields,
   sendUpdateRecipient,
   sendUpdateNativeAmount,

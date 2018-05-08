@@ -8,8 +8,6 @@ import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
 import SubscribeForm from '../components/SubscribeForm';
 import Button from '../components/Button';
-import WalletConnectLogo from '../components/WalletConnectLogo';
-import walletConnectWhite from '../assets/walletconnect-white.svg';
 import metamaskLogoImage from '../assets/metamask-logo.png';
 import ledgerLogoImage from '../assets/ledger-logo.svg';
 import walletConnectLogoImage from '../assets/walletconnect-blue.svg';
@@ -134,17 +132,13 @@ const StyledLedgerLogo = styled.div`
 
 const StyledWalletConnectLogo = styled.div`
   position: absolute;
-  top: 27px;
-  left: 28px;
-  width: 100px;
-  height: 53px;
+  top: 0;
+  left: 0;
+  width: 173px;
+  height: 102px;
   background: url(${walletConnectLogoImage});
   background-size: contain;
   background-repeat: no-repeat;
-
-  @media screen and (${responsive.sm.max}) {
-    top: 38px;
-  }
 `;
 
 const StyledTrezorLogo = styled.div`
@@ -249,11 +243,9 @@ class Home extends Component {
           <StyledWalletConnect>
             <StyledWalletConnectLogo />
             <p>Connect and sign with your WalletConnect-enabled mobile wallet.</p>
-            <Link to={this.onWalletConnectInit}>
-              <StyledWalletConnectButton left color="walletconnect">
-                {lang.t('button.connect_walletconnect')}
-              </StyledWalletConnectButton>
-            </Link>
+            <StyledWalletConnectButton left color="walletconnect" onClick={this.onWalletConnectInit}>
+              {lang.t('button.connect_walletconnect')}
+            </StyledWalletConnectButton>
           </StyledWalletConnect>
         </StyledCardContainer>
       </StyledCard>

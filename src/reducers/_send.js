@@ -15,6 +15,8 @@ import {
   web3MetamaskTransferToken,
   web3LedgerSendTransaction,
   web3LedgerTransferToken,
+  web3WalletConnectSendTransaction,
+  web3WalletConnectTransferToken,
   estimateGasLimit
 } from '../helpers/web3';
 import { notificationShow } from './_notification';
@@ -45,6 +47,14 @@ const SEND_ETHER_LEDGER_FAILURE = 'send/SEND_ETHER_LEDGER_FAILURE';
 const SEND_TOKEN_LEDGER_REQUEST = 'send/SEND_TOKEN_LEDGER_REQUEST';
 const SEND_TOKEN_LEDGER_SUCCESS = 'send/SEND_TOKEN_LEDGER_SUCCESS';
 const SEND_TOKEN_LEDGER_FAILURE = 'send/SEND_TOKEN_LEDGER_FAILURE';
+
+const SEND_ETHER_WALLETCONNECT_REQUEST = 'send/SEND_ETHER_WALLETCONNECT_REQUEST';
+const SEND_ETHER_WALLETCONNECT_SUCCESS = 'send/SEND_ETHER_WALLETCONNECT_SUCCESS';
+const SEND_ETHER_WALLETCONNECT_FAILURE = 'send/SEND_ETHER_WALLETCONNECT_FAILURE';
+
+const SEND_TOKEN_WALLETCONNECT_REQUEST = 'send/SEND_TOKEN_WALLETCONNECT_REQUEST';
+const SEND_TOKEN_WALLETCONNECT_SUCCESS = 'send/SEND_TOKEN_WALLETCONNECT_SUCCESS';
+const SEND_TOKEN_WALLETCONNECT_FAILURE = 'send/SEND_TOKEN_WALLETCONNECT_FAILURE';
 
 const SEND_TOGGLE_CONFIRMATION_VIEW = 'send/SEND_TOGGLE_CONFIRMATION_VIEW';
 
@@ -291,6 +301,88 @@ export const sendTokenLedger = ({
     });
 };
 
+export const sendEtherWalletConnect = ({
+  address,
+  recipient,
+  amount,
+  selectedAsset,
+  gasPrice,
+  gasLimit
+}) => (dispatch, getState) => {
+  dispatch({ type: SEND_ETHER_WALLETCONNECT_REQUEST });
+  web3WalletConnectSendTransaction({
+    from: address,
+    to: recipient,
+    value: amount,
+    gasPrice: gasPrice.value.amount,
+    gasLimit: gasLimit
+  })
+    .then(txHash => {
+      const txDetails = {
+        hash: txHash,
+        from: address,
+        to: recipient,
+        nonce: null,
+        value: amount,
+        gasPrice: gasPrice.value.amount,
+        gasLimit: gasLimit,
+        asset: selectedAsset
+      };
+      dispatch(accountUpdateTransactions(txDetails));
+      dispatch({
+        type: SEND_ETHER_WALLETCONNECT_SUCCESS,
+        payload: txHash
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: SEND_ETHER_WALLETCONNECT_FAILURE });
+    });
+};
+
+export const sendTokenWalletConnect = ({
+  address,
+  recipient,
+  amount,
+  selectedAsset,
+  gasPrice,
+  gasLimit
+}) => (dispatch, getState) => {
+  dispatch({ type: SEND_TOKEN_WALLETCONNECT_REQUEST });
+  web3WalletConnectTransferToken({
+    tokenObject: selectedAsset,
+    from: address,
+    to: recipient,
+    nonce: null,
+    amount: amount,
+    gasPrice: gasPrice.value.amount,
+    gasLimit: gasLimit
+  })
+    .then(txHash => {
+      const txDetails = {
+        hash: txHash,
+        from: address,
+        to: recipient,
+        nonce: null,
+        value: amount,
+        gasPrice: gasPrice.value.amount,
+        gasLimit: gasLimit,
+        asset: selectedAsset
+      };
+      dispatch(accountUpdateTransactions(txDetails));
+      dispatch({
+        type: SEND_TOKEN_WALLETCONNECT_SUCCESS,
+        payload: txHash
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: SEND_TOKEN_WALLETCONNECT_FAILURE });
+    });
+};
+
 export const sendToggleConfirmationView = boolean => (dispatch, getState) => {
   let confirm = boolean;
   if (!confirm) {
@@ -404,6 +496,9 @@ export default (state = INITIAL_STATE, action) => {
     case SEND_ETHER_LEDGER_REQUEST:
     case SEND_TOKEN_LEDGER_REQUEST:
       return { ...state, fetching: true };
+    case SEND_ETHER_WALLETCONNECT_REQUEST:
+    case SEND_TOKEN_WALLETCONNECT_REQUEST:
+      return { ...state, fetching: true };
     case SEND_ETHER_METAMASK_SUCCESS:
     case SEND_TOKEN_METAMASK_SUCCESS:
     case SEND_ETHER_LEDGER_SUCCESS:
@@ -414,10 +509,26 @@ export default (state = INITIAL_STATE, action) => {
         gasPrices: {},
         txHash: action.payload
       };
+    case SEND_ETHER_WALLETCONNECT_SUCCESS:
+    case SEND_TOKEN_WALLETCONNECT_SUCCESS:
+      return {
+        ...state,
+        fetching: false,
+        gasPrices: {},
+        txHash: action.payload
+      };
     case SEND_ETHER_METAMASK_FAILURE:
     case SEND_TOKEN_METAMASK_FAILURE:
     case SEND_ETHER_LEDGER_FAILURE:
     case SEND_TOKEN_LEDGER_FAILURE:
+      return {
+        ...state,
+        fetching: false,
+        txHash: '',
+        confirm: false
+      };
+    case SEND_ETHER_WALLETCONNECT_FAILURE:
+    case SEND_TOKEN_WALLETCONNECT_FAILURE:
       return {
         ...state,
         fetching: false,

@@ -67,7 +67,7 @@ export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
       if (txObj) {
         const address = getState().account.accountInfo.address;
         const transactions = getState().account.transactions;
-        const _transactions = parseConfirmedTransaction(transactions, txObj.hash, txObj.timestamp);
+        const _transactions = parseConfirmedTransaction(transactions, txHash, txObj.timestamp);
         updateLocalTransactions(address, _transactions, network);
         dispatch({
           type: ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS,

@@ -633,12 +633,13 @@ export const parseNewTransaction = async (
  * @desc parse confirmed transaction
  * @param  {Object} [transactions=null]
  * @param  {String} [hash='']
+ * @param  {String} [timestamp='']
  * @return {String}
  */
-export const parseConfirmedTransaction = (transactions, hash, timestamp) => {
+export const parseConfirmedTransaction = (transactions = null, hash = '', timestamp = '') => {
   let _transactions = [];
   transactions.forEach(tx => {
-    if (tx.hash === hash) {
+    if (tx.hash.toLowerCase() === hash.toLowerCase()) {
       tx.pending = false;
       tx.timestamp = timestamp;
     }

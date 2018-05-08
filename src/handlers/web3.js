@@ -8,8 +8,8 @@ import {
   convertHexToString
 } from './bignumber';
 import { ledgerEthSignTransaction } from './ledger-eth';
-import ethUnits from '../libraries/ethereum-units.json';
-import smartContractMethods from '../libraries/smartcontract-methods.json';
+import ethUnits from '../references/ethereum-units.json';
+import smartContractMethods from '../references/smartcontract-methods.json';
 
 /**
  * @desc web3 http instance

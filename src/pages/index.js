@@ -14,7 +14,7 @@ import trezorLogoImage from '../assets/trezor-logo.svg';
 // import WalletConnectLogo from '../components/WalletConnectLogo';
 // import walletConnectWhite from '../assets/walletconnect-white.svg';
 import { accountUpdateAccountAddress } from '../reducers/_account';
-import { getLocal } from '../helpers/utilities';
+import { getLocal } from '../handlers/utilities';
 import { modalOpen } from '../reducers/_modal';
 import { fonts, responsive } from '../styles';
 

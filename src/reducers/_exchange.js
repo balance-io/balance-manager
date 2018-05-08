@@ -1,6 +1,6 @@
-import { apiShapeshiftGetCoins, apiShapeshiftGetMarketInfo } from '../helpers/api';
-import ethTokens from '../libraries/coinwoke-tokens.json';
-import { parseError } from '../helpers/parsers';
+import { apiShapeshiftGetCoins, apiShapeshiftGetMarketInfo } from '../handlers/api';
+import ethTokens from '../references/coinwoke-tokens.json';
+import { parseError } from '../handlers/parsers';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //

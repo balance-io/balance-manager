@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { parseHistoricalPrices } from './parsers';
-import networkList from '../libraries/ethereum-networks.json';
-import nativeCurrencies from '../libraries/native-currencies.json';
+import networkList from '../references/ethereum-networks.json';
+import nativeCurrencies from '../references/native-currencies.json';
 
 /**
  * @desc get prices

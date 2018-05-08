@@ -1,8 +1,8 @@
 import { getTransactionCount, getTokenBalanceOf, getAccountBalance } from './web3';
 import { convertAssetAmountToBigNumber, convertStringToNumber } from './utilities';
-import ropstenTokens from '../libraries/ropsten-tokens.json';
-import rinkebyTokens from '../libraries/rinkeby-tokens.json';
-import kovanTokens from '../libraries/kovan-tokens.json';
+import ropstenTokens from '../references/ropsten-tokens.json';
+import rinkebyTokens from '../references/rinkeby-tokens.json';
+import kovanTokens from '../references/kovan-tokens.json';
 
 /**
  * @desc get account tokens

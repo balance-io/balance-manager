@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { lambdaAllowedAccess } from '../helpers/utilities';
+import { lambdaAllowedAccess } from '../handlers/utilities';
 
 const getCoins = async () => {
   try {

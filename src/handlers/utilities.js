@@ -1,4 +1,4 @@
-import networkList from '../libraries/ethereum-networks.json';
+import networkList from '../references/ethereum-networks.json';
 
 /**
  * @desc save to local storage

@@ -26,9 +26,9 @@ import {
   exchangeToggleConfirmationView
 } from '../reducers/_exchange';
 import { notificationShow } from '../reducers/_notification';
-import { isValidAddress } from '../helpers/validators';
-import { convertAmountFromBigNumber } from '../helpers/bignumber';
-import { capitalize } from '../helpers/utilities';
+import { isValidAddress } from '../handlers/validators';
+import { convertAmountFromBigNumber } from '../handlers/bignumber';
+import { capitalize } from '../handlers/utilities';
 import { fonts, colors } from '../styles';
 
 const StyledSuccessMessage = styled.div`

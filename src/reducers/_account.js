@@ -5,23 +5,23 @@ import {
   apiGetAccountTransactions,
   apiGetPrices,
   apiGetTransactionStatus
-} from '../helpers/api';
+} from '../handlers/api';
 import {
   parseError,
   parseNewTransaction,
   parseAccountBalancesPrices,
   parsePricesObject,
   parseConfirmedTransaction
-} from '../helpers/parsers';
+} from '../handlers/parsers';
 import {
   saveLocal,
   getLocal,
   updateLocalTransactions,
   updateLocalBalances
-} from '../helpers/utilities';
-import { web3SetHttpProvider } from '../helpers/web3';
+} from '../handlers/utilities';
+import { web3SetHttpProvider } from '../handlers/web3';
 import { notificationShow } from './_notification';
-import nativeCurrencies from '../libraries/native-currencies.json';
+import nativeCurrencies from '../references/native-currencies.json';
 
 // -- Constants ------------------------------------------------------------- //
 

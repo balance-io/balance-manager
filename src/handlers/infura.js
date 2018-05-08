@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { convertHexToString } from '../helpers/bignumber';
-import { getNakedAddress, getDataString } from '../helpers/utilities';
-import smartContractMethods from '../libraries/smartcontract-methods.json';
+import { convertHexToString } from '../handlers/bignumber';
+import { getNakedAddress, getDataString } from '../handlers/utilities';
+import smartContractMethods from '../references/smartcontract-methods.json';
 
 /**
  * @desc infura rpc request ethereum balance

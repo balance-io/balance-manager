@@ -1,22 +1,22 @@
 import BigNumber from 'bignumber.js';
-import { apiGetGasPrices } from '../helpers/api';
+import { apiGetGasPrices } from '../handlers/api';
 import lang from '../languages';
-import ethUnits from '../libraries/ethereum-units.json';
+import ethUnits from '../references/ethereum-units.json';
 import {
   convertAmountToBigNumber,
   convertAssetAmountFromNativeValue,
   convertAssetAmountToNativeValue,
   countDecimalPlaces,
   formatFixedDecimals
-} from '../helpers/bignumber';
-import { parseError, parseGasPrices, parseGasPricesTxFee } from '../helpers/parsers';
+} from '../handlers/bignumber';
+import { parseError, parseGasPrices, parseGasPricesTxFee } from '../handlers/parsers';
 import {
   web3MetamaskSendTransaction,
   web3MetamaskTransferToken,
   web3LedgerSendTransaction,
   web3LedgerTransferToken,
   estimateGasLimit
-} from '../helpers/web3';
+} from '../handlers/web3';
 import { notificationShow } from './_notification';
 import { accountUpdateTransactions } from './_account';
 

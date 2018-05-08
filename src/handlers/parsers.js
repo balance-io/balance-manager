@@ -9,12 +9,12 @@ import {
   convertAssetAmountToNativeValue,
   convertAssetAmountToNativeAmount
 } from './bignumber';
-import { debounceRequest } from '../helpers/utilities';
+import { debounceRequest } from '../handlers/utilities';
 import { getTransactionCount } from './web3';
 import { getTimeString } from './time';
-import nativeCurrencies from '../libraries/native-currencies.json';
-import ethUnits from '../libraries/ethereum-units.json';
-import timeUnits from '../libraries/time-units.json';
+import nativeCurrencies from '../references/native-currencies.json';
+import ethUnits from '../references/ethereum-units.json';
+import timeUnits from '../references/time-units.json';
 import { apiGetHistoricalPrices } from './api';
 
 /**

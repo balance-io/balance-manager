@@ -3,10 +3,10 @@ import {
   apiWalletConnectGetAddress,
   apiWalletConnectGetTransactionStatus,
   apiWalletConnectInitiateTransaction
-} from '../helpers/api';
-import { generateKeyPair, encryptMessage, decryptMessage } from '../helpers/rsa';
-import { saveLocal } from '../helpers/utilities';
-import { parseError } from '../helpers/parsers';
+} from '../handlers/api';
+import { generateKeyPair, encryptMessage, decryptMessage } from '../handlers/rsa';
+import { saveLocal } from '../handlers/utilities';
+import { parseError } from '../handlers/parsers';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
 import { accountUpdateAccountAddress } from './_account';

@@ -17,7 +17,6 @@
     "jsonp": "^0.2.1",
     "lodash": "^4.17.5",
     "netlify-lambda": "^0.3.0",
-    "node-forge": "^0.7.4",
     "prop-types": "^15.6.1",
     "qrcode": "^1.2.0",
     "react": "^16.2.0",

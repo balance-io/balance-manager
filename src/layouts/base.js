@@ -3,16 +3,16 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import Link from '../components/Link';
-import Modal from '../components/Modal';
 import Dropdown from '../components/Dropdown';
 import Background from '../components/Background';
 import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
 import Notification from '../components/Notification';
 import Warning from '../components/Warning';
+import Modals from '../modals';
 import balanceManagerLogo from '../assets/balance-manager-logo.svg';
-import ethereumNetworks from '../libraries/ethereum-networks.json';
-import nativeCurrencies from '../libraries/native-currencies.json';
+import ethereumNetworks from '../references/ethereum-networks.json';
+import nativeCurrencies from '../references/native-currencies.json';
 import { ledgerUpdateNetwork } from '../reducers/_ledger';
 import { accountChangeNativeCurrency, accountUpdateAccountAddress } from '../reducers/_account';
 import { colors, responsive } from '../styles';
@@ -156,7 +156,7 @@ const BaseLayout = ({
         </StyledHeader>
         <StyledContent>{children}</StyledContent>
       </Column>
-      <Modal />
+      <Modals />
       <Notification />
       <Warning />
     </StyledLayout>

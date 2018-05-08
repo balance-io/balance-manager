@@ -9,6 +9,8 @@ export const colors = {
   mediumGrey: '161, 165, 179',
   headerTitle: '170, 175, 189',
   grey: '169, 169, 188',
+  brightGreen: '18, 184, 120',
+  brightGreenHover: '21, 193, 127',
   lightGrey: '247, 248, 252',
   blue: '101, 127, 230',
   blueHover: '108, 135, 245',
@@ -26,7 +28,7 @@ export const colors = {
   ledger: '47, 49, 55',
   bodyBackground: '44,47,56',
   darkText: '43,45,51',
-  rowDivider: '224,224,224,0.24',
+  rowDivider: '224,224,224,0.24'
 };
 
 export const fonts = {

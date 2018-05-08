@@ -9,7 +9,7 @@ import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import arrowUp from '../assets/arrow-up.svg';
 import { modalClose } from '../reducers/_modal';
-import { capitalize } from '../helpers/utilities';
+import { capitalize } from '../handlers/utilities';
 import { fonts, colors, responsive } from '../styles';
 
 const StyledContainer = styled.div`
@@ -77,30 +77,36 @@ class ReceiveModal extends Component {
   onClose = () => {
     this.props.modalClose();
   };
-  render = () => (
-    <Card background="lightGrey">
-      <StyledContainer>
-        <StyledJustifyContent>
-          <StyledSubTitle>
-            <StyledIcon color="grey" icon={arrowUp} rotation={180} />
-            {lang.t('modal.receive_title', { walletName: capitalize(this.props.modalProps.name) })}
-          </StyledSubTitle>
-          <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
-        </StyledJustifyContent>
-        <StyledQRCodeDisplay data={this.props.modalProps.address} />
-        <StyledCopyToClipboard text={this.props.modalProps.address} />
-      </StyledContainer>
-    </Card>
-  );
+  render = () => {
+    return (
+      <Card background="lightGrey">
+        <StyledContainer>
+          <StyledJustifyContent>
+            <StyledSubTitle>
+              <StyledIcon color="grey" icon={arrowUp} rotation={180} />
+              {lang.t('modal.receive_title', {
+                walletName: capitalize(`${this.props.accountType}${lang.t('modal.default_wallet')}`)
+              })}
+            </StyledSubTitle>
+            <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
+          </StyledJustifyContent>
+          <StyledQRCodeDisplay data={this.props.accountAddress} />
+          <StyledCopyToClipboard text={this.props.accountAddress} />
+        </StyledContainer>
+      </Card>
+    );
+  };
 }
 
 ReceiveModal.propTypes = {
   modalClose: PropTypes.func.isRequired,
-  modalProps: PropTypes.object.isRequired
+  accountAddress: PropTypes.string.isRequired,
+  accountType: PropTypes.string.isRequired
 };
 
-const reduxProps = ({ modal }) => ({
-  modalProps: modal.modalProps
+const reduxProps = ({ account }) => ({
+  accountAddress: account.accountAddress,
+  accountType: account.accountType
 });
 
 export default connect(reduxProps, {

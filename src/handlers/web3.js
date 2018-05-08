@@ -8,8 +8,9 @@ import {
   convertHexToString
 } from './bignumber';
 import { ledgerEthSignTransaction } from './ledger-eth';
-import ethUnits from '../libraries/ethereum-units.json';
-import smartContractMethods from '../libraries/smartcontract-methods.json';
+import { walletConnectSignTransaction } from './walletconnect';
+import ethUnits from '../references/ethereum-units.json';
+import smartContractMethods from '../references/smartcontract-methods.json';
 
 /**
  * @desc web3 http instance
@@ -225,6 +226,60 @@ export const web3MetamaskTransferToken = transaction =>
   new Promise((resolve, reject) => {
     transaction = getTransferTokenTransaction(transaction);
     web3MetamaskSendTransaction({
+      from: transaction.from,
+      to: transaction.to,
+      data: transaction.data,
+      gasPrice: transaction.gasPrice,
+      gasLimit: transaction.gasLimit
+    })
+      .then(txHash => resolve(txHash))
+      .catch(error => reject(error));
+  });
+
+/**
+ * @desc walletconnect send transaction
+ * @param  {Object}  transaction { from, to, value, data, gasPrice}
+ * @return {Promise}
+ */
+export const web3WalletConnectSendTransaction = transaction =>
+  new Promise((resolve, reject) => {
+    const from =
+      transaction.from.substr(0, 2) === '0x' ? transaction.from : `0x${transaction.from}`;
+    const to = transaction.to.substr(0, 2) === '0x' ? transaction.to : `0x${transaction.to}`;
+    const value = transaction.value ? toWei(transaction.value) : '0x00';
+    const data = transaction.data ? transaction.data : '0x';
+    getTxDetails({
+      from,
+      to,
+      data,
+      value,
+      gasPrice: transaction.gasPrice,
+      gasLimit: transaction.gasLimit
+    })
+      .then(txDetails => {
+        walletConnectSignTransaction(txDetails)
+          .then(txHash => {
+            console.log('txhash', txHash);
+            if (txHash) {
+              resolve(txHash);
+            } else {
+              throw new Error('Could not send transaction via Wallet Connect');
+            }
+          })
+          .catch(error => reject(error));
+      })
+      .catch(error => reject(error));
+  });
+
+/**
+ * @desc walletconnect transfer token
+ * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
+ * @return {Promise}
+ */
+export const web3WalletConnectTransferToken = transaction =>
+  new Promise((resolve, reject) => {
+    transaction = getTransferTokenTransaction(transaction);
+    web3WalletConnectSendTransaction({
       from: transaction.from,
       to: transaction.to,
       data: transaction.data,

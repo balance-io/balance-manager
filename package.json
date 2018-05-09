@@ -40,7 +40,7 @@
   "scripts": {
     "remove-sourcemaps": "rm -rf build/static/js/*.map",
     "start": "HTTPS=true NODE_ENV=development concurrently \"react-scripts start\" \"netlify-lambda serve src/lambda\"",
-    "build": "react-scripts build && yarn run remove-sourcemaps",
+    "build": "react-scripts build",
     "build:lambda": "netlify-lambda build src/lambda",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",

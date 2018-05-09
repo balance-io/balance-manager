@@ -32,6 +32,7 @@ import {
   sendUpdateNativeAmount,
   sendUpdateAssetAmount,
   sendUpdateSelected,
+  sendMaxBalance,
   sendToggleConfirmationView
 } from '../reducers/_send';
 import { notificationShow } from '../reducers/_notification';
@@ -253,8 +254,7 @@ class SendModal extends Component {
   }
   state = {
     isValidAddress: true,
-    showQRCodeReader: false,
-    QRCodeReaderTarget: ''
+    showQRCodeReader: false
   };
   componentWillReceiveProps(newProps) {
     if (newProps.recipient.length >= 42) {
@@ -267,45 +267,18 @@ class SendModal extends Component {
       }
     }
   }
-  onChangeSelected = value => {
-    let selected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
-    if (value !== 'ETH') {
-      selected = this.props.accountInfo.assets.filter(asset => asset.symbol === value)[0];
-    }
-    if (
-      this.props.prices[this.props.nativeCurrency] &&
-      this.props.prices[this.props.nativeCurrency][selected.symbol]
-    ) {
-      this.props.sendUpdateAssetAmount(this.props.assetAmount, selected);
-    }
-    this.props.sendUpdateSelected(selected);
-  };
+
   onAddressInputFocus = () => this.setState({ isValidAddress: true });
   onAddressInputBlur = () =>
     this.setState({ isValidAddress: isValidAddress(this.props.recipient) });
   onGoBack = () => this.props.sendToggleConfirmationView(false);
-  onSendEntireBalance = () => {
-    if (this.props.selected.symbol === 'ETH') {
-      const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
-      const balanceAmount = ethereum.balance.amount;
-      const txFeeAmount = this.props.gasPrice.txFee.value.amount;
-      const remaining = BigNumber(balanceAmount)
-        .minus(BigNumber(txFeeAmount))
-        .toNumber();
-      const ether = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
-      this.props.sendUpdateAssetAmount(ether, { symbol: 'ETH' });
-    } else {
-      this.props.sendUpdateAssetAmount(
-        convertAmountFromBigNumber(this.props.selected.balance.amount),
-        this.props.selected
-      );
-    }
-  };
+  onSendMaxBalance = () => this.props.sendMaxBalance();
   onSendAnother = () => {
     this.props.sendToggleConfirmationView(false);
     this.props.sendClearFields();
     this.props.sendModalInit();
   };
+
   onSubmit = e => {
     e.preventDefault();
     const request = {
@@ -388,30 +361,29 @@ class SendModal extends Component {
     }
     this.props.sendToggleConfirmationView(true);
   };
-  toggleQRCodeReader = target =>
-    this.setState({ showQRCodeReader: !this.state.showQRCodeReader, QRCodeReaderTarget: target });
-  onQRCodeValidate = rawData => {
-    if (this.state.QRCodeReaderTarget === 'recipient') {
-      const data = rawData.match(/0x\w{40}/g) ? rawData.match(/0x\w{40}/g)[0] : null;
-      const result = data ? isValidAddress(data) : false;
-      const onError = () =>
-        this.props.notificationShow(lang.t('notification.error.invalid_address_scanned'), true);
-      return { data, result, onError };
-    }
-  };
-  onQRCodeScan = data => {
-    if (this.state.QRCodeReaderTarget === 'recipient') {
-      this.props.sendUpdateRecipient(data);
-    }
-    this.setState({ showQRCodeReader: false, QRCodeReaderTarget: '' });
-  };
-  onQRCodeError = () => {
-    this.props.notificationShow(lang.t('notification.error.failed_scanning_qr_code'), true);
-  };
+
   onClose = () => {
     this.props.sendClearFields();
     this.props.modalClose();
   };
+
+  // QR Code Reader Handlers
+  toggleQRCodeReader = () => this.setState({ showQRCodeReader: !this.state.showQRCodeReader });
+  onQRCodeValidate = rawData => {
+    const data = rawData.match(/0x\w{40}/g) ? rawData.match(/0x\w{40}/g)[0] : null;
+    const result = data ? isValidAddress(data) : false;
+    const onError = () =>
+      this.props.notificationShow(lang.t('notification.error.invalid_address_scanned'), true);
+    return { data, result, onError };
+  };
+  onQRCodeScan = data => {
+    this.props.sendUpdateRecipient(data);
+    this.setState({ showQRCodeReader: false });
+  };
+  onQRCodeError = () => {
+    this.props.notificationShow(lang.t('notification.error.failed_scanning_qr_code'), true);
+  };
+
   render = () => {
     return (
       <Card background="lightGrey">
@@ -431,7 +403,7 @@ class SendModal extends Component {
                 <DropdownAsset
                   selected={this.props.selected.symbol}
                   assets={this.props.accountInfo.assets}
-                  onChange={this.onChangeSelected}
+                  onChange={value => this.props.sendUpdateSelected(value)}
                 />
               </div>
 
@@ -445,15 +417,13 @@ class SendModal extends Component {
                   value={this.props.recipient}
                   onFocus={this.onAddressInputFocus}
                   onBlur={this.onAddressInputBlur}
-                  onChange={({ target }) =>
-                    this.props.sendUpdateRecipient(target.value, this.props.selected.symbol)
-                  }
+                  onChange={({ target }) => this.props.sendUpdateRecipient(target.value)}
                 />
                 {this.props.recipient &&
                   !this.state.isValidAddress && (
                     <StyledInvalidAddress>{lang.t('modal.invalid_address')}</StyledInvalidAddress>
                   )}
-                <StyledQRIcon onClick={() => this.toggleQRCodeReader('recipient')}>
+                <StyledQRIcon onClick={this.toggleQRCodeReader}>
                   <img src={qrIcon} alt="recipient" />
                 </StyledQRIcon>
               </StyledFlex>
@@ -466,11 +436,9 @@ class SendModal extends Component {
                     placeholder="0.0"
                     type="text"
                     value={this.props.assetAmount}
-                    onChange={({ target }) =>
-                      this.props.sendUpdateAssetAmount(target.value, this.props.selected)
-                    }
+                    onChange={({ target }) => this.props.sendUpdateAssetAmount(target.value)}
                   />
-                  <StyledMaxBalance onClick={this.onSendEntireBalance}>
+                  <StyledMaxBalance onClick={this.onSendMaxBalance}>
                     {lang.t('modal.maximum_balance')}
                   </StyledMaxBalance>
                   <StyledAmountCurrency>{this.props.selected.symbol}</StyledAmountCurrency>
@@ -490,9 +458,7 @@ class SendModal extends Component {
                       !this.props.prices[this.props.nativeCurrency] ||
                       !this.props.prices[this.props.nativeCurrency][this.props.selected.symbol]
                     }
-                    onChange={({ target }) =>
-                      this.props.sendUpdateNativeAmount(target.value, this.props.selected)
-                    }
+                    onChange={({ target }) => this.props.sendUpdateNativeAmount(target.value)}
                   />
                   <StyledAmountCurrency disabled={!this.props.prices[this.props.selected.symbol]}>
                     {this.props.prices && this.props.prices.selected
@@ -604,7 +570,7 @@ class SendModal extends Component {
                   onValidate={this.onQRCodeValidate}
                   onScan={this.onQRCodeScan}
                   onError={this.onQRCodeError}
-                  onClose={() => this.toggleQRCodeReader('')}
+                  onClose={this.toggleQRCodeReader}
                 />
               )}
             </Form>
@@ -681,6 +647,7 @@ SendModal.propTypes = {
   sendUpdateNativeAmount: PropTypes.func.isRequired,
   sendUpdateAssetAmount: PropTypes.func.isRequired,
   sendUpdateSelected: PropTypes.func.isRequired,
+  sendMaxBalance: PropTypes.func.isRequired,
   sendToggleConfirmationView: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
   modalClose: PropTypes.func.isRequired,
@@ -740,6 +707,7 @@ export default connect(reduxProps, {
   sendUpdateNativeAmount,
   sendUpdateAssetAmount,
   sendUpdateSelected,
+  sendMaxBalance,
   sendToggleConfirmationView,
   notificationShow
 })(SendModal);

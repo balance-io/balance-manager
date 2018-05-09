@@ -238,6 +238,7 @@ class Home extends Component {
         </StyledCardContainer>
       </StyledCardTrezor>
 
+    {/*
       <StyledCard>
         <StyledCardContainer>
           <StyledWalletConnect>
@@ -253,6 +254,7 @@ class Home extends Component {
           </StyledWalletConnect>
         </StyledCardContainer>
       </StyledCard>
+    */}
     </BaseLayout>
   );
 }

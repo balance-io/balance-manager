@@ -439,7 +439,7 @@ class SendModal extends Component {
                     onChange={({ target }) => this.props.sendUpdateAssetAmount(target.value)}
                   />
                   <StyledMaxBalance onClick={this.onSendMaxBalance}>
-                    {lang.t('modal.maximum_balance')}
+                    {lang.t('modal.send_max')}
                   </StyledMaxBalance>
                   <StyledAmountCurrency>{this.props.selected.symbol}</StyledAmountCurrency>
                 </StyledFlex>

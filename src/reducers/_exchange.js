@@ -148,6 +148,23 @@ export const exchangeUpdateWithdrawalAmount = withdrawalAmount => (dispatch, get
   });
 };
 
+// export const exchangeMaxBalance = () => (dispatch, getState) => {
+//   const { selected, gasPrice } = getState().send;
+//   const { accountInfo } = getState().account;
+//   if (selected.symbol === 'ETH') {
+//     const ethereum = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+//     const balanceAmount = ethereum.balance.amount;
+//     const txFeeAmount = gasPrice.txFee.value.amount;
+//     const remaining = BigNumber(balanceAmount)
+//       .minus(BigNumber(txFeeAmount))
+//       .toNumber();
+//     const ether = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
+//     dispatch(sendUpdateAssetAmount(ether));
+//   } else {
+//     dispatch(sendUpdateAssetAmount(convertAmountFromBigNumber(selected.balance.amount)));
+//   }
+// };
+//
 export const exchangeClearFields = () => ({ type: EXCHANGE_CLEAR_FIELDS });
 
 // -- Reducer --------------------------------------------------------------- //
@@ -155,13 +172,13 @@ const INITIAL_STATE = {
   fetching: false,
   address: '',
   recipient: '',
-  exchangeDetails: {},
   txHash: '',
   confirm: false,
+  exchangeDetails: {},
   depositAssets: [],
   withdrawalAssets: [],
-  depositSelected: { symbol: 'ETH' },
-  withdrawalSelected: { symbol: 'ZRX' },
+  depositSelected: { symbol: 'ETH', decimals: 18 },
+  withdrawalSelected: { symbol: 'ZRX', decimals: 18 },
   depositAmount: '',
   withdrawalAmount: ''
 };

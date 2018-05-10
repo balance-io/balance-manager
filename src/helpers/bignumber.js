@@ -84,7 +84,7 @@ export const convertAmountToDisplay = (value, nativePrices, asset, buffer) => {
     const display = handleSignificantDecimals(value, decimals, buffer);
     return `${display}%`;
   } else if (!nativePrices && asset) {
-    const decimals = asset.decimals;
+    const decimals = asset.decimals || 18;
     const display = handleSignificantDecimals(value, decimals, buffer);
     return `${display} ${asset.symbol}`;
   } else if (nativePrices) {

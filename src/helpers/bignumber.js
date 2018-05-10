@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
-import ethUnits from '../libraries/ethereum-units.json';
-import nativeCurrencies from '../libraries/native-currencies.json';
+import ethUnits from '../references/ethereum-units.json';
+import nativeCurrencies from '../references/native-currencies.json';
 
 /**
  * @desc convert from number to string

@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import './helpers/intercom';
 import { injectGlobal } from 'styled-components';
 import { globalStyles } from './styles';
-import './helpers/intercom';
 import { bootIntercom } from './helpers/utilities';
 import Root from './Root';
 

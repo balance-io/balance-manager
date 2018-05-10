@@ -37,6 +37,7 @@
       "connect_walletconnect": "Use WalletConnect",
       "connect_metamask": "Connect to MetaMask",
       "connect_ledger": "Connect to Ledger",
+      "exchange": "Exchange",
       "send": "Send",
       "receive": "Receive",
       "close": "Close",
@@ -59,6 +60,7 @@
     },
     "modal": {
       "receive_title": "Receive to {{walletName}}",
+      "exchange_title": "Exchange from {{walletName}}",
       "send_title": "Send from {{walletName}}",
       "approve_tx": "Approve transaction on {{walletType}}",
       "confirm_tx": "Confirm transaction from {{walletName}}",
@@ -74,27 +76,11 @@
       "tx_confirm_amount": "Amount",
       "tx_confirm_fee": "Transaction Fee",
       "tx_hash": "Transaction Hash",
-      "tx_verify": "Verify your transaction here"
-    },
-    "time": {
-      "ms": "ms",
-      "milisecond": "milisecond",
-      "miliseconds": "miliseconds",
-      "s": "s",
-      "sec": "sec",
-      "secs": "secs",
-      "second": "second",
-      "seconds": "seconds",
-      "min": "min",
-      "mins": "mins",
-      "minute": "minute",
-      "minutes": "minutes",
-      "hr": "hr",
-      "hrs": "hrs",
-      "hour": "hour",
-      "hours": "hours",
-      "day": "day",
-      "days": "days"
+      "tx_verify": "Verify your transaction here",
+      "deposit_dropdown_label": "Exchange my",
+      "withdrawal_dropdown_label": "for",
+      "deposit_input_label": "Pay",
+      "withdrawal_input_label": "Get"
     },
     "message": {
       "web3_not_available": "Please install the MetaMask Chrome extension",
@@ -137,6 +123,26 @@
       "successful": "Check your email",
       "sending": "Sending...",
       "generic_error": "Oops, something went wrong"
+    },
+    "time": {
+      "ms": "ms",
+      "milisecond": "milisecond",
+      "miliseconds": "miliseconds",
+      "s": "s",
+      "sec": "sec",
+      "secs": "secs",
+      "second": "second",
+      "seconds": "seconds",
+      "min": "min",
+      "mins": "mins",
+      "minute": "minute",
+      "minutes": "minutes",
+      "hr": "hr",
+      "hrs": "hrs",
+      "hour": "hour",
+      "hours": "hours",
+      "day": "day",
+      "days": "days"
     }
   }
 }

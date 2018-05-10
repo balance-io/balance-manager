@@ -1,5 +1,5 @@
-import { apiGetMetamaskNetwork } from '../helpers/api';
-import { parseError } from '../helpers/parsers';
+import { apiGetMetamaskNetwork } from '../handlers/api';
+import { parseError } from '../handlers/parsers';
 import { modalClose } from './_modal';
 import { accountUpdateAccountAddress, accountUpdateNetwork } from './_account';
 import { notificationShow } from './_notification';

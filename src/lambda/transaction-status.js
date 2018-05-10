@@ -1,4 +1,4 @@
-import { infuraGetTransactionByHash, infuraGetBlockByHash } from '../helpers/infura';
+import { infuraGetTransactionByHash, infuraGetBlockByHash } from '../handlers/infura';
 import { lambdaAllowedAccess } from '../helpers/utilities';
 import { convertHexToString } from '../helpers/bignumber';
 

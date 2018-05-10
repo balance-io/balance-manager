@@ -49,7 +49,7 @@ const StyledRow = styled.div`
     justify-content: space-between;
   }
   & ${StyledAsset} {
-    width: 60%;
+    width: ${({ noBalance }) => (noBalance ? '100%' : '60%')};
     text-align: left;
   }
   & > div > p {
@@ -105,34 +105,54 @@ class DropdownAsset extends Component {
   };
   toggleDropdown = () => this.setState({ showDropdown: !this.state.showDropdown });
   render() {
-    const { selected, assets, ...props } = this.props;
-    const ethereum = assets.filter(asset => asset.symbol === 'ETH')[0];
-    const tokensWithValue = assets.filter(asset => asset.symbol !== 'ETH' && asset.native);
-    const tokensWithNoValue = assets.filter(asset => asset.symbol !== 'ETH' && !asset.native);
-    const _assets = [ethereum, ...tokensWithValue, ...tokensWithNoValue];
+    const { selected, assets, noBalance, ...props } = this.props;
     const options = {};
-    _assets.forEach(option => {
-      options[option.symbol] = option;
-    });
+    if (assets.length) {
+      const ethereum = assets.filter(asset => asset.symbol === 'ETH')[0];
+      const tokensWithValue = assets.filter(asset => asset.symbol !== 'ETH' && asset.native);
+      const tokensWithNoValue = assets.filter(asset => asset.symbol !== 'ETH' && !asset.native);
+      let _assets = [ethereum, ...tokensWithValue, ...tokensWithNoValue];
+      _assets.forEach(option => {
+        if (option) {
+          options[option.symbol] = option;
+        }
+      });
+    }
+    const empty = !Object.keys(options).length;
     return (
       <StyledWrapper show={this.state.showDropdown} {...props}>
-        <StyledSelected noOptions={Object.keys(options).length < 2} onClick={this.toggleDropdown}>
+        <StyledSelected
+          noBalance={noBalance}
+          noOptions={Object.keys(options).length < 2}
+          onClick={this.toggleDropdown}
+        >
           <div>
-            <StyledAsset data-toggle="tooltip" title={options[this.props.selected].name}>
+            <StyledAsset
+              data-toggle="tooltip"
+              title={!empty ? options[this.props.selected].name : 'Ethereum'}
+            >
               <AssetIcon
                 size={18}
-                asset={this.props.selected === 'ETH' ? 'ETH' : options[this.props.selected].address}
+                asset={
+                  !empty
+                    ? this.props.selected === 'ETH' ? 'ETH' : options[this.props.selected].address
+                    : 'ETH'
+                }
+                image={!empty ? options[this.props.selected].image || '' : ''}
               />
-              <p>{ellipseText(options[this.props.selected].name, 30)}</p>
+              <p>{!empty ? ellipseText(options[this.props.selected].name, 30) : 'Ethereum'}</p>
             </StyledAsset>
-            <p>{`${options[this.props.selected].balance.display}${
-              options[this.props.selected].native
-                ? ` ≈ ${options[this.props.selected].native.balance.display}`
-                : ''
-            }`}</p>
+            <p>
+              {!noBalance &&
+                `${options[this.props.selected].balance.display}${
+                  options[this.props.selected].native
+                    ? ` ≈ ${options[this.props.selected].native.balance.display}`
+                    : ''
+                }`}
+            </p>
           </div>
         </StyledSelected>
-        <StyledDropdown show={this.state.showDropdown}>
+        <StyledDropdown noBalance={noBalance} show={this.state.showDropdown}>
           {Object.keys(options)
             .filter(key => key !== this.props.selected)
             .map(key => (
@@ -141,12 +161,19 @@ class DropdownAsset extends Component {
                 onClick={() => this.onChangeSelected(options[key].symbol)}
               >
                 <StyledAsset data-toggle="tooltip" title={options[key].name}>
-                  <AssetIcon size={18} asset={key === 'ETH' ? 'ETH' : options[key].address} />
+                  <AssetIcon
+                    size={18}
+                    asset={key === 'ETH' ? 'ETH' : options[key].address}
+                    image={options[key].image || ''}
+                  />
                   <p>{ellipseText(options[key].name, 30)}</p>
                 </StyledAsset>
-                <p>{`${options[key].balance.display}${
-                  options[key].native ? ` ≈ ${options[key].native.balance.display}` : ''
-                }`}</p>
+                <p>
+                  {!noBalance &&
+                    `${options[key].balance.display}${
+                      options[key].native ? ` ≈ ${options[key].native.balance.display}` : ''
+                    }`}
+                </p>
               </div>
             ))}
         </StyledDropdown>
@@ -158,7 +185,12 @@ class DropdownAsset extends Component {
 DropdownAsset.propTypes = {
   selected: PropTypes.string.isRequired,
   assets: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+  noBalance: PropTypes.bool
+};
+
+DropdownAsset.defaultProps = {
+  noBalance: false
 };
 
 export default DropdownAsset;

@@ -5,7 +5,6 @@ import {
   convertAmountFromBigNumber,
   convertAmountToDisplay,
   convertAmountToDisplaySpecific,
-  convertAssetAmountToBigNumber,
   convertAssetAmountToNativeValue,
   convertAssetAmountToNativeAmount
 } from '../helpers/bignumber';
@@ -587,7 +586,9 @@ export const parseNewTransaction = async (
   if (response.data.response !== 'Error' && response.data[assetSymbol]) {
     await Promise.all(
       Object.keys(nativeCurrencies).map(async nativeCurrency => {
-        const assetPriceAmount = convertAmountToBigNumber(response.data[assetSymbol][nativeCurrency]);
+        const assetPriceAmount = convertAmountToBigNumber(
+          response.data[assetSymbol][nativeCurrency]
+        );
         let prices = { selected: nativeCurrencies[nativeCurrency] };
         prices[nativeCurrency] = {};
         prices[nativeCurrency][assetSymbol] = {

@@ -48,7 +48,7 @@ const StyledTop = styled.div`
       margin-top: 15px;
     }
   }
-  @media screen and (${responsive.sm.max}) {
+  @media screen and (max-width: 768px) {
     flex-direction: column-reverse;
   }
 `;

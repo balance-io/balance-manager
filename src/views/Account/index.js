@@ -3,22 +3,23 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import lang from '../languages';
-import TabMenu from './TabMenu';
-import Card from './Card';
-import Button from './Button';
-import CopyToClipboard from './CopyToClipboard';
-import AccountViewBalances from './AccountViewBalances';
-import AccountViewTransactions from './AccountViewTransactions';
-import AccountViewInteractions from './AccountViewInteractions';
-import arrowUp from '../assets/arrow-up.svg';
-import qrCode from '../assets/qr-code-transparent.svg';
-import { accountClearState } from '../reducers/_account';
-import { modalOpen } from '../reducers/_modal';
-import { capitalize } from '../helpers/utilities';
-import { colors, fonts, responsive } from '../styles';
+import lang from '../../languages';
+import TabMenu from '../../components/TabMenu';
+import Card from '../../components/Card';
+import Button from '../../components/Button';
+import CopyToClipboard from '../../components/CopyToClipboard';
+import AccountBalances from './AccountBalances';
+import AccountTransactions from './AccountTransactions';
+import AccountInteractions from './AccountInteractions';
+import arrowUp from '../../assets/arrow-up.svg';
+// import exchangeIcon from '../../assets/exchange-icon.svg';
+import qrCode from '../../assets/qr-code-transparent.svg';
+import { accountClearState } from '../../reducers/_account';
+import { modalOpen } from '../../reducers/_modal';
+import { capitalize } from '../../helpers/utilities';
+import { colors, fonts, responsive } from '../../styles';
 
-const StyledAccountView = styled.div`
+const StyledAccount = styled.div`
   width: 100%;
   margin-bottom: 60px;
 `;
@@ -75,43 +76,38 @@ const StyledMessage = styled.div`
   font-weight: ${fonts.weight.medium};
 `;
 
-class AccountView extends Component {
-  openSendModal = () =>
-    this.props.modalOpen('SEND_MODAL', {
-      name:
-        this.props.accountInfo.name || `${this.props.accountType}${lang.t('modal.default_wallet')}`,
-      address: this.props.accountAddress || this.props.accountInfo.address,
-      accountType: this.props.accountType || this.props.accountInfo.type,
-      assets: this.props.accountInfo.assets
-    });
-  openReceiveModal = () =>
-    this.props.modalOpen('RECEIVE_MODAL', {
-      name:
-        this.props.accountInfo.name ||
-        `${this.props.accountInfo.type}${lang.t('modal.default_wallet')}`,
-      address: this.props.accountInfo.address
-    });
+class Account extends Component {
+  openExchangeModal = () => this.props.modalOpen('EXCHANGE_MODAL');
+  openSendModal = () => this.props.modalOpen('SEND_MODAL');
+  openReceiveModal = () => this.props.modalOpen('RECEIVE_MODAL');
   render() {
     return (
-      <StyledAccountView>
+      <StyledAccount>
         <Card
           fetching={this.props.fetching || this.props.fetchingWallet}
           fetchingMessage={this.props.fetchingMessage}
           background={'lightGrey'}
           minHeight={200}
         >
-          {!!this.props.accountAddress || !!this.props.accountInfo.address ? (
+          {!!this.props.accountAddress ? (
             <StyledFlex>
               <StyledTop>
                 <StyledAddressWrapper>
-                  <h6>{capitalize(this.props.accountType || this.props.accountInfo.type)} </h6>
-                  <CopyToClipboard
-                    iconOnHover
-                    text={this.props.accountAddress || this.props.accountInfo.address}
-                  />
+                  <h6>{capitalize(this.props.accountType)} </h6>
+                  <CopyToClipboard iconOnHover text={this.props.accountAddress} />
                 </StyledAddressWrapper>
 
                 <StyledActions>
+                  {/* <Button
+                    left
+                    color="brightGreen"
+                    hoverColor="brightGreenHover"
+                    activeColor="brightGreenHover"
+                    icon={exchangeIcon}
+                    onClick={this.openExchangeModal}
+                  >
+                    {lang.t('button.exchange')}
+                  </Button> */}
                   <Button
                     left
                     color="blue"
@@ -138,16 +134,16 @@ class AccountView extends Component {
               <TabMenu match={this.props.match} />
 
               <Switch>
-                <Route exact path={this.props.match.url} component={AccountViewBalances} />
+                <Route exact path={this.props.match.url} component={AccountBalances} />
                 <Route
                   exact
                   path={`${this.props.match.url}/transactions`}
-                  component={AccountViewTransactions}
+                  component={AccountTransactions}
                 />
                 <Route
                   exact
                   path={`${this.props.match.url}/interactions`}
-                  component={AccountViewInteractions}
+                  component={AccountInteractions}
                 />
                 <Route render={() => <Redirect to={this.props.match.url} />} />
               </Switch>
@@ -156,12 +152,12 @@ class AccountView extends Component {
             <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
           )}
         </Card>
-      </StyledAccountView>
+      </StyledAccount>
     );
   }
 }
 
-AccountView.propTypes = {
+Account.propTypes = {
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
   accountClearState: PropTypes.func.isRequired,
@@ -173,7 +169,7 @@ AccountView.propTypes = {
   fetchingMessage: PropTypes.string
 };
 
-AccountView.defaultProps = {
+Account.defaultProps = {
   fetchingWallet: false,
   fetchingMessage: ''
 };
@@ -188,4 +184,4 @@ const reduxProps = ({ account }) => ({
 export default connect(reduxProps, {
   modalOpen,
   accountClearState
-})(AccountView);
+})(Account);

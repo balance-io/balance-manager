@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { infuraGetEthereumBalance, infuraCallTokenBalance } from '../helpers/infura';
+import { infuraGetEthereumBalance, infuraCallTokenBalance } from '../handlers/infura';
 import { lambdaAllowedAccess } from '../helpers/utilities';
 import {
   convertStringToNumber,

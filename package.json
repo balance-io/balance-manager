@@ -1,9 +1,14 @@
 {
   "name": "balance-manager",
-  "description": "Balance Manager",
-  "version": "1.0.0",
+  "description": "Ethereum Wallet Manager Interface for MetaMask, Ledger, Trezor and WalletConnect",
+  "version": "0.5.0",
   "author": "Pedro Gomes <pedro@balance.io>",
-  "license": "MIT",
+  "license": "GPL-3",
+  "homepage": "https://manager.balance.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/balance-io/balance-manager.git"
+  },
   "bugs": {
     "url": "https://github.com/balance-io/balance-manager/issues"
   },
@@ -17,7 +22,6 @@
     "jsonp": "^0.2.1",
     "lodash": "^4.17.5",
     "netlify-lambda": "^0.3.0",
-    "node-forge": "^0.7.4",
     "prop-types": "^15.6.1",
     "qrcode": "^1.2.0",
     "react": "^16.2.0",
@@ -30,12 +34,13 @@
     "redux-devtools-extension": "^2.13.2",
     "redux-thunk": "^2.2.0",
     "styled-components": "^3.2.3",
+    "walletconnect": "^0.0.1-beta.11",
     "web3": "^1.0.0-beta.34"
   },
   "scripts": {
     "remove-sourcemaps": "rm -rf build/static/js/*.map",
     "start": "HTTPS=true NODE_ENV=development concurrently \"react-scripts start\" \"netlify-lambda serve src/lambda\"",
-    "build": "react-scripts build && yarn run remove-sourcemaps",
+    "build": "react-scripts build",
     "build:lambda": "netlify-lambda build src/lambda",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",

@@ -2,12 +2,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import lang from '../languages';
-import AssetIcon from './AssetIcon';
-import ToggleIndicator from './ToggleIndicator';
-import { ellipseText } from '../helpers/utilities';
-import { convertStringToNumber, hasHighMarketValue, hasLowMarketValue } from '../helpers/bignumber';
-import { colors, fonts, responsive } from '../styles';
+import lang from '../../languages';
+import AssetIcon from '../../components/AssetIcon';
+import ToggleIndicator from '../../components/ToggleIndicator';
+import { ellipseText } from '../../helpers/utilities';
+import {
+  convertStringToNumber,
+  hasHighMarketValue,
+  hasLowMarketValue
+} from '../../helpers/bignumber';
+import { colors, fonts, responsive } from '../../styles';
 
 const StyledGrid = styled.div`
   width: 100%;
@@ -175,7 +179,7 @@ const StyledShowMoreTokens = styled(StyledToken)`
   }
 `;
 
-class AccountViewBalances extends Component {
+class AccountBalances extends Component {
   state = {
     disableToggle: false,
     showMoreTokens: false
@@ -292,11 +296,11 @@ class AccountViewBalances extends Component {
   }
 }
 
-AccountViewBalances.propTypes = {
+AccountBalances.propTypes = {
   accountInfo: PropTypes.object.isRequired
 };
 const reduxProps = ({ account }) => ({
   accountInfo: account.accountInfo
 });
 
-export default connect(reduxProps, null)(AccountViewBalances);
+export default connect(reduxProps, null)(AccountBalances);

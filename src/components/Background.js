@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import trianglesBlue from '../assets/triangles-light.svg';
 
 const StyledBackgroundFixed = styled.div`
   position: fixed;
@@ -31,8 +30,7 @@ const StyledBackgroundBlue = styled.div`
 const Background = () => (
   <StyledBackgroundFixed>
     <StyledBackgroundRelative>
-      <StyledBackgroundBlue>
-      </StyledBackgroundBlue>
+      <StyledBackgroundBlue />
     </StyledBackgroundRelative>
   </StyledBackgroundFixed>
 );

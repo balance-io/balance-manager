@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { parseHistoricalPrices } from './parsers';
-import networkList from '../libraries/ethereum-networks.json';
-import nativeCurrencies from '../libraries/native-currencies.json';
+import networkList from '../references/ethereum-networks.json';
+import nativeCurrencies from '../references/native-currencies.json';
 
 /**
  * @desc get prices
@@ -32,8 +32,7 @@ export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now())
  * @desc get ethereum gas prices
  * @return {Promise}
  */
-export const apiGetGasPrices = () =>
-  axios.get(`https://ethgasstation.info/json/ethgasAPI.json`, { timeout: 10000 });
+export const apiGetGasPrices = () => axios.get(`https://ethgasstation.info/json/ethgasAPI.json`);
 
 /**
  * @desc get metmask selected network
@@ -101,67 +100,19 @@ export const apiGetAccountTransactions = async (
  * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
-export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') => {
-  try {
-    const { data } = await axios.get(
-      `/.netlify/functions/transaction-status?hash=${hash}&network=${network}`
-    );
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
+export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') =>
+  axios.get(`/.netlify/functions/transaction-status?hash=${hash}&network=${network}`);
 
 /**
- * Configuration for WalletConnect api instance
- * @type axios instance
- */
-const walletConnect = axios.create({
-  baseURL: 'https://walletconnect.balance.io',
-  timeout: 30000, // 30 secs
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: '&xFvdofLFGDPzk9LwWQEEpoqP^YFJ8ReGREe2VPWZsKKYcwnBndAA8xWncYgJDqm'
-  }
-});
-
-/**
- * @desc wallet connect request device details
+ * @desc shapeshift get coins
  * @return {Promise}
  */
-export const apiWalletConnectInit = () => walletConnect.get('/request-device-details');
+export const apiShapeshiftGetCoins = () => axios.get(`/.netlify/functions/shapeshift-getcoins`);
 
 /**
- * @desc wallet connect get address
- * @param  {String}   [sessionToken = '']
+ * @desc shapeshift get market info
+ * @param  {String}   [exchangePair = '']
  * @return {Promise}
  */
-export const apiWalletConnectGetAddress = (sessionToken = '') =>
-  walletConnect.post('/get-device-details', { sessionToken });
-
-/**
- * @desc wallet connect initiate transaction
- * @param  {String}   [deviceUuid = '', encryptedTransactionDetails = '', notificationDetails = {}]
- * @return {Promise}
- */
-export const apiWalletConnectInitiateTransaction = (
-  deviceUuid = '',
-  transactionDetails = '',
-  notificationDetails = {}
-) =>
-  walletConnect.post('/add-transaction-details', {
-    deviceUuid,
-    transactionDetails,
-    notificationDetails
-  });
-
-/**
- * @desc wallet connect get transaction status
- * @param  {String}   [deviceUuid = '', transactionUuid = '']
- * @return {Promise}
- */
-export const apiWalletConnectGetTransactionStatus = (deviceUuid = '', transactionUuid = '') =>
-  walletConnect.post('/get-transaction-status', {
-    deviceUuid,
-    transactionUuid
-  });
+export const apiShapeshiftGetMarketInfo = (exchangePair = '') =>
+  axios.get(`/.netlify/functions/shapeshift-marketinfo?exchangePair=${exchangePair}`);

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import BigNumber from 'bignumber.js';
 import lang, { resources } from './languages';
-import Home from './pages/Home';
+import Homepage from './pages';
 import Wallet from './pages/Wallet';
 import Metamask from './pages/Metamask';
 import Ledger from './pages/Ledger';
@@ -30,7 +30,7 @@ class Router extends Component {
   }
   render = () => (
     <Switch>
-      <Route exact path="/" component={Home} />
+      <Route exact path="/" component={Homepage} />
       <Route path="/wallet" component={Wallet} />
       <Route path="/metamask" component={Metamask} />
       <Route path="/ledger" component={Ledger} />

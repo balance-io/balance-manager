@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Column from '../components/Column';
-import SendModal from '../modals/SendModal';
-import ReceiveModal from '../modals/ReceiveModal';
-import WalletConnectInit from '../modals/WalletConnectInit';
+import ExchangeModal from './ExchangeModal';
+import SendModal from './SendModal';
+import ReceiveModal from './ReceiveModal';
+import WalletConnectInit from './WalletConnectInit';
 import { modalClose } from '../reducers/_modal';
 import { sendClearFields } from '../reducers/_send';
+import { exchangeClearFields } from '../reducers/_exchange';
 import { colors, transitions } from '../styles';
 
 const StyledLightbox = styled.div`
@@ -36,6 +38,7 @@ const StyledContainer = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
+  padding: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,6 +47,8 @@ const StyledContainer = styled.div`
 class Modal extends Component {
   modalController = () => {
     switch (this.props.modal) {
+      case 'EXCHANGE_MODAL':
+        return <ExchangeModal />;
       case 'SEND_MODAL':
         return <SendModal />;
       case 'RECEIVE_MODAL':
@@ -56,6 +61,7 @@ class Modal extends Component {
   };
   onClose = () => {
     this.props.sendClearFields();
+    this.props.exchangeClearFields();
     this.props.modalClose();
   };
   render = () => {
@@ -79,6 +85,7 @@ class Modal extends Component {
 Modal.propTypes = {
   modalClose: PropTypes.func.isRequired,
   sendClearFields: PropTypes.func.isRequired,
+  exchangeClearFields: PropTypes.func.isRequired,
   modal: PropTypes.string.isRequired
 };
 
@@ -86,4 +93,4 @@ const reduxProps = ({ modal }) => ({
   modal: modal.modal
 });
 
-export default connect(reduxProps, { modalClose, sendClearFields })(Modal);
+export default connect(reduxProps, { modalClose, sendClearFields, exchangeClearFields })(Modal);

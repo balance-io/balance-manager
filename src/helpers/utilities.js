@@ -1,4 +1,4 @@
-import networkList from '../libraries/ethereum-networks.json';
+import networkList from '../references/ethereum-networks.json';
 
 /**
  * @desc save to local storage
@@ -221,7 +221,7 @@ export const bootIntercom = () => {
   let appID = process.env.NODE_ENV === 'production' ? 'j0fl7v0m' : 'k8c9ptl1';
   const setup = () => window.Intercom('boot', { app_id: appID });
   if (typeof window.Intercom !== 'undefined') setup();
-  else setTimeout(setup, 5000);
+  else setTimeout(setup, 500);
 };
 
 /**

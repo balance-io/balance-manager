@@ -10,9 +10,8 @@ import SubscribeForm from '../components/SubscribeForm';
 import Button from '../components/Button';
 import metamaskLogoImage from '../assets/metamask-logo.png';
 import ledgerLogoImage from '../assets/ledger-logo.svg';
+import walletConnectLogoImage from '../assets/walletconnect-blue.svg';
 import trezorLogoImage from '../assets/trezor-logo.svg';
-// import WalletConnectLogo from '../components/WalletConnectLogo';
-// import walletConnectWhite from '../assets/walletconnect-white.svg';
 import { accountUpdateAccountAddress } from '../reducers/_account';
 import { getLocal } from '../helpers/utilities';
 import { modalOpen } from '../reducers/_modal';
@@ -68,6 +67,18 @@ const StyledMetamaskConnect = styled.div`
   }
 `;
 
+const StyledWalletConnect = styled.div`
+  & p {
+    margin: 43px 20px 0 196px;
+  }
+
+  @media screen and (max-width: 736px) {
+    & p {
+      display: none;
+    }
+  }
+`;
+
 const StyledMetamaskLogo = styled.div`
   position: absolute;
   top: 0;
@@ -78,13 +89,6 @@ const StyledMetamaskLogo = styled.div`
   background-size: 100%;
   border-radius: 10px 0 0 10px;
 `;
-
-// const StyledWalletConnect = styled(Column)`
-//   padding: 15px;
-//   & > * {
-//     margin: 24px;
-//   }
-// `;
 
 const StyledHardwareWallets = styled.div`
   & p {
@@ -126,6 +130,17 @@ const StyledLedgerLogo = styled.div`
   }
 `;
 
+const StyledWalletConnectLogo = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 173px;
+  height: 102px;
+  background: url(${walletConnectLogoImage});
+  background-size: contain;
+  background-repeat: no-repeat;
+`;
+
 const StyledTrezorLogo = styled.div`
   position: absolute;
   top: 22px;
@@ -156,6 +171,15 @@ const StyledMetamaskButton = StyledConnectButton.extend`
 `;
 
 const StyledLedgerButton = StyledConnectButton.extend`
+  &:hover {
+    background: #454852;
+  }
+  &:active {
+    background: #2b2d33;
+  }
+`;
+
+const StyledWalletConnectButton = StyledConnectButton.extend`
   &:hover {
     background: #454852;
   }
@@ -214,17 +238,23 @@ class Home extends Component {
         </StyledCardContainer>
       </StyledCardTrezor>
 
-      {/* <StyledConnect>
-            <WalletConnectLogo />
-            <Button
+    {/*
+      <StyledCard>
+        <StyledCardContainer>
+          <StyledWalletConnect>
+            <StyledWalletConnectLogo />
+            <p>Connect and sign with your WalletConnect-enabled mobile wallet.</p>
+            <StyledWalletConnectButton
               left
               color="walletconnect"
-              icon={walletConnectWhite}
               onClick={this.onWalletConnectInit}
             >
               {lang.t('button.connect_walletconnect')}
-            </Button>
-          </StyledConnect> */}
+            </StyledWalletConnectButton>
+          </StyledWalletConnect>
+        </StyledCardContainer>
+      </StyledCard>
+    */}
     </BaseLayout>
   );
 }

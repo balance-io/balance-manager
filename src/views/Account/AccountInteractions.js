@@ -2,19 +2,19 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import lang from '../languages';
-import Card from './Card';
-import ButtonCustom from './ButtonCustom';
-import LineBreak from './LineBreak';
-import Blockie from './Blockie';
-import AssetIcon from './AssetIcon';
-import HoverWrapper from './HoverWrapper';
-import ToggleIndicator from './ToggleIndicator';
-import TransactionStatus from './TransactionStatus';
-import etherscanLogo from '../assets/etherscan-logo.svg';
-import ethplorerLogo from '../assets/ethplorer-logo.svg';
-import { getLocalTimeDate } from '../helpers/time';
-import { colors, fonts, shadows, responsive } from '../styles';
+import lang from '../../languages';
+import Card from '../../components/Card';
+import ButtonCustom from '../../components/ButtonCustom';
+import LineBreak from '../../components/LineBreak';
+import Blockie from '../../components/Blockie';
+import AssetIcon from '../../components/AssetIcon';
+import HoverWrapper from '../../components/HoverWrapper';
+import ToggleIndicator from '../../components/ToggleIndicator';
+import TransactionStatus from '../../components/TransactionStatus';
+import etherscanLogo from '../../assets/etherscan-logo.svg';
+import ethplorerLogo from '../../assets/ethplorer-logo.svg';
+import { getLocalTimeDate } from '../../helpers/time';
+import { colors, fonts, shadows, responsive } from '../../styles';
 
 const StyledGrid = styled.div`
   width: 100%;
@@ -216,7 +216,7 @@ const StyledMessage = styled.div`
   font-weight: ${fonts.weight.medium};
 `;
 
-class AccountViewInteractions extends Component {
+class AccountInteractions extends Component {
   state = {
     showTxDetails: null,
     showAllInteractions: false
@@ -398,7 +398,7 @@ class AccountViewInteractions extends Component {
   };
 }
 
-AccountViewInteractions.propTypes = {
+AccountInteractions.propTypes = {
   transactions: PropTypes.array.isRequired,
   fetchingTransactions: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
@@ -415,4 +415,4 @@ const reduxProps = ({ account }) => ({
   nativeCurrency: account.nativeCurrency
 });
 
-export default connect(reduxProps, null)(AccountViewInteractions);
+export default connect(reduxProps, null)(AccountInteractions);

@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
-import { apiGetGasPrices } from '../helpers/api';
+import { apiGetGasPrices } from '../handlers/api';
 import lang from '../languages';
-import ethUnits from '../libraries/ethereum-units.json';
+import ethUnits from '../references/ethereum-units.json';
 import {
   convertAmountToBigNumber,
   convertAssetAmountFromNativeValue,
@@ -9,14 +9,16 @@ import {
   countDecimalPlaces,
   formatFixedDecimals
 } from '../helpers/bignumber';
-import { parseError, parseGasPrices, parseGasPricesTxFee } from '../helpers/parsers';
+import { parseError, parseGasPrices, parseGasPricesTxFee } from '../handlers/parsers';
 import {
   web3MetamaskSendTransaction,
   web3MetamaskTransferToken,
   web3LedgerSendTransaction,
   web3LedgerTransferToken,
+  web3WalletConnectSendTransaction,
+  web3WalletConnectTransferToken,
   estimateGasLimit
-} from '../helpers/web3';
+} from '../handlers/web3';
 import { notificationShow } from './_notification';
 import { accountUpdateTransactions } from './_account';
 
@@ -46,6 +48,14 @@ const SEND_TOKEN_LEDGER_REQUEST = 'send/SEND_TOKEN_LEDGER_REQUEST';
 const SEND_TOKEN_LEDGER_SUCCESS = 'send/SEND_TOKEN_LEDGER_SUCCESS';
 const SEND_TOKEN_LEDGER_FAILURE = 'send/SEND_TOKEN_LEDGER_FAILURE';
 
+const SEND_ETHER_WALLETCONNECT_REQUEST = 'send/SEND_ETHER_WALLETCONNECT_REQUEST';
+const SEND_ETHER_WALLETCONNECT_SUCCESS = 'send/SEND_ETHER_WALLETCONNECT_SUCCESS';
+const SEND_ETHER_WALLETCONNECT_FAILURE = 'send/SEND_ETHER_WALLETCONNECT_FAILURE';
+
+const SEND_TOKEN_WALLETCONNECT_REQUEST = 'send/SEND_TOKEN_WALLETCONNECT_REQUEST';
+const SEND_TOKEN_WALLETCONNECT_SUCCESS = 'send/SEND_TOKEN_WALLETCONNECT_SUCCESS';
+const SEND_TOKEN_WALLETCONNECT_FAILURE = 'send/SEND_TOKEN_WALLETCONNECT_FAILURE';
+
 const SEND_TOGGLE_CONFIRMATION_VIEW = 'send/SEND_TOGGLE_CONFIRMATION_VIEW';
 
 const SEND_UPDATE_NATIVE_AMOUNT = 'send/SEND_UPDATE_NATIVE_AMOUNT';
@@ -53,16 +63,21 @@ const SEND_UPDATE_NATIVE_AMOUNT = 'send/SEND_UPDATE_NATIVE_AMOUNT';
 const SEND_UPDATE_RECIPIENT = 'send/SEND_UPDATE_RECIPIENT';
 const SEND_UPDATE_CRYPTO_AMOUNT = 'send/SEND_UPDATE_CRYPTO_AMOUNT';
 const SEND_UPDATE_SELECTED = 'send/SEND_UPDATE_SELECTED';
-const SEND_UPDATE_PRIVATE_KEY = 'send/SEND_UPDATE_PRIVATE_KEY';
 
 const SEND_CLEAR_FIELDS = 'send/SEND_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
-export const sendModalInit = (address, selected) => (dispatch, getState) => {
-  dispatch({ type: SEND_GET_GAS_PRICES_REQUEST, payload: { address, selected } });
-  const { prices } = getState().account;
+export const sendModalInit = () => (dispatch, getState) => {
+  const { accountInfo, prices } = getState().account;
   const { gasLimit } = getState().send;
+  const selected = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+  const address = accountInfo.address;
+  const fallbackGasPrices = parseGasPrices(null, prices, gasLimit);
+  dispatch({
+    type: SEND_GET_GAS_PRICES_REQUEST,
+    payload: { address, selected, gasPrices: fallbackGasPrices }
+  });
   apiGetGasPrices()
     .then(({ data }) => {
       const gasPrices = parseGasPrices(data, prices, gasLimit);
@@ -73,7 +88,7 @@ export const sendModalInit = (address, selected) => (dispatch, getState) => {
     })
     .catch(error => {
       console.error(error);
-      const fallbackGasPrices = parseGasPrices(null, prices, gasLimit);
+
       dispatch({ type: SEND_GET_GAS_PRICES_FAILURE, payload: fallbackGasPrices });
     });
 };
@@ -291,6 +306,88 @@ export const sendTokenLedger = ({
     });
 };
 
+export const sendEtherWalletConnect = ({
+  address,
+  recipient,
+  amount,
+  selectedAsset,
+  gasPrice,
+  gasLimit
+}) => (dispatch, getState) => {
+  dispatch({ type: SEND_ETHER_WALLETCONNECT_REQUEST });
+  web3WalletConnectSendTransaction({
+    from: address,
+    to: recipient,
+    value: amount,
+    gasPrice: gasPrice.value.amount,
+    gasLimit: gasLimit
+  })
+    .then(txHash => {
+      const txDetails = {
+        hash: txHash,
+        from: address,
+        to: recipient,
+        nonce: null,
+        value: amount,
+        gasPrice: gasPrice.value.amount,
+        gasLimit: gasLimit,
+        asset: selectedAsset
+      };
+      dispatch(accountUpdateTransactions(txDetails));
+      dispatch({
+        type: SEND_ETHER_WALLETCONNECT_SUCCESS,
+        payload: txHash
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: SEND_ETHER_WALLETCONNECT_FAILURE });
+    });
+};
+
+export const sendTokenWalletConnect = ({
+  address,
+  recipient,
+  amount,
+  selectedAsset,
+  gasPrice,
+  gasLimit
+}) => (dispatch, getState) => {
+  dispatch({ type: SEND_TOKEN_WALLETCONNECT_REQUEST });
+  web3WalletConnectTransferToken({
+    tokenObject: selectedAsset,
+    from: address,
+    to: recipient,
+    nonce: null,
+    amount: amount,
+    gasPrice: gasPrice.value.amount,
+    gasLimit: gasLimit
+  })
+    .then(txHash => {
+      const txDetails = {
+        hash: txHash,
+        from: address,
+        to: recipient,
+        nonce: null,
+        value: amount,
+        gasPrice: gasPrice.value.amount,
+        gasLimit: gasLimit,
+        asset: selectedAsset
+      };
+      dispatch(accountUpdateTransactions(txDetails));
+      dispatch({
+        type: SEND_TOKEN_WALLETCONNECT_SUCCESS,
+        payload: txHash
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: SEND_TOKEN_WALLETCONNECT_FAILURE });
+    });
+};
+
 export const sendToggleConfirmationView = boolean => (dispatch, getState) => {
   let confirm = boolean;
   if (!confirm) {
@@ -367,9 +464,12 @@ export default (state = INITIAL_STATE, action) => {
     case SEND_GET_GAS_PRICES_REQUEST:
       return {
         ...state,
+        fetchingGasPrices: true,
         address: action.payload.address,
         selected: action.payload.selected,
-        fetchingGasPrices: true
+        gasPrice: action.payload.gasPrices.average,
+        gasPrices: action.payload.gasPrices,
+        gasPriceOption: action.payload.gasPrices.average.option
       };
     case SEND_GET_GAS_PRICES_SUCCESS:
       return {
@@ -404,6 +504,9 @@ export default (state = INITIAL_STATE, action) => {
     case SEND_ETHER_LEDGER_REQUEST:
     case SEND_TOKEN_LEDGER_REQUEST:
       return { ...state, fetching: true };
+    case SEND_ETHER_WALLETCONNECT_REQUEST:
+    case SEND_TOKEN_WALLETCONNECT_REQUEST:
+      return { ...state, fetching: true };
     case SEND_ETHER_METAMASK_SUCCESS:
     case SEND_TOKEN_METAMASK_SUCCESS:
     case SEND_ETHER_LEDGER_SUCCESS:
@@ -414,10 +517,26 @@ export default (state = INITIAL_STATE, action) => {
         gasPrices: {},
         txHash: action.payload
       };
+    case SEND_ETHER_WALLETCONNECT_SUCCESS:
+    case SEND_TOKEN_WALLETCONNECT_SUCCESS:
+      return {
+        ...state,
+        fetching: false,
+        gasPrices: {},
+        txHash: action.payload
+      };
     case SEND_ETHER_METAMASK_FAILURE:
     case SEND_TOKEN_METAMASK_FAILURE:
     case SEND_ETHER_LEDGER_FAILURE:
     case SEND_TOKEN_LEDGER_FAILURE:
+      return {
+        ...state,
+        fetching: false,
+        txHash: '',
+        confirm: false
+      };
+    case SEND_ETHER_WALLETCONNECT_FAILURE:
+    case SEND_TOKEN_WALLETCONNECT_FAILURE:
       return {
         ...state,
         fetching: false,
@@ -440,11 +559,6 @@ export default (state = INITIAL_STATE, action) => {
       };
     case SEND_UPDATE_SELECTED:
       return { ...state, selected: action.payload };
-    case SEND_UPDATE_PRIVATE_KEY:
-      return {
-        ...state,
-        privateKey: action.payload
-      };
     case SEND_CLEAR_FIELDS:
       return { ...state, ...INITIAL_STATE };
     default:

@@ -247,17 +247,6 @@ class ExchangeModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
-        switch (this.props.accountType) {
-          case 'METAMASK':
-            this.props.exchangeEtherMetamask(request);
-            break;
-          case 'LEDGER':
-            this.props.exchangeEtherLedger(request);
-            break;
-          default:
-            this.props.exchangeEtherMetamask(request);
-            break;
-        }
       } else {
         const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
         const etherBalanceAmount = ethereum.balance.amount;
@@ -273,6 +262,25 @@ class ExchangeModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
+      }
+      this.props.exchangeToggleConfirmationView(true);
+    } else {
+      if (this.props.depositSelected.symbol === 'ETH') {
+        switch (this.props.accountType) {
+          case 'METAMASK':
+            this.props.exchangeEtherMetamask(request);
+            break;
+          case 'LEDGER':
+            this.props.exchangeEtherLedger(request);
+            break;
+          case 'WALLETCONNECT':
+            this.props.sendEtherWalletConnect(request);
+            break;
+          default:
+            this.props.exchangeEtherMetamask(request);
+            break;
+        }
+      } else {
         switch (this.props.accountType) {
           case 'METAMASK':
             this.props.exchangeTokenMetamask(request);
@@ -280,13 +288,15 @@ class ExchangeModal extends Component {
           case 'LEDGER':
             this.props.exchangeTokenLedger(request);
             break;
+          case 'WALLETCONNECT':
+            this.props.sendTokenWalletConnect(request);
+            break;
           default:
             this.props.exchangeTokenMetamask(request);
             break;
         }
       }
     }
-    this.props.exchangeToggleConfirmationView(true);
   };
   onClose = () => {
     this.props.exchangeClearFields();

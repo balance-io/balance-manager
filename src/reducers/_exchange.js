@@ -121,6 +121,7 @@ export const exchangeToggleConfirmationView = boolean => (dispatch, getState) =>
 export const exchangeUpdateDepositAmount = depositAmount => (dispatch, getState) => {
   let { withdrawalAmount } = getState().exchange;
   const { exchangeDetails } = getState().exchange;
+  depositAmount = depositAmount.replace(/[^0-9.]/g, '');
   if (depositAmount) {
     withdrawalAmount = multiply(depositAmount, exchangeDetails.rate);
     withdrawalAmount = formatInputDecimals(withdrawalAmount, depositAmount);
@@ -136,6 +137,7 @@ export const exchangeUpdateDepositAmount = depositAmount => (dispatch, getState)
 export const exchangeUpdateWithdrawalAmount = withdrawalAmount => (dispatch, getState) => {
   let { depositAmount } = getState().exchange;
   const { exchangeDetails } = getState().exchange;
+  withdrawalAmount = withdrawalAmount.replace(/[^0-9.]/g, '');
   if (withdrawalAmount) {
     depositAmount = divide(withdrawalAmount, exchangeDetails.rate);
     depositAmount = formatInputDecimals(depositAmount, withdrawalAmount);

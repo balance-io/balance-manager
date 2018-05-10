@@ -538,14 +538,12 @@ export const parseAccountBalancesPrices = (account = null, nativePrices = null, 
  * @param  {Object} [txDetails=null]
  * @param  {Object} [transactions=null]
  * @param  {Object} [nativeCurrency='']
- * @param  {String} [address='']
- * @param  {String} [network='']
  * @return {String}
  */
 export const parseNewTransaction = async (
   txDetails = null,
   transactions = null,
-  nativeSelected = ''
+  nativeCurrency = ''
 ) => {
   let _transactions = [...transactions];
 
@@ -581,7 +579,7 @@ export const parseNewTransaction = async (
 
   const timestamp = Date.now();
   const assetSymbol = tx.asset.symbol;
-  tx.native = { selected: nativeCurrencies[nativeSelected] };
+  tx.native = { selected: nativeCurrencies[nativeCurrency] };
 
   const response = await apiGetHistoricalPrices(assetSymbol, timestamp);
 

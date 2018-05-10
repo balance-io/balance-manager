@@ -27,7 +27,6 @@ import {
   exchangeMaxBalance
 } from '../reducers/_exchange';
 import { notificationShow } from '../reducers/_notification';
-import { isValidAddress } from '../helpers/validators';
 import {
   convertAmountFromBigNumber,
   convertAmountToDisplay,
@@ -231,10 +230,7 @@ class ExchangeModal extends Component {
       return;
     }
     if (!this.props.confirm) {
-      if (!isValidAddress(this.props.recipient)) {
-        this.props.notificationShow(lang.t('notification.error.invalid_address'), true);
-        return;
-      } else if (this.props.depositSelected.symbol === 'ETH') {
+      if (this.props.depositSelected.symbol === 'ETH') {
         const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
         const balanceAmount = ethereum.balance.amount;
         const balance = convertAmountFromBigNumber(balanceAmount);

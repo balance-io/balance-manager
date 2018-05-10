@@ -1,13 +1,28 @@
-import { apiShapeshiftGetCurrencies, apiShapeshiftGetMarketInfo } from '../handlers/api';
-import { parseError } from '../handlers/parsers';
-import { multiply, divide, formatInputDecimals } from '../helpers/bignumber';
+import BigNumber from 'bignumber.js';
+import {
+  apiShapeshiftGetCurrencies,
+  apiShapeshiftGetMarketInfo,
+  apiGetGasPrices
+} from '../handlers/api';
+import { parseError, parseGasPrices } from '../handlers/parsers';
+import {
+  multiply,
+  divide,
+  formatInputDecimals,
+  convertAmountFromBigNumber
+} from '../helpers/bignumber';
 import { notificationShow } from './_notification';
+import ethUnits from '../references/ethereum-units.json';
 
 // -- Constants ------------------------------------------------------------- //
 
 const EXCHANGE_GET_AVAILABLE_REQUEST = 'exchange/EXCHANGE_GET_AVAILABLE_REQUEST';
 const EXCHANGE_GET_AVAILABLE_SUCCESS = 'exchange/EXCHANGE_GET_AVAILABLE_SUCCESS';
 const EXCHANGE_GET_AVAILABLE_FAILURE = 'exchange/EXCHANGE_GET_AVAILABLE_FAILURE';
+
+const EXCHANGE_GET_GAS_PRICE_REQUEST = 'exchange/EXCHANGE_GET_GAS_PRICE_REQUEST';
+const EXCHANGE_GET_GAS_PRICE_SUCCESS = 'exchange/EXCHANGE_GET_GAS_PRICE_SUCCESS';
+const EXCHANGE_GET_GAS_PRICE_FAILURE = 'exchange/EXCHANGE_GET_GAS_PRICE_FAILURE';
 
 const EXCHANGE_GET_MARKET_INFO_REQUEST = 'exchange/EXCHANGE_GET_MARKET_INFO_REQUEST';
 const EXCHANGE_GET_MARKET_INFO_SUCCESS = 'exchange/EXCHANGE_GET_MARKET_INFO_SUCCESS';
@@ -41,6 +56,23 @@ export const exchangeUpdateExchangeRate = () => (dispatch, getState) => {
     });
 };
 
+export const exchangeGetGasPrices = () => (dispatch, getState) => {
+  const { prices } = getState().account;
+  const { gasLimit } = getState().exchange;
+  dispatch({ type: EXCHANGE_GET_GAS_PRICE_REQUEST });
+  apiGetGasPrices()
+    .then(({ data }) => {
+      const gasPrices = parseGasPrices(data, prices, gasLimit);
+      const gasPrice = gasPrices.average;
+      dispatch({ type: EXCHANGE_GET_GAS_PRICE_SUCCESS, payload: gasPrice });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: EXCHANGE_GET_GAS_PRICE_FAILURE });
+    });
+};
+
 export const exchangeModalInit = () => (dispatch, getState) => {
   const { accountAddress, accountInfo } = getState().account;
   const depositSelected = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
@@ -59,6 +91,7 @@ export const exchangeModalInit = () => (dispatch, getState) => {
         type: EXCHANGE_GET_AVAILABLE_SUCCESS,
         payload: { withdrawalAssets, depositAssets, withdrawalSelected: withdrawalAssets[1] }
       });
+      dispatch(exchangeGetGasPrices());
       dispatch(exchangeUpdateExchangeRate());
     })
     .catch(error => {
@@ -150,23 +183,27 @@ export const exchangeUpdateWithdrawalAmount = withdrawalAmount => (dispatch, get
   });
 };
 
-// export const exchangeMaxBalance = () => (dispatch, getState) => {
-//   const { selected, gasPrice } = getState().send;
-//   const { accountInfo } = getState().account;
-//   if (selected.symbol === 'ETH') {
-//     const ethereum = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
-//     const balanceAmount = ethereum.balance.amount;
-//     const txFeeAmount = gasPrice.txFee.value.amount;
-//     const remaining = BigNumber(balanceAmount)
-//       .minus(BigNumber(txFeeAmount))
-//       .toNumber();
-//     const ether = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
-//     dispatch(sendUpdateAssetAmount(ether));
-//   } else {
-//     dispatch(sendUpdateAssetAmount(convertAmountFromBigNumber(selected.balance.amount)));
-//   }
-// };
-//
+export const exchangeMaxBalance = () => (dispatch, getState) => {
+  const { depositSelected, gasPrice, exchangeDetails } = getState().exchange;
+  const { accountInfo } = getState().account;
+  let amount = '';
+  if (depositSelected.symbol === 'ETH') {
+    const ethereum = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+    const balanceAmount = ethereum.balance.amount;
+    const txFeeAmount = gasPrice.txFee.value.amount;
+    const remaining = BigNumber(balanceAmount)
+      .minus(BigNumber(txFeeAmount))
+      .toNumber();
+    amount = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
+  } else {
+    amount = convertAmountFromBigNumber(depositSelected.balance.amount);
+  }
+  if (BigNumber(amount).comparedTo(BigNumber(exchangeDetails.maxLimit)) === 1) {
+    amount = exchangeDetails.maxLimit;
+  }
+  dispatch(exchangeUpdateDepositAmount(amount));
+};
+
 export const exchangeClearFields = () => ({ type: EXCHANGE_CLEAR_FIELDS });
 
 // -- Reducer --------------------------------------------------------------- //
@@ -176,6 +213,8 @@ const INITIAL_STATE = {
   recipient: '',
   txHash: '',
   confirm: false,
+  gasLimit: ethUnits.basic_tx,
+  gasPrice: {},
   exchangeDetails: {},
   depositAssets: [],
   withdrawalAssets: [],
@@ -207,6 +246,22 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         fetching: false,
         withdrawalAssets: []
+      };
+    case EXCHANGE_GET_GAS_PRICE_REQUEST:
+      return {
+        ...state,
+        fetching: true
+      };
+    case EXCHANGE_GET_GAS_PRICE_SUCCESS:
+      return {
+        ...state,
+        fetching: false,
+        gasPrice: action.payload
+      };
+    case EXCHANGE_GET_GAS_PRICE_FAILURE:
+      return {
+        ...state,
+        fetching: false
       };
     case EXCHANGE_GET_MARKET_INFO_SUCCESS:
       return {

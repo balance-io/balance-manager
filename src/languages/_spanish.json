@@ -81,7 +81,9 @@
       "deposit_dropdown_label": "Cambiar mi",
       "withdrawal_dropdown_label": "por",
       "deposit_input_label": "Pagar",
-      "withdrawal_input_label": "Obtener"
+      "withdrawal_input_label": "Obtener",
+      "tx_fee": "Tarifa de transacción",
+      "exchange_fee": "Tarifa de cambio"
     },
     "message": {
       "web3_not_available": "Instala la Chrome extension de MetaMask",

@@ -23,7 +23,8 @@ import {
   exchangeUpdateDepositAmount,
   exchangeUpdateDepositSelected,
   exchangeUpdateWithdrawalSelected,
-  exchangeToggleConfirmationView
+  exchangeToggleConfirmationView,
+  exchangeMaxBalance
 } from '../reducers/_exchange';
 import { notificationShow } from '../reducers/_notification';
 import { isValidAddress } from '../helpers/validators';
@@ -196,6 +197,12 @@ const StyledActions = styled.div`
   }
 `;
 
+const StyledFees = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 class ExchangeModal extends Component {
   componentDidMount() {
     this.props.exchangeModalInit();
@@ -203,7 +210,7 @@ class ExchangeModal extends Component {
   onChangeDepositSelected = value => this.props.exchangeUpdateDepositSelected(value);
   onChangeWithdrawalSelected = value => this.props.exchangeUpdateWithdrawalSelected(value);
   onGoBack = () => this.props.exchangeToggleConfirmationView(false);
-  // onExchangeMaxBalance = () => this.props.exchangeMaxBalance();
+  onExchangeMaxBalance = () => this.props.exchangeMaxBalance();
   onExchangeAnother = () => {
     this.props.exchangeToggleConfirmationView(false);
     this.props.exchangeClearFields();
@@ -383,6 +390,29 @@ class ExchangeModal extends Component {
           ) === 1
         : false
       : false;
+    const exchangeFeeValue = exchangeDetails
+      ? convertAmountToDisplay(
+          convertAmountToBigNumber(exchangeDetails.minerFee),
+          null,
+          this.props.withdrawalSelected
+        )
+      : null;
+    const exchangeFeeNative =
+      exchangeDetails && depositPrices
+        ? convertAmountToDisplay(
+            convertAmountToBigNumber(
+              multiply(
+                exchangeDetails.minerFee,
+                multiply(
+                  convertAmountFromBigNumber(depositPrices.price.amount),
+                  divide(1, exchangeDetails.rate)
+                )
+              )
+            ),
+            this.props.prices
+          )
+        : null;
+
     return (
       <Card allowOverflow background="lightGrey" fetching={this.props.fetching}>
         {!this.props.txHash ? (
@@ -479,7 +509,7 @@ class ExchangeModal extends Component {
                         )
                       }
                     />
-                    <StyledMaxBalance onClick={this.onExchangeEntireBalance}>
+                    <StyledMaxBalance onClick={this.onExchangeMaxBalance}>
                       {lang.t('modal.exchange_max')}
                     </StyledMaxBalance>
                     <StyledAmountCurrency>{this.props.depositSelected.symbol}</StyledAmountCurrency>
@@ -553,6 +583,30 @@ class ExchangeModal extends Component {
               <StyledBottomModal>
                 <StyledActions>
                   <Button onClick={this.onClose}>{lang.t('button.cancel')}</Button>
+                  <StyledFees>
+                    <StyledParagraph>
+                      <span>{`${lang.t('modal.tx_fee')}: `}</span>
+                      <span>{`${
+                        Object.keys(this.props.gasPrice).length
+                          ? this.props.gasPrice.txFee.native.value.display
+                          : '$0.00'
+                      }${
+                        this.props.nativeCurrency !== 'ETH'
+                          ? ` (${
+                              Object.keys(this.props.gasPrice).length
+                                ? this.props.gasPrice.txFee.value.display
+                                : '0.000 ETH'
+                            })`
+                          : ''
+                      }`}</span>
+                    </StyledParagraph>
+                    <StyledParagraph>
+                      <span>{`${lang.t('modal.exchange_fee')}: `}</span>
+                      <span>{`${exchangeFeeNative ? exchangeFeeNative : '$0.00'}${
+                        exchangeFeeValue ? ` (${exchangeFeeValue})` : ''
+                      }`}</span>
+                    </StyledParagraph>
+                  </StyledFees>
                   <Button
                     left
                     color="brightGreen"
@@ -642,8 +696,10 @@ ExchangeModal.propTypes = {
   exchangeUpdateDepositSelected: PropTypes.func.isRequired,
   exchangeUpdateWithdrawalSelected: PropTypes.func.isRequired,
   exchangeToggleConfirmationView: PropTypes.func.isRequired,
+  exchangeMaxBalance: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
+  gasPrice: PropTypes.object.isRequired,
   address: PropTypes.string.isRequired,
   recipient: PropTypes.string.isRequired,
   txHash: PropTypes.string.isRequired,
@@ -664,6 +720,7 @@ ExchangeModal.propTypes = {
 
 const reduxProps = ({ modal, exchange, account }) => ({
   fetching: exchange.fetching,
+  gasPrice: exchange.gasPrice,
   address: exchange.address,
   recipient: exchange.recipient,
   txHash: exchange.txHash,
@@ -691,5 +748,6 @@ export default connect(reduxProps, {
   exchangeUpdateDepositSelected,
   exchangeUpdateWithdrawalSelected,
   exchangeToggleConfirmationView,
+  exchangeMaxBalance,
   notificationShow
 })(ExchangeModal);

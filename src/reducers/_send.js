@@ -7,8 +7,7 @@ import {
   convertAmountToBigNumber,
   convertAssetAmountFromNativeValue,
   convertAssetAmountToNativeValue,
-  countDecimalPlaces,
-  formatFixedDecimals
+  formatInputDecimals
 } from '../helpers/bignumber';
 import { parseError, parseGasPrices, parseGasPricesTxFee } from '../handlers/parsers';
 import {
@@ -416,11 +415,8 @@ export const sendUpdateAssetAmount = assetAmount => (dispatch, getState) => {
   const _assetAmount = assetAmount.replace(/[^0-9.]/g, '');
   let _nativeAmount = '';
   if (_assetAmount.length && prices[nativeCurrency][selected.symbol]) {
-    const _assetAmountDecimalPlaces = countDecimalPlaces(_assetAmount);
     const nativeAmount = convertAssetAmountToNativeValue(_assetAmount, selected, prices);
-    const _nativeAmountDecimalPlaces =
-      _assetAmountDecimalPlaces > 8 ? _assetAmountDecimalPlaces : 8;
-    _nativeAmount = formatFixedDecimals(nativeAmount, _nativeAmountDecimalPlaces);
+    _nativeAmount = formatInputDecimals(nativeAmount, _assetAmount);
   }
   dispatch({
     type: SEND_UPDATE_ASSET_AMOUNT,
@@ -434,11 +430,8 @@ export const sendUpdateNativeAmount = nativeAmount => (dispatch, getState) => {
   const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
   let _assetAmount = '';
   if (_nativeAmount.length && prices[nativeCurrency][selected.symbol]) {
-    const _nativeAmountDecimalPlaces = countDecimalPlaces(_nativeAmount);
     const assetAmount = convertAssetAmountFromNativeValue(_nativeAmount, selected, prices);
-    const _assetAmountDecimalPlaces =
-      _nativeAmountDecimalPlaces > 8 ? _nativeAmountDecimalPlaces : 8;
-    _assetAmount = formatFixedDecimals(assetAmount, _assetAmountDecimalPlaces);
+    _assetAmount = formatInputDecimals(assetAmount, _nativeAmount);
   }
   dispatch({
     type: SEND_UPDATE_ASSET_AMOUNT,

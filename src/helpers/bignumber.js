@@ -224,22 +224,26 @@ export const convertAssetAmountFromNativeAmount = (value, asset, nativePrices) =
 };
 
 /**
- * @desc format value string to fixed decimals
- * @param  {String}   value
- * @param  {Number}   decimals
- * @return {String}
- */
-export const formatFixedDecimals = (value, decimals) =>
-  BigNumber(BigNumber(`${value}`).toFixed(BigNumber(`${decimals}`).toNumber()))
-    .toFormat()
-    .replace(',', '');
-
-/**
  * @desc count value's number of decimals places
  * @param  {String}   value
  * @return {String}
  */
 export const countDecimalPlaces = value => BigNumber(`${value}`).dp();
+
+/**
+ * @desc format inputOne value to signficant decimals given inputTwo
+ * @param  {String}   inputOne
+ * @param  {String}   inputTwo
+ * @return {String}
+ */
+export const formatInputDecimals = (inputOne, inputTwo) => {
+  const _nativeAmountDecimalPlaces = countDecimalPlaces(inputTwo);
+  const decimals = _nativeAmountDecimalPlaces > 8 ? _nativeAmountDecimalPlaces : 8;
+  const result = BigNumber(BigNumber(`${inputOne}`).toFixed(BigNumber(`${decimals}`).toNumber()))
+    .toFormat()
+    .replace(/,/g, '');
+  return result;
+};
 
 /**
  * @desc convert hex to number string
@@ -279,4 +283,15 @@ export const hasLowMarketValue = asset =>
 export const multiply = (numberOne, numberTwo) =>
   BigNumber(`${numberOne}`)
     .times(BigNumber(`${numberTwo}`))
+    .toString();
+
+/**
+ * @desc divides two numbers
+ * @param  {Number}   numberOne
+ * @param  {Number}   numberTwo
+ * @return {String}
+ */
+export const divide = (numberOne, numberTwo) =>
+  BigNumber(`${numberOne}`)
+    .dividedBy(BigNumber(`${numberTwo}`))
     .toString();

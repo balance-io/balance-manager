@@ -138,7 +138,7 @@ class DropdownAsset extends Component {
                     ? this.props.selected === 'ETH' ? 'ETH' : options[this.props.selected].address
                     : 'ETH'
                 }
-                image={!empty ? options[this.props.selected].image || '' : ''}
+                image={!empty ? options[this.props.selected].img || '' : ''}
               />
               <p>{!empty ? ellipseText(options[this.props.selected].name, 30) : 'Ethereum'}</p>
             </StyledAsset>
@@ -164,7 +164,7 @@ class DropdownAsset extends Component {
                   <AssetIcon
                     size={18}
                     asset={key === 'ETH' ? 'ETH' : options[key].address}
-                    image={options[key].image || ''}
+                    image={options[key].img || ''}
                   />
                   <p>{ellipseText(options[key].name, 30)}</p>
                 </StyledAsset>

@@ -104,15 +104,29 @@ export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') =>
   axios.get(`/.netlify/functions/transaction-status?hash=${hash}&network=${network}`);
 
 /**
+ * Configuration for balance proxy api
+ * @type axios instance
+ */
+const balanceProxy = axios.create({
+  baseURL: 'https://indexer.balance.io',
+  timeout: 30000, // 30 secs
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
+  }
+});
+
+/**
  * @desc shapeshift get coins
  * @return {Promise}
  */
-export const apiShapeshiftGetCoins = () => axios.get(`/.netlify/functions/shapeshift-getcoins`);
+export const apiShapeshiftGetCurrencies = () => balanceProxy.get(`/get_currencies`);
 
 /**
  * @desc shapeshift get market info
- * @param  {String}   [exchangePair = '']
+ * @param  {String}   [depositSelected = '']
+ * @param  {String}   [withdrawalSelected = '']
  * @return {Promise}
  */
-export const apiShapeshiftGetMarketInfo = (exchangePair = '') =>
-  axios.get(`/.netlify/functions/shapeshift-marketinfo?exchangePair=${exchangePair}`);
+export const apiShapeshiftGetMarketInfo = (depositSelected = '', withdrawalSelected = '') =>
+  balanceProxy.get(`/get_market_info?deposit=${depositSelected}&withdrawal=${withdrawalSelected}`);

@@ -1,6 +1,6 @@
-import { apiShapeshiftGetCoins, apiShapeshiftGetMarketInfo } from '../handlers/api';
-import ethTokens from '../references/coinwoke-tokens.json';
+import { apiShapeshiftGetCurrencies, apiShapeshiftGetMarketInfo } from '../handlers/api';
 import { parseError } from '../handlers/parsers';
+import { multiply, divide, formatInputDecimals } from '../helpers/bignumber';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //
@@ -26,12 +26,13 @@ const EXCHANGE_CLEAR_FIELDS = 'exchange/EXCHANGE_CLEAR_FIELDS';
 // -- Actions --------------------------------------------------------------- //
 
 export const exchangeUpdateExchangeRate = () => (dispatch, getState) => {
-  const { withdrawalSelected, depositSelected } = getState().exchange;
-  const exchangePair = `${withdrawalSelected.symbol}_${depositSelected.symbol}`.toLowerCase();
+  const { depositSelected, withdrawalSelected, depositAmount } = getState().exchange;
   dispatch({ type: EXCHANGE_GET_MARKET_INFO_REQUEST });
-  apiShapeshiftGetMarketInfo(exchangePair)
+  apiShapeshiftGetMarketInfo(depositSelected.symbol, withdrawalSelected.symbol)
     .then(({ data }) => {
-      dispatch({ type: EXCHANGE_GET_MARKET_INFO_SUCCESS, payload: data });
+      const exchangeDetails = data[Object.keys(data)[0]];
+      dispatch({ type: EXCHANGE_GET_MARKET_INFO_SUCCESS, payload: exchangeDetails });
+      dispatch(exchangeUpdateDepositAmount(depositAmount));
     })
     .catch(error => {
       const message = parseError(error);
@@ -47,21 +48,13 @@ export const exchangeModalInit = () => (dispatch, getState) => {
     type: EXCHANGE_GET_AVAILABLE_REQUEST,
     payload: { address: accountAddress, depositSelected }
   });
-  apiShapeshiftGetCoins()
+  apiShapeshiftGetCurrencies()
     .then(({ data }) => {
-      const withdrawalAssets = [{ name: 'Ethereum', symbol: 'ETH', image: null, imageSmall: null }];
-      if (data) {
-        Object.keys(data).forEach(key => {
-          if (data[key].status === 'available' && ethTokens.indexOf(key) !== -1) {
-            withdrawalAssets.push(data[key]);
-          }
-        });
-      }
+      const withdrawalAssets = data.available;
       const availableSymbols = withdrawalAssets.map(availableAsset => availableAsset.symbol);
       const depositAssets = accountInfo.assets.filter(
         asset => availableSymbols.indexOf(asset.symbol) !== -1
       );
-
       dispatch({
         type: EXCHANGE_GET_AVAILABLE_SUCCESS,
         payload: { withdrawalAssets, depositAssets, withdrawalSelected: withdrawalAssets[1] }
@@ -126,8 +119,14 @@ export const exchangeToggleConfirmationView = boolean => (dispatch, getState) =>
 };
 
 export const exchangeUpdateDepositAmount = depositAmount => (dispatch, getState) => {
+  let { withdrawalAmount } = getState().exchange;
   const { exchangeDetails } = getState().exchange;
-  const withdrawalAmount = `${depositAmount / exchangeDetails.rate}`;
+  if (depositAmount) {
+    withdrawalAmount = multiply(depositAmount, exchangeDetails.rate);
+    withdrawalAmount = formatInputDecimals(withdrawalAmount, depositAmount);
+  } else {
+    withdrawalAmount = '';
+  }
   dispatch({
     type: EXCHANGE_UPDATE_ASSET_AMOUNT,
     payload: { depositAmount, withdrawalAmount }
@@ -135,8 +134,14 @@ export const exchangeUpdateDepositAmount = depositAmount => (dispatch, getState)
 };
 
 export const exchangeUpdateWithdrawalAmount = withdrawalAmount => (dispatch, getState) => {
+  let { depositAmount } = getState().exchange;
   const { exchangeDetails } = getState().exchange;
-  const depositAmount = `${withdrawalAmount * exchangeDetails.rate}`;
+  if (withdrawalAmount) {
+    depositAmount = divide(withdrawalAmount, exchangeDetails.rate);
+    depositAmount = formatInputDecimals(depositAmount, withdrawalAmount);
+  } else {
+    depositAmount = '';
+  }
   dispatch({
     type: EXCHANGE_UPDATE_ASSET_AMOUNT,
     payload: { depositAmount, withdrawalAmount }

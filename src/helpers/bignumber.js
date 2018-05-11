@@ -295,3 +295,25 @@ export const divide = (numberOne, numberTwo) =>
   BigNumber(`${numberOne}`)
     .dividedBy(BigNumber(`${numberTwo}`))
     .toString();
+
+/**
+ * @desc adds two numbers
+ * @param  {Number}   numberOne
+ * @param  {Number}   numberTwo
+ * @return {String}
+ */
+export const add = (numberOne, numberTwo) =>
+  BigNumber(`${numberOne}`)
+    .plus(BigNumber(`${numberTwo}`))
+    .toString();
+
+/**
+ * @desc subtracts two numbers
+ * @param  {Number}   numberOne
+ * @param  {Number}   numberTwo
+ * @return {String}
+ */
+export const subtract = (numberOne, numberTwo) =>
+  BigNumber(`${numberOne}`)
+    .minus(BigNumber(`${numberTwo}`))
+    .toString();

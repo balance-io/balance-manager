@@ -19,6 +19,7 @@ import { modalClose } from '../reducers/_modal';
 import {
   exchangeClearFields,
   exchangeModalInit,
+  exchangeTransaction,
   exchangeUpdateWithdrawalAmount,
   exchangeUpdateDepositAmount,
   exchangeUpdateDepositSelected,
@@ -30,6 +31,7 @@ import { notificationShow } from '../reducers/_notification';
 import {
   convertAmountFromBigNumber,
   convertAmountToDisplay,
+  subtract,
   multiply,
   divide,
   convertAmountToBigNumber
@@ -268,37 +270,7 @@ class ExchangeModal extends Component {
       }
       this.props.exchangeToggleConfirmationView(true);
     } else {
-      if (this.props.depositSelected.symbol === 'ETH') {
-        switch (this.props.accountType) {
-          case 'METAMASK':
-            this.props.exchangeEtherMetamask(request);
-            break;
-          case 'LEDGER':
-            this.props.exchangeEtherLedger(request);
-            break;
-          case 'WALLETCONNECT':
-            this.props.sendEtherWalletConnect(request);
-            break;
-          default:
-            this.props.exchangeEtherMetamask(request);
-            break;
-        }
-      } else {
-        switch (this.props.accountType) {
-          case 'METAMASK':
-            this.props.exchangeTokenMetamask(request);
-            break;
-          case 'LEDGER':
-            this.props.exchangeTokenLedger(request);
-            break;
-          case 'WALLETCONNECT':
-            this.props.exchangeTokenWalletConnect(request);
-            break;
-          default:
-            this.props.exchangeTokenMetamask(request);
-            break;
-        }
-      }
+      this.props.exchangeTransaction(request);
     }
   };
   onClose = () => {
@@ -363,14 +335,21 @@ class ExchangeModal extends Component {
       : null;
     const withdrawalMin = exchangeDetails
       ? convertAmountToDisplay(
-          convertAmountToBigNumber(multiply(exchangeDetails.min, exchangeDetails.rate)),
+          convertAmountToBigNumber(
+            subtract(multiply(exchangeDetails.min, exchangeDetails.rate), exchangeDetails.minerFee)
+          ),
           null,
           this.props.withdrawalSelected
         )
       : null;
     const withdrawalMax = exchangeDetails
       ? convertAmountToDisplay(
-          convertAmountToBigNumber(multiply(exchangeDetails.maxLimit, exchangeDetails.rate)),
+          convertAmountToBigNumber(
+            subtract(
+              multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
+              exchangeDetails.minerFee
+            )
+          ),
           null,
           this.props.withdrawalSelected
         )
@@ -388,14 +367,24 @@ class ExchangeModal extends Component {
     const withdrawalUnder = exchangeDetails
       ? this.props.withdrawalAmount !== ''
         ? BigNumber(this.props.withdrawalAmount).comparedTo(
-            BigNumber(multiply(exchangeDetails.min, exchangeDetails.rate))
+            BigNumber(
+              subtract(
+                multiply(exchangeDetails.min, exchangeDetails.rate),
+                exchangeDetails.minerFee
+              )
+            )
           ) === -1
         : false
       : false;
     const withdrawalOver = exchangeDetails
       ? this.props.withdrawalAmount !== ''
         ? BigNumber(this.props.withdrawalAmount).comparedTo(
-            BigNumber(multiply(exchangeDetails.maxLimit, exchangeDetails.rate))
+            BigNumber(
+              subtract(
+                multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
+                exchangeDetails.minerFee
+              )
+            )
           ) === 1
         : false
       : false;
@@ -421,7 +410,6 @@ class ExchangeModal extends Component {
             this.props.prices
           )
         : null;
-
     return (
       <Card allowOverflow background="lightGrey" fetching={this.props.fetching}>
         {!this.props.txHash ? (
@@ -700,6 +688,7 @@ ExchangeModal.propTypes = {
   modalClose: PropTypes.func.isRequired,
   exchangeClearFields: PropTypes.func.isRequired,
   exchangeModalInit: PropTypes.func.isRequired,
+  exchangeTransaction: PropTypes.func.isRequired,
   exchangeUpdateWithdrawalAmount: PropTypes.func.isRequired,
   exchangeUpdateDepositAmount: PropTypes.func.isRequired,
   exchangeUpdateDepositSelected: PropTypes.func.isRequired,
@@ -752,6 +741,7 @@ export default connect(reduxProps, {
   modalClose,
   exchangeClearFields,
   exchangeModalInit,
+  exchangeTransaction,
   exchangeUpdateWithdrawalAmount,
   exchangeUpdateDepositAmount,
   exchangeUpdateDepositSelected,

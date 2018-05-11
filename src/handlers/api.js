@@ -130,3 +130,30 @@ export const apiShapeshiftGetCurrencies = () => balanceProxy.get(`/get_currencie
  */
 export const apiShapeshiftGetMarketInfo = (depositSelected = '', withdrawalSelected = '') =>
   balanceProxy.get(`/get_market_info?deposit=${depositSelected}&withdrawal=${withdrawalSelected}`);
+
+/**
+ * @desc shapeshift get fixed price
+ * @param  {String}   [amount = '']
+ * @param  {String}   [exchangePair = '']
+ * @param  {String}   [address = '']
+ * @return {Promise}
+ */
+export const apiShapeshiftGetFixedPrice = (amount = '', exchangePair = '', address = '') =>
+  balanceProxy.post(`/shapeshift_send_amount`, {
+    amount,
+    withdrawal: address,
+    pair: exchangePair,
+    returnAddress: address
+  });
+
+/**
+ * @desc shapeshift get quoted price
+ * @param  {String}   [amount = '']
+ * @param  {String}   [exchangePair = '']
+ * @return {Promise}
+ */
+export const apiShapeshiftGetQuotedPrice = (amount = '', exchangePair = '') =>
+  balanceProxy.post(`/shapeshift_quoted_price_request`, {
+    amount,
+    pair: exchangePair
+  });

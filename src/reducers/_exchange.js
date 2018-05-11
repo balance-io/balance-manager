@@ -5,13 +5,17 @@ import {
   apiGetGasPrices
 } from '../handlers/api';
 import { parseError, parseGasPrices } from '../handlers/parsers';
+import { web3SendTransactionMultiWallet } from '../handlers/web3';
 import {
+  add,
+  subtract,
   multiply,
   divide,
   formatInputDecimals,
   convertAmountFromBigNumber
 } from '../helpers/bignumber';
 import { notificationShow } from './_notification';
+import { accountUpdateTransactions } from './_account';
 import ethUnits from '../references/ethereum-units.json';
 
 // -- Constants ------------------------------------------------------------- //
@@ -27,6 +31,10 @@ const EXCHANGE_GET_GAS_PRICE_FAILURE = 'exchange/EXCHANGE_GET_GAS_PRICE_FAILURE'
 const EXCHANGE_GET_MARKET_INFO_REQUEST = 'exchange/EXCHANGE_GET_MARKET_INFO_REQUEST';
 const EXCHANGE_GET_MARKET_INFO_SUCCESS = 'exchange/EXCHANGE_GET_MARKET_INFO_SUCCESS';
 const EXCHANGE_GET_MARKET_INFO_FAILURE = 'exchange/EXCHANGE_GET_MARKET_INFO_FAILURE';
+
+const EXCHANGE_TRANSACTION_REQUEST = 'exchange/EXCHANGE_TRANSACTION_REQUEST';
+const EXCHANGE_TRANSACTION_SUCCESS = 'exchange/EXCHANGE_TRANSACTION_SUCCESS';
+const EXCHANGE_TRANSACTION_FAILURE = 'exchange/EXCHANGE_TRANSACTION_FAILURE';
 
 const EXCHANGE_TOGGLE_CONFIRMATION_VIEW = 'exchange/EXCHANGE_TOGGLE_CONFIRMATION_VIEW';
 
@@ -156,10 +164,16 @@ export const exchangeUpdateDepositAmount = depositAmount => (dispatch, getState)
   const { exchangeDetails } = getState().exchange;
   depositAmount = depositAmount.replace(/[^0-9.]/g, '');
   if (depositAmount) {
-    withdrawalAmount = multiply(depositAmount, exchangeDetails.rate);
+    withdrawalAmount = subtract(
+      multiply(depositAmount, exchangeDetails.rate),
+      exchangeDetails.minerFee
+    );
     withdrawalAmount = formatInputDecimals(withdrawalAmount, depositAmount);
   } else {
     withdrawalAmount = '';
+  }
+  if (withdrawalAmount && Number(withdrawalAmount) <= 0) {
+    withdrawalAmount = '0';
   }
   dispatch({
     type: EXCHANGE_UPDATE_ASSET_AMOUNT,
@@ -172,10 +186,14 @@ export const exchangeUpdateWithdrawalAmount = withdrawalAmount => (dispatch, get
   const { exchangeDetails } = getState().exchange;
   withdrawalAmount = withdrawalAmount.replace(/[^0-9.]/g, '');
   if (withdrawalAmount) {
-    depositAmount = divide(withdrawalAmount, exchangeDetails.rate);
+    depositAmount = add(withdrawalAmount, exchangeDetails.minerFee);
+    depositAmount = divide(depositAmount, exchangeDetails.rate);
     depositAmount = formatInputDecimals(depositAmount, withdrawalAmount);
   } else {
     depositAmount = '';
+  }
+  if (depositAmount && Number(depositAmount) <= 0) {
+    depositAmount = '0';
   }
   dispatch({
     type: EXCHANGE_UPDATE_ASSET_AMOUNT,
@@ -202,6 +220,37 @@ export const exchangeMaxBalance = () => (dispatch, getState) => {
     amount = exchangeDetails.maxLimit;
   }
   dispatch(exchangeUpdateDepositAmount(amount));
+};
+
+export const exchangeTransaction = ({ address, recipient, amount, asset, gasPrice, gasLimit }) => (
+  dispatch,
+  getState
+) => {
+  dispatch({ type: EXCHANGE_TRANSACTION_REQUEST });
+  const { accountType } = getState().account;
+  const txDetails = {
+    asset: asset,
+    from: address,
+    to: recipient,
+    nonce: null,
+    amount: amount,
+    gasPrice: gasPrice.value.amount,
+    gasLimit: gasLimit
+  };
+  web3SendTransactionMultiWallet(txDetails, accountType)
+    .then(txHash => {
+      txDetails.hash = txHash;
+      dispatch(accountUpdateTransactions(txDetails));
+      dispatch({
+        type: EXCHANGE_TRANSACTION_SUCCESS,
+        payload: txHash
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: EXCHANGE_TRANSACTION_FAILURE });
+    });
 };
 
 export const exchangeClearFields = () => ({ type: EXCHANGE_CLEAR_FIELDS });
@@ -272,6 +321,21 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         confirm: action.payload
+      };
+    case EXCHANGE_TRANSACTION_REQUEST:
+      return { ...state, fetching: true };
+    case EXCHANGE_TRANSACTION_SUCCESS:
+      return {
+        ...state,
+        fetching: false,
+        txHash: action.payload
+      };
+    case EXCHANGE_TRANSACTION_FAILURE:
+      return {
+        ...state,
+        fetching: false,
+        txHash: '',
+        confirm: false
       };
     case EXCHANGE_UPDATE_NATIVE_AMOUNT:
     case EXCHANGE_UPDATE_ASSET_AMOUNT:

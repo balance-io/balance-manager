@@ -1,6 +1,8 @@
-import BigNumber from 'bignumber.js';
 import lang from '../languages';
 import {
+  add,
+  multiply,
+  divide,
   convertAmountToBigNumber,
   convertAmountFromBigNumber,
   convertAmountToDisplay,
@@ -71,16 +73,11 @@ export const parseGasPrices = (data, prices, gasLimit) => {
     };
     gasPrices.fast.txFee = {
       value: {
-        amount: BigNumber(gasPrices.fast.value.amount)
-          .times(BigNumber(`${gasLimit}`))
-          .toString(),
-        display: convertAmountToDisplay(
-          BigNumber(gasPrices.fast.value.amount)
-            .times(BigNumber(`${gasLimit}`))
-            .toString(),
-          null,
-          { symbol: 'ETH', decimals: 18 }
-        )
+        amount: multiply(gasPrices.fast.value.amount, gasLimit),
+        display: convertAmountToDisplay(multiply(gasPrices.fast.value.amount, gasLimit), null, {
+          symbol: 'ETH',
+          decimals: 18
+        })
       },
       native: null
     };
@@ -98,16 +95,11 @@ export const parseGasPrices = (data, prices, gasLimit) => {
     };
     gasPrices.average.txFee = {
       value: {
-        amount: BigNumber(gasPrices.average.value.amount)
-          .times(BigNumber(`${gasLimit}`))
-          .toString(),
-        display: convertAmountToDisplay(
-          BigNumber(gasPrices.average.value.amount)
-            .times(BigNumber(`${gasLimit}`))
-            .toString(),
-          null,
-          { symbol: 'ETH', decimals: 18 }
-        )
+        amount: multiply(gasPrices.average.value.amount, gasLimit),
+        display: convertAmountToDisplay(multiply(gasPrices.average.value.amount, gasLimit), null, {
+          symbol: 'ETH',
+          decimals: 18
+        })
       },
       native: null
     };
@@ -125,16 +117,11 @@ export const parseGasPrices = (data, prices, gasLimit) => {
     };
     gasPrices.slow.txFee = {
       value: {
-        amount: BigNumber(gasPrices.slow.value.amount)
-          .times(BigNumber(`${gasLimit}`))
-          .toString(),
-        display: convertAmountToDisplay(
-          BigNumber(gasPrices.slow.value.amount)
-            .times(BigNumber(`${gasLimit}`))
-            .toString(),
-          null,
-          { symbol: 'ETH', decimals: 18 }
-        )
+        amount: multiply(gasPrices.slow.value.amount, gasLimit),
+        display: convertAmountToDisplay(multiply(gasPrices.slow.value.amount, gasLimit), null, {
+          symbol: 'ETH',
+          decimals: 18
+        })
       },
       native: null
     };
@@ -142,72 +129,42 @@ export const parseGasPrices = (data, prices, gasLimit) => {
     gasPrices.fast = {
       option: 'fast',
       estimatedTime: {
-        amount: BigNumber(`${data.fastWait}`)
-          .times(BigNumber(`${timeUnits.ms.minute}`))
-          .toString(),
-        display: getTimeString(
-          BigNumber(`${data.fastWait}`)
-            .times(BigNumber(`${timeUnits.ms.minute}`))
-            .toString(),
-          'ms'
-        )
+        amount: multiply(data.fastWait, timeUnits.ms.minute),
+        display: getTimeString(multiply(data.fastWait, timeUnits.ms.minute), 'ms')
       },
       value: {
-        amount: `${BigNumber(`${data.fast}`)
-          .dividedBy(10)
-          .times(`${ethUnits.gwei}`)
-          .toString()}`,
-        display: `${BigNumber(`${data.fast}`).dividedBy(10)} Gwei`
+        amount: multiply(divide(data.fast, 10), ethUnits.gwei),
+        display: `${divide(data.fast, 10)} Gwei`
       }
     };
     gasPrices.fast.txFee = {
       value: {
-        amount: BigNumber(gasPrices.fast.value.amount)
-          .times(BigNumber(`${gasLimit}`))
-          .toString(),
-        display: convertAmountToDisplay(
-          BigNumber(gasPrices.fast.value.amount)
-            .times(BigNumber(`${gasLimit}`))
-            .toString(),
-          null,
-          { symbol: 'ETH', decimals: 18 }
-        )
+        amount: multiply(gasPrices.fast.value.amount, gasLimit),
+        display: convertAmountToDisplay(multiply(gasPrices.fast.value.amount, gasLimit), null, {
+          symbol: 'ETH',
+          decimals: 18
+        })
       },
       native: null
     };
     gasPrices.average = {
       option: 'average',
       estimatedTime: {
-        amount: BigNumber(`${data.avgWait}`)
-          .times(BigNumber(`${timeUnits.ms.minute}`))
-          .toString(),
-        display: getTimeString(
-          BigNumber(`${data.avgWait}`)
-            .times(BigNumber(`${timeUnits.ms.minute}`))
-            .toString(),
-          'ms'
-        )
+        amount: multiply(data.avgWait, timeUnits.ms.minute),
+        display: getTimeString(multiply(data.avgWait, timeUnits.ms.minute), 'ms')
       },
       value: {
-        amount: `${BigNumber(`${data.average}`)
-          .dividedBy(10)
-          .times(`${ethUnits.gwei}`)
-          .toString()}`,
-        display: `${BigNumber(`${data.average}`).dividedBy(10)} Gwei`
+        amount: multiply(divide(data.average, 10), ethUnits.gwei),
+        display: `${divide(data.average, 10)} Gwei`
       }
     };
     gasPrices.average.txFee = {
       value: {
-        amount: BigNumber(gasPrices.average.value.amount)
-          .times(BigNumber(`${gasLimit}`))
-          .toString(),
-        display: convertAmountToDisplay(
-          BigNumber(gasPrices.average.value.amount)
-            .times(BigNumber(`${gasLimit}`))
-            .toString(),
-          null,
-          { symbol: 'ETH', decimals: 18 }
-        )
+        amount: multiply(gasPrices.average.value.amount, gasLimit),
+        display: convertAmountToDisplay(multiply(gasPrices.average.value.amount, gasLimit), null, {
+          symbol: 'ETH',
+          decimals: 18
+        })
       },
       native: null
     };
@@ -215,36 +172,21 @@ export const parseGasPrices = (data, prices, gasLimit) => {
     gasPrices.slow = {
       option: 'slow',
       estimatedTime: {
-        amount: BigNumber(`${data.safeLowWait}`)
-          .times(BigNumber(`${timeUnits.ms.minute}`))
-          .toString(),
-        display: getTimeString(
-          BigNumber(`${data.safeLowWait}`)
-            .times(BigNumber(`${timeUnits.ms.minute}`))
-            .toString(),
-          'ms'
-        )
+        amount: multiply(data.safeLowWait, timeUnits.ms.minute),
+        display: getTimeString(multiply(data.safeLowWait, timeUnits.ms.minute), 'ms')
       },
       value: {
-        amount: `${BigNumber(`${data.safeLow}`)
-          .dividedBy(10)
-          .times(`${ethUnits.gwei}`)
-          .toString()}`,
-        display: `${BigNumber(`${data.safeLow}`).dividedBy(10)} Gwei`
+        amount: multiply(divide(data.safeLow, 10), ethUnits.gwei),
+        display: `${divide(data.safeLow, 10)} Gwei`
       }
     };
     gasPrices.slow.txFee = {
       value: {
-        amount: BigNumber(gasPrices.slow.value.amount)
-          .times(BigNumber(`${gasLimit}`))
-          .toString(),
-        display: convertAmountToDisplay(
-          BigNumber(gasPrices.slow.value.amount)
-            .times(BigNumber(`${gasLimit}`))
-            .toString(),
-          null,
-          { symbol: 'ETH', decimals: 18 }
-        )
+        amount: multiply(gasPrices.slow.value.amount, gasLimit),
+        display: convertAmountToDisplay(multiply(gasPrices.slow.value.amount, gasLimit), null, {
+          symbol: 'ETH',
+          decimals: 18
+        })
       },
       native: null
     };
@@ -323,47 +265,32 @@ export const parseGasPrices = (data, prices, gasLimit) => {
 export const parseGasPricesTxFee = (gasPrices, prices, gasLimit) => {
   gasPrices.fast.txFee = {
     value: {
-      amount: BigNumber(gasPrices.fast.value.amount)
-        .times(BigNumber(`${gasLimit}`))
-        .toString(),
-      display: convertAmountToDisplay(
-        BigNumber(gasPrices.fast.value.amount)
-          .times(BigNumber(`${gasLimit}`))
-          .toString(),
-        null,
-        { symbol: 'ETH', decimals: 18 }
-      )
+      amount: multiply(gasPrices.fast.value.amount, gasLimit),
+      display: convertAmountToDisplay(multiply(gasPrices.fast.value.amount, gasLimit), null, {
+        symbol: 'ETH',
+        decimals: 18
+      })
     },
     native: null
   };
   gasPrices.average.txFee = {
     value: {
-      amount: BigNumber(gasPrices.average.value.amount)
-        .times(BigNumber(`${gasLimit}`))
-        .toString(),
-      display: convertAmountToDisplay(
-        BigNumber(gasPrices.average.value.amount)
-          .times(BigNumber(`${gasLimit}`))
-          .toString(),
-        null,
-        { symbol: 'ETH', decimals: 18 }
-      )
+      amount: multiply(gasPrices.average.value.amount, gasLimit),
+      display: convertAmountToDisplay(multiply(gasPrices.average.value.amount, gasLimit), null, {
+        symbol: 'ETH',
+        decimals: 18
+      })
     },
     native: null
   };
 
   gasPrices.slow.txFee = {
     value: {
-      amount: BigNumber(gasPrices.slow.value.amount)
-        .times(BigNumber(`${gasLimit}`))
-        .toString(),
-      display: convertAmountToDisplay(
-        BigNumber(gasPrices.slow.value.amount)
-          .times(BigNumber(`${gasLimit}`))
-          .toString(),
-        null,
-        { symbol: 'ETH', decimals: 18 }
-      )
+      amount: multiply(gasPrices.slow.value.amount, gasLimit),
+      display: convertAmountToDisplay(multiply(gasPrices.slow.value.amount, gasLimit), null, {
+        symbol: 'ETH',
+        decimals: 18
+      })
     },
     native: null
   };
@@ -496,9 +423,7 @@ export const parseAccountBalancesPrices = (account = null, nativePrices = null, 
       const balancePriceUnit = convertAmountFromBigNumber(
         nativePrices[nativeSelected][asset.symbol].price.amount
       );
-      const balanceRaw = BigNumber(balanceAmountUnit)
-        .times(BigNumber(balancePriceUnit))
-        .toString();
+      const balanceRaw = multiply(balanceAmountUnit, balancePriceUnit);
       const balanceAmount = convertAmountToBigNumber(balanceRaw);
       const balanceDisplay = convertAmountToDisplay(balanceAmount, nativePrices);
       const assetPrice = nativePrices[nativeSelected][asset.symbol].price;
@@ -516,10 +441,7 @@ export const parseAccountBalancesPrices = (account = null, nativePrices = null, 
       };
     });
     totalAmount = newAssets.reduce(
-      (total, asset) =>
-        BigNumber(`${total}`)
-          .plus(BigNumber(asset.native ? asset.native.balance.amount : 0))
-          .toString(),
+      (total, asset) => add(total, asset.native ? asset.native.balance.amount : 0),
       0
     );
     const totalDisplay = convertAmountToDisplay(totalAmount, nativePrices);
@@ -547,9 +469,7 @@ export const parseNewTransaction = async (
 ) => {
   let _transactions = [...transactions];
 
-  let totalGas = BigNumber(`${txDetails.gasLimit}`)
-    .times(BigNumber(`${txDetails.gasPrice}`))
-    .toString();
+  let totalGas = multiply(txDetails.gasLimit, txDetails.gasPrice);
   let txFee = {
     amount: totalGas,
     display: convertAmountToDisplay(totalGas, null, {

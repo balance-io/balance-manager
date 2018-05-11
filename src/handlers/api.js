@@ -29,12 +29,6 @@ export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now())
 };
 
 /**
- * @desc get ethereum gas prices
- * @return {Promise}
- */
-export const apiGetGasPrices = () => axios.get(`https://ethgasstation.info/json/ethgasAPI.json`);
-
-/**
  * @desc get metmask selected network
  * @return {Promise}
  */
@@ -107,7 +101,7 @@ export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') =>
  * Configuration for balance proxy api
  * @type axios instance
  */
-const balanceProxy = axios.create({
+const api = axios.create({
   baseURL: 'https://indexer.balance.io',
   timeout: 30000, // 30 secs
   headers: {
@@ -117,10 +111,16 @@ const balanceProxy = axios.create({
 });
 
 /**
+ * @desc get ethereum gas prices
+ * @return {Promise}
+ */
+export const apiGetGasPrices = () => api.get(`/get_eth_gas_prices`);
+
+/**
  * @desc shapeshift get coins
  * @return {Promise}
  */
-export const apiShapeshiftGetCurrencies = () => balanceProxy.get(`/get_currencies`);
+export const apiShapeshiftGetCurrencies = () => api.get(`/get_currencies`);
 
 /**
  * @desc shapeshift get market info
@@ -129,7 +129,7 @@ export const apiShapeshiftGetCurrencies = () => balanceProxy.get(`/get_currencie
  * @return {Promise}
  */
 export const apiShapeshiftGetMarketInfo = (depositSelected = '', withdrawalSelected = '') =>
-  balanceProxy.get(`/get_market_info?deposit=${depositSelected}&withdrawal=${withdrawalSelected}`);
+  api.get(`/get_market_info?deposit=${depositSelected}&withdrawal=${withdrawalSelected}`);
 
 /**
  * @desc shapeshift get fixed price
@@ -139,7 +139,7 @@ export const apiShapeshiftGetMarketInfo = (depositSelected = '', withdrawalSelec
  * @return {Promise}
  */
 export const apiShapeshiftGetFixedPrice = (amount = '', exchangePair = '', address = '') =>
-  balanceProxy.post(`/shapeshift_send_amount`, {
+  api.post(`/shapeshift_send_amount`, {
     amount,
     withdrawal: address,
     pair: exchangePair,
@@ -153,7 +153,7 @@ export const apiShapeshiftGetFixedPrice = (amount = '', exchangePair = '', addre
  * @return {Promise}
  */
 export const apiShapeshiftGetQuotedPrice = (amount = '', exchangePair = '') =>
-  balanceProxy.post(`/shapeshift_quoted_price_request`, {
+  api.post(`/shapeshift_quoted_price_request`, {
     amount,
     pair: exchangePair
   });

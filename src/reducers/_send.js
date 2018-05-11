@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js';
 import { apiGetGasPrices } from '../handlers/api';
 import lang from '../languages';
 import ethUnits from '../references/ethereum-units.json';
@@ -7,7 +6,10 @@ import {
   convertAmountToBigNumber,
   convertAssetAmountFromNativeValue,
   convertAssetAmountToNativeValue,
-  formatInputDecimals
+  convertStringToNumber,
+  formatInputDecimals,
+  greaterThan,
+  subtract
 } from '../helpers/bignumber';
 import { parseError, parseGasPrices, parseGasPricesTxFee } from '../handlers/parsers';
 import { web3SendTransactionMultiWallet, estimateGasLimit } from '../handlers/web3';
@@ -99,7 +101,7 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
       if (assetAmount) {
         const requestedAmount = convertAmountToBigNumber(`${assetAmount}`);
         const availableBalance = selected.balance.amount;
-        if (BigNumber(requestedAmount).comparedTo(BigNumber(availableBalance)) === 1) {
+        if (greaterThan(requestedAmount, availableBalance)) {
           dispatch(notificationShow(lang.t('notification.error.insufficient_balance'), true));
         }
       } else {
@@ -216,9 +218,7 @@ export const sendMaxBalance = () => (dispatch, getState) => {
     const ethereum = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
     const balanceAmount = ethereum.balance.amount;
     const txFeeAmount = gasPrice.txFee.value.amount;
-    const remaining = BigNumber(balanceAmount)
-      .minus(BigNumber(txFeeAmount))
-      .toNumber();
+    const remaining = convertStringToNumber(subtract(balanceAmount, txFeeAmount));
     const ether = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
     dispatch(sendUpdateAssetAmount(ether));
   } else {

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import BigNumber from 'bignumber.js';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -31,9 +30,13 @@ import { notificationShow } from '../reducers/_notification';
 import {
   convertAmountFromBigNumber,
   convertAmountToDisplay,
+  convertNumberToString,
+  add,
   subtract,
   multiply,
   divide,
+  greaterThan,
+  smallerThan,
   convertAmountToBigNumber
 } from '../helpers/bignumber';
 import { capitalize } from '../helpers/utilities';
@@ -239,16 +242,14 @@ class ExchangeModal extends Component {
         const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
         const balanceAmount = ethereum.balance.amount;
         const balance = convertAmountFromBigNumber(balanceAmount);
-        const requestedAmount = BigNumber(`${this.props.depositAmount}`).toString();
+        const requestedAmount = convertNumberToString(this.props.depositAmount);
         const txFeeAmount = this.props.gasPrice.txFee.value.amount;
         const txFee = convertAmountFromBigNumber(txFeeAmount);
-        const includingFees = BigNumber(requestedAmount)
-          .plus(BigNumber(txFee))
-          .toString();
-        if (BigNumber(requestedAmount).comparedTo(BigNumber(balance)) === 1) {
+        const includingFees = add(requestedAmount, txFee);
+        if (greaterThan(requestedAmount, balance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
-        } else if (BigNumber(includingFees).comparedTo(BigNumber(balance)) === 1) {
+        } else if (greaterThan(includingFees, balance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
@@ -258,12 +259,12 @@ class ExchangeModal extends Component {
         const etherBalance = convertAmountFromBigNumber(etherBalanceAmount);
         const tokenBalanceAmount = this.props.depositSelected.balance.amount;
         const tokenBalance = convertAmountFromBigNumber(tokenBalanceAmount);
-        const requestedAmount = BigNumber(`${this.props.depositAmount}`).toString();
+        const requestedAmount = convertNumberToString(this.props.depositAmount);
         const includingFees = convertAmountFromBigNumber(this.props.gasPrice.txFee.value.amount);
-        if (BigNumber(requestedAmount).comparedTo(BigNumber(tokenBalance)) === 1) {
+        if (greaterThan(requestedAmount, tokenBalance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
-        } else if (BigNumber(includingFees).comparedTo(BigNumber(etherBalance)) === 1) {
+        } else if (greaterThan(includingFees, etherBalance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
@@ -356,36 +357,31 @@ class ExchangeModal extends Component {
       : null;
     const depositUnder = exchangeDetails
       ? this.props.depositAmount !== ''
-        ? BigNumber(this.props.depositAmount).comparedTo(BigNumber(exchangeDetails.min)) === -1
+        ? smallerThan(this.props.depositAmount, exchangeDetails.min)
         : false
       : false;
     const depositOver = exchangeDetails
       ? this.props.depositAmount !== ''
-        ? BigNumber(this.props.depositAmount).comparedTo(BigNumber(exchangeDetails.maxLimit)) === 1
+        ? greaterThan(this.props.depositAmount, exchangeDetails.maxLimit)
         : false
       : false;
     const withdrawalUnder = exchangeDetails
       ? this.props.withdrawalAmount !== ''
-        ? BigNumber(this.props.withdrawalAmount).comparedTo(
-            BigNumber(
-              subtract(
-                multiply(exchangeDetails.min, exchangeDetails.rate),
-                exchangeDetails.minerFee
-              )
-            )
-          ) === -1
+        ? smallerThan(
+            this.props.withdrawalAmount,
+            subtract(multiply(exchangeDetails.min, exchangeDetails.rate), exchangeDetails.minerFee)
+          )
         : false
       : false;
     const withdrawalOver = exchangeDetails
       ? this.props.withdrawalAmount !== ''
-        ? BigNumber(this.props.withdrawalAmount).comparedTo(
-            BigNumber(
-              subtract(
-                multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
-                exchangeDetails.minerFee
-              )
+        ? greaterThan(
+            this.props.withdrawalAmount,
+            subtract(
+              multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
+              exchangeDetails.minerFee
             )
-          ) === 1
+          )
         : false
       : false;
     const exchangeFeeValue = exchangeDetails

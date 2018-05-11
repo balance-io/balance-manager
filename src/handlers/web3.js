@@ -1,11 +1,14 @@
 import Web3 from 'web3';
-import BigNumber from 'bignumber.js';
 import { isValidAddress } from '../helpers/validators';
 import { getDataString, getNakedAddress } from '../helpers/utilities';
 import {
+  convertStringToNumber,
+  convertNumberToString,
   convertAmountToBigNumber,
   convertAssetAmountFromBigNumber,
-  convertHexToString
+  convertHexToString,
+  convertStringToHex,
+  convertAmountToAssetAmount
 } from '../helpers/bignumber';
 import { ledgerEthSignTransaction } from './ledger-eth';
 import { walletConnectSignTransaction } from './walletconnect';
@@ -94,7 +97,7 @@ export const getTransactionCount = address =>
 export const getAccountBalance = async address => {
   const wei = await web3Instance.eth.getBalance(address);
   const ether = fromWei(wei);
-  const balance = Number(ether) !== 0 ? BigNumber(`${ether}`).toString() : 0;
+  const balance = convertStringToNumber(ether) !== 0 ? convertNumberToString(ether) : 0;
   return balance;
 };
 
@@ -147,9 +150,9 @@ export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }
  */
 export const getTransferTokenTransaction = transaction => {
   const transferMethodHash = smartContractMethods.token_transfer.hash;
-  const value = BigNumber(transaction.amount)
-    .times(BigNumber(10).pow(transaction.asset.decimals))
-    .toString(16);
+  const value = convertStringToHex(
+    convertAmountToAssetAmount(transaction.amount, transaction.asset.decimals)
+  );
   const recipient = getNakedAddress(transaction.to);
   const dataString = getDataString(transferMethodHash, [recipient, value]);
   return {
@@ -393,7 +396,7 @@ export const estimateGasLimit = async ({ asset, address, recipient, amount }) =>
   if (asset.symbol !== 'ETH') {
     const transferMethodHash = smartContractMethods.token_transfer.hash;
     let value = convertAssetAmountFromBigNumber(_amount, asset.decimals);
-    value = BigNumber(value).toString(16);
+    value = convertStringToHex(value);
     data = getDataString(transferMethodHash, [getNakedAddress(_recipient), value]);
     estimateGasData = { from: address, to: asset.address, data, value: '0x0' };
     gasLimit = await web3Instance.eth.estimateGas(estimateGasData);

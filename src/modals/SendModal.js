@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import BigNumber from 'bignumber.js';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -32,7 +31,12 @@ import {
 } from '../reducers/_send';
 import { notificationShow } from '../reducers/_notification';
 import { isValidAddress } from '../helpers/validators';
-import { convertAmountFromBigNumber } from '../helpers/bignumber';
+import {
+  convertAmountFromBigNumber,
+  convertNumberToString,
+  add,
+  greaterThan
+} from '../helpers/bignumber';
 import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
@@ -299,16 +303,14 @@ class SendModal extends Component {
         const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
         const balanceAmount = ethereum.balance.amount;
         const balance = convertAmountFromBigNumber(balanceAmount);
-        const requestedAmount = BigNumber(`${this.props.assetAmount}`).toString();
+        const requestedAmount = convertNumberToString(this.props.assetAmount);
         const txFeeAmount = this.props.gasPrice.txFee.value.amount;
         const txFee = convertAmountFromBigNumber(txFeeAmount);
-        const includingFees = BigNumber(requestedAmount)
-          .plus(BigNumber(txFee))
-          .toString();
-        if (BigNumber(requestedAmount).comparedTo(BigNumber(balance)) === 1) {
+        const includingFees = add(requestedAmount, txFee);
+        if (greaterThan(requestedAmount, balance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
-        } else if (BigNumber(includingFees).comparedTo(BigNumber(balance)) === 1) {
+        } else if (greaterThan(includingFees, balance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
@@ -318,12 +320,12 @@ class SendModal extends Component {
         const etherBalance = convertAmountFromBigNumber(etherBalanceAmount);
         const tokenBalanceAmount = this.props.selected.balance.amount;
         const tokenBalance = convertAmountFromBigNumber(tokenBalanceAmount);
-        const requestedAmount = BigNumber(`${this.props.assetAmount}`).toString();
+        const requestedAmount = convertNumberToString(this.props.assetAmount);
         const includingFees = convertAmountFromBigNumber(this.props.gasPrice.txFee.value.amount);
-        if (BigNumber(requestedAmount).comparedTo(BigNumber(tokenBalance)) === 1) {
+        if (greaterThan(requestedAmount, tokenBalance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
-        } else if (BigNumber(includingFees).comparedTo(BigNumber(etherBalance)) === 1) {
+        } else if (greaterThan(includingFees, etherBalance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }

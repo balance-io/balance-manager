@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js';
 import {
   apiShapeshiftGetCurrencies,
   apiShapeshiftGetMarketInfo,
@@ -11,8 +10,10 @@ import {
   subtract,
   multiply,
   divide,
+  greaterThan,
   formatInputDecimals,
-  convertAmountFromBigNumber
+  convertAmountFromBigNumber,
+  convertStringToNumber
 } from '../helpers/bignumber';
 import { notificationShow } from './_notification';
 import { accountUpdateTransactions } from './_account';
@@ -209,14 +210,12 @@ export const exchangeMaxBalance = () => (dispatch, getState) => {
     const ethereum = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
     const balanceAmount = ethereum.balance.amount;
     const txFeeAmount = gasPrice.txFee.value.amount;
-    const remaining = BigNumber(balanceAmount)
-      .minus(BigNumber(txFeeAmount))
-      .toNumber();
+    const remaining = convertStringToNumber(subtract(balanceAmount, txFeeAmount));
     amount = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
   } else {
     amount = convertAmountFromBigNumber(depositSelected.balance.amount);
   }
-  if (BigNumber(amount).comparedTo(BigNumber(exchangeDetails.maxLimit)) === 1) {
+  if (greaterThan(amount, exchangeDetails.maxLimit)) {
     amount = exchangeDetails.maxLimit;
   }
   dispatch(exchangeUpdateDepositAmount(amount));

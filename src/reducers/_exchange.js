@@ -82,7 +82,7 @@ export const exchangeModalInit = () => (dispatch, getState) => {
   });
   apiShapeshiftGetCurrencies()
     .then(({ data }) => {
-      const withdrawalAssets = data.available;
+      const withdrawalAssets = data;
       const availableSymbols = withdrawalAssets.map(availableAsset => availableAsset.symbol);
       const depositAssets = accountInfo.assets.filter(
         asset => availableSymbols.indexOf(asset.symbol) !== -1

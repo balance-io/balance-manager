@@ -128,8 +128,11 @@ const StyledHash = styled.p`
 
 const StyledAmountCurrency = styled.div`
   position: absolute;
-  top: 38px;
-  right: 12px;
+  top: 34px;
+  right: 6px;
+  padding: 4px;
+  border-radius: 6px;
+  background: rgb(${colors.white});
   font-size: ${fonts.size.medium};
   color: rgba(${colors.darkGrey}, 0.7);
   opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
@@ -289,7 +292,7 @@ class ExchangeModal extends Component {
             this.props.exchangeTokenLedger(request);
             break;
           case 'WALLETCONNECT':
-            this.props.sendTokenWalletConnect(request);
+            this.props.exchangeTokenWalletConnect(request);
             break;
           default:
             this.props.exchangeTokenMetamask(request);

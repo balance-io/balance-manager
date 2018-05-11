@@ -21,12 +21,7 @@ import { modalClose } from '../reducers/_modal';
 import {
   sendModalInit,
   sendUpdateGasPrice,
-  sendEtherMetamask,
-  sendTokenMetamask,
-  sendEtherLedger,
-  sendTokenLedger,
-  sendEtherWalletConnect,
-  sendTokenWalletConnect,
+  sendTransaction,
   sendClearFields,
   sendUpdateRecipient,
   sendUpdateNativeAmount,
@@ -120,8 +115,11 @@ const StyledQRIcon = styled.div`
 
 const StyledAmountCurrency = styled.div`
   position: absolute;
-  bottom: 12px;
-  right: 12px;
+  bottom: 10px;
+  right: 6px;
+  padding: 4px;
+  border-radius: 6px;
+  background: rgb(${colors.white});
   font-size: ${fonts.size.medium};
   color: rgba(${colors.darkGrey}, 0.7);
   opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
@@ -285,7 +283,7 @@ class SendModal extends Component {
       address: this.props.accountInfo.address,
       recipient: this.props.recipient,
       amount: this.props.assetAmount,
-      selectedAsset: this.props.selected,
+      asset: this.props.selected,
       gasPrice: this.props.gasPrice,
       gasLimit: this.props.gasLimit
     };
@@ -314,20 +312,6 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
-        switch (this.props.accountType) {
-          case 'METAMASK':
-            this.props.sendEtherMetamask(request);
-            break;
-          case 'LEDGER':
-            this.props.sendEtherLedger(request);
-            break;
-          case 'WALLETCONNECT':
-            this.props.sendEtherWalletConnect(request);
-            break;
-          default:
-            this.props.sendEtherMetamask(request);
-            break;
-        }
       } else {
         const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
         const etherBalanceAmount = ethereum.balance.amount;
@@ -343,21 +327,8 @@ class SendModal extends Component {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
-        switch (this.props.accountType) {
-          case 'METAMASK':
-            this.props.sendTokenMetamask(request);
-            break;
-          case 'LEDGER':
-            this.props.sendTokenLedger(request);
-            break;
-          case 'WALLETCONNECT':
-            this.props.sendTokenWalletConnect(request);
-            break;
-          default:
-            this.props.sendTokenMetamask(request);
-            break;
-        }
       }
+      this.props.sendTransaction(request);
     }
     this.props.sendToggleConfirmationView(true);
   };
@@ -636,12 +607,7 @@ class SendModal extends Component {
 SendModal.propTypes = {
   sendModalInit: PropTypes.func.isRequired,
   sendUpdateGasPrice: PropTypes.func.isRequired,
-  sendEtherMetamask: PropTypes.func.isRequired,
-  sendTokenMetamask: PropTypes.func.isRequired,
-  sendEtherLedger: PropTypes.func.isRequired,
-  sendTokenLedger: PropTypes.func.isRequired,
-  sendEtherWalletConnect: PropTypes.func.isRequired,
-  sendTokenWalletConnect: PropTypes.func.isRequired,
+  sendTransaction: PropTypes.func.isRequired,
   sendClearFields: PropTypes.func.isRequired,
   sendUpdateRecipient: PropTypes.func.isRequired,
   sendUpdateNativeAmount: PropTypes.func.isRequired,
@@ -696,12 +662,7 @@ export default connect(reduxProps, {
   modalClose,
   sendModalInit,
   sendUpdateGasPrice,
-  sendEtherMetamask,
-  sendTokenMetamask,
-  sendEtherLedger,
-  sendTokenLedger,
-  sendEtherWalletConnect,
-  sendTokenWalletConnect,
+  sendTransaction,
   sendClearFields,
   sendUpdateRecipient,
   sendUpdateNativeAmount,

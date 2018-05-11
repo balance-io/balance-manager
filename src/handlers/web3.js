@@ -142,19 +142,19 @@ export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }
 
 /**
  * @desc get transfer token transaction
- * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
+ * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
  * @return {Object}
  */
 export const getTransferTokenTransaction = transaction => {
   const transferMethodHash = smartContractMethods.token_transfer.hash;
   const value = BigNumber(transaction.amount)
-    .times(BigNumber(10).pow(transaction.tokenObject.decimals))
+    .times(BigNumber(10).pow(transaction.asset.decimals))
     .toString(16);
   const recipient = getNakedAddress(transaction.to);
   const dataString = getDataString(transferMethodHash, [recipient, value]);
   return {
     from: transaction.from,
-    to: transaction.tokenObject.address,
+    to: transaction.asset.address,
     data: dataString,
     gasPrice: transaction.gasPrice,
     gasLimit: transaction.gasLimit
@@ -212,7 +212,7 @@ export const web3MetamaskSendTransaction = transaction =>
 
 /**
  * @desc metamask transfer token
- * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
+ * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
  * @return {Promise}
  */
 export const web3MetamaskTransferToken = transaction =>
@@ -265,7 +265,7 @@ export const web3WalletConnectSendTransaction = transaction =>
 
 /**
  * @desc walletconnect transfer token
- * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
+ * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
  * @return {Promise}
  */
 export const web3WalletConnectTransferToken = transaction =>
@@ -316,7 +316,7 @@ export const web3LedgerSendTransaction = transaction =>
 
 /**
  * @desc ledger transfer token
- * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
+ * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
  * @return {Promise}
  */
 export const web3LedgerTransferToken = transaction =>
@@ -334,26 +334,68 @@ export const web3LedgerTransferToken = transaction =>
   });
 
 /**
+ * @desc send transaction controller given asset transfered and account type
+ * @param {Object} transaction { asset, from, to, amount, gasPrice }
+ * @return {Promise}
+ */
+export const web3SendTransactionMultiWallet = (transaction, accountType) => {
+  let method = null;
+  if (transaction.asset.symbol === 'ETH') {
+    transaction.value = transaction.amount;
+    switch (accountType) {
+      case 'METAMASK':
+        method = web3MetamaskSendTransaction;
+        break;
+      case 'LEDGER':
+        method = web3LedgerSendTransaction;
+        break;
+      case 'WALLETCONNECT':
+        method = web3WalletConnectSendTransaction;
+        break;
+      default:
+        method = web3MetamaskSendTransaction;
+        break;
+    }
+  } else {
+    switch (accountType) {
+      case 'METAMASK':
+        method = web3MetamaskTransferToken;
+        break;
+      case 'LEDGER':
+        method = web3LedgerTransferToken;
+        break;
+      case 'WALLETCONNECT':
+        method = web3WalletConnectTransferToken;
+        break;
+      default:
+        method = web3MetamaskTransferToken;
+        break;
+    }
+  }
+  return method(transaction);
+};
+
+/**
  * @desc estimate gas limit
  * @param {Object} [{selected, address, recipient, amount, gasPrice}]
  * @return {String}
  */
-export const estimateGasLimit = async ({ tokenObject, address, recipient, amount }) => {
+export const estimateGasLimit = async ({ asset, address, recipient, amount }) => {
   let gasLimit = ethUnits.basic_tx;
   let data = '0x';
   let _amount =
-    amount && Number(amount) ? convertAmountToBigNumber(amount) : tokenObject.balance.amount;
+    amount && Number(amount) ? convertAmountToBigNumber(amount) : asset.balance.amount * 0.1;
   let _recipient =
     recipient && isValidAddress(recipient)
       ? recipient
       : '0x737e583620f4ac1842d4e354789ca0c5e0651fbb';
   let estimateGasData = { to: _recipient, data };
-  if (tokenObject.symbol !== 'ETH') {
+  if (asset.symbol !== 'ETH') {
     const transferMethodHash = smartContractMethods.token_transfer.hash;
-    let value = convertAssetAmountFromBigNumber(_amount, tokenObject.decimals);
+    let value = convertAssetAmountFromBigNumber(_amount, asset.decimals);
     value = BigNumber(value).toString(16);
     data = getDataString(transferMethodHash, [getNakedAddress(_recipient), value]);
-    estimateGasData = { from: address, to: tokenObject.address, data, value: '0x0' };
+    estimateGasData = { from: address, to: asset.address, data, value: '0x0' };
     gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
   }
   return gasLimit;

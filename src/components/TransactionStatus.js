@@ -54,11 +54,11 @@ const TransactionStatus = ({ tx, accountAddress, ...props }) => {
     color = 'red';
     icon = txFailedIcon;
   } else {
-    if (tx.from === tx.to) {
+    if (tx.from.toLowerCase() === tx.to.toLowerCase()) {
       text = lang.t('account.tx_self');
       color = 'blue';
       icon = circle;
-    } else if (tx.from === accountAddress) {
+    } else if (tx.from.toLowerCase() === accountAddress.toLowerCase()) {
       text = lang.t('account.tx_sent');
       color = 'gold';
       icon = txSentIcon;

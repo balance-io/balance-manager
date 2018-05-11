@@ -109,6 +109,7 @@ export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
 
 export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { accountAddress, network } = getState().account;
+  console.log('accountGetAccountTransactions', accountAddress);
   let cachedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
   if (accountLocal && accountLocal[network]) {

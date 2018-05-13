@@ -1,8 +1,8 @@
 ## Balance Manager
 
-#### Ethereum Wallet Manager for MetaMask, Ledger, Trezor and WalletConnect
-
 <img src="https://cl.ly/0h173T3Q3p3n/app.png" alt="Balance Manager Preview">
+
+#### Ethereum Wallet Manager for MetaMask, Ledger, Trezor and WalletConnect
 
 ## Want to help us?
 We really appreciate any time you can spare. We need help with design, engineering, translation and security audit.

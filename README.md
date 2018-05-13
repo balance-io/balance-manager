@@ -16,6 +16,7 @@ Stuck on something? Got questions? Want to chat privately? Send <a href="twitter
 ## How to run Manager
 
 Development: `yarn start`
+
 Production: `yarn build`
 
 ## How to contribute to Manager

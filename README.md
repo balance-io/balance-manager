@@ -11,7 +11,7 @@ Issues: https://github.com/balance-io/balance-manager/issues
 
 Community: https://spectrum.chat/balance/manager
 
-Stuck on something? Got questions? Want to chat privately? Send @ricburton a Direct Message (DM) on Twitter at any time: twitter.com/ricburton
+Stuck on something? Got questions? Want to chat privately? Send <a href="twitter.com/ricburton">@ricburton</a> a Direct Message (DM) on Twitter at any time: <a href="twitter.com/ricburton">twitter.com/ricburton</a>
 
 ## How to run Manager
 

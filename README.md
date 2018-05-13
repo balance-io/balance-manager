@@ -8,6 +8,7 @@
 We really appreciate any time you can spare. We need help with design, engineering, translation and security audit.
 
 Issues: https://github.com/balance-io/balance-manager/issues
+
 Community: https://spectrum.chat/balance/manager
 
 Stuck on something? Got questions? Want to chat privately? Send @ricburton a Direct Message (DM) on Twitter at any time: twitter.com/ricburton

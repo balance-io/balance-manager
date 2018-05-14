@@ -37,14 +37,14 @@
     "walletconnect": "^0.0.1-beta.11",
     "web3": "^1.0.0-beta.34"
   },
-  "scripts": {
+    "scripts": {
     "remove-sourcemaps": "rm -rf build/static/js/*.map",
-    "start": "HTTPS=true NODE_ENV=development concurrently \"react-scripts start\" \"netlify-lambda serve src/lambda\"",
-    "build": "react-scripts build",
-    "build:lambda": "netlify-lambda build src/lambda",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "lint": "eslint src --ext .js"
+    "start": "HTTPS=true NODE_ENV=development node node_modules/concurrently/src/main.js \"node node_modules/react-scripts/bin/react-scripts.js start\" \"node node_modules/netlify-lambda/bin/cmd.js serve src/lambda\"",
+    "build": "node node_modules/react-scripts/bin/react-scripts.js build",
+    "build:lambda": "node node_modules/netlify-lambda/bin/cmd.js build src/lambda",
+    "test": "node node_modules/react-scripts/bin/react-scripts.js test --env=jsdom",
+    "eject": "node node_modules/react-scripts/bin/react-scripts.js eject",
+    "lint": "node node_modules/eslint/bin/eslint.js src --ext .js"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",

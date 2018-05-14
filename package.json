@@ -1,7 +1,7 @@
 {
   "name": "balance-manager",
   "description": "Ethereum Wallet Manager Interface for MetaMask, Ledger, Trezor and WalletConnect",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "Pedro Gomes <pedro@balance.io>",
   "license": "GPL-3",
   "homepage": "https://manager.balance.io",
@@ -39,7 +39,8 @@
   },
   "scripts": {
     "remove-sourcemaps": "rm -rf build/static/js/*.map",
-    "start": "HTTPS=true NODE_ENV=development concurrently \"react-scripts start\" \"netlify-lambda serve src/lambda\"",
+    "start":
+      "HTTPS=true NODE_ENV=development concurrently \"react-scripts start\" \"netlify-lambda serve src/lambda\"",
     "build": "react-scripts build",
     "build:lambda": "netlify-lambda build src/lambda",
     "test": "react-scripts test --env=jsdom",

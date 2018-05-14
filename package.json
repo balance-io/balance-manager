@@ -21,7 +21,6 @@
     "i18next": "^10.6.0",
     "jsonp": "^0.2.1",
     "lodash": "^4.17.5",
-    "netlify-lambda": "^0.3.0",
     "prop-types": "^15.6.1",
     "qrcode": "^1.2.0",
     "react": "^16.2.0",
@@ -39,7 +38,7 @@
   },
   "scripts": {
     "remove-sourcemaps": "rm -rf build/static/js/*.map",
-    "start": "HTTPS=true NODE_ENV=development concurrently \"react-scripts start\" \"netlify-lambda serve src/lambda\"",
+    "start": "HTTPS=true NODE_ENV=development react-scripts start",
     "build": "react-scripts build",
     "build:lambda": "netlify-lambda build src/lambda",
     "test": "react-scripts test --env=jsdom",
@@ -48,20 +47,11 @@
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",
-    "concurrently": "^3.5.1",
     "eslint": "^4.19.0",
     "eslint-config-react-app": "^2.1.0",
     "eslint-plugin-flowtype": "^2.46.1",
     "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.7.0"
-  },
-  "proxy": {
-    "/.netlify/functions": {
-      "target": "http://localhost:9000",
-      "pathRewrite": {
-        "^/\\.netlify/functions": ""
-      }
-    }
   }
 }

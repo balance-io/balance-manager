@@ -51,6 +51,6 @@ Stuck on something? Got questions? Want to chat privately? Send <a href="twitter
 
 ## How to contribute to Manager
 
-Always clone or fork from the `latest` branch
+Always clone or fork from the `latest` branch.
 We are going to work on making this process as simple as possible.
 At this stage we would encourage you to comment on issues you want to work on and reach out to us over Spectrum or Twitter.

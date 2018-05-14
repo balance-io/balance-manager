@@ -13,7 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Changed
 
-\*
+* Improve hover performance of box-shadow on rows (Issue #180)
+* Collapse Dropdown component onClick outside of Dropdown (Issue #172)
+* Fix flickering AssetIcon due to unnecessary setState calls (Issue ##107)
 
 ### Removed
 

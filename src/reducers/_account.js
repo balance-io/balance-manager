@@ -63,7 +63,7 @@ export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
   const network = getState().account.network;
   dispatch({ type: ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST });
   apiGetTransactionStatus(txHash, network)
-    .then( ({ data }) => {
+    .then(({ data }) => {
       if (data) {
         const address = getState().account.accountInfo.address;
         const transactions = getState().account.transactions;

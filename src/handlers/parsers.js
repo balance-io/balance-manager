@@ -767,7 +767,6 @@ export const parseAccountTransactions = async (data = null, address = '', networ
  */
 export const parseHistoricalPrices = async (transactions = null) => {
   if (!transactions.length) return transactions;
-  console.log('parseHistoricalPrices transactions', transactions);
   const _transactions = await Promise.all(
     transactions.map(async (tx, idx) => {
       const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();

@@ -12,7 +12,7 @@ import AccountBalances from './AccountBalances';
 import AccountTransactions from './AccountTransactions';
 import AccountInteractions from './AccountInteractions';
 import arrowUp from '../../assets/arrow-up.svg';
-// import exchangeIcon from '../../assets/exchange-icon.svg';
+import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { accountClearState } from '../../reducers/_account';
 import { modalOpen } from '../../reducers/_modal';
@@ -98,7 +98,7 @@ class Account extends Component {
                 </StyledAddressWrapper>
 
                 <StyledActions>
-                  {/* {this.props.network === 'mainnet' && (
+                  {this.props.network === 'mainnet' && (
                     <Button
                       left
                       color="brightGreen"
@@ -109,7 +109,7 @@ class Account extends Component {
                     >
                       {lang.t('button.exchange')}
                     </Button>
-                  )} */}
+                  )}
                   <Button
                     left
                     color="blue"

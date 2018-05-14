@@ -138,7 +138,6 @@ class DropdownAsset extends Component {
                     ? this.props.selected === 'ETH' ? 'ETH' : options[this.props.selected].address
                     : 'ETH'
                 }
-                image={!empty ? options[this.props.selected].img || '' : ''}
               />
               <p>{!empty ? ellipseText(options[this.props.selected].name, 30) : 'Ethereum'}</p>
             </StyledAsset>
@@ -161,11 +160,7 @@ class DropdownAsset extends Component {
                 onClick={() => this.onChangeSelected(options[key].symbol)}
               >
                 <StyledAsset data-toggle="tooltip" title={options[key].name}>
-                  <AssetIcon
-                    size={18}
-                    asset={key === 'ETH' ? 'ETH' : options[key].address}
-                    image={options[key].img || ''}
-                  />
+                  <AssetIcon size={18} asset={key === 'ETH' ? 'ETH' : options[key].address} />
                   <p>{ellipseText(options[key].name, 30)}</p>
                 </StyledAsset>
                 <p>

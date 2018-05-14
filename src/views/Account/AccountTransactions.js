@@ -216,10 +216,40 @@ const StyledMessage = styled.div`
   font-weight: ${fonts.weight.medium};
 `;
 
+const StyledFilterInput = styled.input`
+  width: 100%;
+  margin-left: 8px;
+  background: rgb(${colors.white});
+  padding: 8px;
+  border: none;
+  border-style: none;
+  font-family: ${({ monospace }) => (monospace ? `${fonts.family.SFMono}` : `inherit`)};
+  font-size: ${fonts.size.h6};
+  font-weight: ${fonts.weight.semibold};
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  border-radius: 8px;
+  -webkit-box-shadow: ${shadows.medium};
+  box-shadow: ${shadows.medium};
+  outline: none;
+  &::placeholder {
+    color: rgba(${colors.grey}, 0.8);
+    font-weight: ${fonts.weight.medium};
+    opacity: 1;
+  }
+  @media screen and (${responsive.sm.max}) {
+    padding: 8px 10px;
+  }
+`;
+
 class AccountViewTransactions extends Component {
   state = {
     showTxDetails: null,
-    showAllTransactions: false
+    showAllTransactions: false,
+    filterAssets: null
   };
   onShowTxDetails = hash => {
     if (this.state.showTxDetails === hash) {
@@ -230,6 +260,8 @@ class AccountViewTransactions extends Component {
   };
   onShowAllTransactions = () =>
     this.setState({ showAllTransactions: !this.state.showAllTransactions });
+  onFilterChange = (e) =>
+    this.setState({ filterAssets: e.target.value.toLowerCase() });
 
   render = () => {
     const nativeCurrency = this.props.nativeCurrency;
@@ -241,7 +273,7 @@ class AccountViewTransactions extends Component {
       !this.props.fetchingTransactions ? (
         <StyledGrid>
           <StyledLabelsRow>
-            <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
+            <StyledLabels>{lang.t('account.label_asset')} <StyledFilterInput placeholder="Filter..." type="text" onChange={this.onFilterChange} /></StyledLabels>
             <StyledLabels>{lang.t('account.label_status')}</StyledLabels>
             <StyledLabels>{lang.t('account.label_quantity')}</StyledLabels>
             <StyledLabels>{lang.t('account.label_price')}</StyledLabels>
@@ -250,6 +282,7 @@ class AccountViewTransactions extends Component {
 
           {_transactions.map((tx, idx, arr) => {
             if (!this.state.showAllTransactions && idx > 10) return null;
+            if (this.state.filterAssets && tx.asset.name && !tx.asset.name.toLowerCase().includes(this.state.filterAssets)) return null;
             return (
               <StyledTransactionWrapper
                 showTxDetails={this.state.showTxDetails === tx.hash}

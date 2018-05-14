@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-\*
+* New token icons
+* Add Github templates for Issues and PR
 
 ### Changed
 

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ClickOutside from 'react-click-outside';
 import styled from 'styled-components';
-import AssetIcon from '../components/AssetIcon';
 import selector from '../assets/selector-grey.svg';
 import { ellipseText } from '../helpers/utilities';
 import { fonts, colors, shadows, responsive, transitions } from '../styles';
+import AssetIcon from './AssetIcon';
+import ClickOutside from './ClickOutside';
 
 const StyledWrapper = styled.div`
   width: 100%;

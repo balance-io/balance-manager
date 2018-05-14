@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ClickOutside from 'react-click-outside';
 import styled from 'styled-components';
 import caret from '../assets/caret.svg';
 import circle from '../assets/circle.svg';
 import { fonts, colors, shadows, transitions } from '../styles';
+import ClickOutside from './ClickOutside';
 
 const StyledWrapper = styled.div`
   width: 100%;

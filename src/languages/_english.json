@@ -42,8 +42,6 @@
     },
     "button": {
       "connect_walletconnect": "Use WalletConnect",
-      "connect_metamask": "Connect to MetaMask",
-      "connect_ledger": "Connect to Ledger",
       "exchange": "Exchange",
       "send": "Send",
       "donate": "Donate ETH",

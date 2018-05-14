@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import ClickOutside from 'react-click-outside';
 import styled from 'styled-components';
 import caret from '../assets/caret.svg';
 import circle from '../assets/circle.svg';
@@ -107,6 +108,11 @@ class Dropdown extends Component {
       this.props.onChange(selected);
     }
   };
+  onClickOutside = () => {
+    if (this.state.showDropdown) {
+      this.setState({ showDropdown: false });
+    }
+  };
   toggleDropdown = () => {
     if (this.props.onChange) {
       this.setState({ showDropdown: !this.state.showDropdown });
@@ -126,6 +132,7 @@ class Dropdown extends Component {
     const _selected = selected || options[Object.keys(options)[0]][displayKey];
     if (!options[_selected]) return null;
     return (
+      <ClickOutside onClickOutside={this.onClickOutside}>
       <StyledWrapper {...props}>
         <StyledSelectedWrapper
           monospace={monospace}
@@ -157,6 +164,7 @@ class Dropdown extends Component {
             ))}
         </StyledDropdownWrapper>
       </StyledWrapper>
+      </ClickOutside>
     );
   }
 }

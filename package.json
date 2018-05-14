@@ -24,6 +24,7 @@
     "prop-types": "^15.6.1",
     "qrcode": "^1.2.0",
     "react": "^16.2.0",
+    "react-click-outside": "github:tj/react-click-outside",
     "react-dom": "^16.2.0",
     "react-qr-reader": "^2.1.0",
     "react-redux": "^5.0.7",

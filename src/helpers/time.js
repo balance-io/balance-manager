@@ -3,21 +3,6 @@ import lang from '../languages';
 import timeUnits from '../references/time-units.json';
 
 /**
- * @desc get time zone code
- * @param  {Number} [timestamp=null]
- * @return {String}
- */
-export const getTimeZone = (timestamp = null) => {
-  if (!timestamp) return '';
-  const date = new Date(timestamp);
-  const timezone = date
-    .toString()
-    .match(/\(.[^()]*\)/g)[0]
-    .replace(/[()]/g, '');
-  return timezone;
-};
-
-/**
  * @desc get local time & date string
  * @param  {Number} [timestamp=null]
  * @return {String}

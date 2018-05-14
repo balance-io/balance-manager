@@ -29,7 +29,7 @@ export const walletConnectEthAccounts = (cb) => {
 };
 
 
-const walletConnectListenTransactionStatus = (transactionId) => 
+const walletConnectListenTransactionStatus = (transactionId) =>
   new Promise((resolve, reject) => {
     walletConnectInstance.webConnector.listenTransactionStatus(transactionId, (err, data) => {
       if (err) reject(err);
@@ -44,18 +44,15 @@ const walletConnectListenTransactionStatus = (transactionId) =>
  */
 export const walletConnectSignTransaction = async transaction => {
   const transactionId = await walletConnectInstance.webConnector.createTransaction(transaction);
-  const data = await walletConnectListenTransactionStatus(transactionId.transactionId); 
+  const data = await walletConnectListenTransactionStatus(transactionId.transactionId);
   if (data) {
     const transactionSentSuccess = data.success;
     if (transactionSentSuccess) {
       const transactionHash = data.txHash;
       return transactionHash;
     } else {
-      console.log('no transaction success - try again');
       return null;
     }
   }
-  console.log('no data')
   return null;
 };
-

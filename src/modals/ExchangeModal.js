@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import BigNumber from 'bignumber.js';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -19,15 +18,27 @@ import { modalClose } from '../reducers/_modal';
 import {
   exchangeClearFields,
   exchangeModalInit,
+  exchangeTransaction,
   exchangeUpdateWithdrawalAmount,
   exchangeUpdateDepositAmount,
   exchangeUpdateDepositSelected,
   exchangeUpdateWithdrawalSelected,
-  exchangeToggleConfirmationView
+  exchangeToggleConfirmationView,
+  exchangeMaxBalance
 } from '../reducers/_exchange';
 import { notificationShow } from '../reducers/_notification';
-import { isValidAddress } from '../helpers/validators';
-import { convertAmountFromBigNumber } from '../helpers/bignumber';
+import {
+  convertAmountFromBigNumber,
+  convertAmountToDisplay,
+  convertNumberToString,
+  add,
+  subtract,
+  multiply,
+  divide,
+  greaterThan,
+  smallerThan,
+  convertAmountToBigNumber
+} from '../helpers/bignumber';
 import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
@@ -57,12 +68,6 @@ const StyledFlex = styled.div`
   transform: none;
 `;
 
-const StyledDropdownWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-
 const StyledDropdownLabel = styled.p`
   color: rgb(${colors.grey});
   font-size: 13px;
@@ -70,9 +75,34 @@ const StyledDropdownLabel = styled.p`
   margin-bottom: 8px;
 `;
 
-const StyledHelperText = styled.div`
+const StyledHelperWrapper = styled.div`
   width: 100%;
   display: flex;
+  flex-direction: column;
+`;
+
+const StyledHelperContainer = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-top: 16px;
+`;
+
+const StyledHelperText = styled.div`
+  width: 100%;
+  text-align: right;
+  padding-right: 16px;
+  & p {
+    color: ${({ warn }) => (warn ? `rgb(${colors.red})` : `rgb(${colors.grey})`)};
+    font-size: 13px;
+    font-weight: ${fonts.weight.normal};
+  }
+  & strong {
+    color: ${({ warn }) => (warn ? `rgb(${colors.red})` : `rgb(${colors.grey})`)};
+    font-size: 13px;
+    font-weight: ${fonts.weight.semibold};
+    margin-bottom: 8px;
+  }
 `;
 
 const StyledBottomModal = styled(StyledFlex)`
@@ -103,8 +133,11 @@ const StyledHash = styled.p`
 
 const StyledAmountCurrency = styled.div`
   position: absolute;
-  bottom: 12px;
-  right: 12px;
+  top: 34px;
+  right: 6px;
+  padding: 4px;
+  border-radius: 6px;
+  background: rgb(${colors.white});
   font-size: ${fonts.size.medium};
   color: rgba(${colors.darkGrey}, 0.7);
   opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
@@ -116,7 +149,7 @@ const StyledExchangeIcon = styled.div`
   & img {
     width: 20px;
     position: absolute;
-    bottom: 12px;
+    top: 40px;
     left: calc(50% - 10px);
   }
 `;
@@ -171,25 +204,20 @@ const StyledActions = styled.div`
   }
 `;
 
+const StyledFees = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 class ExchangeModal extends Component {
   componentDidMount() {
     this.props.exchangeModalInit();
   }
-  onChangeDepositSelected = value => {
-    let depositSelected = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
-    if (value !== 'ETH') {
-      depositSelected = this.props.accountInfo.assets.filter(asset => asset.symbol === value)[0];
-    }
-    this.props.exchangeUpdateDepositSelected(depositSelected);
-  };
-  onChangeWithdrawalSelected = value => {
-    let withdrawalSelected = this.props.availableAssets.filter(asset => asset.symbol === 'ETH')[0];
-    if (value !== 'ETH') {
-      withdrawalSelected = this.props.availableAssets.filter(asset => asset.symbol === value)[0];
-    }
-    this.props.exchangeUpdateWithdrawalSelected(withdrawalSelected);
-  };
+  onChangeDepositSelected = value => this.props.exchangeUpdateDepositSelected(value);
+  onChangeWithdrawalSelected = value => this.props.exchangeUpdateWithdrawalSelected(value);
   onGoBack = () => this.props.exchangeToggleConfirmationView(false);
+  onExchangeMaxBalance = () => this.props.exchangeMaxBalance();
   onExchangeAnother = () => {
     this.props.exchangeToggleConfirmationView(false);
     this.props.exchangeClearFields();
@@ -210,36 +238,20 @@ class ExchangeModal extends Component {
       return;
     }
     if (!this.props.confirm) {
-      if (!isValidAddress(this.props.recipient)) {
-        this.props.notificationShow(lang.t('notification.error.invalid_address'), true);
-        return;
-      } else if (this.props.depositSelected.symbol === 'ETH') {
+      if (this.props.depositSelected.symbol === 'ETH') {
         const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
         const balanceAmount = ethereum.balance.amount;
         const balance = convertAmountFromBigNumber(balanceAmount);
-        const requestedAmount = BigNumber(`${this.props.depositAmount}`).toString();
+        const requestedAmount = convertNumberToString(this.props.depositAmount);
         const txFeeAmount = this.props.gasPrice.txFee.value.amount;
         const txFee = convertAmountFromBigNumber(txFeeAmount);
-        const includingFees = BigNumber(requestedAmount)
-          .plus(BigNumber(txFee))
-          .toString();
-        if (BigNumber(requestedAmount).comparedTo(BigNumber(balance)) === 1) {
+        const includingFees = add(requestedAmount, txFee);
+        if (greaterThan(requestedAmount, balance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
-        } else if (BigNumber(includingFees).comparedTo(BigNumber(balance)) === 1) {
+        } else if (greaterThan(includingFees, balance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
-        }
-        switch (this.props.accountType) {
-          case 'METAMASK':
-            this.props.exchangeEtherMetamask(request);
-            break;
-          case 'LEDGER':
-            this.props.exchangeEtherLedger(request);
-            break;
-          default:
-            this.props.exchangeEtherMetamask(request);
-            break;
         }
       } else {
         const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
@@ -247,41 +259,153 @@ class ExchangeModal extends Component {
         const etherBalance = convertAmountFromBigNumber(etherBalanceAmount);
         const tokenBalanceAmount = this.props.depositSelected.balance.amount;
         const tokenBalance = convertAmountFromBigNumber(tokenBalanceAmount);
-        const requestedAmount = BigNumber(`${this.props.depositAmount}`).toString();
+        const requestedAmount = convertNumberToString(this.props.depositAmount);
         const includingFees = convertAmountFromBigNumber(this.props.gasPrice.txFee.value.amount);
-        if (BigNumber(requestedAmount).comparedTo(BigNumber(tokenBalance)) === 1) {
+        if (greaterThan(requestedAmount, tokenBalance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_balance'), true);
           return;
-        } else if (BigNumber(includingFees).comparedTo(BigNumber(etherBalance)) === 1) {
+        } else if (greaterThan(includingFees, etherBalance)) {
           this.props.notificationShow(lang.t('notification.error.insufficient_for_fees'), true);
           return;
         }
-        switch (this.props.accountType) {
-          case 'METAMASK':
-            this.props.exchangeTokenMetamask(request);
-            break;
-          case 'LEDGER':
-            this.props.exchangeTokenLedger(request);
-            break;
-          default:
-            this.props.exchangeTokenMetamask(request);
-            break;
-        }
       }
+      this.props.exchangeToggleConfirmationView(true);
+    } else {
+      this.props.exchangeTransaction(request);
     }
-    this.props.exchangeToggleConfirmationView(true);
   };
   onClose = () => {
     this.props.exchangeClearFields();
     this.props.modalClose();
   };
   render = () => {
-    const availableSymbols = this.props.availableAssets.map(
-      availableAsset => availableAsset.symbol
-    );
-    const filteredAvailableAssets = this.props.accountInfo.assets.filter(
-      asset => availableSymbols.indexOf(asset.symbol) !== -1
-    );
+    const quantity = this.props.accountInfo.assets.filter(
+      asset => asset.symbol === this.props.depositSelected.symbol
+    )[0].balance.display;
+    const depositNative = this.props.accountInfo.assets.filter(
+      asset => asset.symbol === this.props.depositSelected.symbol
+    )[0].native;
+    const total = depositNative
+      ? this.props.accountInfo.assets.filter(
+          asset => asset.symbol === this.props.depositSelected.symbol
+        )[0].native.balance.display
+      : '';
+    const exchangeDetails =
+      Object.keys(this.props.exchangeDetails).length && this.props.exchangeDetails.rate
+        ? this.props.exchangeDetails
+        : null;
+    const price = exchangeDetails
+      ? convertAmountToDisplay(
+          convertAmountToBigNumber(divide(1, exchangeDetails.rate)),
+          null,
+          this.props.depositSelected
+        )
+      : null;
+    const depositPrices =
+      exchangeDetails &&
+      this.props.prices[this.props.nativeCurrency] &&
+      this.props.prices[this.props.nativeCurrency][this.props.depositSelected.symbol] &&
+      Object.keys(exchangeDetails).length
+        ? this.props.prices[this.props.nativeCurrency][this.props.depositSelected.symbol]
+        : null;
+    const native =
+      exchangeDetails && depositPrices
+        ? convertAmountToDisplay(
+            convertAmountToBigNumber(
+              multiply(
+                convertAmountFromBigNumber(depositPrices.price.amount),
+                divide(1, exchangeDetails.rate)
+              )
+            ),
+            this.props.prices
+          )
+        : null;
+    const depositMin = exchangeDetails
+      ? convertAmountToDisplay(
+          convertAmountToBigNumber(exchangeDetails.min),
+          null,
+          this.props.depositSelected
+        )
+      : null;
+    const depositMax = exchangeDetails
+      ? convertAmountToDisplay(
+          convertAmountToBigNumber(exchangeDetails.maxLimit),
+          null,
+          this.props.depositSelected
+        )
+      : null;
+    const withdrawalMin = exchangeDetails
+      ? convertAmountToDisplay(
+          convertAmountToBigNumber(
+            subtract(multiply(exchangeDetails.min, exchangeDetails.rate), exchangeDetails.minerFee)
+          ),
+          null,
+          this.props.withdrawalSelected
+        )
+      : null;
+    const withdrawalMax = exchangeDetails
+      ? convertAmountToDisplay(
+          convertAmountToBigNumber(
+            subtract(
+              multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
+              exchangeDetails.minerFee
+            )
+          ),
+          null,
+          this.props.withdrawalSelected
+        )
+      : null;
+    const depositUnder = exchangeDetails
+      ? this.props.depositAmount !== ''
+        ? smallerThan(this.props.depositAmount, exchangeDetails.min)
+        : false
+      : false;
+    const depositOver = exchangeDetails
+      ? this.props.depositAmount !== ''
+        ? greaterThan(this.props.depositAmount, exchangeDetails.maxLimit)
+        : false
+      : false;
+    const withdrawalUnder = exchangeDetails
+      ? this.props.withdrawalAmount !== ''
+        ? smallerThan(
+            this.props.withdrawalAmount,
+            subtract(multiply(exchangeDetails.min, exchangeDetails.rate), exchangeDetails.minerFee)
+          )
+        : false
+      : false;
+    const withdrawalOver = exchangeDetails
+      ? this.props.withdrawalAmount !== ''
+        ? greaterThan(
+            this.props.withdrawalAmount,
+            subtract(
+              multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
+              exchangeDetails.minerFee
+            )
+          )
+        : false
+      : false;
+    const exchangeFeeValue = exchangeDetails
+      ? convertAmountToDisplay(
+          convertAmountToBigNumber(exchangeDetails.minerFee),
+          null,
+          this.props.withdrawalSelected
+        )
+      : null;
+    const exchangeFeeNative =
+      exchangeDetails && depositPrices
+        ? convertAmountToDisplay(
+            convertAmountToBigNumber(
+              multiply(
+                exchangeDetails.minerFee,
+                multiply(
+                  convertAmountFromBigNumber(depositPrices.price.amount),
+                  divide(1, exchangeDetails.rate)
+                )
+              )
+            ),
+            this.props.prices
+          )
+        : null;
     return (
       <Card allowOverflow background="lightGrey" fetching={this.props.fetching}>
         {!this.props.txHash ? (
@@ -297,74 +421,110 @@ class ExchangeModal extends Component {
               </StyledSubTitle>
 
               <StyledFlex>
-                <StyledDropdownWrapper>
+                <StyledHelperWrapper>
                   <StyledDropdownLabel>
                     {lang.t('modal.deposit_dropdown_label')}
                   </StyledDropdownLabel>
                   <DropdownAsset
                     noBalance
                     selected={this.props.depositSelected.symbol}
-                    assets={filteredAvailableAssets}
+                    assets={this.props.depositAssets}
                     onChange={this.onChangeDepositSelected}
                   />
-                  <StyledHelperText>
-                    <div>
-                      <strong />
-                      <p />
-                    </div>
-                    <div>
-                      <strong />
-                      <p />
-                    </div>
-                  </StyledHelperText>
-                </StyledDropdownWrapper>
+                  <StyledHelperContainer>
+                    {quantity ? (
+                      <StyledHelperText>
+                        <strong>Quantity</strong>
+                        <p>{quantity}</p>
+                      </StyledHelperText>
+                    ) : (
+                      <div />
+                    )}
+                    {total ? (
+                      <StyledHelperText>
+                        <strong>Total</strong>
+                        <p>{total}</p>
+                      </StyledHelperText>
+                    ) : (
+                      <div />
+                    )}
+                  </StyledHelperContainer>
+                </StyledHelperWrapper>
                 <StyledFlex>
                   <StyledExchangeIcon>
                     <img src={exchangeIcon} alt="conversion" />
                   </StyledExchangeIcon>
                 </StyledFlex>
-                <StyledDropdownWrapper>
+                <StyledHelperWrapper>
                   <StyledDropdownLabel>
                     {lang.t('modal.withdrawal_dropdown_label')}
                   </StyledDropdownLabel>
                   <DropdownAsset
                     noBalance
                     selected={this.props.withdrawalSelected.symbol}
-                    assets={this.props.availableAssets}
+                    assets={this.props.withdrawalAssets}
                     onChange={this.onChangeWithdrawalSelected}
                   />
-                  <StyledHelperText>
-                    <div>
-                      <strong />
-                      <p />
-                    </div>
-                    <div>
-                      <strong />
-                      <p />
-                    </div>
-                  </StyledHelperText>
-                </StyledDropdownWrapper>
+                  <StyledHelperContainer>
+                    {price ? (
+                      <StyledHelperText>
+                        <strong>Price</strong>
+                        <p>{price}</p>
+                      </StyledHelperText>
+                    ) : (
+                      <div />
+                    )}
+                    {native ? (
+                      <StyledHelperText>
+                        <strong>Native</strong>
+                        <p>{native}</p>
+                      </StyledHelperText>
+                    ) : (
+                      <div />
+                    )}
+                  </StyledHelperContainer>
+                </StyledHelperWrapper>
               </StyledFlex>
 
               <StyledFlex>
                 <StyledFlex>
-                  <Input
-                    monospace
-                    label={lang.t('modal.deposit_input_label')}
-                    placeholder="0.0"
-                    type="text"
-                    value={this.props.depositAmount}
-                    onChange={({ target }) =>
-                      this.props.exchangeUpdateDepositAmount(
-                        target.value,
-                        this.props.depositSelected
-                      )
-                    }
-                  />
-                  <StyledMaxBalance onClick={this.onExchangeEntireBalance}>
-                    {lang.t('modal.maximum_balance')}
-                  </StyledMaxBalance>
-                  <StyledAmountCurrency>{this.props.depositSelected.symbol}</StyledAmountCurrency>
+                  <StyledHelperWrapper>
+                    <Input
+                      monospace
+                      label={lang.t('modal.deposit_input_label')}
+                      placeholder="0.0"
+                      type="text"
+                      value={this.props.depositAmount}
+                      onChange={({ target }) =>
+                        this.props.exchangeUpdateDepositAmount(
+                          target.value,
+                          this.props.depositSelected
+                        )
+                      }
+                    />
+                    <StyledMaxBalance onClick={this.onExchangeMaxBalance}>
+                      {lang.t('modal.exchange_max')}
+                    </StyledMaxBalance>
+                    <StyledAmountCurrency>{this.props.depositSelected.symbol}</StyledAmountCurrency>
+                    <StyledHelperContainer>
+                      {depositMin ? (
+                        <StyledHelperText warn={depositUnder}>
+                          <strong>Min</strong>
+                          <p>{depositMin}</p>
+                        </StyledHelperText>
+                      ) : (
+                        <div />
+                      )}
+                      {depositMax ? (
+                        <StyledHelperText warn={depositOver}>
+                          <strong>Max</strong>
+                          <p>{depositMax}</p>
+                        </StyledHelperText>
+                      ) : (
+                        <div />
+                      )}
+                    </StyledHelperContainer>
+                  </StyledHelperWrapper>
                 </StyledFlex>
                 <StyledFlex>
                   <StyledExchangeIcon>
@@ -372,22 +532,42 @@ class ExchangeModal extends Component {
                   </StyledExchangeIcon>
                 </StyledFlex>
                 <StyledFlex>
-                  <Input
-                    monospace
-                    placeholder="0.0"
-                    label={lang.t('modal.withdrawal_input_label')}
-                    type="text"
-                    value={this.props.withdrawalAmount}
-                    onChange={({ target }) =>
-                      this.props.exchangeUpdateWithdrawalAmount(
-                        target.value,
-                        this.props.withdrawalSelected
-                      )
-                    }
-                  />
-                  <StyledAmountCurrency>
-                    {this.props.withdrawalSelected.symbol}
-                  </StyledAmountCurrency>
+                  <StyledHelperWrapper>
+                    <Input
+                      monospace
+                      placeholder="0.0"
+                      label={lang.t('modal.withdrawal_input_label')}
+                      type="text"
+                      value={this.props.withdrawalAmount}
+                      onChange={({ target }) =>
+                        this.props.exchangeUpdateWithdrawalAmount(
+                          target.value,
+                          this.props.withdrawalSelected
+                        )
+                      }
+                    />
+                    <StyledAmountCurrency>
+                      {this.props.withdrawalSelected.symbol}
+                    </StyledAmountCurrency>
+                    <StyledHelperContainer>
+                      {withdrawalMin ? (
+                        <StyledHelperText warn={withdrawalUnder}>
+                          <strong>Min</strong>
+                          <p>{withdrawalMin}</p>
+                        </StyledHelperText>
+                      ) : (
+                        <div />
+                      )}
+                      {withdrawalMax ? (
+                        <StyledHelperText warn={withdrawalOver}>
+                          <strong>Max</strong>
+                          <p>{withdrawalMax}</p>
+                        </StyledHelperText>
+                      ) : (
+                        <div />
+                      )}
+                    </StyledHelperContainer>
+                  </StyledHelperWrapper>
                 </StyledFlex>
               </StyledFlex>
 
@@ -396,14 +576,43 @@ class ExchangeModal extends Component {
               <StyledBottomModal>
                 <StyledActions>
                   <Button onClick={this.onClose}>{lang.t('button.cancel')}</Button>
+                  <StyledFees>
+                    <StyledParagraph>
+                      <span>{`${lang.t('modal.tx_fee')}: `}</span>
+                      <span>{`${
+                        Object.keys(this.props.gasPrice).length
+                          ? this.props.gasPrice.txFee.native.value.display
+                          : '$0.00'
+                      }${
+                        this.props.nativeCurrency !== 'ETH'
+                          ? ` (${
+                              Object.keys(this.props.gasPrice).length
+                                ? this.props.gasPrice.txFee.value.display
+                                : '0.000 ETH'
+                            })`
+                          : ''
+                      }`}</span>
+                    </StyledParagraph>
+                    <StyledParagraph>
+                      <span>{`${lang.t('modal.exchange_fee')}: `}</span>
+                      <span>{`${exchangeFeeNative ? exchangeFeeNative : '$0.00'}${
+                        exchangeFeeValue ? ` (${exchangeFeeValue})` : ''
+                      }`}</span>
+                    </StyledParagraph>
+                  </StyledFees>
                   <Button
                     left
-                    color="blue"
-                    icon={arrowUp}
+                    color="brightGreen"
+                    hoverColor="brightGreenHover"
+                    activeColor="brightGreenHover"
+                    icon={exchangeIcon}
                     disabled={
-                      this.props.recipient.length !== 42 ||
-                      (this.props.depositSelected.symbol !== 'ETH' &&
-                        !Number(this.props.depositAmount))
+                      !this.props.depositAmount ||
+                      !this.props.withdrawalAmount ||
+                      depositUnder ||
+                      depositOver ||
+                      withdrawalUnder ||
+                      withdrawalOver
                     }
                     type="submit"
                   >
@@ -472,45 +681,55 @@ class ExchangeModal extends Component {
 }
 
 ExchangeModal.propTypes = {
+  modalClose: PropTypes.func.isRequired,
   exchangeClearFields: PropTypes.func.isRequired,
   exchangeModalInit: PropTypes.func.isRequired,
+  exchangeTransaction: PropTypes.func.isRequired,
   exchangeUpdateWithdrawalAmount: PropTypes.func.isRequired,
   exchangeUpdateDepositAmount: PropTypes.func.isRequired,
   exchangeUpdateDepositSelected: PropTypes.func.isRequired,
   exchangeUpdateWithdrawalSelected: PropTypes.func.isRequired,
   exchangeToggleConfirmationView: PropTypes.func.isRequired,
+  exchangeMaxBalance: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
-  modalClose: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
+  gasPrice: PropTypes.object.isRequired,
   address: PropTypes.string.isRequired,
   recipient: PropTypes.string.isRequired,
-  depositAmount: PropTypes.string.isRequired,
-  withdrawalAmount: PropTypes.string.isRequired,
-  availableAssets: PropTypes.array.isRequired,
   txHash: PropTypes.string.isRequired,
   confirm: PropTypes.bool.isRequired,
+  exchangeDetails: PropTypes.object.isRequired,
+  depositAssets: PropTypes.array.isRequired,
+  withdrawalAssets: PropTypes.array.isRequired,
   depositSelected: PropTypes.object.isRequired,
   withdrawalSelected: PropTypes.object.isRequired,
+  depositAmount: PropTypes.string.isRequired,
+  withdrawalAmount: PropTypes.string.isRequired,
   accountInfo: PropTypes.object.isRequired,
   accountType: PropTypes.string.isRequired,
   network: PropTypes.string.isRequired,
+  prices: PropTypes.object.isRequired,
   nativeCurrency: PropTypes.string.isRequired
 };
 
 const reduxProps = ({ modal, exchange, account }) => ({
   fetching: exchange.fetching,
+  gasPrice: exchange.gasPrice,
   address: exchange.address,
   recipient: exchange.recipient,
-  depositAmount: exchange.depositAmount,
-  withdrawalAmount: exchange.withdrawalAmount,
-  availableAssets: exchange.availableAssets,
   txHash: exchange.txHash,
   confirm: exchange.confirm,
+  exchangeDetails: exchange.exchangeDetails,
+  depositAssets: exchange.depositAssets,
+  withdrawalAssets: exchange.withdrawalAssets,
   depositSelected: exchange.depositSelected,
   withdrawalSelected: exchange.withdrawalSelected,
+  depositAmount: exchange.depositAmount,
+  withdrawalAmount: exchange.withdrawalAmount,
   accountInfo: account.accountInfo,
   accountType: account.accountType,
   network: account.network,
+  prices: account.prices,
   nativeCurrency: account.nativeCurrency
 });
 
@@ -518,10 +737,12 @@ export default connect(reduxProps, {
   modalClose,
   exchangeClearFields,
   exchangeModalInit,
+  exchangeTransaction,
   exchangeUpdateWithdrawalAmount,
   exchangeUpdateDepositAmount,
   exchangeUpdateDepositSelected,
   exchangeUpdateWithdrawalSelected,
   exchangeToggleConfirmationView,
+  exchangeMaxBalance,
   notificationShow
 })(ExchangeModal);

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import lang from '../languages';
 import clipboardIcon from '../assets/clipboard.png';
+import { toChecksumAddress } from '../handlers/web3';
 import { notificationShow } from '../reducers/_notification';
 import { fonts, colors, transitions, responsive } from '../styles';
 
@@ -109,7 +110,8 @@ class CopyToClipboard extends Component {
     this.props.notificationShow(lang.t('notification.info.address_copied_to_clipboard'));
   };
   render() {
-    const { notificationShow, iconOnHover, text, ...props } = this.props;
+    let { notificationShow, iconOnHover, text, ...props } = this.props;
+    text = toChecksumAddress(text);
     return (
       <StyledCopyToClipboard {...props}>
         <StyledContainer iconOnHover={iconOnHover}>

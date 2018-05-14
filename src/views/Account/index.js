@@ -48,7 +48,7 @@ const StyledTop = styled.div`
       margin-top: 15px;
     }
   }
-  @media screen and (${responsive.sm.max}) {
+  @media screen and (max-width: 768px) {
     flex-direction: column-reverse;
   }
 `;
@@ -98,16 +98,18 @@ class Account extends Component {
                 </StyledAddressWrapper>
 
                 <StyledActions>
-                  {/* <Button
-                    left
-                    color="brightGreen"
-                    hoverColor="brightGreenHover"
-                    activeColor="brightGreenHover"
-                    icon={exchangeIcon}
-                    onClick={this.openExchangeModal}
-                  >
-                    {lang.t('button.exchange')}
-                  </Button> */}
+                  {/* {this.props.network === 'mainnet' && (
+                    <Button
+                      left
+                      color="brightGreen"
+                      hoverColor="brightGreenHover"
+                      activeColor="brightGreenHover"
+                      icon={exchangeIcon}
+                      onClick={this.openExchangeModal}
+                    >
+                      {lang.t('button.exchange')}
+                    </Button>
+                  )} */}
                   <Button
                     left
                     color="blue"
@@ -175,6 +177,7 @@ Account.defaultProps = {
 };
 
 const reduxProps = ({ account }) => ({
+  network: account.network,
   fetching: account.fetching,
   accountInfo: account.accountInfo,
   accountAddress: account.accountAddress,

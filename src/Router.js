@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import BigNumber from 'bignumber.js';
 import lang, { resources } from './languages';
 import Homepage from './pages';
 import Wallet from './pages/Wallet';
@@ -21,9 +20,6 @@ class Router extends Component {
     });
   }
   componentDidMount() {
-    if (process.env.NODE_ENV === 'development') {
-      window.BigNumber = BigNumber;
-    }
     window.browserHistory = this.context.router.history;
     window.onoffline = () => this.props.warningOffline();
     window.ononline = () => this.props.warningOnline();

@@ -65,7 +65,8 @@
       "approve_tx": "Aprobar transacción en {{walletType}}",
       "confirm_tx": "Confirmar transacción de {{walletName}}",
       "invalid_address": "Dirección inválida",
-      "maximum_balance": "Enviar máximo",
+      "send_max": "Enviar máximo",
+      "exchange_max": "Cambiar máximo",
       "default_wallet": " Cartera",
       "gas_slow": "Lento",
       "gas_average": "Medio",
@@ -80,7 +81,9 @@
       "deposit_dropdown_label": "Cambiar mi",
       "withdrawal_dropdown_label": "por",
       "deposit_input_label": "Pagar",
-      "withdrawal_input_label": "Obtener"
+      "withdrawal_input_label": "Obtener",
+      "tx_fee": "Tarifa de transacción",
+      "exchange_fee": "Tarifa de cambio"
     },
     "message": {
       "web3_not_available": "Instala la Chrome extension de MetaMask",

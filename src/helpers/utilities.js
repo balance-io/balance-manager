@@ -42,21 +42,6 @@ export const debounceRequest = (request, params, timeout) =>
   );
 
 /**
- * @desc check if lambda request has allowed access
- * @param  {Object}  request
- * @return {Boolean}
- */
-export const lambdaAllowedAccess = event => {
-  if (process.env.NODE_ENV === 'development') return true;
-  const referer = event.headers.referer;
-  if (!referer) return false;
-  const allowed =
-    referer.indexOf('balance-manager.netlify.com') !== -1 ||
-    referer.indexOf('manager.balance.io') !== -1;
-  return allowed;
-};
-
-/**
  * @desc filter object by a set of allowed keys
  * @param  {Function}  request
  * @param  {Array}     params
@@ -81,15 +66,17 @@ export const filterObjectByKeys = (object, allowedKeys) => {
  * @return {Void}
  */
 export const updateLocalBalances = (account, network) => {
+  const address = account.address;
+  if (!address) return;
   const networks = Object.keys(networkList);
-  let accountLocal = getLocal(account.address) || {};
+  let accountLocal = getLocal(address) || {};
   accountLocal = filterObjectByKeys(accountLocal, networks);
   if (!accountLocal[network]) {
     accountLocal[network] = {};
   }
   accountLocal[network].type = account.type;
   accountLocal[network].balances = { assets: account.assets, total: account.total || '———' };
-  saveLocal(account.address, accountLocal);
+  saveLocal(address, accountLocal);
 };
 
 /**
@@ -100,6 +87,7 @@ export const updateLocalBalances = (account, network) => {
  * @return {Void}
  */
 export const updateLocalTransactions = (address, transactions, network) => {
+  if (!address) return;
   const networks = Object.keys(networkList);
   let accountLocal = getLocal(address) || {};
   accountLocal = filterObjectByKeys(accountLocal, networks);

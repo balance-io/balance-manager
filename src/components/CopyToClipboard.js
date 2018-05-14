@@ -6,17 +6,8 @@ import lang from '../languages';
 import clipboardIcon from '../assets/clipboard.png';
 import { notificationShow } from '../reducers/_notification';
 import { fonts, colors, transitions, responsive } from '../styles';
-
-const StyledIcon = styled.img`
-  cursor: pointer;
-  transition: ${transitions.base};
-  position: absolute;
-  right: -20px;
-  top: calc(50% - 8px);
-  width: 16px;
-  height: 16px;
-  opacity: 0;
-`;
+import copyIcon from '../assets/circle.svg';
+import copiedIcon from '../assets/btc.svg';
 
 const StyledText = styled.p`
   transition: ${transitions.base};
@@ -30,17 +21,42 @@ const StyledText = styled.p`
   letter-spacing: -0.2px;
 `;
 
+const StyledIcon = styled.div`
+  position: absolute;
+  height: 15px;
+  width: 15px;
+  margin: 0 8px;
+  top: 5px;
+  mask: url(${copyIcon});
+  background-color: rgb(${colors.white});
+`;
+
 const StyledCopyToClipboard = styled.div`
   width: 100%;
   min-height: 19px;
   position: relative;
 `;
 
+const StyledButton = styled.button`
+  background-color: rgb(${colors.blue});
+  height: 17px;
+  border-radius: 3px;
+`;
+
+const StyledButtonText = styled.span`
+  color: rgb(${colors.white});
+  transition: ${transitions.base};
+  font-weight: ${fonts.weight.medium};
+  font-size: ${fonts.size.small};
+  font-family: ${fonts.family.SFProText};
+  letter-spacing: -0.2px;
+`;
+
 const StyledContainer = styled.div`
   position: relative;
   display: inline;
   @media (hover: hover) {
-    &:hover ${StyledIcon} {
+    &:hover ${StyledButton} {
       opacity: ${({ iconOnHover }) => (iconOnHover ? '1' : '0')};
     }
     &:hover ${StyledText} {
@@ -120,8 +136,12 @@ class CopyToClipboard extends Component {
             onChange={() => {}}
             onClick={this.copyToCopyToClipboard}
           />
+          <StyledButton>
+            <StyledIcon />
+            <StyledButtonText className="copy">{lang.t('button.copy')}</StyledButtonText>
+            <StyledButtonText className="copied">{lang.t('button.copied')}</StyledButtonText>
+          </StyledButton>
           <StyledText>{lang.t('message.click_to_copy_to_clipboard')}</StyledText>
-          <StyledIcon src={clipboardIcon} alt="copy" onClick={this.simulateCopyToClipboard} />
         </StyledContainer>
       </StyledCopyToClipboard>
     );

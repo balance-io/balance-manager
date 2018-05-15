@@ -93,6 +93,7 @@ const StyledHelperText = styled.div`
   width: 100%;
   text-align: right;
   padding-right: 16px;
+  opacity: ${({ fetching }) => (fetching ? `0.5` : `1.0`)};
   & p {
     color: ${({ warn }) => (warn ? `rgb(${colors.red})` : `rgb(${colors.grey})`)};
     font-size: 13px;
@@ -138,10 +139,10 @@ const StyledAmountCurrency = styled.div`
   right: 6px;
   padding: 4px;
   border-radius: 6px;
-  background: rgb(${colors.white});
+  background: ${({ fetching }) => (fetching ? 'none' : `rgb(${colors.white})`)};
   font-size: ${fonts.size.medium};
   color: rgba(${colors.darkGrey}, 0.7);
-  opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
+  opacity: ${({ fetching }) => (fetching ? '0.5' : '1')};
 `;
 
 const StyledExchangeIcon = styled.div`
@@ -212,6 +213,9 @@ const StyledFees = styled.div`
 `;
 
 class ExchangeModal extends Component {
+  state = {
+    activeInput: ''
+  };
   componentDidMount() {
     this.props.exchangeModalInit();
   }
@@ -224,6 +228,8 @@ class ExchangeModal extends Component {
     this.props.exchangeClearFields();
     this.props.exchangeModalInit();
   };
+  onFocus = activeInput => this.setState({ activeInput });
+  onBlur = () => this.setState({ activeInput: '' });
   onSubmit = e => {
     e.preventDefault();
     const request = {
@@ -439,11 +445,11 @@ class ExchangeModal extends Component {
                     onChange={this.onChangeDepositSelected}
                   />
                   <StyledHelperContainer>
-                    <StyledHelperText>
+                    <StyledHelperText fetching={this.props.fetchingRate}>
                       <strong>Quantity</strong>
                       <p>{quantity || '———'}</p>
                     </StyledHelperText>
-                    <StyledHelperText>
+                    <StyledHelperText fetching={this.props.fetchingRate}>
                       <strong>Total</strong>
                       <p>{total || '———'}</p>
                     </StyledHelperText>
@@ -465,11 +471,11 @@ class ExchangeModal extends Component {
                     onChange={this.onChangeWithdrawalSelected}
                   />
                   <StyledHelperContainer>
-                    <StyledHelperText>
+                    <StyledHelperText fetching={this.props.fetchingRate}>
                       <strong>Price</strong>
                       <p>{price || '———'}</p>
                     </StyledHelperText>
-                    <StyledHelperText>
+                    <StyledHelperText fetching={this.props.fetchingRate}>
                       <strong>Native</strong>
                       <p>{native || '———'}</p>
                     </StyledHelperText>
@@ -481,7 +487,9 @@ class ExchangeModal extends Component {
                 <StyledFlex>
                   <StyledHelperWrapper>
                     <Input
-                      disable={this.props.fetchingRate}
+                      fetching={this.props.fetchingRate && this.state.activeInput !== 'DEPOSIT'}
+                      onFocus={() => this.onFocus('DEPOSIT')}
+                      onBlur={this.onBlur}
                       monospace
                       label={lang.t('modal.deposit_input_label')}
                       placeholder="0.0"
@@ -494,13 +502,23 @@ class ExchangeModal extends Component {
                     <StyledMaxBalance onClick={this.onExchangeMaxBalance}>
                       {lang.t('modal.exchange_max')}
                     </StyledMaxBalance>
-                    <StyledAmountCurrency>{this.props.depositSelected.symbol}</StyledAmountCurrency>
+                    <StyledAmountCurrency
+                      fetching={this.props.fetchingRate && this.state.activeInput !== 'DEPOSIT'}
+                    >
+                      {this.props.depositSelected.symbol}
+                    </StyledAmountCurrency>
                     <StyledHelperContainer>
-                      <StyledHelperText warn={depositUnder}>
+                      <StyledHelperText
+                        fetching={this.props.fetchingRate}
+                        warn={!this.props.fetchingRate && depositUnder}
+                      >
                         <strong>Min</strong>
                         <p>{depositMin || '———'}</p>
                       </StyledHelperText>
-                      <StyledHelperText warn={depositOver}>
+                      <StyledHelperText
+                        fetching={this.props.fetchingRate}
+                        warn={!this.props.fetchingRate && depositOver}
+                      >
                         <strong>Max</strong>
                         <p>{depositMax || '———'}</p>
                       </StyledHelperText>
@@ -515,7 +533,9 @@ class ExchangeModal extends Component {
                 <StyledFlex>
                   <StyledHelperWrapper>
                     <Input
-                      disable={this.props.fetchingRate}
+                      fetching={this.props.fetchingRate && this.state.activeInput !== 'WITHDRAWAL'}
+                      onFocus={() => this.onFocus('WITHDRAWAL')}
+                      onBlur={this.onBlur}
                       monospace
                       placeholder="0.0"
                       label={lang.t('modal.withdrawal_input_label')}
@@ -525,15 +545,23 @@ class ExchangeModal extends Component {
                         this.props.exchangeUpdateWithdrawalAmount(target.value)
                       }
                     />
-                    <StyledAmountCurrency>
+                    <StyledAmountCurrency
+                      fetching={this.props.fetchingRate && this.state.activeInput !== 'WITHDRAWAL'}
+                    >
                       {this.props.withdrawalSelected.symbol}
                     </StyledAmountCurrency>
                     <StyledHelperContainer>
-                      <StyledHelperText warn={withdrawalUnder}>
+                      <StyledHelperText
+                        fetching={this.props.fetchingRate}
+                        warn={!this.props.fetchingRate && withdrawalUnder}
+                      >
                         <strong>Min</strong>
                         <p>{withdrawalMin || '———'}</p>
                       </StyledHelperText>
-                      <StyledHelperText warn={withdrawalOver}>
+                      <StyledHelperText
+                        fetching={this.props.fetchingRate}
+                        warn={!this.props.fetchingRate && withdrawalOver}
+                      >
                         <strong>Max</strong>
                         <p>{withdrawalMax || '———'}</p>
                       </StyledHelperText>

@@ -228,10 +228,20 @@ export const apiShapeshiftGetQuotedPrice = async ({
     const response = await shapeshift.post(`/sendamount`, body);
     if (response.data.success) {
       response.data.success.min = min;
+      return response;
     } else {
-      throw new Error(response.data.error);
+      console.log(marketInfo);
+      return {
+        data: {
+          pair,
+          quotedRate: marketInfo.data.rate,
+          maxLimit: marketInfo.data.maxLimit,
+          min: marketInfo.data.minimum,
+          minerFee: marketInfo.data.minerFee,
+          error: response.data.error
+        }
+      };
     }
-    return response;
   } catch (error) {
     throw error;
   }

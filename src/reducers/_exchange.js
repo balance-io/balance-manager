@@ -131,12 +131,19 @@ export const exchangeUpdateDepositAmount = (depositAmount = '', noTimeout = fals
       depositAmount
     })
       .then(({ data }) => {
-        const exchangeDetails = data.success;
-        if (depositAmount) {
-          withdrawalAmount = exchangeDetails.withdrawalAmount;
-          withdrawalAmount = formatInputDecimals(withdrawalAmount, depositAmount);
+        let exchangeDetails = null;
+        if (data.success) {
+          exchangeDetails = data.success;
+          if (depositAmount) {
+            withdrawalAmount = exchangeDetails.withdrawalAmount;
+            withdrawalAmount = formatInputDecimals(withdrawalAmount, depositAmount);
+          } else {
+            withdrawalAmount = '';
+          }
         } else {
+          exchangeDetails = data;
           withdrawalAmount = '';
+          dispatch(notificationShow(data.error, true));
         }
         dispatch({
           type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_SUCCESS,
@@ -177,12 +184,19 @@ export const exchangeUpdateWithdrawalAmount = (withdrawalAmount = '', noTimeout 
       withdrawalAmount
     })
       .then(({ data }) => {
-        const exchangeDetails = data.success;
-        if (withdrawalAmount) {
-          depositAmount = exchangeDetails.depositAmount;
-          depositAmount = formatInputDecimals(depositAmount, withdrawalAmount);
+        let exchangeDetails = null;
+        if (data.success) {
+          exchangeDetails = data.success;
+          if (withdrawalAmount) {
+            depositAmount = exchangeDetails.depositAmount;
+            depositAmount = formatInputDecimals(depositAmount, withdrawalAmount);
+          } else {
+            depositAmount = '';
+          }
         } else {
+          exchangeDetails = data;
           depositAmount = '';
+          dispatch(notificationShow(data.error, true));
         }
         dispatch({
           type: EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_SUCCESS,

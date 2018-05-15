@@ -66,7 +66,7 @@ const StyledFlex = styled.div`
   transform: none;
 `;
 
-const StyledBottomModal = styled(StyledFlex)`
+const StyledBottomModal = styled(StyledFlex) `
   & p {
     font-size: ${fonts.size.h6};
   }
@@ -174,7 +174,7 @@ const StyledSubTitle = styled.div`
   }
 `;
 
-const StyledGasButton = styled(Button)`
+const StyledGasButton = styled(Button) `
   width: 100%;
   height: 54px;
   & p {
@@ -455,6 +455,8 @@ class SendModal extends Component {
               />
               <StyledGasOptions>
                 <StyledGasButton
+                  data-toggle="tooltip"
+                  title={lang.t('button.gas_slow_tooltip')}
                   dark
                   disabled={!this.props.gasPrices.slow}
                   onClick={() => this.props.sendUpdateGasPrice('slow')}
@@ -463,14 +465,16 @@ class SendModal extends Component {
                     this.props.gasPrices.slow && this.props.gasPrices.slow.txFee.native
                       ? this.props.gasPrices.slow.txFee.native.value.display
                       : '$0.00'
-                  }`}</p>
+                    }`}</p>
                   <p>{`~ ${
                     this.props.gasPrices.slow
                       ? this.props.gasPrices.slow.estimatedTime.display
                       : '0 secs'
-                  }`}</p>
+                    }`}</p>
                 </StyledGasButton>
                 <StyledGasButton
+                  data-toggle="tooltip"
+                  title={lang.t('button.gas_average_tooltip')}
                   dark
                   disabled={!this.props.gasPrices.average}
                   onClick={() => this.props.sendUpdateGasPrice('average')}
@@ -479,14 +483,16 @@ class SendModal extends Component {
                     this.props.gasPrices.average && this.props.gasPrices.average.txFee.native
                       ? this.props.gasPrices.average.txFee.native.value.display
                       : '$0.00'
-                  }`}</p>
+                    }`}</p>
                   <p>{`~ ${
                     this.props.gasPrices.average
                       ? this.props.gasPrices.average.estimatedTime.display
                       : '0 secs'
-                  }`}</p>
+                    }`}</p>
                 </StyledGasButton>
                 <StyledGasButton
+                  data-toggle="tooltip"
+                  title={lang.t('button.gas_fast_tooltip')}
                   dark
                   disabled={!this.props.gasPrices.fast}
                   onClick={() => this.props.sendUpdateGasPrice('fast')}
@@ -495,36 +501,44 @@ class SendModal extends Component {
                     this.props.gasPrices.fast && this.props.gasPrices.fast.txFee.native
                       ? this.props.gasPrices.fast.txFee.native.value.display
                       : '$0.00'
-                  }`}</p>
+                    }`}</p>
                   <p>{`~ ${
                     this.props.gasPrices.fast
                       ? this.props.gasPrices.fast.estimatedTime.display
                       : '0 secs'
-                  }`}</p>
+                    }`}</p>
                 </StyledGasButton>
               </StyledGasOptions>
               <LineBreak noMargin />
               <StyledBottomModal>
                 <StyledActions>
-                  <Button onClick={this.onClose}>{lang.t('button.cancel')}</Button>
+                  <Button
+                    data-toggle="tooltip"
+                    title={lang.t('button.cancel_tooltip')}
+                    onClick={this.onClose}
+                  >
+                    {lang.t('button.cancel')}
+                  </Button>
                   <StyledParagraph>
                     <span>{`${lang.t('modal.gas_fee')}: `}</span>
                     <span>{`${
                       this.props.gasPrices[this.props.gasPriceOption] &&
-                      this.props.gasPrices[this.props.gasPriceOption].txFee.native
+                        this.props.gasPrices[this.props.gasPriceOption].txFee.native
                         ? this.props.gasPrices[this.props.gasPriceOption].txFee.native.value.display
                         : '$0.00'
-                    }${
+                      }${
                       this.props.nativeCurrency !== 'ETH'
                         ? ` (${
-                            this.props.gasPrices[this.props.gasPriceOption]
-                              ? this.props.gasPrices[this.props.gasPriceOption].txFee.value.display
-                              : '0.000 ETH'
-                          })`
+                        this.props.gasPrices[this.props.gasPriceOption]
+                          ? this.props.gasPrices[this.props.gasPriceOption].txFee.value.display
+                          : '0.000 ETH'
+                        })`
                         : ''
-                    }`}</span>
+                      }`}</span>
                   </StyledParagraph>
                   <Button
+                    data-toggle="tooltip"
+                    title={lang.t('button.send_tooltip')}
                     left
                     color="blue"
                     icon={arrowUp}
@@ -548,59 +562,76 @@ class SendModal extends Component {
               )}
             </Form>
           ) : (
-            <StyledApproveTransaction>
-              {(() => {
-                switch (this.props.accountType) {
-                  case 'METAMASK':
-                    return <MetamaskLogo />;
-                  case 'LEDGER':
-                    return <LedgerLogo />;
-                  case 'TREZOR':
-                    return <TrezorLogo />;
-                  default:
-                    return <div />;
-                }
-              })()}
-              <StyledParagraph>
-                {lang.t('modal.approve_tx', {
-                  walletType: capitalize(this.props.accountType)
-                })}
-              </StyledParagraph>
-              <StyledActions single>
-                <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
-              </StyledActions>
-            </StyledApproveTransaction>
-          )
+              <StyledApproveTransaction>
+                {(() => {
+                  switch (this.props.accountType) {
+                    case 'METAMASK':
+                      return <MetamaskLogo />;
+                    case 'LEDGER':
+                      return <LedgerLogo />;
+                    case 'TREZOR':
+                      return <TrezorLogo />;
+                    default:
+                      return <div />;
+                  }
+                })()}
+                <StyledParagraph>
+                  {lang.t('modal.approve_tx', {
+                    walletType: capitalize(this.props.accountType)
+                  })}
+                </StyledParagraph>
+                <StyledActions single>
+                  <Button
+                    data-toggle="tooltip"
+                    title={lang.t('button.close_tooltip')}
+                    onClick={this.onClose}
+                  >
+                    {lang.t('button.close')}
+                  </Button>
+                </StyledActions>
+              </StyledApproveTransaction>
+            )
         ) : (
-          <StyledSuccessMessage>
-            <StyledSubTitle>
-              <StyledIcon color="grey" icon={arrowUp} />
-              {`Success`}
-            </StyledSubTitle>
-            <div>
+            <StyledSuccessMessage>
+              <StyledSubTitle>
+                <StyledIcon color="grey" icon={arrowUp} />
+                {`Success`}
+              </StyledSubTitle>
+              <div>
+                <StyledParagraph>
+                  <strong>{`${lang.t('modal.tx_hash')}:`}</strong>
+                </StyledParagraph>
+                <StyledHash>{` ${this.props.txHash}`}</StyledHash>
+              </div>
               <StyledParagraph>
-                <strong>{`${lang.t('modal.tx_hash')}:`}</strong>
+                <a
+                  href={`https://${
+                    this.props.network !== 'mainnet' ? `${this.props.network}.` : ''
+                    }etherscan.io/tx/${this.props.txHash}`}
+                  target="_blank"
+                >
+                  {lang.t('modal.tx_verify')}
+                </a>
               </StyledParagraph>
-              <StyledHash>{` ${this.props.txHash}`}</StyledHash>
-            </div>
-            <StyledParagraph>
-              <a
-                href={`https://${
-                  this.props.network !== 'mainnet' ? `${this.props.network}.` : ''
-                }etherscan.io/tx/${this.props.txHash}`}
-                target="_blank"
-              >
-                {lang.t('modal.tx_verify')}
-              </a>
-            </StyledParagraph>
-            <StyledActions>
-              <Button onClick={this.onSendAnother}>{lang.t('button.send_another')}</Button>
-              <Button color="red" onClick={this.onClose}>
-                {lang.t('button.close')}
-              </Button>
-            </StyledActions>
-          </StyledSuccessMessage>
-        )}
+              <StyledActions>
+                <Button
+                  data-toggle="tooltip"
+                  title={lang.t('button.send_another_tooltip')}
+                  onClick={this.onSendAnother}
+                >
+                  {lang.t('button.send_another')}
+                </Button>
+                <Button
+                  data-toggle="tooltip"
+                  title={lang.t('button.close_tooltip')}
+                  color="red"
+                  onClick={this.onClose}
+                >
+                  {lang.t('button.close')}
+                </Button>
+              </StyledActions>
+            </StyledSuccessMessage>
+          )}
       </Card>
     );
   };

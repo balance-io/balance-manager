@@ -23,7 +23,7 @@ const StyledContainer = styled.div`
   }
 `;
 
-const StyledQRCodeDisplay = styled(QRCodeDisplay)`
+const StyledQRCodeDisplay = styled(QRCodeDisplay) `
   margin: 35px auto;
 `;
 
@@ -54,7 +54,7 @@ const StyledJustifyContent = styled.div`
   align-items: center;
 `;
 
-const StyledCopyToClipboard = styled(CopyToClipboard)`
+const StyledCopyToClipboard = styled(CopyToClipboard) `
   font-weight: ${fonts.weight.semibold};
   text-align: center;
   letter-spacing: 2px;
@@ -88,7 +88,13 @@ class ReceiveModal extends Component {
                 walletName: capitalize(`${this.props.accountType}${lang.t('modal.default_wallet')}`)
               })}
             </StyledSubTitle>
-            <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
+            <Button
+              data-toggle="tooltip"
+              title={lang.t('button.close_tooltip')}
+              onClick={this.onClose}
+            >
+              {lang.t('button.close')}
+            </Button>
           </StyledJustifyContent>
           <StyledQRCodeDisplay data={this.props.accountAddress} />
           <StyledCopyToClipboard text={this.props.accountAddress} />

@@ -34,7 +34,7 @@ const SForm = styled.form`
   }
 `;
 
-const StyledSubmit = styled(Button)`
+const StyledSubmit = styled(Button) `
   position: absolute;
   right: 0;
   padding: 0 15px 2px 15px;
@@ -97,7 +97,7 @@ class SubscribeForm extends Component {
     }
     const url = `//${options.server}.list-manage.com/subscribe/post-json?u=${options.userId}&id=${
       options.listId
-    }&ORIGIN=${options.origin}&EMAIL=${encodeURIComponent(this.state.input)}`;
+      }&ORIGIN=${options.origin}&EMAIL=${encodeURIComponent(this.state.input)}`;
     this.onStatusChange(
       {
         status: 'sending',
@@ -169,6 +169,8 @@ class SubscribeForm extends Component {
           onChange={this.onChange}
         />
         <StyledSubmit
+          data-toggle="tooltip"
+          title={lang.t('button.notify_me_tooltip')}
           disabled={!this.state.input}
           color="blue"
           hoverColor="blueHover"

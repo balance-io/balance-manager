@@ -111,6 +111,8 @@ class Account extends Component {
                     </Button>
                   )} */}
                   <Button
+                    data-toggle="tooltip"
+                    title={lang.t('button.receive_tooltip')}
                     left
                     color="blue"
                     hoverColor="blueHover"
@@ -121,6 +123,8 @@ class Account extends Component {
                     {lang.t('button.receive')}
                   </Button>
                   <Button
+                    data-toggle="tooltip"
+                    title={lang.t('button.send_tooltip')}
                     left
                     color="blue"
                     hoverColor="blueHover"
@@ -151,8 +155,8 @@ class Account extends Component {
               </Switch>
             </StyledFlex>
           ) : (
-            <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
-          )}
+              <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
+            )}
         </Card>
       </StyledAccount>
     );

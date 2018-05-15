@@ -84,6 +84,7 @@ const StyledHelperWrapper = styled.div`
 const StyledHelperContainer = styled.div`
   width: 100%;
   display: grid;
+  height: 34px;
   grid-template-columns: 1fr 1fr;
   padding-top: 16px;
 `;
@@ -291,12 +292,12 @@ class ExchangeModal extends Component {
         )[0].native.balance.display
       : '';
     const exchangeDetails =
-      Object.keys(this.props.exchangeDetails).length && this.props.exchangeDetails.rate
+      Object.keys(this.props.exchangeDetails).length && this.props.exchangeDetails.quotedRate
         ? this.props.exchangeDetails
         : null;
     const price = exchangeDetails
       ? convertAmountToDisplay(
-          convertAmountToBigNumber(divide(1, exchangeDetails.rate)),
+          convertAmountToBigNumber(divide(1, exchangeDetails.quotedRate)),
           null,
           this.props.depositSelected
         )
@@ -314,7 +315,7 @@ class ExchangeModal extends Component {
             convertAmountToBigNumber(
               multiply(
                 convertAmountFromBigNumber(depositPrices.price.amount),
-                divide(1, exchangeDetails.rate)
+                divide(1, exchangeDetails.quotedRate)
               )
             ),
             this.props.prices
@@ -337,7 +338,10 @@ class ExchangeModal extends Component {
     const withdrawalMin = exchangeDetails
       ? convertAmountToDisplay(
           convertAmountToBigNumber(
-            subtract(multiply(exchangeDetails.min, exchangeDetails.rate), exchangeDetails.minerFee)
+            subtract(
+              multiply(exchangeDetails.min, exchangeDetails.quotedRate),
+              exchangeDetails.minerFee
+            )
           ),
           null,
           this.props.withdrawalSelected
@@ -347,7 +351,7 @@ class ExchangeModal extends Component {
       ? convertAmountToDisplay(
           convertAmountToBigNumber(
             subtract(
-              multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
+              multiply(exchangeDetails.maxLimit, exchangeDetails.quotedRate),
               exchangeDetails.minerFee
             )
           ),
@@ -369,7 +373,10 @@ class ExchangeModal extends Component {
       ? this.props.withdrawalAmount !== ''
         ? smallerThan(
             this.props.withdrawalAmount,
-            subtract(multiply(exchangeDetails.min, exchangeDetails.rate), exchangeDetails.minerFee)
+            subtract(
+              multiply(exchangeDetails.min, exchangeDetails.quotedRate),
+              exchangeDetails.minerFee
+            )
           )
         : false
       : false;
@@ -378,7 +385,7 @@ class ExchangeModal extends Component {
         ? greaterThan(
             this.props.withdrawalAmount,
             subtract(
-              multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
+              multiply(exchangeDetails.maxLimit, exchangeDetails.quotedRate),
               exchangeDetails.minerFee
             )
           )
@@ -399,7 +406,7 @@ class ExchangeModal extends Component {
                 exchangeDetails.minerFee,
                 multiply(
                   convertAmountFromBigNumber(depositPrices.price.amount),
-                  divide(1, exchangeDetails.rate)
+                  divide(1, exchangeDetails.quotedRate)
                 )
               )
             ),
@@ -432,22 +439,14 @@ class ExchangeModal extends Component {
                     onChange={this.onChangeDepositSelected}
                   />
                   <StyledHelperContainer>
-                    {quantity ? (
-                      <StyledHelperText>
-                        <strong>Quantity</strong>
-                        <p>{quantity}</p>
-                      </StyledHelperText>
-                    ) : (
-                      <div />
-                    )}
-                    {total ? (
-                      <StyledHelperText>
-                        <strong>Total</strong>
-                        <p>{total}</p>
-                      </StyledHelperText>
-                    ) : (
-                      <div />
-                    )}
+                    <StyledHelperText>
+                      <strong>Quantity</strong>
+                      <p>{quantity || '———'}</p>
+                    </StyledHelperText>
+                    <StyledHelperText>
+                      <strong>Total</strong>
+                      <p>{total || '———'}</p>
+                    </StyledHelperText>
                   </StyledHelperContainer>
                 </StyledHelperWrapper>
                 <StyledFlex>
@@ -466,22 +465,14 @@ class ExchangeModal extends Component {
                     onChange={this.onChangeWithdrawalSelected}
                   />
                   <StyledHelperContainer>
-                    {price ? (
-                      <StyledHelperText>
-                        <strong>Price</strong>
-                        <p>{price}</p>
-                      </StyledHelperText>
-                    ) : (
-                      <div />
-                    )}
-                    {native ? (
-                      <StyledHelperText>
-                        <strong>Native</strong>
-                        <p>{native}</p>
-                      </StyledHelperText>
-                    ) : (
-                      <div />
-                    )}
+                    <StyledHelperText>
+                      <strong>Price</strong>
+                      <p>{price || '———'}</p>
+                    </StyledHelperText>
+                    <StyledHelperText>
+                      <strong>Native</strong>
+                      <p>{native || '———'}</p>
+                    </StyledHelperText>
                   </StyledHelperContainer>
                 </StyledHelperWrapper>
               </StyledFlex>
@@ -507,22 +498,14 @@ class ExchangeModal extends Component {
                     </StyledMaxBalance>
                     <StyledAmountCurrency>{this.props.depositSelected.symbol}</StyledAmountCurrency>
                     <StyledHelperContainer>
-                      {depositMin ? (
-                        <StyledHelperText warn={depositUnder}>
-                          <strong>Min</strong>
-                          <p>{depositMin}</p>
-                        </StyledHelperText>
-                      ) : (
-                        <div />
-                      )}
-                      {depositMax ? (
-                        <StyledHelperText warn={depositOver}>
-                          <strong>Max</strong>
-                          <p>{depositMax}</p>
-                        </StyledHelperText>
-                      ) : (
-                        <div />
-                      )}
+                      <StyledHelperText warn={depositUnder}>
+                        <strong>Min</strong>
+                        <p>{depositMin || '———'}</p>
+                      </StyledHelperText>
+                      <StyledHelperText warn={depositOver}>
+                        <strong>Max</strong>
+                        <p>{depositMax || '———'}</p>
+                      </StyledHelperText>
                     </StyledHelperContainer>
                   </StyledHelperWrapper>
                 </StyledFlex>
@@ -550,22 +533,14 @@ class ExchangeModal extends Component {
                       {this.props.withdrawalSelected.symbol}
                     </StyledAmountCurrency>
                     <StyledHelperContainer>
-                      {withdrawalMin ? (
-                        <StyledHelperText warn={withdrawalUnder}>
-                          <strong>Min</strong>
-                          <p>{withdrawalMin}</p>
-                        </StyledHelperText>
-                      ) : (
-                        <div />
-                      )}
-                      {withdrawalMax ? (
-                        <StyledHelperText warn={withdrawalOver}>
-                          <strong>Max</strong>
-                          <p>{withdrawalMax}</p>
-                        </StyledHelperText>
-                      ) : (
-                        <div />
-                      )}
+                      <StyledHelperText warn={withdrawalUnder}>
+                        <strong>Min</strong>
+                        <p>{withdrawalMin || '———'}</p>
+                      </StyledHelperText>
+                      <StyledHelperText warn={withdrawalOver}>
+                        <strong>Max</strong>
+                        <p>{withdrawalMax || '———'}</p>
+                      </StyledHelperText>
                     </StyledHelperContainer>
                   </StyledHelperWrapper>
                 </StyledFlex>

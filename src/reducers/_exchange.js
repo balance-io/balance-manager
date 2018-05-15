@@ -1,6 +1,6 @@
 import {
   apiShapeshiftGetCurrencies,
-  apiShapeshiftGetMarketInfo,
+  apiShapeshiftGetQuotedPrice,
   apiGetGasPrices
 } from '../handlers/api';
 import { parseError, parseGasPrices } from '../handlers/parsers';
@@ -52,9 +52,9 @@ const EXCHANGE_CLEAR_FIELDS = 'exchange/EXCHANGE_CLEAR_FIELDS';
 export const exchangeUpdateExchangeRate = () => (dispatch, getState) => {
   const { depositSelected, withdrawalSelected, depositAmount } = getState().exchange;
   dispatch({ type: EXCHANGE_GET_MARKET_INFO_REQUEST });
-  apiShapeshiftGetMarketInfo(depositSelected.symbol, withdrawalSelected.symbol)
+  apiShapeshiftGetQuotedPrice(depositSelected.symbol, withdrawalSelected.symbol)
     .then(({ data }) => {
-      const exchangeDetails = data[Object.keys(data)[0]];
+      const exchangeDetails = data.success;
       dispatch({ type: EXCHANGE_GET_MARKET_INFO_SUCCESS, payload: exchangeDetails });
       dispatch(exchangeUpdateDepositAmount(depositAmount));
     })
@@ -166,7 +166,7 @@ export const exchangeUpdateDepositAmount = depositAmount => (dispatch, getState)
   depositAmount = depositAmount.replace(/[^0-9.]/g, '');
   if (depositAmount) {
     withdrawalAmount = subtract(
-      multiply(depositAmount, exchangeDetails.rate),
+      multiply(depositAmount, exchangeDetails.quotedRate),
       exchangeDetails.minerFee
     );
     withdrawalAmount = formatInputDecimals(withdrawalAmount, depositAmount);
@@ -188,7 +188,7 @@ export const exchangeUpdateWithdrawalAmount = withdrawalAmount => (dispatch, get
   withdrawalAmount = withdrawalAmount.replace(/[^0-9.]/g, '');
   if (withdrawalAmount) {
     depositAmount = add(withdrawalAmount, exchangeDetails.minerFee);
-    depositAmount = divide(depositAmount, exchangeDetails.rate);
+    depositAmount = divide(depositAmount, exchangeDetails.quotedRate);
     depositAmount = formatInputDecimals(depositAmount, withdrawalAmount);
   } else {
     depositAmount = '';

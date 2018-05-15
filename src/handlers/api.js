@@ -164,15 +164,6 @@ export const apiGetGasPrices = () => api.get(`/get_eth_gas_prices`);
 export const apiShapeshiftGetCurrencies = () => api.get(`/get_currencies`);
 
 /**
- * @desc shapeshift get market info
- * @param  {String}   [depositSelected = '']
- * @param  {String}   [withdrawalSelected = '']
- * @return {Promise}
- */
-export const apiShapeshiftGetMarketInfo = (depositSelected = '', withdrawalSelected = '') =>
-  api.get(`/get_market_info?deposit=${depositSelected}&withdrawal=${withdrawalSelected}`);
-
-/**
  * @desc shapeshift get fixed price
  * @param  {String}   [amount = '']
  * @param  {String}   [exchangePair = '']
@@ -189,12 +180,24 @@ export const apiShapeshiftGetFixedPrice = (amount = '', exchangePair = '', addre
 
 /**
  * @desc shapeshift get quoted price
+ * @param  {String}   [depositSelected = '']
+ * @param  {String}   [withdrawalSelected = '']
  * @param  {String}   [amount = '']
- * @param  {String}   [exchangePair = '']
+ * @param  {String}   [depositAmount = '']
  * @return {Promise}
  */
-export const apiShapeshiftGetQuotedPrice = (amount = '', exchangePair = '') =>
-  api.post(`/shapeshift_quoted_price_request`, {
-    amount,
-    pair: exchangePair
-  });
+export const apiShapeshiftGetQuotedPrice = (
+  depositSelected = '',
+  withdrawalSelected = '',
+  amount = '',
+  depositAmount = ''
+) => {
+  const pair = `${depositSelected.toLowerCase()}_${withdrawalSelected.toLowerCase()}`;
+  const body = { pair };
+  if (amount) {
+    body.amount = amount;
+  } else if (depositAmount) {
+    body.depositAmount = depositAmount;
+  }
+  return api.post(`/shapeshift_quoted_price_request`, body);
+};

@@ -6,10 +6,7 @@ import {
 import { parseError, parseGasPrices } from '../handlers/parsers';
 import { web3SendTransactionMultiWallet } from '../handlers/web3';
 import {
-  add,
   subtract,
-  multiply,
-  divide,
   greaterThan,
   formatInputDecimals,
   convertAmountFromBigNumber,
@@ -39,9 +36,9 @@ const EXCHANGE_TRANSACTION_FAILURE = 'exchange/EXCHANGE_TRANSACTION_FAILURE';
 
 const EXCHANGE_TOGGLE_CONFIRMATION_VIEW = 'exchange/EXCHANGE_TOGGLE_CONFIRMATION_VIEW';
 
-const EXCHANGE_UPDATE_NATIVE_AMOUNT = 'exchange/EXCHANGE_UPDATE_NATIVE_AMOUNT';
+const EXCHANGE_UPDATE_DEPOSIT_AMOUNT = 'exchange/EXCHANGE_UPDATE_DEPOSIT_AMOUNT';
+const EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT = 'exchange/EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT';
 
-const EXCHANGE_UPDATE_ASSET_AMOUNT = 'exchange/EXCHANGE_UPDATE_ASSET_AMOUNT';
 const EXCHANGE_UPDATE_DEPOSIT_SELECTED = 'exchange/EXCHANGE_UPDATE_DEPOSIT_SELECTED';
 const EXCHANGE_UPDATE_WITHDRAWAL_SELECTED = 'exchange/EXCHANGE_UPDATE_WITHDRAWAL_SELECTED';
 
@@ -52,7 +49,10 @@ const EXCHANGE_CLEAR_FIELDS = 'exchange/EXCHANGE_CLEAR_FIELDS';
 export const exchangeUpdateExchangeRate = () => (dispatch, getState) => {
   const { depositSelected, withdrawalSelected, depositAmount } = getState().exchange;
   dispatch({ type: EXCHANGE_GET_MARKET_INFO_REQUEST });
-  apiShapeshiftGetQuotedPrice(depositSelected.symbol, withdrawalSelected.symbol)
+  apiShapeshiftGetQuotedPrice({
+    depositSymbol: depositSelected.symbol,
+    withdrawalSymbol: withdrawalSelected.symbol
+  })
     .then(({ data }) => {
       const exchangeDetails = data.success;
       dispatch({ type: EXCHANGE_GET_MARKET_INFO_SUCCESS, payload: exchangeDetails });
@@ -152,54 +152,66 @@ export const exchangeUpdateWithdrawalSelected = value => (dispatch, getState) =>
   dispatch(exchangeUpdateExchangeRate());
 };
 
-export const exchangeToggleConfirmationView = boolean => (dispatch, getState) => {
-  let confirm = boolean;
-  if (!confirm) {
-    confirm = !getState().exchange.confirm;
-  }
-  dispatch({ type: EXCHANGE_TOGGLE_CONFIRMATION_VIEW, payload: confirm });
-};
-
 export const exchangeUpdateDepositAmount = depositAmount => (dispatch, getState) => {
-  let { withdrawalAmount } = getState().exchange;
-  const { exchangeDetails } = getState().exchange;
+  let { withdrawalAmount, depositSelected, withdrawalSelected } = getState().exchange;
   depositAmount = depositAmount.replace(/[^0-9.]/g, '');
-  if (depositAmount) {
-    withdrawalAmount = subtract(
-      multiply(depositAmount, exchangeDetails.quotedRate),
-      exchangeDetails.minerFee
-    );
-    withdrawalAmount = formatInputDecimals(withdrawalAmount, depositAmount);
-  } else {
-    withdrawalAmount = '';
-  }
-  if (withdrawalAmount && Number(withdrawalAmount) <= 0) {
-    withdrawalAmount = '0';
-  }
-  dispatch({
-    type: EXCHANGE_UPDATE_ASSET_AMOUNT,
-    payload: { depositAmount, withdrawalAmount }
-  });
+  apiShapeshiftGetQuotedPrice({
+    depositSymbol: depositSelected.symbol,
+    withdrawalSymbol: withdrawalSelected.symbol,
+    depositAmount
+  })
+    .then(({ data }) => {
+      const exchangeDetails = data.success;
+      if (depositAmount) {
+        withdrawalAmount = exchangeDetails.withdrawalAmount;
+        withdrawalAmount = formatInputDecimals(withdrawalAmount, depositAmount);
+      } else {
+        withdrawalAmount = '';
+      }
+      if (withdrawalAmount && Number(withdrawalAmount) <= 0) {
+        withdrawalAmount = '0';
+      }
+      dispatch({
+        type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT,
+        payload: { exchangeDetails, depositAmount, withdrawalAmount }
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: EXCHANGE_GET_MARKET_INFO_FAILURE });
+    });
 };
 
 export const exchangeUpdateWithdrawalAmount = withdrawalAmount => (dispatch, getState) => {
-  let { depositAmount } = getState().exchange;
-  const { exchangeDetails } = getState().exchange;
+  let { depositAmount, depositSelected, withdrawalSelected } = getState().exchange;
   withdrawalAmount = withdrawalAmount.replace(/[^0-9.]/g, '');
-  if (withdrawalAmount) {
-    depositAmount = add(withdrawalAmount, exchangeDetails.minerFee);
-    depositAmount = divide(depositAmount, exchangeDetails.quotedRate);
-    depositAmount = formatInputDecimals(depositAmount, withdrawalAmount);
-  } else {
-    depositAmount = '';
-  }
-  if (depositAmount && Number(depositAmount) <= 0) {
-    depositAmount = '0';
-  }
-  dispatch({
-    type: EXCHANGE_UPDATE_ASSET_AMOUNT,
-    payload: { depositAmount, withdrawalAmount }
-  });
+  apiShapeshiftGetQuotedPrice({
+    depositSymbol: depositSelected.symbol,
+    withdrawalSymbol: withdrawalSelected.symbol,
+    withdrawalAmount
+  })
+    .then(({ data }) => {
+      const exchangeDetails = data.success;
+      if (withdrawalAmount) {
+        depositAmount = exchangeDetails.depositAmount;
+        depositAmount = formatInputDecimals(depositAmount, withdrawalAmount);
+      } else {
+        depositAmount = '';
+      }
+      if (depositAmount && Number(depositAmount) <= 0) {
+        depositAmount = '0';
+      }
+      dispatch({
+        type: EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT,
+        payload: { exchangeDetails, depositAmount, withdrawalAmount }
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: EXCHANGE_GET_MARKET_INFO_FAILURE });
+    });
 };
 
 export const exchangeMaxBalance = () => (dispatch, getState) => {
@@ -252,11 +264,20 @@ export const exchangeTransaction = ({ address, recipient, amount, asset, gasPric
     });
 };
 
+export const exchangeToggleConfirmationView = boolean => (dispatch, getState) => {
+  let confirm = boolean;
+  if (!confirm) {
+    confirm = !getState().exchange.confirm;
+  }
+  dispatch({ type: EXCHANGE_TOGGLE_CONFIRMATION_VIEW, payload: confirm });
+};
+
 export const exchangeClearFields = () => ({ type: EXCHANGE_CLEAR_FIELDS });
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
   fetching: false,
+  fetchingRate: false,
   address: '',
   recipient: '',
   txHash: '',
@@ -336,10 +357,11 @@ export default (state = INITIAL_STATE, action) => {
         txHash: '',
         confirm: false
       };
-    case EXCHANGE_UPDATE_NATIVE_AMOUNT:
-    case EXCHANGE_UPDATE_ASSET_AMOUNT:
+    case EXCHANGE_UPDATE_DEPOSIT_AMOUNT:
+    case EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT:
       return {
         ...state,
+        exchangeDetails: action.payload.exchangeDetails,
         depositAmount: action.payload.depositAmount,
         withdrawalAmount: action.payload.withdrawalAmount
       };

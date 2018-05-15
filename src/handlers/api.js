@@ -182,20 +182,20 @@ export const apiShapeshiftGetFixedPrice = (amount = '', exchangePair = '', addre
  * @desc shapeshift get quoted price
  * @param  {String}   [depositSelected = '']
  * @param  {String}   [withdrawalSelected = '']
- * @param  {String}   [amount = '']
  * @param  {String}   [depositAmount = '']
+ * @param  {String}   [withdrawalAmount = '']
  * @return {Promise}
  */
-export const apiShapeshiftGetQuotedPrice = (
-  depositSelected = '',
-  withdrawalSelected = '',
-  amount = '',
-  depositAmount = ''
-) => {
-  const pair = `${depositSelected.toLowerCase()}_${withdrawalSelected.toLowerCase()}`;
+export const apiShapeshiftGetQuotedPrice = ({
+  depositSymbol = '',
+  withdrawalSymbol = '',
+  depositAmount = '',
+  withdrawalAmount = ''
+}) => {
+  const pair = `${depositSymbol.toLowerCase()}_${withdrawalSymbol.toLowerCase()}`;
   const body = { pair };
-  if (amount) {
-    body.amount = amount;
+  if (withdrawalAmount) {
+    body.amount = withdrawalAmount;
   } else if (depositAmount) {
     body.depositAmount = depositAmount;
   }

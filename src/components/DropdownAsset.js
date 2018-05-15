@@ -54,7 +54,7 @@ const StyledRow = styled.div`
     text-align: left;
   }
   & > div > p {
-    width: 40%;
+    width: ${({ noBalance }) => (noBalance ? '0' : '40%')};
     text-align: right;
   }
   @media screen and (${responsive.xs.max}) {

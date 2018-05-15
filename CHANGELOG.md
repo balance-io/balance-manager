@@ -19,6 +19,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 \*
 
+## [0.5.2](https://github.com/balance-io/balance-manager/releases/tag/0.5.2)
+
+### Added
+
+* New token icons
+* Add Github templates for Issues and PR
+
+### Changed
+
+* Improve hover performance of box-shadow on rows (Issue #180)
+* Collapse Dropdown component onClick outside of Dropdown (Issue #172)
+* Fix flickering AssetIcon due to unnecessary setState calls (Issue ##107)
+
+### Removed
+
+\*
+
 ## [0.5.1](https://github.com/balance-io/balance-manager/releases/tag/0.5.1)
 
 ### Added

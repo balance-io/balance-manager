@@ -164,6 +164,19 @@ export const apiGetGasPrices = () => api.get(`/get_eth_gas_prices`);
 export const apiShapeshiftGetCurrencies = () => api.get(`/get_currencies`);
 
 /**
+ * Configuration for shapeshift api
+ * @type axios instance
+ */
+const shapeshift = axios.create({
+  baseURL: 'https://shapeshift.io',
+  timeout: 30000, // 30 secs
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
+  }
+});
+
+/**
  * @desc shapeshift get fixed price
  * @param  {String}   [amount = '']
  * @param  {String}   [exchangePair = '']
@@ -171,12 +184,20 @@ export const apiShapeshiftGetCurrencies = () => api.get(`/get_currencies`);
  * @return {Promise}
  */
 export const apiShapeshiftGetFixedPrice = (amount = '', exchangePair = '', address = '') =>
-  api.post(`/shapeshift_send_amount`, {
+  shapeshift.post(`/sendamount`, {
     amount,
     withdrawal: address,
     pair: exchangePair,
     returnAddress: address
   });
+
+/**
+ * @desc shapeshift get market info
+ * @param  {String}   [exchangePair = '']
+ * @return {Promise}
+ */
+export const apiShapeshiftGetMarketInfo = (exchangePair = '') =>
+  shapeshift.get(`/marketinfo/${exchangePair}`);
 
 /**
  * @desc shapeshift get quoted price
@@ -186,18 +207,43 @@ export const apiShapeshiftGetFixedPrice = (amount = '', exchangePair = '', addre
  * @param  {String}   [withdrawalAmount = '']
  * @return {Promise}
  */
-export const apiShapeshiftGetQuotedPrice = ({
+export const apiShapeshiftGetQuotedPrice = async ({
   depositSymbol = '',
   withdrawalSymbol = '',
   depositAmount = '',
   withdrawalAmount = ''
 }) => {
-  const pair = `${depositSymbol.toLowerCase()}_${withdrawalSymbol.toLowerCase()}`;
-  const body = { pair };
-  if (withdrawalAmount) {
-    body.amount = withdrawalAmount;
-  } else if (depositAmount) {
-    body.depositAmount = depositAmount;
+  try {
+    const pair = `${depositSymbol.toLowerCase()}_${withdrawalSymbol.toLowerCase()}`;
+    const marketInfo = await apiShapeshiftGetMarketInfo(pair);
+    const min = marketInfo.data.minimum;
+    const body = { pair };
+    if (withdrawalAmount) {
+      body.amount = withdrawalAmount;
+    } else if (depositAmount) {
+      body.depositAmount = depositAmount;
+    } else {
+      body.depositAmount = min;
+    }
+    const response = await shapeshift.post(`/sendamount`, body);
+    if (response.data.success) {
+      response.data.success.min = min;
+    } else {
+      throw new Error(response.data.error);
+    }
+    return response;
+  } catch (error) {
+    throw error;
   }
-  return api.post(`/shapeshift_quoted_price_request`, body);
 };
+
+/**
+ * @desc shapeshift verify availability
+ * @param  {String}   [depositSelected = '']
+ * @param  {String}   [withdrawalSelected = '']
+ * @param  {String}   [depositAmount = '']
+ * @param  {String}   [withdrawalAmount = '']
+ * @return {Promise}
+ */
+export const apiShapeshiftVerify = async () =>
+  shapeshift.post(`/sendamount`, { pair: 'eth_bnt', amount: '0.5' });

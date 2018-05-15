@@ -4,7 +4,8 @@ import {
   apiGetAccountBalances,
   apiGetAccountTransactions,
   apiGetPrices,
-  apiGetTransactionStatus
+  apiGetTransactionStatus,
+  apiShapeshiftVerify
 } from '../handlers/api';
 import {
   parseError,
@@ -48,6 +49,10 @@ const ACCOUNT_UPDATE_BALANCES_FAILURE = 'account/ACCOUNT_UPDATE_BALANCES_FAILURE
 const ACCOUNT_GET_NATIVE_PRICES_REQUEST = 'account/ACCOUNT_GET_NATIVE_PRICES_REQUEST';
 const ACCOUNT_GET_NATIVE_PRICES_SUCCESS = 'account/ACCOUNT_GET_NATIVE_PRICES_SUCCESS';
 const ACCOUNT_GET_NATIVE_PRICES_FAILURE = 'account/ACCOUNT_GET_NATIVE_PRICES_FAILURE';
+
+const ACCOUNT_SHAPESHIFT_VERIFY_REQUEST = 'account/ACCOUNT_SHAPESHIFT_VERIFY_REQUEST';
+const ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS = 'account/ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS';
+const ACCOUNT_SHAPESHIFT_VERIFY_FAILURE = 'account/ACCOUNT_SHAPESHIFT_VERIFY_FAILURE';
 
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 const ACCOUNT_UPDATE_WEB3_NETWORK = 'account/ACCOUNT_UPDATE_WEB3_NETWORK';
@@ -228,11 +233,23 @@ export const accountUpdateBalances = () => (dispatch, getState) => {
 
 export const accountUpdateNetwork = network => dispatch => {
   web3SetHttpProvider(`https://${network}.infura.io/`);
-  dispatch({ type: ACCOUNT_UPDATE_WEB3_NETWORK, payload: network });
+  dispatch({
+    type: ACCOUNT_UPDATE_WEB3_NETWORK,
+    payload: network
+  });
 };
 
 export const accountClearIntervals = () => dispatch => {
   clearInterval(getPricesInterval);
+};
+
+export const accountShapeshiftVerify = () => dispatch => {
+  dispatch({
+    type: ACCOUNT_SHAPESHIFT_VERIFY_REQUEST
+  });
+  apiShapeshiftVerify()
+    .then(() => dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS }))
+    .catch(() => dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_FAILURE }));
 };
 
 export const accountUpdateAccountAddress = (accountAddress, accountType) => (
@@ -245,6 +262,7 @@ export const accountUpdateAccountAddress = (accountAddress, accountType) => (
     payload: { accountAddress, accountType }
   });
   if (accountAddress) {
+    dispatch(accountShapeshiftVerify());
     dispatch(accountGetAccountTransactions());
     dispatch(accountGetAccountBalances());
   }
@@ -332,6 +350,8 @@ const INITIAL_STATE = {
     total: '———'
   },
   transactions: [],
+  shapeshiftAvailable: false,
+  fetchingShapeshift: false,
   fetchingTransactions: false,
   fetching: false
 };
@@ -404,6 +424,23 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         fetchingNativePrices: false,
         nativePriceRequest: ''
+      };
+    case ACCOUNT_SHAPESHIFT_VERIFY_REQUEST:
+      return {
+        ...state,
+        fetchingShapeshift: true
+      };
+    case ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS:
+      return {
+        ...state,
+        fetchingShapeshift: false,
+        shapeshiftAvailable: true
+      };
+    case ACCOUNT_SHAPESHIFT_VERIFY_FAILURE:
+      return {
+        ...state,
+        fetchingShapeshift: false,
+        shapeshiftAvailable: false
       };
     case ACCOUNT_CHANGE_NATIVE_CURRENCY:
       return {

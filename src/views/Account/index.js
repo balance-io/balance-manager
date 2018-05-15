@@ -106,6 +106,13 @@ class Account extends Component {
                       activeColor="brightGreenHover"
                       icon={exchangeIcon}
                       onClick={this.openExchangeModal}
+                      disabled={this.props.fetchingShapeshift || !this.props.shapeshiftAvailable}
+                      data-toggle="tooltip"
+                      title={
+                        this.props.fetchingShapeshift || !this.props.shapeshiftAvailable
+                          ? lang.t('button.exchange_not_available')
+                          : lang.t('button.exchange')
+                      }
                     >
                       {lang.t('button.exchange')}
                     </Button>
@@ -167,6 +174,8 @@ Account.propTypes = {
   accountInfo: PropTypes.object.isRequired,
   accountAddress: PropTypes.string.isRequired,
   accountType: PropTypes.string.isRequired,
+  shapeshiftAvailable: PropTypes.bool.isRequired,
+  fetchingShapeshift: PropTypes.bool.isRequired,
   fetchingWallet: PropTypes.bool,
   fetchingMessage: PropTypes.string
 };
@@ -181,7 +190,9 @@ const reduxProps = ({ account }) => ({
   fetching: account.fetching,
   accountInfo: account.accountInfo,
   accountAddress: account.accountAddress,
-  accountType: account.accountType
+  accountType: account.accountType,
+  shapeshiftAvailable: account.shapeshiftAvailable,
+  fetchingShapeshift: account.fetchingShapeshift
 });
 
 export default connect(reduxProps, {

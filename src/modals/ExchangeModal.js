@@ -481,16 +481,14 @@ class ExchangeModal extends Component {
                 <StyledFlex>
                   <StyledHelperWrapper>
                     <Input
+                      disable={this.props.fetchingRate}
                       monospace
                       label={lang.t('modal.deposit_input_label')}
                       placeholder="0.0"
                       type="text"
                       value={this.props.depositAmount}
                       onChange={({ target }) =>
-                        this.props.exchangeUpdateDepositAmount(
-                          target.value,
-                          this.props.depositSelected
-                        )
+                        this.props.exchangeUpdateDepositAmount(target.value)
                       }
                     />
                     <StyledMaxBalance onClick={this.onExchangeMaxBalance}>
@@ -517,16 +515,14 @@ class ExchangeModal extends Component {
                 <StyledFlex>
                   <StyledHelperWrapper>
                     <Input
+                      disable={this.props.fetchingRate}
                       monospace
                       placeholder="0.0"
                       label={lang.t('modal.withdrawal_input_label')}
                       type="text"
                       value={this.props.withdrawalAmount}
                       onChange={({ target }) =>
-                        this.props.exchangeUpdateWithdrawalAmount(
-                          target.value,
-                          this.props.withdrawalSelected
-                        )
+                        this.props.exchangeUpdateWithdrawalAmount(target.value)
                       }
                     />
                     <StyledAmountCurrency>
@@ -555,13 +551,15 @@ class ExchangeModal extends Component {
                     <StyledParagraph>
                       <span>{`${lang.t('modal.tx_fee')}: `}</span>
                       <span>{`${
-                        Object.keys(this.props.gasPrice).length
+                        Object.keys(this.props.gasPrice).length &&
+                        this.props.gasPrice.txFee &&
+                        this.props.gasPrice.txFee.native
                           ? this.props.gasPrice.txFee.native.value.display
                           : '$0.00'
                       }${
                         this.props.nativeCurrency !== 'ETH'
                           ? ` (${
-                              Object.keys(this.props.gasPrice).length
+                              Object.keys(this.props.gasPrice).length && this.props.gasPrice.txFee
                                 ? this.props.gasPrice.txFee.value.display
                                 : '0.000 ETH'
                             })`
@@ -667,6 +665,7 @@ ExchangeModal.propTypes = {
   exchangeToggleConfirmationView: PropTypes.func.isRequired,
   exchangeMaxBalance: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
+  fetchingRate: PropTypes.bool.isRequired,
   fetching: PropTypes.bool.isRequired,
   gasPrice: PropTypes.object.isRequired,
   address: PropTypes.string.isRequired,
@@ -688,6 +687,7 @@ ExchangeModal.propTypes = {
 };
 
 const reduxProps = ({ modal, exchange, account }) => ({
+  fetchingRate: exchange.fetchingRate,
   fetching: exchange.fetching,
   gasPrice: exchange.gasPrice,
   address: exchange.address,

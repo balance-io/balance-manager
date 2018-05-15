@@ -6,23 +6,23 @@ import { shadows } from '../styles';
 const StyledHoverWrapper = styled.div`
   position: relative;
   width: 100%;
-  box-shadow: ${({ hover }) => (hover ? shadows.big : '0')};
   z-index: ${({ hover }) => (hover ? 20 : 0)};
-`;
 
-const StyledRelative = styled.div`
-  width: 100%;
-  position: relative;
-`;
-const StyledHover = styled.div`
-  width: 100%;
-  position: absolute;
+  &:before {
+    bottom: 0;
+    box-shadow: ${shadows.big};
+    content: " ";
+    left: 0;
+    opacity: ${({ hover }) => (hover ? 1 : 0)}
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
 `;
 
 const HoverWrapper = ({ hover, children, ...props }) => (
   <StyledHoverWrapper hover={hover} {...props}>
-    <StyledHover hover={hover}>{children}</StyledHover>
-    <StyledRelative hover={hover}>{children}</StyledRelative>
+    {children}
   </StyledHoverWrapper>
 );
 

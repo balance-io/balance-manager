@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import eth from '../assets/eth.svg';
@@ -9,34 +9,19 @@ const StyledIcon = styled.img`
   height: ${({ size }) => `${size}px`};
 `;
 
-class AssetIcon extends Component {
-  state = {
-    imgSrc: erc20
-  };
-  updateIcon = props => {
-    if (props.asset) {
-      if (props.asset.toUpperCase() === 'ETH') {
-        this.setState({ imgSrc: eth });
-      } else {
-        this.setState({
-          imgSrc: `/tokens/images/${props.asset}.png`
-        });
-      }
-    }
-  };
-  componentWillMount() {
-    this.updateIcon(this.props);
-  }
-  componentWillReceiveProps(newProps) {
-    this.updateIcon(newProps);
-  }
-  onError = () => this.setState({ imgSrc: erc20 });
-  render() {
-    const { size, image } = this.props;
-    const { imgSrc } = this.state;
-    return <StyledIcon size={size} src={image || imgSrc || erc20} onError={this.onError} />;
-  }
+const buildAssetSourceUrl = (asset) => {
+  if (!asset) return erc20;
+  if (asset.toUpperCase() === 'ETH') return eth;
+  return `/tokens/images/${asset}.png`;
 }
+
+const AssetIcon = ({ asset, image, size }) => (
+  <StyledIcon
+    onError={(event) => (event.target.src = erc20)}
+    size={size}
+    src={image || buildAssetSourceUrl(asset)}
+  />
+);
 
 AssetIcon.propTypes = {
   asset: PropTypes.string,

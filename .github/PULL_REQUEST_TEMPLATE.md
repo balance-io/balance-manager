@@ -14,4 +14,4 @@
 
 ### Notes
 
-<!--- Describe here anything relevant for the PR review -->
+<!--- Write anything relevant for the PR review -->

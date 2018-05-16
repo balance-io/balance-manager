@@ -1,10 +1,10 @@
-### What is this issue about?
+### What is this issue about? (select one)
 
 * [ ] Bug report
 * [ ] Feature request
 * [ ] Enhancement
 
-### Description
+### Issue Description
 
 <!-- Delete the following sections if it's NOT a bug report -->
 

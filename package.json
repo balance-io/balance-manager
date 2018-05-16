@@ -48,7 +48,7 @@
     "lint": "eslint src --ext .js"
   },
   "lint-staged": {
-    "src/**/*.js": ["prettier --write", "git add"]
+    "src/**/*.js": ["eslint src --ext .js","prettier --write", "git add"]
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",

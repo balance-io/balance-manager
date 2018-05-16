@@ -90,7 +90,7 @@ const StyledTransactionWrapper = styled.div`
   border-radius: 0;
   z-index: 0;
   & > div {
-    transition: box-shadow .1s ease;
+    transition: box-shadow 0.1s ease;
     border-radius: 0;
     @media (hover: hover) {
       &:hover {

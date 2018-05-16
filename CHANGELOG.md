@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * More consistent api handlers
 * Fix pending transaction never confirmed (#163)
 * Fix lastTxHash incorrect because of pending tx (#167)
+* Updated .gitignore file
+* Updated dependencies
 
 ### Removed
 

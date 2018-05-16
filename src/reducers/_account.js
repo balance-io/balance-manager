@@ -142,7 +142,8 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   });
   const lastTxHash = cachedTransactions.length ? cachedTransactions[0].hash : '';
   apiGetAccountTransactions(accountAddress, network, lastTxHash)
-    .then(transactions => {
+    .then(({ data }) => {
+      const transactions = data;
       const address = getState().account.accountAddress;
       const currentTransactions = getState().account.transactions;
       let _transactions = _.unionBy(transactions, currentTransactions, 'hash');
@@ -193,8 +194,8 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
     }
   });
   apiGetAccountBalances(accountAddress, network)
-    .then(accountInfo => {
-      accountInfo = { ...accountInfo, type: accountType };
+    .then(({ data }) => {
+      let accountInfo = { ...data, type: accountType };
       updateLocalBalances(accountAddress, accountInfo, network);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS });
       dispatch(accountGetNativePrices(accountInfo));
@@ -210,9 +211,9 @@ export const accountUpdateBalances = () => (dispatch, getState) => {
   const { network, accountAddress, accountType } = getState().account;
   dispatch({ type: ACCOUNT_UPDATE_BALANCES_REQUEST });
   apiGetAccountBalances(accountAddress, network)
-    .then(accountInfo => {
+    .then(({ data }) => {
       const prices = getState().account.prices;
-      accountInfo = { ...accountInfo, type: accountType };
+      let accountInfo = { ...data, type: accountType };
       const parsedAccountInfo = parseAccountBalancesPrices(accountInfo, prices, network);
       dispatch({
         type: ACCOUNT_UPDATE_BALANCES_SUCCESS,

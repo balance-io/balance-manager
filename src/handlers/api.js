@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { parseHistoricalPrices, parseAccountAssets, parseAccountTransactions } from './parsers';
-import { infuraGetTransactionByHash, infuraGetBlockByHash } from '../handlers/infura';
+import { getTransactionByHash, getBlockByHash } from '../handlers/web3';
 import { convertHexToString } from '../helpers/bignumber';
 import networkList from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
@@ -59,20 +59,21 @@ export const apiGetMetamaskNetwork = () =>
  */
 export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') => {
   try {
-    let result = await infuraGetTransactionByHash(hash, network);
-    if (!result || !result.blockNumber || !result.blockHash) return null;
-    if (result) {
-      const blockData = await infuraGetBlockByHash(result.blockHash, network);
-      result.timestamp = null;
+    let tx = await getTransactionByHash(hash);
+    if (!tx || !tx.blockNumber || !tx.blockHash) return null;
+    if (tx) {
+      const blockData = await getBlockByHash(tx.blockHash);
+      tx.timestamp = null;
       if (blockData) {
         const blockTimestamp = convertHexToString(blockData.timestamp);
-        result.timestamp = {
+        tx.timestamp = {
           secs: blockTimestamp,
           ms: `${blockTimestamp}000`
         };
       }
     }
-    return { data: result };
+    const result = { data: tx };
+    return result;
   } catch (error) {
     throw error;
   }
@@ -101,7 +102,8 @@ export const apiGetAccountBalances = async (address = '', network = 'mainnet') =
   try {
     const { data } = await api.get(`/get_balances/${network}/${address}`);
     const accountInfo = parseAccountAssets(data, address);
-    return accountInfo;
+    const result = { data: accountInfo };
+    return result;
   } catch (error) {
     throw error;
   }
@@ -145,7 +147,8 @@ export const apiGetAccountTransactions = async (
       });
     }
     transactions = await parseHistoricalPrices(transactions);
-    return transactions;
+    const result = { data: transactions };
+    return result;
   } catch (error) {
     throw error;
   }

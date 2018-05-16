@@ -89,6 +89,20 @@ export const getTransactionCount = address =>
   web3Instance.eth.getTransactionCount(address, 'pending');
 
 /**
+ * @desc get transaction by hash
+ * @param   {String}  hash
+ * @return  {Promise}
+ */
+export const getTransactionByHash = hash => web3Instance.eth.getTransaction(hash);
+
+/**
+ * @desc get block by hash
+ * @param   {String}  hash
+ * @return  {Promise}
+ */
+export const getBlockByHash = hash => web3Instance.eth.getBlock(hash);
+
+/**
  * @desc get account ether balance
  * @param  {String} accountAddress
  * @param  {String} tokenAddress

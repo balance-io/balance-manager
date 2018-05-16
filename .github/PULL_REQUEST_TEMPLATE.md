@@ -8,10 +8,6 @@
 
 <!--- Which issue(s) is this PR targeting -->
 
-### Change log
+### Changelog
 
 <!--- Paste here the added change logs added to the CHANGELOG.md -->
-
-### Notes
-
-<!--- Write anything relevant for the PR review -->

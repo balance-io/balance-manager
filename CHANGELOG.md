@@ -13,11 +13,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Changed
 
-\*
+* Refactor helpers and remove unused functions
+* Fix network change not updating
+* Fix failed transactions display
+* Update Github PR and Issue templates
+* More consistent api handlers
 
 ### Removed
 
-\*
+* Infura handlers
+* Deprecated componentWillReceiveProps lifecycle
 
 ## [0.5.2](https://github.com/balance-io/balance-manager/releases/tag/0.5.2)
 

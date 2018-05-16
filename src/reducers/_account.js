@@ -112,6 +112,7 @@ export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
 export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { accountAddress, network } = getState().account;
   let cachedTransactions = [];
+  let confirmedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
   if (accountLocal && accountLocal[network]) {
     if (accountLocal[network].pending) {
@@ -121,6 +122,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
       );
     }
     if (accountLocal[network].transactions) {
+      confirmedTransactions = accountLocal[network].transactions;
       cachedTransactions = _.unionBy(
         cachedTransactions,
         accountLocal[network].transactions,
@@ -140,7 +142,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
         !accountLocal[network].transactions.length
     }
   });
-  const lastTxHash = cachedTransactions.length ? cachedTransactions[0].hash : '';
+  const lastTxHash = confirmedTransactions.length ? confirmedTransactions[0].hash : '';
   apiGetAccountTransactions(accountAddress, network, lastTxHash)
     .then(({ data }) => {
       const transactions = data;

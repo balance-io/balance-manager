@@ -12,14 +12,12 @@ import NotFound from './pages/NotFound';
 import { warningOnline, warningOffline } from './reducers/_warning';
 
 class Router extends Component {
-  componentWillMount() {
+  componentDidMount() {
     lang.init({
       lng: 'en',
       debug: process.env.NODE_ENV === 'development',
       resources,
     });
-  }
-  componentDidMount() {
     window.browserHistory = this.context.router.history;
     window.onoffline = () => this.props.warningOffline();
     window.ononline = () => this.props.warningOnline();

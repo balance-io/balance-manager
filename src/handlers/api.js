@@ -59,8 +59,9 @@ export const apiGetMetamaskNetwork = () =>
  */
 export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') => {
   try {
+    let result = { data: null };
     let tx = await getTransactionByHash(hash);
-    if (!tx || !tx.blockNumber || !tx.blockHash) return null;
+    if (!tx || !tx.blockNumber || !tx.blockHash) return result;
     if (tx) {
       const blockData = await getBlockByHash(tx.blockHash);
       tx.timestamp = null;
@@ -72,7 +73,7 @@ export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') =>
         };
       }
     }
-    const result = { data: tx };
+    result = { data: tx };
     return result;
   } catch (error) {
     throw error;

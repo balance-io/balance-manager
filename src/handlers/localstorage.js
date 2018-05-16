@@ -4,7 +4,8 @@
  * @param  {Object}  [data={}]
  * @return {Object}
  */
-export const saveLocal = (key = '', data = {}) => localStorage.setItem(key, JSON.stringify(data));
+export const saveLocal = (key = '', data = {}) =>
+  localStorage.setItem(key, JSON.stringify(data));
 
 /**
  * @desc get from local storage
@@ -35,7 +36,10 @@ export const updateLocalBalances = (address, account, network) => {
     accountLocal[network] = {};
   }
   accountLocal[network].type = account.type;
-  accountLocal[network].balances = { assets: account.assets, total: account.total || '———' };
+  accountLocal[network].balances = {
+    assets: account.assets,
+    total: account.total || '———',
+  };
   saveLocal(address, accountLocal);
 };
 

@@ -259,10 +259,10 @@ class Home extends Component {
 
 Home.propTypes = {
   modalOpen: PropTypes.func.isRequired,
-  accountUpdateAccountAddress: PropTypes.func.isRequired
+  accountUpdateAccountAddress: PropTypes.func.isRequired,
 };
 
 export default connect(null, {
   modalOpen,
-  accountUpdateAccountAddress
+  accountUpdateAccountAddress,
 })(Home);

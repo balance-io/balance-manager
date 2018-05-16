@@ -33,7 +33,7 @@ Blockie.propTypes = {
   bgcolor: PropTypes.string,
   size: PropTypes.number,
   scale: PropTypes.number,
-  spotcolor: PropTypes.string
+  spotcolor: PropTypes.string,
 };
 
 Blockie.defaultProps = {
@@ -41,7 +41,7 @@ Blockie.defaultProps = {
   bgcolor: null,
   size: null,
   scale: null,
-  spotcolor: null
+  spotcolor: null,
 };
 
 export default Blockie;

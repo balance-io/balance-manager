@@ -9,7 +9,7 @@ import { ellipseText } from '../../helpers/utilities';
 import {
   convertStringToNumber,
   hasHighMarketValue,
-  hasLowMarketValue
+  hasLowMarketValue,
 } from '../../helpers/bignumber';
 import { colors, fonts, responsive } from '../../styles';
 
@@ -18,8 +18,8 @@ const StyledGrid = styled.div`
   text-align: right;
   position: relative;
   z-index: 0;
-  box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
-    0 3px 6px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08),
+    0 0 1px 0 rgba(50, 50, 93, 0.02), 0 3px 6px 0 rgba(0, 0, 0, 0.06);
 `;
 
 const StyledRow = styled.div`
@@ -129,7 +129,11 @@ const StyledAsset = styled.div`
 const StyledPercentage = styled.p`
   color: ${({ percentage }) =>
     percentage
-      ? percentage > 0 ? `rgb(${colors.green})` : percentage < 0 ? `rgb(${colors.red})` : `inherit`
+      ? percentage > 0
+        ? `rgb(${colors.green})`
+        : percentage < 0
+          ? `rgb(${colors.red})`
+          : `inherit`
       : `inherit`};
 `;
 
@@ -182,29 +186,34 @@ const StyledShowMoreTokens = styled(StyledToken)`
 class AccountBalances extends Component {
   state = {
     disableToggle: false,
-    showMoreTokens: false
+    showMoreTokens: false,
   };
   onShowMoreTokens = () => {
     this.setState({ showMoreTokens: !this.state.showMoreTokens });
   };
   render() {
     if (!this.props.accountInfo.assets) return null;
-    const ethereum = this.props.accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+    const ethereum = this.props.accountInfo.assets.filter(
+      asset => asset.symbol === 'ETH',
+    )[0];
     const tokens = this.props.accountInfo.assets.filter(
-      asset => asset.symbol !== 'ETH' && typeof asset === 'object' && !!asset
+      asset => asset.symbol !== 'ETH' && typeof asset === 'object' && !!asset,
     );
     if (tokens.length && tokens.length < 5 && !this.state.disableToggle) {
       this.setState({ disableToggle: true });
     }
     const tokensWithHighMarketValue = tokens.filter(
-      asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset)
+      asset => asset.symbol !== 'ETH' && hasHighMarketValue(asset),
     );
     const tokensWithLowMarketValue = tokens.filter(
-      asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset)
+      asset => asset.symbol !== 'ETH' && hasLowMarketValue(asset),
     );
     const tokensWithNoMarketValue = tokens.filter(asset => !asset.native);
     let tokensAlwaysDisplay = tokensWithHighMarketValue;
-    let tokensToggleDisplay = [...tokensWithLowMarketValue, ...tokensWithNoMarketValue];
+    let tokensToggleDisplay = [
+      ...tokensWithLowMarketValue,
+      ...tokensWithNoMarketValue,
+    ];
     if (this.state.disableToggle) {
       tokensAlwaysDisplay = [...tokensAlwaysDisplay, ...tokensToggleDisplay];
       tokensToggleDisplay = [];
@@ -229,7 +238,11 @@ class AccountBalances extends Component {
           <p>{ethereum.balance.display}</p>
           <p>{ethereum.native ? ethereum.native.price.display : '———'}</p>
           <StyledPercentage
-            percentage={ethereum.native ? convertStringToNumber(ethereum.native.change.amount) : 0}
+            percentage={
+              ethereum.native
+                ? convertStringToNumber(ethereum.native.change.amount)
+                : 0
+            }
           >
             {ethereum.native ? ethereum.native.change.display : '———'}
           </StyledPercentage>
@@ -237,7 +250,9 @@ class AccountBalances extends Component {
         </StyledEthereum>
         {!!tokensAlwaysDisplay &&
           tokensAlwaysDisplay.map(token => (
-            <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
+            <StyledToken
+              key={`${this.props.accountInfo.address}-${token.symbol}`}
+            >
               <StyledAsset>
                 <AssetIcon asset={token.address} />
                 <p>{token.name}</p>
@@ -245,7 +260,11 @@ class AccountBalances extends Component {
               <p>{token.balance.display}</p>
               <p>{token.native ? token.native.price.display : '———'}</p>
               <StyledPercentage
-                percentage={token.native ? convertStringToNumber(token.native.change.amount) : 0}
+                percentage={
+                  token.native
+                    ? convertStringToNumber(token.native.change.amount)
+                    : 0
+                }
               >
                 {token.native ? token.native.change.display : '———'}
               </StyledPercentage>
@@ -255,7 +274,9 @@ class AccountBalances extends Component {
         {!!tokensToggleDisplay.length &&
           this.state.showMoreTokens &&
           tokensToggleDisplay.map(token => (
-            <StyledToken key={`${this.props.accountInfo.address}-${token.symbol}`}>
+            <StyledToken
+              key={`${this.props.accountInfo.address}-${token.symbol}`}
+            >
               <StyledAsset data-toggle="tooltip" title={token.name}>
                 <AssetIcon asset={token.address} />
                 <p>{ellipseText(token.name, 30)}</p>
@@ -263,7 +284,11 @@ class AccountBalances extends Component {
               <p>{token.balance.display}</p>
               <p>{token.native ? token.native.price.display : '———'}</p>
               <StyledPercentage
-                percentage={token.native ? convertStringToNumber(token.native.change.amount) : 0}
+                percentage={
+                  token.native
+                    ? convertStringToNumber(token.native.change.amount)
+                    : 0
+                }
               >
                 {token.native ? token.native.change.display : '———'}
               </StyledPercentage>
@@ -274,9 +299,11 @@ class AccountBalances extends Component {
           {!!tokensToggleDisplay.length && !this.state.disableToggle ? (
             <StyledShowMoreTokens onClick={this.onShowMoreTokens}>
               <ToggleIndicator show={this.state.showMoreTokens} />
-              {`${this.state.showMoreTokens ? lang.t('account.hide') : lang.t('account.show')} ${
-                tokensToggleDisplay.length
-              } ${
+              {`${
+                this.state.showMoreTokens
+                  ? lang.t('account.hide')
+                  : lang.t('account.show')
+              } ${tokensToggleDisplay.length} ${
                 tokensToggleDisplay.length === 1
                   ? lang.t('account.token')
                   : lang.t('account.tokens')
@@ -297,10 +324,10 @@ class AccountBalances extends Component {
 }
 
 AccountBalances.propTypes = {
-  accountInfo: PropTypes.object.isRequired
+  accountInfo: PropTypes.object.isRequired,
 };
 const reduxProps = ({ account }) => ({
-  accountInfo: account.accountInfo
+  accountInfo: account.accountInfo,
 });
 
 export default connect(reduxProps, null)(AccountBalances);

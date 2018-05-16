@@ -9,15 +9,15 @@ const StyledIcon = styled.img`
   height: ${({ size }) => `${size}px`};
 `;
 
-const buildAssetSourceUrl = (asset) => {
+const buildAssetSourceUrl = asset => {
   if (!asset) return erc20;
   if (asset.toUpperCase() === 'ETH') return eth;
   return `/tokens/images/${asset}.png`;
-}
+};
 
 const AssetIcon = ({ asset, image, size }) => (
   <StyledIcon
-    onError={(event) => (event.target.src = erc20)}
+    onError={event => (event.target.src = erc20)}
     size={size}
     src={image || buildAssetSourceUrl(asset)}
   />
@@ -26,13 +26,13 @@ const AssetIcon = ({ asset, image, size }) => (
 AssetIcon.propTypes = {
   asset: PropTypes.string,
   image: PropTypes.string,
-  size: PropTypes.number
+  size: PropTypes.number,
 };
 
 AssetIcon.defaultProps = {
   asset: null,
   image: '',
-  size: 20
+  size: 20,
 };
 
 export default AssetIcon;

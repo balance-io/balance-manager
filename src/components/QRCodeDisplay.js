@@ -16,10 +16,13 @@ class QRCodeDisplay extends Component {
     QRCode.toCanvas(
       this.canvas,
       this.props.data,
-      { errorCorrectionLevel: this.props.errorCorrectionLevel, scale: this.props.scale },
+      {
+        errorCorrectionLevel: this.props.errorCorrectionLevel,
+        scale: this.props.scale,
+      },
       error => {
         if (error) console.error(error);
-      }
+      },
     );
   }
   render = () => (
@@ -32,12 +35,12 @@ class QRCodeDisplay extends Component {
 QRCodeDisplay.propTypes = {
   data: PropTypes.string.isRequired,
   errorCorrectionLevel: PropTypes.string,
-  scale: PropTypes.number
+  scale: PropTypes.number,
 };
 
 QRCodeDisplay.defaultProps = {
   errorCorrectionLevel: 'L',
-  scale: 7
+  scale: 7,
 };
 
 export default QRCodeDisplay;

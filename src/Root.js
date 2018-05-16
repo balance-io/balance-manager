@@ -7,7 +7,10 @@ import ReduxThunk from 'redux-thunk';
 import reducers from './reducers';
 import Router from './Router';
 
-const store = createStore(reducers, composeWithDevTools(applyMiddleware(ReduxThunk)));
+const store = createStore(
+  reducers,
+  composeWithDevTools(applyMiddleware(ReduxThunk)),
+);
 
 const Root = () => (
   <Provider store={store}>

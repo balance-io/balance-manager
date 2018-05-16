@@ -93,7 +93,10 @@ class Account extends Component {
               <StyledTop>
                 <StyledAddressWrapper>
                   <h6>{capitalize(this.props.accountType)} </h6>
-                  <CopyToClipboard iconOnHover text={this.props.accountAddress} />
+                  <CopyToClipboard
+                    iconOnHover
+                    text={this.props.accountAddress}
+                  />
                 </StyledAddressWrapper>
 
                 <StyledActions>
@@ -135,7 +138,11 @@ class Account extends Component {
               <TabMenu match={this.props.match} />
 
               <Switch>
-                <Route exact path={this.props.match.url} component={AccountBalances} />
+                <Route
+                  exact
+                  path={this.props.match.url}
+                  component={AccountBalances}
+                />
                 <Route
                   exact
                   path={`${this.props.match.url}/transactions`}
@@ -166,12 +173,12 @@ Account.propTypes = {
   accountAddress: PropTypes.string.isRequired,
   accountType: PropTypes.string.isRequired,
   fetchingWallet: PropTypes.bool,
-  fetchingMessage: PropTypes.string
+  fetchingMessage: PropTypes.string,
 };
 
 Account.defaultProps = {
   fetchingWallet: false,
-  fetchingMessage: ''
+  fetchingMessage: '',
 };
 
 const reduxProps = ({ account }) => ({
@@ -179,9 +186,9 @@ const reduxProps = ({ account }) => ({
   fetching: account.fetching,
   accountInfo: account.accountInfo,
   accountAddress: account.accountAddress,
-  accountType: account.accountType
+  accountType: account.accountType,
 });
 
 export default connect(reduxProps, {
-  modalOpen
+  modalOpen,
 })(Account);

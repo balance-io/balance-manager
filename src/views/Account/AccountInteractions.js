@@ -87,11 +87,11 @@ const StyledTransactionWrapper = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 8px;
+  border-radius: 0;
   z-index: 0;
   & > div {
-    transition: box-shadow 0.2s ease-in-out;
-    border-radius: 8px;
+    transition: box-shadow 0.1s ease;
+    border-radius: 0;
     @media (hover: hover) {
       &:hover {
         z-index: 10;
@@ -120,8 +120,7 @@ const StyledTransaction = styled(StyledRow)`
 
 const StyledTransactionMainRow = styled(StyledTransaction)`
   cursor: pointer;
-  border-radius: ${({ showTxDetails }) =>
-    showTxDetails ? '8px 8px 0 0' : `8px`};
+  border-radius: ${({ showTxDetails }) => (showTxDetails ? '0' : `0`)};
   &:nth-child(n + 3) {
     border-top: 1px solid rgba(${colors.rowDivider});
   }

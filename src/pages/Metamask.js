@@ -9,7 +9,7 @@ import Card from '../components/Card';
 import {
   metamaskUpdateMetamaskAccount,
   metamaskConnectInit,
-  metamaskClearIntervals
+  metamaskClearIntervals,
 } from '../reducers/_metamask';
 import { fonts, colors } from '../styles';
 
@@ -41,8 +41,13 @@ class Metamask extends Component {
     <BaseLayout>
       <StyledWrapper>
         {this.props.fetching ||
-        (this.props.network && this.props.accountAddress && this.props.web3Available) ? (
-          <Account fetchingWallet={this.props.fetching} match={this.props.match} />
+        (this.props.network &&
+          this.props.accountAddress &&
+          this.props.web3Available) ? (
+          <Account
+            fetchingWallet={this.props.fetching}
+            match={this.props.match}
+          />
         ) : (
           <Card minHeight={200} fetching={this.props.fetching}>
             <StyledMessage>{this.renderMessage()}</StyledMessage>
@@ -61,11 +66,11 @@ Metamask.propTypes = {
   network: PropTypes.string.isRequired,
   fetching: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired,
-  accountAddress: PropTypes.string
+  accountAddress: PropTypes.string,
 };
 
 Metamask.defaultProps = {
-  accountAddress: null
+  accountAddress: null,
 };
 
 const reduxProps = ({ account, metamask }) => ({
@@ -73,11 +78,11 @@ const reduxProps = ({ account, metamask }) => ({
   web3Available: metamask.web3Available,
   network: metamask.network,
   accountAddress: metamask.accountAddress,
-  fetching: metamask.fetching
+  fetching: metamask.fetching,
 });
 
 export default connect(reduxProps, {
   metamaskUpdateMetamaskAccount,
   metamaskConnectInit,
-  metamaskClearIntervals
+  metamaskClearIntervals,
 })(Metamask);

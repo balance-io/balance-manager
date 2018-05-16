@@ -1,8 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import lang from '../languages';
 import { colors, fonts, shadows, responsive } from '../styles';
+
+const shimmer = keyframes`
+0% {
+  background-position: -468px 0
+}
+
+100% {
+  background-position: 468px 0
+}
+
+`;
 
 const StyledInputWrapper = styled.div`
   width: 100%;
@@ -24,7 +35,8 @@ const StyledInput = styled.input`
   padding: 12px;
   border: none;
   border-style: none;
-  font-family: ${({ monospace }) => (monospace ? `${fonts.family.SFMono}` : `inherit`)};
+  font-family: ${({ monospace }) =>
+    monospace ? `${fonts.family.SFMono}` : `inherit`};
   font-size: ${fonts.size.h6};
   font-weight: ${fonts.weight.semibold};
   font-style: normal;
@@ -36,6 +48,21 @@ const StyledInput = styled.input`
   -webkit-box-shadow: ${shadows.medium};
   box-shadow: ${shadows.medium};
   outline: none;
+  ${({ fetching }) =>
+    fetching &&
+    `
+    color: rgba(${colors.dark}, 0.7);
+    -webkit-animation-duration: 1s;
+    -webkit-animation-fill-mode: forwards;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-name: ${shimmer};
+    -webkit-animation-timing-function: linear;
+    background: #f6f7f8;
+    background-image: -webkit-gradient(linear, left center, right center, from(#f6f7f8), color-stop(.2, #edeef1), color-stop(.4, #f6f7f8), to(#f6f7f8));
+    background-image: -webkit-linear-gradient(left, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+    background-repeat: no-repeat;
+    background-size: 800px 104px;
+  `};
   &::placeholder {
     color: rgba(${colors.grey}, 0.8);
     font-weight: ${fonts.weight.medium};
@@ -46,7 +73,16 @@ const StyledInput = styled.input`
   }
 `;
 
-const Input = ({ label, type, disabled, value, placeholder, monospace, ...props }) => {
+const Input = ({
+  fetching,
+  label,
+  type,
+  disabled,
+  value,
+  placeholder,
+  monospace,
+  ...props
+}) => {
   let _label = label;
   let _placeholder = placeholder;
   if (!label) {
@@ -73,6 +109,7 @@ const Input = ({ label, type, disabled, value, placeholder, monospace, ...props 
     <StyledInputWrapper disabled={disabled}>
       <StyledLabel hide={_label === 'Input'}>{_label}</StyledLabel>
       <StyledInput
+        fetching={fetching}
         disabled={disabled}
         type={type}
         value={!disabled ? value : ''}
@@ -88,15 +125,17 @@ Input.propTypes = {
   type: PropTypes.string.isRequired,
   label: PropTypes.string,
   placeholder: PropTypes.string,
+  fetching: PropTypes.bool,
   monospace: PropTypes.bool,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
 };
 
 Input.defaultProps = {
   label: '',
   placeholder: '',
+  fetching: false,
   monospace: false,
-  disabled: false
+  disabled: false,
 };
 
 export default Input;

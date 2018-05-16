@@ -18,11 +18,11 @@ const TrezorLogo = ({ size, ...props }) => (
 );
 
 TrezorLogo.propTypes = {
-  size: PropTypes.number
+  size: PropTypes.number,
 };
 
 TrezorLogo.defaultProps = {
-  size: 275
+  size: 275,
 };
 
 export default TrezorLogo;

@@ -4,7 +4,7 @@ import spanish from './_spanish.json';
 
 export const resources = {
   en: english,
-  es: spanish
+  es: spanish,
 };
 
 export const updateLanguage = code => i18next.changeLanguage(code);

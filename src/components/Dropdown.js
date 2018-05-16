@@ -22,7 +22,8 @@ const StyledCaret = styled.img`
   height: 14px;
   mask: url(${caret}) center no-repeat;
   mask-size: 90%;
-  background-color: ${({ dark }) => (dark ? `rgb(${colors.dark})` : `rgba(${colors.white}, 0.8)`)};
+  background-color: ${({ dark }) =>
+    dark ? `rgb(${colors.dark})` : `rgba(${colors.white}, 0.8)`};
 `;
 
 const StyledIcon = styled.div`
@@ -31,7 +32,8 @@ const StyledIcon = styled.div`
   mask: url(${circle}) center no-repeat;
   mask-size: 60%;
   display: ${({ iconColor }) => (iconColor ? 'block' : 'none')};
-  background-color: ${({ iconColor }) => (iconColor ? `rgb(${colors[iconColor]})` : 'transparent')};
+  background-color: ${({ iconColor }) =>
+    iconColor ? `rgb(${colors[iconColor]})` : 'transparent'};
 `;
 
 const StyledRowWrapper = styled.div`
@@ -41,7 +43,8 @@ const StyledRowWrapper = styled.div`
   color: rgb(${colors.dark});
   font-size: ${fonts.size.small};
   font-weight: ${fonts.weight.medium};
-  font-family: ${({ monospace }) => (monospace ? `${fonts.family.SFMono}` : `inherit`)};
+  font-family: ${({ monospace }) =>
+    monospace ? `${fonts.family.SFMono}` : `inherit`};
   text-align: center;
   outline: none;
   & p {
@@ -52,7 +55,8 @@ const StyledRowWrapper = styled.div`
 const StyledSelectedWrapper = styled(StyledRowWrapper)`
   outline: none;
   background: transparent;
-  color: ${({ dark }) => (dark ? `rgb(${colors.dark})` : `rgba(${colors.white}, 0.8)`)};
+  color: ${({ dark }) =>
+    dark ? `rgb(${colors.dark})` : `rgba(${colors.white}, 0.8)`};
   border-radius: 6px;
   & > div {
     cursor: ${({ noOptions }) => (noOptions ? 'auto' : 'pointer')};
@@ -87,7 +91,8 @@ const StyledRow = styled.div`
   cursor: pointer;
   transition: ${transitions.base};
   border-top: 1px solid rgba(${colors.lightGrey}, 0.7);
-  font-weight: ${({ selected }) => (selected ? fonts.weight.bold : fonts.weight.normal)};
+  font-weight: ${({ selected }) =>
+    selected ? fonts.weight.bold : fonts.weight.normal};
   padding: 6px;
   width: auto;
   text-align: center;
@@ -100,7 +105,7 @@ const StyledRow = styled.div`
 
 class Dropdown extends Component {
   state = {
-    showDropdown: false
+    showDropdown: false,
   };
   onChangeSelected = selected => {
     this.setState({ showDropdown: false });
@@ -133,37 +138,37 @@ class Dropdown extends Component {
     if (!options[_selected]) return null;
     return (
       <ClickOutside onClickOutside={this.onClickOutside}>
-      <StyledWrapper {...props}>
-        <StyledSelectedWrapper
-          monospace={monospace}
-          dark={dark}
-          show={this.state.showDropdown}
-          noOptions={!onChange || Object.keys(options).length < 2}
-          onClick={this.toggleDropdown}
-        >
-          <div>
-            <StyledIcon iconColor={options[_selected].color || iconColor} />
-            <p>{options[_selected][displayKey]}</p>
-          </div>
-          <StyledCaret dark={dark} />
-        </StyledSelectedWrapper>
-        <StyledDropdownWrapper
-          monospace={monospace}
-          show={this.state.showDropdown}
-          noOptions={!onChange || Object.keys(options).length < 2}
-        >
-          {onChange &&
-            Object.keys(options).map(key => (
-              <StyledRow
-                selected={key === _selected}
-                key={options[key][displayKey]}
-                onClick={() => this.onChangeSelected(key)}
-              >
-                <p>{options[key][displayKey]}</p>
-              </StyledRow>
-            ))}
-        </StyledDropdownWrapper>
-      </StyledWrapper>
+        <StyledWrapper {...props}>
+          <StyledSelectedWrapper
+            monospace={monospace}
+            dark={dark}
+            show={this.state.showDropdown}
+            noOptions={!onChange || Object.keys(options).length < 2}
+            onClick={this.toggleDropdown}
+          >
+            <div>
+              <StyledIcon iconColor={options[_selected].color || iconColor} />
+              <p>{options[_selected][displayKey]}</p>
+            </div>
+            <StyledCaret dark={dark} />
+          </StyledSelectedWrapper>
+          <StyledDropdownWrapper
+            monospace={monospace}
+            show={this.state.showDropdown}
+            noOptions={!onChange || Object.keys(options).length < 2}
+          >
+            {onChange &&
+              Object.keys(options).map(key => (
+                <StyledRow
+                  selected={key === _selected}
+                  key={options[key][displayKey]}
+                  onClick={() => this.onChangeSelected(key)}
+                >
+                  <p>{options[key][displayKey]}</p>
+                </StyledRow>
+              ))}
+          </StyledDropdownWrapper>
+        </StyledWrapper>
       </ClickOutside>
     );
   }
@@ -176,7 +181,7 @@ Dropdown.propTypes = {
   monospace: PropTypes.bool,
   selected: PropTypes.string,
   onChange: PropTypes.func,
-  iconColor: PropTypes.string
+  iconColor: PropTypes.string,
 };
 
 Dropdown.defaultProps = {
@@ -184,7 +189,7 @@ Dropdown.defaultProps = {
   monospace: false,
   selected: null,
   onChange: null,
-  iconColor: ''
+  iconColor: '',
 };
 
 export default Dropdown;

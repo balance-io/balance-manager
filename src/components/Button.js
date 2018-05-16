@@ -18,9 +18,12 @@ const StyledButton = styled.button`
   border: none;
   border-style: none;
   box-sizing: border-box;
-  background-color: ${({ outline, color }) => (outline ? 'transparent' : `rgb(${colors[color]})`)};
-  border: ${({ outline, color }) => (outline ? `1px solid rgb(${colors[color]})` : 'none')};
-  color: ${({ outline, color }) => (outline ? `rgb(${colors[color]})` : `rgb(${colors.white})`)};
+  background-color: ${({ outline, color }) =>
+    outline ? 'transparent' : `rgb(${colors[color]})`};
+  border: ${({ outline, color }) =>
+    outline ? `1px solid rgb(${colors[color]})` : 'none'};
+  color: ${({ outline, color }) =>
+    outline ? `rgb(${colors[color]})` : `rgb(${colors.white})`};
   box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)};
   border-radius: 8px;
   font-size: ${fonts.size.h6};
@@ -39,17 +42,33 @@ const StyledButton = styled.button`
 
   @media (hover: hover) {
     &:hover {
-      transform: ${({ disabled }) => !disabled ? 'translateY(-1px)' : 'none'};
-      background-color: ${({ disabled, hoverColor, color }) => !disabled ? hoverColor ? `rgb(${colors[hoverColor]})` : `rgb(${colors[color]})` : `rgb(${colors[color]})`};
-      box-shadow: ${({ disabled, outline }) => (!disabled ? outline ? 'none' : `${shadows.hover}` : `${shadows.soft}`)};
+      transform: ${({ disabled }) => (!disabled ? 'translateY(-1px)' : 'none')};
+      background-color: ${({ disabled, hoverColor, color }) =>
+        !disabled
+          ? hoverColor
+            ? `rgb(${colors[hoverColor]})`
+            : `rgb(${colors[color]})`
+          : `rgb(${colors[color]})`};
+      box-shadow: ${({ disabled, outline }) =>
+        !disabled
+          ? outline
+            ? 'none'
+            : `${shadows.hover}`
+          : `${shadows.soft}`};
     }
   }
 
   &:active {
-    transform: ${({ disabled }) => !disabled ? 'translateY(1px)' : 'none'};
-    background-color: ${({ disabled, activeColor, color }) => !disabled ? activeColor ? `rgb(${colors[activeColor]})` : `rgb(${colors[color]})` : `rgb(${colors[color]})`};
+    transform: ${({ disabled }) => (!disabled ? 'translateY(1px)' : 'none')};
+    background-color: ${({ disabled, activeColor, color }) =>
+      !disabled
+        ? activeColor
+          ? `rgb(${colors[activeColor]})`
+          : `rgb(${colors[color]})`
+        : `rgb(${colors[color]})`};
     box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)};
-    color: ${({ outline, color }) => (outline ? `rgb(${colors[color]})` : `rgba(${colors.whiteTransparent})`)};
+    color: ${({ outline, color }) =>
+      outline ? `rgb(${colors[color]})` : `rgba(${colors.whiteTransparent})`};
 
     & ${StyledIcon} {
       opacity: 0.8;
@@ -93,7 +112,11 @@ const Button = ({
     {...props}
   >
     <StyledIcon />
-    {fetching ? <Loader size={20} color="white" background={color} /> : children}
+    {fetching ? (
+      <Loader size={20} color="white" background={color} />
+    ) : (
+      children
+    )}
   </StyledButton>
 );
 
@@ -107,7 +130,7 @@ Button.propTypes = {
   activeColor: PropTypes.string,
   disabled: PropTypes.bool,
   icon: PropTypes.any,
-  left: PropTypes.bool
+  left: PropTypes.bool,
 };
 
 Button.defaultProps = {
@@ -119,7 +142,7 @@ Button.defaultProps = {
   activeColor: 'darkGrey',
   disabled: false,
   icon: null,
-  left: false
+  left: false,
 };
 
 export default Button;

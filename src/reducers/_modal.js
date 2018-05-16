@@ -7,14 +7,14 @@ const MODAL_CLOSE = 'modal/MODAL_CLOSE';
 
 export const modalOpen = (modal, props) => ({
   type: MODAL_OPEN,
-  payload: modal
+  payload: modal,
 });
 
 export const modalClose = () => ({ type: MODAL_CLOSE });
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
-  modal: ''
+  modal: '',
 };
 
 export default (state = INITIAL_STATE, action) => {

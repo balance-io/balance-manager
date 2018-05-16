@@ -18,11 +18,11 @@ const MetamaskLogo = ({ size, ...props }) => (
 );
 
 MetamaskLogo.propTypes = {
-  size: PropTypes.number
+  size: PropTypes.number,
 };
 
 MetamaskLogo.defaultProps = {
-  size: 200
+  size: 200,
 };
 
 export default MetamaskLogo;

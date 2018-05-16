@@ -15,7 +15,7 @@ export const notificationShow = (message, error = false) => dispatch => {
 const INITIAL_STATE = {
   show: false,
   error: false,
-  message: ''
+  message: '',
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -25,7 +25,7 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         show: true,
         message: action.payload.message,
-        error: action.payload.error
+        error: action.payload.error,
       };
     case NOTIFICATION_HIDE:
       return { ...state, show: false, message: '', error: false };

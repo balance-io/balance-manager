@@ -86,11 +86,15 @@ Modal.propTypes = {
   modalClose: PropTypes.func.isRequired,
   sendClearFields: PropTypes.func.isRequired,
   exchangeClearFields: PropTypes.func.isRequired,
-  modal: PropTypes.string.isRequired
+  modal: PropTypes.string.isRequired,
 };
 
 const reduxProps = ({ modal }) => ({
-  modal: modal.modal
+  modal: modal.modal,
 });
 
-export default connect(reduxProps, { modalClose, sendClearFields, exchangeClearFields })(Modal);
+export default connect(reduxProps, {
+  modalClose,
+  sendClearFields,
+  exchangeClearFields,
+})(Modal);

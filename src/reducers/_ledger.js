@@ -21,9 +21,16 @@ export const ledgerConnectInit = () => (dispatch, getState) => {
         .then(accounts => {
           if (accounts.length) {
             dispatch({ type: LEDGER_CONNECT_SUCCESS, payload: accounts });
-            dispatch(accountUpdateAccountAddress(accounts[0].address, 'LEDGER'));
+            dispatch(
+              accountUpdateAccountAddress(accounts[0].address, 'LEDGER'),
+            );
           } else {
-            dispatch(notificationShow(lang.t('notification.error.no_accounts_found'), true));
+            dispatch(
+              notificationShow(
+                lang.t('notification.error.no_accounts_found'),
+                true,
+              ),
+            );
             dispatch({ type: LEDGER_CONNECT_FAILURE });
           }
         })
@@ -47,7 +54,7 @@ export const ledgerUpdateNetwork = network => (dispatch, getState) => {
 const INITIAL_STATE = {
   network: 'mainnet',
   fetching: false,
-  accounts: []
+  accounts: [],
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -55,18 +62,18 @@ export default (state = INITIAL_STATE, action) => {
     case LEDGER_CONNECT_REQUEST:
       return {
         ...state,
-        fetching: true
+        fetching: true,
       };
     case LEDGER_CONNECT_SUCCESS:
       return {
         ...state,
         fetching: false,
-        accounts: action.payload
+        accounts: action.payload,
       };
     case LEDGER_CONNECT_FAILURE:
       return {
         ...state,
-        fetching: false
+        fetching: false,
       };
     default:
       return state;

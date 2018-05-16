@@ -68,7 +68,12 @@ const Card = ({
   children,
   ...props
 }) => (
-  <StyledCard allowOverflow={allowOverflow} background={background} maxWidth={maxWidth} {...props}>
+  <StyledCard
+    allowOverflow={allowOverflow}
+    background={background}
+    maxWidth={maxWidth}
+    {...props}
+  >
     <StyledFetching fetching={fetching}>
       <StyledMessage>{fetchingMessage}</StyledMessage>
       <Loader color="darkGrey" background={background} />
@@ -85,7 +90,7 @@ Card.propTypes = {
   allowOverflow: PropTypes.bool,
   fetchingMessage: PropTypes.string,
   background: PropTypes.string,
-  maxWidth: PropTypes.number
+  maxWidth: PropTypes.number,
 };
 
 Card.defaultProps = {
@@ -94,7 +99,7 @@ Card.defaultProps = {
   fetchingMessage: '',
   background: 'white',
   maxWidth: null,
-  minHeight: null
+  minHeight: null,
 };
 
 export default Card;

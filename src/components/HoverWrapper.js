@@ -28,7 +28,7 @@ const HoverWrapper = ({ hover, children, ...props }) => (
 
 HoverWrapper.propTypes = {
   children: PropTypes.node.isRequired,
-  hover: PropTypes.bool.isRequired
+  hover: PropTypes.bool.isRequired,
 };
 
 export default HoverWrapper;

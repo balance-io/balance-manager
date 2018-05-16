@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Fix lastTxHash incorrect because of pending tx (#167)
 * Updated .gitignore file
 * Updated dependencies
+* Add prettier and pre-commit rules
 
 ### Removed
 

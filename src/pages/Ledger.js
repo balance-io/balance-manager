@@ -7,7 +7,6 @@ import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import Account from '../views/Account';
-import { accountClearState } from '../reducers/_account';
 import { ledgerConnectInit } from '../reducers/_ledger';
 import { fonts, colors } from '../styles';
 
@@ -83,6 +82,5 @@ const reduxProps = ({ account, ledger }) => ({
 });
 
 export default connect(reduxProps, {
-  accountClearState,
   ledgerConnectInit
 })(Ledger);

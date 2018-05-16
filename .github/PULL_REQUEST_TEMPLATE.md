@@ -1,4 +1,4 @@
-### PR Checklist
+### PR Checklist (check all)
 
 * [ ] Updated `CHANGELOG.md` to describe the included fixes and changes made
 * [ ] Included issue number on the description of the PR
@@ -8,6 +8,6 @@
 
 <!--- Which issue(s) is this PR targeting -->
 
-### Notes
+### Changelog
 
-<!--- Describe here anything relevant for the PR review -->
+<!--- Paste here the added change logs added to the CHANGELOG.md -->

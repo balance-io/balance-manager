@@ -10,7 +10,7 @@ import {
   convertAssetAmountToNativeValue,
   convertAssetAmountToNativeAmount,
   convertStringToNumber,
-  convertAssetAmountToBigNumber
+  convertAssetAmountToBigNumber,
 } from '../helpers/bignumber';
 import { debounceRequest } from '../helpers/utilities';
 import { getTransactionCount } from './web3';
@@ -29,14 +29,20 @@ import { apiGetHistoricalPrices, apiGetTransactionData } from './api';
 export const parseError = error => {
   if (error) {
     const msgEnd =
-      error.message.indexOf('\n') !== -1 ? error.message.indexOf('\n') : error.message.length;
+      error.message.indexOf('\n') !== -1
+        ? error.message.indexOf('\n')
+        : error.message.length;
     let message = error.message.slice(0, msgEnd);
-    if (error.message.includes('MetaMask') || error.message.includes('Returned error:')) {
+    if (
+      error.message.includes('MetaMask') ||
+      error.message.includes('Returned error:')
+    ) {
       message = message
         .replace('Error: ', '')
         .replace('MetaMask ', '')
         .replace('Returned error: ', '');
-      message = message.slice(0, 1).toUpperCase() + message.slice(1).toLowerCase();
+      message =
+        message.slice(0, 1).toUpperCase() + message.slice(1).toLowerCase();
 
       console.error(new Error(message));
       return message;
@@ -59,138 +65,171 @@ export const parseGasPrices = (data, prices, gasLimit) => {
   let gasPrices = {
     slow: null,
     average: null,
-    fast: null
+    fast: null,
   };
   if (!data) {
     gasPrices.fast = {
       option: 'fast',
       estimatedTime: {
         amount: '30000',
-        display: getTimeString('30000', 'ms')
+        display: getTimeString('30000', 'ms'),
       },
       value: {
         amount: '5000000000',
-        display: '5 Gwei'
-      }
+        display: '5 Gwei',
+      },
     };
     gasPrices.fast.txFee = {
       value: {
         amount: multiply(gasPrices.fast.value.amount, gasLimit),
-        display: convertAmountToDisplay(multiply(gasPrices.fast.value.amount, gasLimit), null, {
-          symbol: 'ETH',
-          decimals: 18
-        })
+        display: convertAmountToDisplay(
+          multiply(gasPrices.fast.value.amount, gasLimit),
+          null,
+          {
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        ),
       },
-      native: null
+      native: null,
     };
 
     gasPrices.average = {
       option: 'average',
       estimatedTime: {
         amount: '360000',
-        display: getTimeString('360000', 'ms')
+        display: getTimeString('360000', 'ms'),
       },
       value: {
         amount: '2000000000',
-        display: '2 Gwei'
-      }
+        display: '2 Gwei',
+      },
     };
     gasPrices.average.txFee = {
       value: {
         amount: multiply(gasPrices.average.value.amount, gasLimit),
-        display: convertAmountToDisplay(multiply(gasPrices.average.value.amount, gasLimit), null, {
-          symbol: 'ETH',
-          decimals: 18
-        })
+        display: convertAmountToDisplay(
+          multiply(gasPrices.average.value.amount, gasLimit),
+          null,
+          {
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        ),
       },
-      native: null
+      native: null,
     };
 
     gasPrices.slow = {
       option: 'slow',
       estimatedTime: {
         amount: '1800000',
-        display: getTimeString('1800000', 'ms')
+        display: getTimeString('1800000', 'ms'),
       },
       value: {
         amount: '1000000000',
-        display: '1 Gwei'
-      }
+        display: '1 Gwei',
+      },
     };
     gasPrices.slow.txFee = {
       value: {
         amount: multiply(gasPrices.slow.value.amount, gasLimit),
-        display: convertAmountToDisplay(multiply(gasPrices.slow.value.amount, gasLimit), null, {
-          symbol: 'ETH',
-          decimals: 18
-        })
+        display: convertAmountToDisplay(
+          multiply(gasPrices.slow.value.amount, gasLimit),
+          null,
+          {
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        ),
       },
-      native: null
+      native: null,
     };
   } else {
     gasPrices.fast = {
       option: 'fast',
       estimatedTime: {
         amount: multiply(data.fastWait, timeUnits.ms.minute),
-        display: getTimeString(multiply(data.fastWait, timeUnits.ms.minute), 'ms')
+        display: getTimeString(
+          multiply(data.fastWait, timeUnits.ms.minute),
+          'ms',
+        ),
       },
       value: {
         amount: multiply(divide(data.fast, 10), ethUnits.gwei),
-        display: `${divide(data.fast, 10)} Gwei`
-      }
+        display: `${divide(data.fast, 10)} Gwei`,
+      },
     };
     gasPrices.fast.txFee = {
       value: {
         amount: multiply(gasPrices.fast.value.amount, gasLimit),
-        display: convertAmountToDisplay(multiply(gasPrices.fast.value.amount, gasLimit), null, {
-          symbol: 'ETH',
-          decimals: 18
-        })
+        display: convertAmountToDisplay(
+          multiply(gasPrices.fast.value.amount, gasLimit),
+          null,
+          {
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        ),
       },
-      native: null
+      native: null,
     };
     gasPrices.average = {
       option: 'average',
       estimatedTime: {
         amount: multiply(data.avgWait, timeUnits.ms.minute),
-        display: getTimeString(multiply(data.avgWait, timeUnits.ms.minute), 'ms')
+        display: getTimeString(
+          multiply(data.avgWait, timeUnits.ms.minute),
+          'ms',
+        ),
       },
       value: {
         amount: multiply(divide(data.average, 10), ethUnits.gwei),
-        display: `${divide(data.average, 10)} Gwei`
-      }
+        display: `${divide(data.average, 10)} Gwei`,
+      },
     };
     gasPrices.average.txFee = {
       value: {
         amount: multiply(gasPrices.average.value.amount, gasLimit),
-        display: convertAmountToDisplay(multiply(gasPrices.average.value.amount, gasLimit), null, {
-          symbol: 'ETH',
-          decimals: 18
-        })
+        display: convertAmountToDisplay(
+          multiply(gasPrices.average.value.amount, gasLimit),
+          null,
+          {
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        ),
       },
-      native: null
+      native: null,
     };
 
     gasPrices.slow = {
       option: 'slow',
       estimatedTime: {
         amount: multiply(data.safeLowWait, timeUnits.ms.minute),
-        display: getTimeString(multiply(data.safeLowWait, timeUnits.ms.minute), 'ms')
+        display: getTimeString(
+          multiply(data.safeLowWait, timeUnits.ms.minute),
+          'ms',
+        ),
       },
       value: {
         amount: multiply(divide(data.safeLow, 10), ethUnits.gwei),
-        display: `${divide(data.safeLow, 10)} Gwei`
-      }
+        display: `${divide(data.safeLow, 10)} Gwei`,
+      },
     };
     gasPrices.slow.txFee = {
       value: {
         amount: multiply(gasPrices.slow.value.amount, gasLimit),
-        display: convertAmountToDisplay(multiply(gasPrices.slow.value.amount, gasLimit), null, {
-          symbol: 'ETH',
-          decimals: 18
-        })
+        display: convertAmountToDisplay(
+          multiply(gasPrices.slow.value.amount, gasLimit),
+          null,
+          {
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        ),
       },
-      native: null
+      native: null,
     };
   }
   if (prices && prices.selected) {
@@ -200,19 +239,19 @@ export const parseGasPrices = (data, prices, gasLimit) => {
         amount: convertAssetAmountToNativeAmount(
           gasPrices.fast.txFee.value.amount,
           { symbol: 'ETH' },
-          prices
+          prices,
         ),
         display: convertAmountToDisplay(
           convertAssetAmountToNativeAmount(
             gasPrices.fast.txFee.value.amount,
             { symbol: 'ETH' },
-            prices
+            prices,
           ),
           prices,
           null,
-          2
-        )
-      }
+          2,
+        ),
+      },
     };
     gasPrices.average.txFee.native = {
       selected: prices.selected,
@@ -220,19 +259,19 @@ export const parseGasPrices = (data, prices, gasLimit) => {
         amount: convertAssetAmountToNativeAmount(
           gasPrices.average.txFee.value.amount,
           { symbol: 'ETH' },
-          prices
+          prices,
         ),
         display: convertAmountToDisplay(
           convertAssetAmountToNativeAmount(
             gasPrices.average.txFee.value.amount,
             { symbol: 'ETH' },
-            prices
+            prices,
           ),
           prices,
           null,
-          2
-        )
-      }
+          2,
+        ),
+      },
     };
     gasPrices.slow.txFee.native = {
       selected: prices.selected,
@@ -240,19 +279,19 @@ export const parseGasPrices = (data, prices, gasLimit) => {
         amount: convertAssetAmountToNativeAmount(
           gasPrices.slow.txFee.value.amount,
           { symbol: 'ETH' },
-          prices
+          prices,
         ),
         display: convertAmountToDisplay(
           convertAssetAmountToNativeAmount(
             gasPrices.slow.txFee.value.amount,
             { symbol: 'ETH' },
-            prices
+            prices,
           ),
           prices,
           null,
-          2
-        )
-      }
+          2,
+        ),
+      },
     };
   }
   return gasPrices;
@@ -268,33 +307,45 @@ export const parseGasPricesTxFee = (gasPrices, prices, gasLimit) => {
   gasPrices.fast.txFee = {
     value: {
       amount: multiply(gasPrices.fast.value.amount, gasLimit),
-      display: convertAmountToDisplay(multiply(gasPrices.fast.value.amount, gasLimit), null, {
-        symbol: 'ETH',
-        decimals: 18
-      })
+      display: convertAmountToDisplay(
+        multiply(gasPrices.fast.value.amount, gasLimit),
+        null,
+        {
+          symbol: 'ETH',
+          decimals: 18,
+        },
+      ),
     },
-    native: null
+    native: null,
   };
   gasPrices.average.txFee = {
     value: {
       amount: multiply(gasPrices.average.value.amount, gasLimit),
-      display: convertAmountToDisplay(multiply(gasPrices.average.value.amount, gasLimit), null, {
-        symbol: 'ETH',
-        decimals: 18
-      })
+      display: convertAmountToDisplay(
+        multiply(gasPrices.average.value.amount, gasLimit),
+        null,
+        {
+          symbol: 'ETH',
+          decimals: 18,
+        },
+      ),
     },
-    native: null
+    native: null,
   };
 
   gasPrices.slow.txFee = {
     value: {
       amount: multiply(gasPrices.slow.value.amount, gasLimit),
-      display: convertAmountToDisplay(multiply(gasPrices.slow.value.amount, gasLimit), null, {
-        symbol: 'ETH',
-        decimals: 18
-      })
+      display: convertAmountToDisplay(
+        multiply(gasPrices.slow.value.amount, gasLimit),
+        null,
+        {
+          symbol: 'ETH',
+          decimals: 18,
+        },
+      ),
     },
-    native: null
+    native: null,
   };
   if (prices) {
     gasPrices.fast.txFee.native = {
@@ -303,19 +354,19 @@ export const parseGasPricesTxFee = (gasPrices, prices, gasLimit) => {
         amount: convertAssetAmountToNativeAmount(
           gasPrices.fast.txFee.value.amount,
           { symbol: 'ETH' },
-          prices
+          prices,
         ),
         display: convertAmountToDisplay(
           convertAssetAmountToNativeAmount(
             gasPrices.fast.txFee.value.amount,
             { symbol: 'ETH' },
-            prices
+            prices,
           ),
           prices,
           null,
-          2
-        )
-      }
+          2,
+        ),
+      },
     };
     gasPrices.average.txFee.native = {
       selected: prices.selected,
@@ -323,19 +374,19 @@ export const parseGasPricesTxFee = (gasPrices, prices, gasLimit) => {
         amount: convertAssetAmountToNativeAmount(
           gasPrices.average.txFee.value.amount,
           { symbol: 'ETH' },
-          prices
+          prices,
         ),
         display: convertAmountToDisplay(
           convertAssetAmountToNativeAmount(
             gasPrices.average.txFee.value.amount,
             { symbol: 'ETH' },
-            prices
+            prices,
           ),
           prices,
           null,
-          2
-        )
-      }
+          2,
+        ),
+      },
     };
     gasPrices.slow.txFee.native = {
       selected: prices.selected,
@@ -343,19 +394,19 @@ export const parseGasPricesTxFee = (gasPrices, prices, gasLimit) => {
         amount: convertAssetAmountToNativeAmount(
           gasPrices.slow.txFee.value.amount,
           { symbol: 'ETH' },
-          prices
+          prices,
         ),
         display: convertAmountToDisplay(
           convertAssetAmountToNativeAmount(
             gasPrices.slow.txFee.value.amount,
             { symbol: 'ETH' },
-            prices
+            prices,
           ),
           prices,
           null,
-          2
-        )
-      }
+          2,
+        ),
+      },
     };
   }
   return gasPrices;
@@ -368,7 +419,11 @@ export const parseGasPricesTxFee = (gasPrices, prices, gasLimit) => {
  * @param  {String} [native='USD']
  * @return {Object}
  */
-export const parsePricesObject = (data = null, assets = [], nativeSelected = 'USD') => {
+export const parsePricesObject = (
+  data = null,
+  assets = [],
+  nativeSelected = 'USD',
+) => {
   let prices = { selected: nativeCurrencies[nativeSelected] };
   Object.keys(nativeCurrencies).forEach(nativeCurrency => {
     prices[nativeCurrency] = {};
@@ -377,19 +432,25 @@ export const parsePricesObject = (data = null, assets = [], nativeSelected = 'US
       if (data.RAW[asset]) {
         assetPrice = {
           price: {
-            amount: convertAmountToBigNumber(data.RAW[asset][nativeCurrency].PRICE),
+            amount: convertAmountToBigNumber(
+              data.RAW[asset][nativeCurrency].PRICE,
+            ),
             display: convertAmountToDisplaySpecific(
               convertAmountToBigNumber(data.RAW[asset][nativeCurrency].PRICE),
               prices,
-              nativeCurrency
-            )
+              nativeCurrency,
+            ),
           },
           change: {
-            amount: convertAmountToBigNumber(data.RAW[asset][nativeCurrency].CHANGEPCT24HOUR),
+            amount: convertAmountToBigNumber(
+              data.RAW[asset][nativeCurrency].CHANGEPCT24HOUR,
+            ),
             display: convertAmountToDisplay(
-              convertAmountToBigNumber(data.RAW[asset][nativeCurrency].CHANGEPCT24HOUR)
-            )
-          }
+              convertAmountToBigNumber(
+                data.RAW[asset][nativeCurrency].CHANGEPCT24HOUR,
+              ),
+            ),
+          },
         };
       }
       if (asset !== 'WETH') {
@@ -421,29 +482,34 @@ export const parseAccountAssets = (data = null, address = '') => {
         name: name,
         symbol: assetData.contract.symbol || '———',
         address: assetData.contract.address || null,
-        decimals: convertStringToNumber(assetData.contract.decimals)
+        decimals: convertStringToNumber(assetData.contract.decimals),
       };
-      const assetBalance = convertAssetAmountToBigNumber(assetData.balance, asset.decimals);
+      const assetBalance = convertAssetAmountToBigNumber(
+        assetData.balance,
+        asset.decimals,
+      );
       return {
         ...asset,
         balance: {
           amount: assetBalance,
           display: convertAmountToDisplay(assetBalance, null, {
             symbol: asset.symbol,
-            decimals: asset.decimals
-          })
+            decimals: asset.decimals,
+          }),
         },
-        native: null
+        native: null,
       };
     });
 
-    assets = assets.filter(asset => !!Number(asset.balance.amount) || asset.symbol === 'ETH');
+    assets = assets.filter(
+      asset => !!Number(asset.balance.amount) || asset.symbol === 'ETH',
+    );
 
     return {
       address: address,
       type: '',
       assets: assets,
-      total: null
+      total: null,
     };
   } catch (error) {
     throw error;
@@ -457,24 +523,37 @@ export const parseAccountAssets = (data = null, address = '') => {
  * @param  {String} [network='']
  * @return {Object}
  */
-export const parseAccountBalancesPrices = (account = null, nativePrices = null, network = '') => {
+export const parseAccountBalancesPrices = (
+  account = null,
+  nativePrices = null,
+  network = '',
+) => {
   let totalAmount = 0;
   let newAccount = {
-    ...account
+    ...account,
   };
   let nativeSelected = nativePrices.selected.currency;
   if (account) {
     const newAssets = account.assets.map(asset => {
-      if (!nativePrices || (nativePrices && !nativePrices[nativeSelected][asset.symbol]))
+      if (
+        !nativePrices ||
+        (nativePrices && !nativePrices[nativeSelected][asset.symbol])
+      )
         return asset;
 
-      const balanceAmountUnit = convertAmountFromBigNumber(asset.balance.amount, asset.decimals);
+      const balanceAmountUnit = convertAmountFromBigNumber(
+        asset.balance.amount,
+        asset.decimals,
+      );
       const balancePriceUnit = convertAmountFromBigNumber(
-        nativePrices[nativeSelected][asset.symbol].price.amount
+        nativePrices[nativeSelected][asset.symbol].price.amount,
       );
       const balanceRaw = multiply(balanceAmountUnit, balancePriceUnit);
       const balanceAmount = convertAmountToBigNumber(balanceRaw);
-      const balanceDisplay = convertAmountToDisplay(balanceAmount, nativePrices);
+      const balanceDisplay = convertAmountToDisplay(
+        balanceAmount,
+        nativePrices,
+      );
       const assetPrice = nativePrices[nativeSelected][asset.symbol].price;
       return {
         ...asset,
@@ -485,20 +564,21 @@ export const parseAccountBalancesPrices = (account = null, nativePrices = null, 
           change:
             asset.symbol === nativePrices.selected.currency
               ? { amount: '0', display: '———' }
-              : nativePrices[nativeSelected][asset.symbol].change
-        }
+              : nativePrices[nativeSelected][asset.symbol].change,
+        },
       };
     });
     totalAmount = newAssets.reduce(
-      (total, asset) => add(total, asset.native ? asset.native.balance.amount : 0),
-      0
+      (total, asset) =>
+        add(total, asset.native ? asset.native.balance.amount : 0),
+      0,
     );
     const totalDisplay = convertAmountToDisplay(totalAmount, nativePrices);
     const total = { amount: totalAmount, display: totalDisplay };
     newAccount = {
       ...newAccount,
       assets: newAssets,
-      total: total
+      total: total,
     };
   }
   return newAccount;
@@ -514,7 +594,7 @@ export const parseAccountBalancesPrices = (account = null, nativePrices = null, 
 export const parseNewTransaction = async (
   txDetails = null,
   transactions = null,
-  nativeCurrency = ''
+  nativeCurrency = '',
 ) => {
   let _transactions = [...transactions];
 
@@ -523,12 +603,18 @@ export const parseNewTransaction = async (
     amount: totalGas,
     display: convertAmountToDisplay(totalGas, null, {
       symbol: 'ETH',
-      decimals: 18
-    })
+      decimals: 18,
+    }),
   };
 
-  const amount = convertAmountToBigNumber(txDetails.value, txDetails.asset.decimals);
-  const value = { amount, display: convertAmountToDisplay(amount, null, txDetails.asset) };
+  const amount = convertAmountToBigNumber(
+    txDetails.value,
+    txDetails.asset.decimals,
+  );
+  const value = {
+    amount,
+    display: convertAmountToDisplay(amount, null, txDetails.asset),
+  };
   const nonce = txDetails.nonce || (await getTransactionCount(txDetails.from));
 
   let tx = {
@@ -543,7 +629,7 @@ export const parseNewTransaction = async (
     txFee: txFee,
     native: null,
     pending: true,
-    asset: txDetails.asset
+    asset: txDetails.asset,
   };
 
   const timestamp = Date.now();
@@ -556,32 +642,52 @@ export const parseNewTransaction = async (
     await Promise.all(
       Object.keys(nativeCurrencies).map(async nativeCurrency => {
         const assetPriceAmount = convertAmountToBigNumber(
-          response.data[assetSymbol][nativeCurrency]
+          response.data[assetSymbol][nativeCurrency],
         );
         let prices = { selected: nativeCurrencies[nativeCurrency] };
         prices[nativeCurrency] = {};
         prices[nativeCurrency][assetSymbol] = {
-          price: { amount: assetPriceAmount, display: null }
+          price: { amount: assetPriceAmount, display: null },
         };
-        const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
+        const assetPriceDisplay = convertAmountToDisplay(
+          assetPriceAmount,
+          prices,
+        );
         prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
         const assetPrice = prices[nativeCurrency][assetSymbol].price;
-        const valuePriceAmount = convertAssetAmountToNativeValue(tx.value.amount, tx.asset, prices);
-        const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
+        const valuePriceAmount = convertAssetAmountToNativeValue(
+          tx.value.amount,
+          tx.asset,
+          prices,
+        );
+        const valuePriceDisplay = convertAmountToDisplay(
+          valuePriceAmount,
+          prices,
+        );
 
         const valuePrice = !tx.error
           ? { amount: valuePriceAmount, display: valuePriceDisplay }
           : { amount: '', display: '' };
-        const txFeePriceAmount = convertAssetAmountToNativeValue(tx.txFee.amount, tx.asset, prices);
-        const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
-        const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
+        const txFeePriceAmount = convertAssetAmountToNativeValue(
+          tx.txFee.amount,
+          tx.asset,
+          prices,
+        );
+        const txFeePriceDisplay = convertAmountToDisplay(
+          txFeePriceAmount,
+          prices,
+        );
+        const txFeePrice = {
+          amount: txFeePriceAmount,
+          display: txFeePriceDisplay,
+        };
 
         tx.native[nativeCurrency] = {
           price: assetPrice,
           value: valuePrice,
-          txFee: txFeePrice
+          txFee: txFeePrice,
         };
-      })
+      }),
     );
   }
 
@@ -597,7 +703,11 @@ export const parseNewTransaction = async (
  * @param  {String} [timestamp='']
  * @return {Array}
  */
-export const parseConfirmedTransaction = (transactions = null, hash = '', timestamp = '') => {
+export const parseConfirmedTransaction = (
+  transactions = null,
+  hash = '',
+  timestamp = '',
+) => {
   let _transactions = [];
   transactions.forEach(tx => {
     if (tx.hash.toLowerCase() === hash.toLowerCase()) {
@@ -616,7 +726,11 @@ export const parseConfirmedTransaction = (transactions = null, hash = '', timest
  * @param  {String} [networks='']
  * @return {Array}
  */
-export const parseAccountTransactions = async (data = null, address = '', network = '') => {
+export const parseAccountTransactions = async (
+  data = null,
+  address = '',
+  network = '',
+) => {
   if (!data || !data.docs) return [];
 
   let transactions = await Promise.all(
@@ -624,7 +738,7 @@ export const parseAccountTransactions = async (data = null, address = '', networ
       const hash = tx._id;
       const timestamp = {
         secs: `${tx.timeStamp}`,
-        ms: `${tx.timeStamp}000`
+        ms: `${tx.timeStamp}000`,
       };
       const error = !!tx.error;
       let interaction = false;
@@ -634,28 +748,28 @@ export const parseAccountTransactions = async (data = null, address = '', networ
         name: 'Ethereum',
         symbol: 'ETH',
         address: null,
-        decimals: 18
+        decimals: 18,
       };
       let value = {
         amount: tx.value,
         display: convertAmountToDisplay(tx.value, null, {
           symbol: 'ETH',
-          decimals: 18
-        })
+          decimals: 18,
+        }),
       };
       let totalGas = multiply(tx.gasUsed, tx.gasPrice);
       let txFee = {
         amount: totalGas,
         display: convertAmountToDisplay(totalGas, null, {
           symbol: 'ETH',
-          decimals: 18
-        })
+          decimals: 18,
+        }),
       };
 
       const includesTokenTransfer = (() => {
         if (tx.operations.length) {
           const tokenTransfers = tx.operations.filter(
-            operation => operation.type === 'token_transfer'
+            operation => operation.type === 'token_transfer',
           );
           if (tokenTransfers.length) {
             return true;
@@ -677,7 +791,7 @@ export const parseAccountTransactions = async (data = null, address = '', networ
         txFee,
         native: {},
         pending: false,
-        asset
+        asset,
       };
 
       if (includesTokenTransfer) {
@@ -695,7 +809,7 @@ export const parseAccountTransactions = async (data = null, address = '', networ
               txFee,
               native: {},
               pending: false,
-              asset
+              asset,
             };
             const name = !transferData.contract.name.startsWith('0x')
               ? transferData.contract.name
@@ -704,18 +818,18 @@ export const parseAccountTransactions = async (data = null, address = '', networ
               name: name,
               symbol: transferData.contract.symbol || '———',
               address: transferData.contract.address || '',
-              decimals: transferData.contract.decimals || 18
+              decimals: transferData.contract.decimals || 18,
             };
 
             transferTx.from = transferData.from;
             transferTx.to = transferData.to;
             const amount = convertAssetAmountToBigNumber(
               transferData.value,
-              transferTx.asset.decimals
+              transferTx.asset.decimals,
             );
             transferTx.value = {
               amount,
-              display: convertAmountToDisplay(amount, null, transferTx.asset)
+              display: convertAmountToDisplay(amount, null, transferTx.asset),
             };
             tokenTransfers.push(transferTx);
           });
@@ -729,7 +843,7 @@ export const parseAccountTransactions = async (data = null, address = '', networ
       }
 
       return result;
-    })
+    }),
   );
   let _transactions = [];
 
@@ -745,11 +859,15 @@ export const parseAccountTransactions = async (data = null, address = '', networ
 
   if (data.pages > data.page) {
     try {
-      const newPageResponse = await apiGetTransactionData(address, network, data.page + 1);
+      const newPageResponse = await apiGetTransactionData(
+        address,
+        network,
+        data.page + 1,
+      );
       const newPageTransations = await parseAccountTransactions(
         newPageResponse.data,
         address,
-        network
+        network,
       );
       _transactions = [..._transactions, ...newPageTransations];
     } catch (error) {
@@ -779,24 +897,32 @@ export const parseHistoricalPrices = async (transactions = null) => {
           const response = await debounceRequest(
             apiGetHistoricalPrices,
             [assetSymbol, timestamp],
-            100 * idx
+            100 * idx,
           );
 
-          if (response.data.response === 'Error' || !response.data[assetSymbol]) {
+          if (
+            response.data.response === 'Error' ||
+            !response.data[assetSymbol]
+          ) {
             return tx;
           }
 
           Object.keys(nativeCurrencies).forEach(nativeCurrency => {
             const assetPriceAmount = convertAmountToBigNumber(
-              response.data[assetSymbol][nativeCurrency]
+              response.data[assetSymbol][nativeCurrency],
             );
             let prices = { selected: nativeCurrencies[nativeCurrency] };
             prices[nativeCurrency] = {};
             prices[nativeCurrency][assetSymbol] = {
-              price: { amount: assetPriceAmount, display: null }
+              price: { amount: assetPriceAmount, display: null },
             };
-            const assetPriceDisplay = convertAmountToDisplay(assetPriceAmount, prices);
-            prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
+            const assetPriceDisplay = convertAmountToDisplay(
+              assetPriceAmount,
+              prices,
+            );
+            prices[nativeCurrency][
+              assetSymbol
+            ].price.display = assetPriceDisplay;
             const assetPrice = prices[nativeCurrency][assetSymbol].price;
             let asset = { ...tx.asset };
             if (asset.symbol === 'WETH') {
@@ -805,9 +931,12 @@ export const parseHistoricalPrices = async (transactions = null) => {
             const valuePriceAmount = convertAssetAmountToNativeValue(
               tx.value.amount,
               asset,
-              prices
+              prices,
             );
-            const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
+            const valuePriceDisplay = convertAmountToDisplay(
+              valuePriceAmount,
+              prices,
+            );
             const valuePrice = !tx.error
               ? { amount: valuePriceAmount, display: valuePriceDisplay }
               : { amount: '', display: '' };
@@ -815,15 +944,21 @@ export const parseHistoricalPrices = async (transactions = null) => {
               tx.txFee.amount,
               asset,
               prices,
-              tx
+              tx,
             );
-            const txFeePriceDisplay = convertAmountToDisplay(txFeePriceAmount, prices);
-            const txFeePrice = { amount: txFeePriceAmount, display: txFeePriceDisplay };
+            const txFeePriceDisplay = convertAmountToDisplay(
+              txFeePriceAmount,
+              prices,
+            );
+            const txFeePrice = {
+              amount: txFeePriceAmount,
+              display: txFeePriceDisplay,
+            };
 
             tx.native[nativeCurrency] = {
               price: assetPrice,
               value: valuePrice,
-              txFee: txFeePrice
+              txFee: txFeePrice,
             };
           });
         } catch (error) {
@@ -831,7 +966,7 @@ export const parseHistoricalPrices = async (transactions = null) => {
         }
       }
       return tx;
-    })
+    }),
   );
   return _transactions;
 };

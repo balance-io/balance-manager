@@ -6,7 +6,10 @@ import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
 import { getLocal } from '../helpers/utilities';
-import { accountUpdateAccountAddress, accountClearState } from '../reducers/_account';
+import {
+  accountUpdateAccountAddress,
+  accountClearState,
+} from '../reducers/_account';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -44,19 +47,19 @@ Wallet.propTypes = {
   accountClearState: PropTypes.func.isRequired,
   accountAddress: PropTypes.string,
   fetching: PropTypes.bool.isRequired,
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
 };
 
 Wallet.defaultProps = {
-  accountAddress: null
+  accountAddress: null,
 };
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
-  accountAddress: account.accountAddress
+  accountAddress: account.accountAddress,
 });
 
 export default connect(reduxProps, {
   accountUpdateAccountAddress,
-  accountClearState
+  accountClearState,
 })(Wallet);

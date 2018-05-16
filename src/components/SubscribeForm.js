@@ -26,8 +26,8 @@ const SForm = styled.form`
     color: rgb(${colors.ledger});
     border: none;
     border-style: none;
-    box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
-      0 3px 6px 0 rgba(0, 0, 0, 0.06);
+    box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08),
+      0 0 1px 0 rgba(50, 50, 93, 0.02), 0 3px 6px 0 rgba(0, 0, 0, 0.06);
   }
   & input::placeholder {
     color: rgba(161, 162, 169, 0.6);
@@ -65,7 +65,7 @@ class SubscribeForm extends Component {
   state = {
     status: null,
     message: null,
-    input: ''
+    input: '',
   };
   onChange = ({ target }) => {
     this.setState({ input: target.value });
@@ -78,9 +78,9 @@ class SubscribeForm extends Component {
         () =>
           this.setState({
             status: '',
-            message: ''
+            message: '',
           }),
-        3000
+        3000,
       );
     }
     if (callback) callback();
@@ -91,17 +91,19 @@ class SubscribeForm extends Component {
     if (!isValidEmail(this.state.input)) {
       this.onStatusChange({
         status: 'error',
-        message: 'Email is invalid'
+        message: 'Email is invalid',
       });
       return;
     }
-    const url = `//${options.server}.list-manage.com/subscribe/post-json?u=${options.userId}&id=${
-      options.listId
-    }&ORIGIN=${options.origin}&EMAIL=${encodeURIComponent(this.state.input)}`;
+    const url = `//${options.server}.list-manage.com/subscribe/post-json?u=${
+      options.userId
+    }&id=${options.listId}&ORIGIN=${options.origin}&EMAIL=${encodeURIComponent(
+      this.state.input,
+    )}`;
     this.onStatusChange(
       {
         status: 'sending',
-        message: ''
+        message: '',
       },
       () =>
         jsonp(url, { param: 'c' }, (err, data) => {
@@ -109,35 +111,36 @@ class SubscribeForm extends Component {
           let result = null;
           if (err) {
             this.onStatusChange({
-              status: 'error'
+              status: 'error',
             });
           } else if (data.result !== 'success') {
             if (data.msg.includes('already subscribed')) {
               error = { message: 'EMAIL_ALREADY_SUBCRIBED' };
               this.onStatusChange({
                 status: 'error',
-                message: `Sorry, you've already signed up with this email`
+                message: `Sorry, you've already signed up with this email`,
               });
             } else if (data.msg.includes('too many recent signup requests')) {
               error = { message: 'TOO_MANY_SIGNUP_REQUESTS' };
               this.onStatusChange({
                 status: 'error',
-                message: `Too many signup requests, please try again later`
+                message: `Too many signup requests, please try again later`,
               });
             } else {
               error = { message: 'UNKNOWN_ERROR' };
               this.onStatusChange({
-                status: 'error'
+                status: 'error',
               });
             }
           } else {
             result = { email: this.state.input };
             this.onStatusChange({
-              status: 'success'
+              status: 'success',
             });
           }
-          if (this.props.options.callback) this.props.options.callback(error, result);
-        })
+          if (this.props.options.callback)
+            this.props.options.callback(error, result);
+        }),
     );
   };
   renderMessage = () => {
@@ -157,7 +160,11 @@ class SubscribeForm extends Component {
   };
   render() {
     return (
-      <SForm noValidate success={this.state.status === 'success'} onSubmit={this.onSubmit}>
+      <SForm
+        noValidate
+        success={this.state.status === 'success'}
+        onSubmit={this.onSubmit}
+      >
         <input
           required
           spellCheck={false}
@@ -189,7 +196,7 @@ class SubscribeForm extends Component {
 }
 
 SubscribeForm.propTypes = {
-  options: PropTypes.objectOf(PropTypes.string)
+  options: PropTypes.objectOf(PropTypes.string),
 };
 
 SubscribeForm.defaultProps = {
@@ -197,8 +204,8 @@ SubscribeForm.defaultProps = {
     server: 'money.us11',
     userId: 'a3f87e208a9f9896949b4f336',
     listId: '3985713da6',
-    origin: ''
-  }
+    origin: '',
+  },
 };
 
 export default SubscribeForm;

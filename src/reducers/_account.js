@@ -4,20 +4,20 @@ import {
   apiGetAccountBalances,
   apiGetAccountTransactions,
   apiGetPrices,
-  apiGetTransactionStatus
+  apiGetTransactionStatus,
 } from '../handlers/api';
 import {
   parseError,
   parseNewTransaction,
   parseAccountBalancesPrices,
   parsePricesObject,
-  parseConfirmedTransaction
+  parseConfirmedTransaction,
 } from '../handlers/parsers';
 import {
   saveLocal,
   getLocal,
   updateLocalTransactions,
-  updateLocalBalances
+  updateLocalBalances,
 } from '../helpers/utilities';
 import { web3SetHttpProvider } from '../handlers/web3';
 import { notificationShow } from './_notification';
@@ -25,29 +25,47 @@ import nativeCurrencies from '../references/native-currencies.json';
 
 // -- Constants ------------------------------------------------------------- //
 
-const ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST = 'account/ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST';
-const ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS = 'account/ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS';
-const ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE = 'account/ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE';
+const ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST =
+  'account/ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST';
+const ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS =
+  'account/ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS';
+const ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE =
+  'account/ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE';
 
-const ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST = 'account/ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST';
-const ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS = 'account/ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS';
-const ACCOUNT_CHECK_TRANSACTION_STATUS_FAILURE = 'account/ACCOUNT_CHECK_TRANSACTION_STATUS_FAILURE';
+const ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST =
+  'account/ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST';
+const ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS =
+  'account/ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS';
+const ACCOUNT_CHECK_TRANSACTION_STATUS_FAILURE =
+  'account/ACCOUNT_CHECK_TRANSACTION_STATUS_FAILURE';
 
-const ACCOUNT_UPDATE_TRANSACTIONS_REQUEST = 'account/ACCOUNT_UPDATE_TRANSACTIONS_REQUEST';
-const ACCOUNT_UPDATE_TRANSACTIONS_SUCCESS = 'account/ACCOUNT_UPDATE_TRANSACTIONS_SUCCESS';
-const ACCOUNT_UPDATE_TRANSACTIONS_FAILURE = 'account/ACCOUNT_UPDATE_TRANSACTIONS_FAILURE';
+const ACCOUNT_UPDATE_TRANSACTIONS_REQUEST =
+  'account/ACCOUNT_UPDATE_TRANSACTIONS_REQUEST';
+const ACCOUNT_UPDATE_TRANSACTIONS_SUCCESS =
+  'account/ACCOUNT_UPDATE_TRANSACTIONS_SUCCESS';
+const ACCOUNT_UPDATE_TRANSACTIONS_FAILURE =
+  'account/ACCOUNT_UPDATE_TRANSACTIONS_FAILURE';
 
-const ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST';
-const ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS';
-const ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE = 'account/ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE';
+const ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST =
+  'account/ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST';
+const ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS =
+  'account/ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS';
+const ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE =
+  'account/ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE';
 
-const ACCOUNT_UPDATE_BALANCES_REQUEST = 'account/ACCOUNT_UPDATE_BALANCES_REQUEST';
-const ACCOUNT_UPDATE_BALANCES_SUCCESS = 'account/ACCOUNT_UPDATE_BALANCES_SUCCESS';
-const ACCOUNT_UPDATE_BALANCES_FAILURE = 'account/ACCOUNT_UPDATE_BALANCES_FAILURE';
+const ACCOUNT_UPDATE_BALANCES_REQUEST =
+  'account/ACCOUNT_UPDATE_BALANCES_REQUEST';
+const ACCOUNT_UPDATE_BALANCES_SUCCESS =
+  'account/ACCOUNT_UPDATE_BALANCES_SUCCESS';
+const ACCOUNT_UPDATE_BALANCES_FAILURE =
+  'account/ACCOUNT_UPDATE_BALANCES_FAILURE';
 
-const ACCOUNT_GET_NATIVE_PRICES_REQUEST = 'account/ACCOUNT_GET_NATIVE_PRICES_REQUEST';
-const ACCOUNT_GET_NATIVE_PRICES_SUCCESS = 'account/ACCOUNT_GET_NATIVE_PRICES_SUCCESS';
-const ACCOUNT_GET_NATIVE_PRICES_FAILURE = 'account/ACCOUNT_GET_NATIVE_PRICES_FAILURE';
+const ACCOUNT_GET_NATIVE_PRICES_REQUEST =
+  'account/ACCOUNT_GET_NATIVE_PRICES_REQUEST';
+const ACCOUNT_GET_NATIVE_PRICES_SUCCESS =
+  'account/ACCOUNT_GET_NATIVE_PRICES_SUCCESS';
+const ACCOUNT_GET_NATIVE_PRICES_FAILURE =
+  'account/ACCOUNT_GET_NATIVE_PRICES_FAILURE';
 
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 const ACCOUNT_UPDATE_WEB3_NETWORK = 'account/ACCOUNT_UPDATE_WEB3_NETWORK';
@@ -67,11 +85,15 @@ export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
       if (data) {
         const address = getState().account.accountInfo.address;
         const transactions = getState().account.transactions;
-        const _transactions = parseConfirmedTransaction(transactions, txHash, data.timestamp);
+        const _transactions = parseConfirmedTransaction(
+          transactions,
+          txHash,
+          data.timestamp,
+        );
         updateLocalTransactions(address, _transactions, network);
         dispatch({
           type: ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS,
-          payload: _transactions
+          payload: _transactions,
         });
         dispatch(accountUpdateBalances());
       } else {
@@ -91,12 +113,18 @@ export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
   const network = getState().account.network;
   const address = getState().account.accountInfo.address;
   const nativeCurrency = getState().account.nativeCurrency;
-  parseNewTransaction(txDetails, currentTransactions, nativeCurrency, address, network)
+  parseNewTransaction(
+    txDetails,
+    currentTransactions,
+    nativeCurrency,
+    address,
+    network,
+  )
     .then(transactions => {
       updateLocalTransactions(address, transactions, network);
       dispatch({
         type: ACCOUNT_UPDATE_TRANSACTIONS_SUCCESS,
-        payload: transactions
+        payload: transactions,
       });
       dispatch(accountCheckTransactionStatus(txDetails.hash));
     })
@@ -115,14 +143,14 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
     if (accountLocal[network].pending) {
       cachedTransactions = [...accountLocal[network].pending];
       accountLocal[network].pending.forEach(pendingTx =>
-        dispatch(accountCheckTransactionStatus(pendingTx.hash))
+        dispatch(accountCheckTransactionStatus(pendingTx.hash)),
       );
     }
     if (accountLocal[network].transactions) {
       cachedTransactions = _.unionBy(
         cachedTransactions,
         accountLocal[network].transactions,
-        'hash'
+        'hash',
       );
     }
   }
@@ -134,29 +162,52 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
         (accountLocal && !accountLocal[network]) ||
         !accountLocal ||
         !accountLocal[network].transactions ||
-        !accountLocal[network].transactions.length
-    }
+        !accountLocal[network].transactions.length,
+    },
   });
-  const lastTxHash = cachedTransactions.length ? cachedTransactions[0].hash : '';
+  const lastTxHash = cachedTransactions.length
+    ? cachedTransactions[0].hash
+    : '';
   apiGetAccountTransactions(accountAddress, network, lastTxHash)
     .then(transactions => {
       const address = getState().account.accountAddress;
       let _transactions = [...transactions, ...cachedTransactions];
-      if (accountLocal && accountLocal[network] && accountLocal[network].pending) {
-        _transactions = _.unionBy(accountLocal[network].pending, _transactions, 'hash');
+      if (
+        accountLocal &&
+        accountLocal[network] &&
+        accountLocal[network].pending
+      ) {
+        _transactions = _.unionBy(
+          accountLocal[network].pending,
+          _transactions,
+          'hash',
+        );
       }
       updateLocalTransactions(address, _transactions, network);
-      dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: _transactions });
+      dispatch({
+        type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS,
+        payload: _transactions,
+      });
     })
     .catch(error => {
       // const message = parseError(error);
-      dispatch(notificationShow(lang.t('notification.error.failed_get_account_tx'), true));
+      dispatch(
+        notificationShow(
+          lang.t('notification.error.failed_get_account_tx'),
+          true,
+        ),
+      );
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE });
     });
 };
 
 export const accountGetAccountBalances = () => (dispatch, getState) => {
-  const { network, accountInfo, accountAddress, accountType } = getState().account;
+  const {
+    network,
+    accountInfo,
+    accountAddress,
+    accountType,
+  } = getState().account;
   let cachedAccount = { ...accountInfo };
   let cachedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
@@ -165,7 +216,7 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
       cachedAccount = {
         ...cachedAccount,
         assets: accountLocal[network].balances.assets,
-        total: accountLocal[network].balances.total
+        total: accountLocal[network].balances.total,
       };
     }
     if (accountLocal[network].type && !cachedAccount.type) {
@@ -178,7 +229,7 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
       cachedTransactions = _.unionBy(
         cachedTransactions,
         accountLocal[network].transactions,
-        'hash'
+        'hash',
       );
     }
   }
@@ -188,8 +239,8 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
       accountType: cachedAccount.type || accountType,
       accountInfo: cachedAccount,
       transactions: cachedTransactions,
-      fetching: (accountLocal && !accountLocal[network]) || !accountLocal
-    }
+      fetching: (accountLocal && !accountLocal[network]) || !accountLocal,
+    },
   });
   apiGetAccountBalances(accountAddress, network)
     .then(accountInfo => {
@@ -212,10 +263,14 @@ export const accountUpdateBalances = () => (dispatch, getState) => {
     .then(accountInfo => {
       const prices = getState().account.prices;
       accountInfo = { ...accountInfo, type: accountType };
-      const parsedAccountInfo = parseAccountBalancesPrices(accountInfo, prices, network);
+      const parsedAccountInfo = parseAccountBalancesPrices(
+        accountInfo,
+        prices,
+        network,
+      );
       dispatch({
         type: ACCOUNT_UPDATE_BALANCES_SUCCESS,
-        payload: parsedAccountInfo
+        payload: parsedAccountInfo,
       });
       dispatch(accountGetNativePrices(accountInfo));
     })
@@ -237,12 +292,13 @@ export const accountClearIntervals = () => dispatch => {
 
 export const accountUpdateAccountAddress = (accountAddress, accountType) => (
   dispatch,
-  getState
+  getState,
 ) => {
-  if (getState().account.accountType !== accountType) dispatch(accountClearState());
+  if (getState().account.accountType !== accountType)
+    dispatch(accountClearState());
   dispatch({
     type: ACCOUNT_UPDATE_ACCOUNT_ADDRESS,
-    payload: { accountAddress, accountType }
+    payload: { accountAddress, accountType },
   });
   if (accountAddress) {
     dispatch(accountGetAccountTransactions());
@@ -255,7 +311,7 @@ export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
   const getPrices = () => {
     dispatch({
       type: ACCOUNT_GET_NATIVE_PRICES_REQUEST,
-      payload: getState().account.nativeCurrency
+      payload: getState().account.nativeCurrency,
     });
     apiGetPrices(assetSymbols)
       .then(({ data }) => {
@@ -264,12 +320,16 @@ export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
         const network = getState().account.network;
         if (nativeCurrency === nativePriceRequest) {
           const prices = parsePricesObject(data, assetSymbols, nativeCurrency);
-          const parsedAccountInfo = parseAccountBalancesPrices(accountInfo, prices, network);
+          const parsedAccountInfo = parseAccountBalancesPrices(
+            accountInfo,
+            prices,
+            network,
+          );
           updateLocalBalances(parsedAccountInfo, network);
           saveLocal('native_prices', prices);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
-            payload: { accountInfo: parsedAccountInfo, prices }
+            payload: { accountInfo: parsedAccountInfo, prices },
           });
         }
       })
@@ -284,7 +344,10 @@ export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
   getPricesInterval = setInterval(getPrices, 15000); // 15secs
 };
 
-export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState) => {
+export const accountChangeNativeCurrency = nativeCurrency => (
+  dispatch,
+  getState,
+) => {
   saveLocal('native_currency', nativeCurrency);
   let prices = getState().account.prices || getLocal('native_prices');
   const network = getState().account.network;
@@ -296,7 +359,7 @@ export const accountChangeNativeCurrency = nativeCurrency => (dispatch, getState
   updateLocalBalances(accountInfo, network);
   dispatch({
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
-    payload: { nativeCurrency, prices: newPrices, accountInfo }
+    payload: { nativeCurrency, prices: newPrices, accountInfo },
   });
 };
 
@@ -324,16 +387,16 @@ const INITIAL_STATE = {
         decimals: 18,
         balance: {
           amount: '',
-          display: '0.00 ETH'
+          display: '0.00 ETH',
         },
-        native: null
-      }
+        native: null,
+      },
     ],
-    total: '———'
+    total: '———',
   },
   transactions: [],
   fetchingTransactions: false,
-  fetching: false
+  fetching: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -343,36 +406,36 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         accountType: action.payload.accountType,
         accountAddress: action.payload.accountAddress,
-        transactions: []
+        transactions: [],
       };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_REQUEST:
       return {
         ...state,
         fetchingTransactions: action.payload.fetchingTransactions,
-        transactions: action.payload.transactions
+        transactions: action.payload.transactions,
       };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS:
       return {
         ...state,
         fetchingTransactions: false,
-        transactions: action.payload
+        transactions: action.payload,
       };
     case ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE:
       return { ...state, fetchingTransactions: false };
     case ACCOUNT_UPDATE_TRANSACTIONS_SUCCESS:
       return {
         ...state,
-        transactions: action.payload
+        transactions: action.payload,
       };
     case ACCOUNT_UPDATE_BALANCES_SUCCESS:
       return {
         ...state,
-        accountInfo: action.payload
+        accountInfo: action.payload,
       };
     case ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS:
       return {
         ...state,
-        transactions: action.payload
+        transactions: action.payload,
       };
     case ACCOUNT_GET_ACCOUNT_BALANCES_REQUEST:
       return {
@@ -380,7 +443,7 @@ export default (state = INITIAL_STATE, action) => {
         fetching: action.payload.fetching,
         accountType: action.payload.accountType,
         accountInfo: action.payload.accountInfo,
-        transactions: action.payload.transactions
+        transactions: action.payload.transactions,
       };
     case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:
     case ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE:
@@ -389,7 +452,7 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetchingNativePrices: true,
-        nativePriceRequest: action.payload
+        nativePriceRequest: action.payload,
       };
     case ACCOUNT_GET_NATIVE_PRICES_SUCCESS:
       return {
@@ -397,30 +460,30 @@ export default (state = INITIAL_STATE, action) => {
         fetchingNativePrices: false,
         nativePriceRequest: '',
         prices: action.payload.prices,
-        accountInfo: action.payload.accountInfo
+        accountInfo: action.payload.accountInfo,
       };
     case ACCOUNT_GET_NATIVE_PRICES_FAILURE:
       return {
         ...state,
         fetchingNativePrices: false,
-        nativePriceRequest: ''
+        nativePriceRequest: '',
       };
     case ACCOUNT_CHANGE_NATIVE_CURRENCY:
       return {
         ...state,
         nativeCurrency: action.payload.nativeCurrency,
         prices: action.payload.prices,
-        accountInfo: action.payload.accountInfo
+        accountInfo: action.payload.accountInfo,
       };
     case ACCOUNT_UPDATE_WEB3_NETWORK:
       return {
         ...state,
-        network: action.payload
+        network: action.payload,
       };
     case ACCOUNT_CLEAR_STATE:
       return {
         ...state,
-        ...INITIAL_STATE
+        ...INITIAL_STATE,
       };
     default:
       return state;

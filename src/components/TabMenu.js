@@ -88,17 +88,21 @@ const StyledTab = styled(Button)`
     mask-size: auto !important;
     margin: 1px 0 0 16px;
     background-color: ${({ active }) =>
-      active ? `rgb(${colors.blue})` : `rgb(${colors.purpleTextTransparent})`} !important;
+      active
+        ? `rgb(${colors.blue})`
+        : `rgb(${colors.purpleTextTransparent})`} !important;
   }
 `;
 
 class TabMenu extends Component {
   state = {
     activeTab: 'BALANCES_TAB',
-    tabPosition: 40
+    tabPosition: 40,
   };
   componentWillReceiveProps(newProps) {
-    const tabRoute = window.browserHistory.location.pathname.replace(newProps.match.url, '') || '/';
+    const tabRoute =
+      window.browserHistory.location.pathname.replace(newProps.match.url, '') ||
+      '/';
     switch (tabRoute) {
       case '/':
         this.setState({ activeTab: 'BALANCES_TAB', tabPosition: -47 });
@@ -158,7 +162,7 @@ class TabMenu extends Component {
 }
 
 TabMenu.propTypes = {
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
 };
 
 export default TabMenu;

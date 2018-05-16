@@ -9,7 +9,7 @@ const StyledWrapper = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 3px;
-  overflow:hidden;
+  overflow: hidden;
   & img {
     width: 100%;
   }
@@ -17,7 +17,7 @@ const StyledWrapper = styled.div`
 
 class Blockie extends Component {
   state = {
-    imgUrl: ''
+    imgUrl: '',
   };
   componentDidMount() {
     this.updateBlockie(this.props);
@@ -33,7 +33,7 @@ class Blockie extends Component {
         bgcolor: props.bgcolor,
         size: props.size,
         scale: props.scale,
-        spotcolor: props.spotcolor
+        spotcolor: props.spotcolor,
       })
       .toDataURL();
     this.setState({ imgUrl });
@@ -53,7 +53,7 @@ Blockie.propTypes = {
   bgcolor: PropTypes.string,
   size: PropTypes.number,
   scale: PropTypes.number,
-  spotcolor: PropTypes.string
+  spotcolor: PropTypes.string,
 };
 
 Blockie.defaultProps = {
@@ -61,7 +61,7 @@ Blockie.defaultProps = {
   bgcolor: null,
   size: null,
   scale: null,
-  spotcolor: null
+  spotcolor: null,
 };
 
 export default Blockie;

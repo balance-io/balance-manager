@@ -16,7 +16,7 @@ class Router extends Component {
     lang.init({
       lng: 'en',
       debug: process.env.NODE_ENV === 'development',
-      resources
+      resources,
     });
   }
   componentDidMount() {
@@ -40,12 +40,12 @@ Router.contextTypes = {
   router: PropTypes.object.isRequired,
   store: PropTypes.object.isRequired,
   email: PropTypes.string,
-  signup: PropTypes.any
+  signup: PropTypes.any,
 };
 
 export default withRouter(
   connect(null, {
     warningOffline,
-    warningOnline
-  })(Router)
+    warningOnline,
+  })(Router),
 );

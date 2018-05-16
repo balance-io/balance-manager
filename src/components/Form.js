@@ -31,7 +31,7 @@ class Form extends Component {
 }
 
 Form.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 };
 
 export default Form;

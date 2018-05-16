@@ -4,9 +4,9 @@ import { WebConnector } from 'walletconnect';
  * @desc WalletConnect webConnector instance
  */
 export let walletConnectInstance = {
-  bridgeDomain: "https://walletconnect.balance.io",
-  dappName: "Balance Manager",
-  webConnector: null
+  bridgeDomain: 'https://walletconnect.balance.io',
+  dappName: 'Balance Manager',
+  webConnector: null,
 };
 
 /**
@@ -14,7 +14,9 @@ export let walletConnectInstance = {
  * @return {Object}
  */
 export const walletConnectEthInit = async () => {
-  const webConnector = new WebConnector(walletConnectInstance.bridgeDomain, {"dappName": walletConnectInstance.dappName });
+  const webConnector = new WebConnector(walletConnectInstance.bridgeDomain, {
+    dappName: walletConnectInstance.dappName,
+  });
   await webConnector.createSession();
   walletConnectInstance.webConnector = webConnector;
   return walletConnectInstance;
@@ -24,17 +26,19 @@ export const walletConnectEthInit = async () => {
  * @desc WalletConnect get accounts
  * @return {Array}
  */
-export const walletConnectEthAccounts = (cb) => {
+export const walletConnectEthAccounts = cb => {
   walletConnectInstance.webConnector.listenSessionStatus(cb);
 };
 
-
-const walletConnectListenTransactionStatus = (transactionId) =>
+const walletConnectListenTransactionStatus = transactionId =>
   new Promise((resolve, reject) => {
-    walletConnectInstance.webConnector.listenTransactionStatus(transactionId, (err, data) => {
-      if (err) reject(err);
-      resolve(data);
-    });
+    walletConnectInstance.webConnector.listenTransactionStatus(
+      transactionId,
+      (err, data) => {
+        if (err) reject(err);
+        resolve(data);
+      },
+    );
   });
 
 /**
@@ -43,8 +47,12 @@ const walletConnectListenTransactionStatus = (transactionId) =>
  * @return {String}
  */
 export const walletConnectSignTransaction = async transaction => {
-  const transactionId = await walletConnectInstance.webConnector.createTransaction(transaction);
-  const data = await walletConnectListenTransactionStatus(transactionId.transactionId);
+  const transactionId = await walletConnectInstance.webConnector.createTransaction(
+    transaction,
+  );
+  const data = await walletConnectListenTransactionStatus(
+    transactionId.transactionId,
+  );
   if (data) {
     const transactionSentSuccess = data.success;
     if (transactionSentSuccess) {

@@ -37,7 +37,7 @@ const StyledClose = styled.img`
 
 class QRCodeReader extends Component {
   state = {
-    delay: 500
+    delay: 500,
   };
   stopRecording = () => this.setState({ delay: false });
   handleScan = data => {
@@ -83,7 +83,7 @@ QRCodeReader.propTypes = {
   onScan: PropTypes.func.isRequired,
   onError: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
-  onValidate: PropTypes.func.isRequired
+  onValidate: PropTypes.func.isRequired,
 };
 
 export default QRCodeReader;

@@ -6,7 +6,8 @@ import networkList from '../references/ethereum-networks.json';
  * @param  {Object}  [data={}]
  * @return {Object}
  */
-export const saveLocal = (key = '', data = {}) => localStorage.setItem(key, JSON.stringify(data));
+export const saveLocal = (key = '', data = {}) =>
+  localStorage.setItem(key, JSON.stringify(data));
 
 /**
  * @desc get from local storage
@@ -37,8 +38,8 @@ export const debounceRequest = (request, params, timeout) =>
         request(...params)
           .then(res => resolve(res))
           .catch(err => reject(err)),
-      timeout
-    )
+      timeout,
+    ),
   );
 
 /**
@@ -75,7 +76,10 @@ export const updateLocalBalances = (account, network) => {
     accountLocal[network] = {};
   }
   accountLocal[network].type = account.type;
-  accountLocal[network].balances = { assets: account.assets, total: account.total || '———' };
+  accountLocal[network].balances = {
+    assets: account.assets,
+    total: account.total || '———',
+  };
   saveLocal(address, accountLocal);
 };
 
@@ -169,7 +173,8 @@ export const getDataString = (func, arrVals) => {
  * @param  {String} address
  * @return {String}
  */
-export const getNakedAddress = address => address.toLowerCase().replace('0x', '');
+export const getNakedAddress = address =>
+  address.toLowerCase().replace('0x', '');
 
 /**
  * @desc sanitize hexadecimal string
@@ -191,7 +196,7 @@ export const sanitizeHex = hex => {
  */
 export const getUrlParameter = (
   parameter,
-  url = typeof window !== 'undefined' ? window.location.href : ''
+  url = typeof window !== 'undefined' ? window.location.href : '',
 ) => {
   let name = parameter.replace(/[[]]/g, '\\$&');
   const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
@@ -249,7 +254,7 @@ export const obtainPathComponentsFromDerivationPath = (derivationPath = '') => {
   const matchResult = regExp.exec(derivationPath);
   if (matchResult === null) {
     throw new Error(
-      "To get multiple accounts your derivation path must follow pattern 44'/60|61'/x'/n "
+      "To get multiple accounts your derivation path must follow pattern 44'/60|61'/x'/n ",
     );
   }
   return { basePath: matchResult[1], index: parseInt(matchResult[2], 10) };

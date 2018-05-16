@@ -10,7 +10,7 @@ import { modalClose } from '../reducers/_modal';
 import {
   walletConnectInit,
   walletConnectGetSession,
-  walletConnectClearFields
+  walletConnectClearFields,
 } from '../reducers/_walletconnect';
 import { responsive } from '../styles';
 
@@ -47,7 +47,10 @@ class WalletConnectInit extends Component {
         {this.props.webConnector && (
           <StyledQRCodeDisplay
             data={`{"domain":"https://walletconnect.balance.io","sessionId":"${
-              this.props.webConnector.sessionId }","sharedKey":"${this.props.webConnector.sharedKey}", "dappName":"${this.props.webConnector.dappName}"}`}
+              this.props.webConnector.sessionId
+            }","sharedKey":"${
+              this.props.webConnector.sharedKey
+            }", "dappName":"${this.props.webConnector.dappName}"}`}
           />
         )}
         <StyledCenter>
@@ -74,5 +77,5 @@ export default connect(reduxProps, {
   modalClose,
   walletConnectInit,
   walletConnectGetSession,
-  walletConnectClearFields
+  walletConnectClearFields,
 })(WalletConnectInit);

@@ -29,11 +29,14 @@ export const getTimeString = (value = '', unit = '', short = false) => {
       if (_value === 1) {
         _unit = lang.t('time.milisecond');
         _unitShort = lang.t('time.ms');
-      } else if (_value >= timeUnits.ms.second && _value < timeUnits.ms.minute) {
+      } else if (
+        _value >= timeUnits.ms.second &&
+        _value < timeUnits.ms.minute
+      ) {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .dividedBy(BigNumber(`${timeUnits.ms.second}`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.second');
@@ -46,7 +49,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .dividedBy(BigNumber(`${timeUnits.ms.minute}`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.minute');
@@ -59,7 +62,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .dividedBy(BigNumber(`${timeUnits.ms.hour}`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.hour');
@@ -72,7 +75,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .dividedBy(BigNumber(`${timeUnits.ms.day}`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.day');
@@ -93,7 +96,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .times(BigNumber(`${timeUnits.ms.second}`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.milisecond');
@@ -102,11 +105,14 @@ export const getTimeString = (value = '', unit = '', short = false) => {
           _unit = lang.t('time.miliseconds');
           _unitShort = lang.t('time.ms');
         }
-      } else if (_value >= timeUnits.secs.minute && _value < timeUnits.secs.hour) {
+      } else if (
+        _value >= timeUnits.secs.minute &&
+        _value < timeUnits.secs.hour
+      ) {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .dividedBy(BigNumber(`${timeUnits.secs.minute}`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.minute');
@@ -119,7 +125,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .dividedBy(BigNumber(`${timeUnits.secs.hour}`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.hour');
@@ -132,7 +138,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .dividedBy(BigNumber(`timeUnits.secs.day`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.day');
@@ -153,7 +159,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .times(BigNumber(`${timeUnits.secs.minute}`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.second');
@@ -166,7 +172,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .dividedBy(BigNumber(`${timeUnits.mins.hour}`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.hour');
@@ -179,7 +185,7 @@ export const getTimeString = (value = '', unit = '', short = false) => {
         _value = BigNumber(
           BigNumber(`${_value}`)
             .dividedBy(BigNumber(`${timeUnits.mins.day}`))
-            .toFixed(2)
+            .toFixed(2),
         ).toString();
         if (_value === 1) {
           _unit = lang.t('time.day');

@@ -8,7 +8,7 @@ import {
   convertAssetAmountFromBigNumber,
   convertHexToString,
   convertStringToHex,
-  convertAmountToAssetAmount
+  convertAmountToAssetAmount,
 } from '../helpers/bignumber';
 import { ledgerEthSignTransaction } from './ledger-eth';
 import { walletConnectSignTransaction } from './walletconnect';
@@ -18,7 +18,9 @@ import smartContractMethods from '../references/smartcontract-methods.json';
 /**
  * @desc web3 http instance
  */
-export const web3Instance = new Web3(new Web3.providers.HttpProvider(`https://mainnet.infura.io/`));
+export const web3Instance = new Web3(
+  new Web3.providers.HttpProvider(`https://mainnet.infura.io/`),
+);
 
 /**
  * @desc set a different web3 provider
@@ -31,7 +33,7 @@ export const web3SetHttpProvider = provider => {
   }
   if (!providerObj) {
     throw new Error(
-      'function web3SetHttpProvider requires provider to match a valid HTTP/HTTPS endpoint'
+      'function web3SetHttpProvider requires provider to match a valid HTTP/HTTPS endpoint',
     );
   }
   return web3Instance.setProvider(providerObj);
@@ -97,7 +99,8 @@ export const getTransactionCount = address =>
 export const getAccountBalance = async address => {
   const wei = await web3Instance.eth.getBalance(address);
   const ether = fromWei(wei);
-  const balance = convertStringToNumber(ether) !== 0 ? convertNumberToString(ether) : 0;
+  const balance =
+    convertStringToNumber(ether) !== 0 ? convertNumberToString(ether) : 0;
   return balance;
 };
 
@@ -110,7 +113,9 @@ export const getAccountBalance = async address => {
 export const getTokenBalanceOf = (accountAddress, tokenAddress) =>
   new Promise((resolve, reject) => {
     const balanceMethodHash = smartContractMethods.token_balance.hash;
-    const dataString = getDataString(balanceMethodHash, [getNakedAddress(accountAddress)]);
+    const dataString = getDataString(balanceMethodHash, [
+      getNakedAddress(accountAddress),
+    ]);
     web3Instance.eth
       .call({ to: tokenAddress, data: dataString })
       .then(balanceHexResult => {
@@ -125,10 +130,18 @@ export const getTokenBalanceOf = (accountAddress, tokenAddress) =>
  * @param  {Object} transaction { from, to, data, value, gasPrice, gasLimit }
  * @return {Object}
  */
-export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }) => {
+export const getTxDetails = async ({
+  from,
+  to,
+  data,
+  value,
+  gasPrice,
+  gasLimit,
+}) => {
   const _gasPrice = gasPrice || (await web3Instance.eth.getGasPrice());
   const estimateGasData = value === '0x00' ? { from, to, data } : { to, data };
-  const _gasLimit = gasLimit || (await web3Instance.eth.estimateGas(estimateGasData));
+  const _gasLimit =
+    gasLimit || (await web3Instance.eth.estimateGas(estimateGasData));
   const nonce = await getTransactionCount(from);
   const tx = {
     from: from,
@@ -138,7 +151,7 @@ export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }
     gasLimit: web3Instance.utils.toHex(_gasLimit),
     gas: web3Instance.utils.toHex(_gasLimit),
     value: web3Instance.utils.toHex(value),
-    data: data
+    data: data,
   };
   return tx;
 };
@@ -151,7 +164,7 @@ export const getTxDetails = async ({ from, to, data, value, gasPrice, gasLimit }
 export const getTransferTokenTransaction = transaction => {
   const transferMethodHash = smartContractMethods.token_transfer.hash;
   const value = convertStringToHex(
-    convertAmountToAssetAmount(transaction.amount, transaction.asset.decimals)
+    convertAmountToAssetAmount(transaction.amount, transaction.asset.decimals),
   );
   const recipient = getNakedAddress(transaction.to);
   const dataString = getDataString(transferMethodHash, [recipient, value]);
@@ -160,7 +173,7 @@ export const getTransferTokenTransaction = transaction => {
     to: transaction.asset.address,
     data: dataString,
     gasPrice: transaction.gasPrice,
-    gasLimit: transaction.gasLimit
+    gasLimit: transaction.gasLimit,
   };
 };
 
@@ -186,8 +199,13 @@ export const web3SendSignedTransaction = signedTx =>
 export const web3MetamaskSendTransaction = transaction =>
   new Promise((resolve, reject) => {
     const from =
-      transaction.from.substr(0, 2) === '0x' ? transaction.from : `0x${transaction.from}`;
-    const to = transaction.to.substr(0, 2) === '0x' ? transaction.to : `0x${transaction.to}`;
+      transaction.from.substr(0, 2) === '0x'
+        ? transaction.from
+        : `0x${transaction.from}`;
+    const to =
+      transaction.to.substr(0, 2) === '0x'
+        ? transaction.to
+        : `0x${transaction.to}`;
     const value = transaction.value ? toWei(transaction.value) : '0x00';
     const data = transaction.data ? transaction.data : '0x';
     getTxDetails({
@@ -196,7 +214,7 @@ export const web3MetamaskSendTransaction = transaction =>
       data,
       value,
       gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit
+      gasLimit: transaction.gasLimit,
     })
       .then(txDetails => {
         if (typeof window.web3 !== 'undefined') {
@@ -226,7 +244,7 @@ export const web3MetamaskTransferToken = transaction =>
       to: transaction.to,
       data: transaction.data,
       gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit
+      gasLimit: transaction.gasLimit,
     })
       .then(txHash => resolve(txHash))
       .catch(error => reject(error));
@@ -240,8 +258,13 @@ export const web3MetamaskTransferToken = transaction =>
 export const web3WalletConnectSendTransaction = transaction =>
   new Promise((resolve, reject) => {
     const from =
-      transaction.from.substr(0, 2) === '0x' ? transaction.from : `0x${transaction.from}`;
-    const to = transaction.to.substr(0, 2) === '0x' ? transaction.to : `0x${transaction.to}`;
+      transaction.from.substr(0, 2) === '0x'
+        ? transaction.from
+        : `0x${transaction.from}`;
+    const to =
+      transaction.to.substr(0, 2) === '0x'
+        ? transaction.to
+        : `0x${transaction.to}`;
     const value = transaction.value ? toWei(transaction.value) : '0x00';
     const data = transaction.data ? transaction.data : '0x';
     getTxDetails({
@@ -250,7 +273,7 @@ export const web3WalletConnectSendTransaction = transaction =>
       data,
       value,
       gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit
+      gasLimit: transaction.gasLimit,
     })
       .then(txDetails => {
         walletConnectSignTransaction(txDetails)
@@ -279,7 +302,7 @@ export const web3WalletConnectTransferToken = transaction =>
       to: transaction.to,
       data: transaction.data,
       gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit
+      gasLimit: transaction.gasLimit,
     })
       .then(txHash => resolve(txHash))
       .catch(error => reject(error));
@@ -293,8 +316,13 @@ export const web3WalletConnectTransferToken = transaction =>
 export const web3LedgerSendTransaction = transaction =>
   new Promise((resolve, reject) => {
     const from =
-      transaction.from.substr(0, 2) === '0x' ? transaction.from : `0x${transaction.from}`;
-    const to = transaction.to.substr(0, 2) === '0x' ? transaction.to : `0x${transaction.to}`;
+      transaction.from.substr(0, 2) === '0x'
+        ? transaction.from
+        : `0x${transaction.from}`;
+    const to =
+      transaction.to.substr(0, 2) === '0x'
+        ? transaction.to
+        : `0x${transaction.to}`;
     const value = transaction.value ? toWei(transaction.value) : '0x00';
     const data = transaction.data ? transaction.data : '0x';
     getTxDetails({
@@ -303,14 +331,14 @@ export const web3LedgerSendTransaction = transaction =>
       data,
       value,
       gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit
+      gasLimit: transaction.gasLimit,
     })
       .then(txDetails => {
         ledgerEthSignTransaction(txDetails)
           .then(signedTx =>
             web3SendSignedTransaction(signedTx)
               .then(txHash => resolve(txHash))
-              .catch(error => reject(error))
+              .catch(error => reject(error)),
           )
           .catch(error => reject(error));
       })
@@ -330,7 +358,7 @@ export const web3LedgerTransferToken = transaction =>
       to: transaction.to,
       data: transaction.data,
       gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit
+      gasLimit: transaction.gasLimit,
     })
       .then(txHash => resolve(txHash))
       .catch(error => reject(error));
@@ -383,11 +411,18 @@ export const web3SendTransactionMultiWallet = (transaction, accountType) => {
  * @param {Object} [{selected, address, recipient, amount, gasPrice}]
  * @return {String}
  */
-export const estimateGasLimit = async ({ asset, address, recipient, amount }) => {
+export const estimateGasLimit = async ({
+  asset,
+  address,
+  recipient,
+  amount,
+}) => {
   let gasLimit = ethUnits.basic_tx;
   let data = '0x';
   let _amount =
-    amount && Number(amount) ? convertAmountToBigNumber(amount) : asset.balance.amount * 0.1;
+    amount && Number(amount)
+      ? convertAmountToBigNumber(amount)
+      : asset.balance.amount * 0.1;
   let _recipient =
     recipient && isValidAddress(recipient)
       ? recipient
@@ -397,7 +432,10 @@ export const estimateGasLimit = async ({ asset, address, recipient, amount }) =>
     const transferMethodHash = smartContractMethods.token_transfer.hash;
     let value = convertAssetAmountFromBigNumber(_amount, asset.decimals);
     value = convertStringToHex(value);
-    data = getDataString(transferMethodHash, [getNakedAddress(_recipient), value]);
+    data = getDataString(transferMethodHash, [
+      getNakedAddress(_recipient),
+      value,
+    ]);
     estimateGasData = { from: address, to: asset.address, data, value: '0x0' };
     gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
   }

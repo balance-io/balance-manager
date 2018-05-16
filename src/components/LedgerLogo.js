@@ -18,11 +18,11 @@ const LedgerLogo = ({ size, ...props }) => (
 );
 
 LedgerLogo.propTypes = {
-  size: PropTypes.number
+  size: PropTypes.number,
 };
 
 LedgerLogo.defaultProps = {
-  size: 300
+  size: 300,
 };
 
 export default LedgerLogo;

@@ -19,14 +19,16 @@ const StyledSpinner = styled.img`
   animation: ${spin} 0.8s linear infinite;
 `;
 
-const Spinner = ({ size, ...props }) => <StyledSpinner src={spinnerImg} size={size} {...props} />;
+const Spinner = ({ size, ...props }) => (
+  <StyledSpinner src={spinnerImg} size={size} {...props} />
+);
 
 Spinner.propTypes = {
-  size: PropTypes.number
+  size: PropTypes.number,
 };
 
 Spinner.defaultProps = {
-  size: 8
+  size: 8,
 };
 
 export default Spinner;

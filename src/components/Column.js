@@ -15,7 +15,12 @@ const StyledColumn = styled.div`
 `;
 
 const Column = ({ children, spanHeight, maxWidth, center, ...props }) => (
-  <StyledColumn spanHeight={spanHeight} maxWidth={maxWidth} center={center} {...props}>
+  <StyledColumn
+    spanHeight={spanHeight}
+    maxWidth={maxWidth}
+    center={center}
+    {...props}
+  >
     {children}
   </StyledColumn>
 );
@@ -24,13 +29,13 @@ Column.propTypes = {
   children: PropTypes.node.isRequired,
   spanHeight: PropTypes.bool,
   maxWidth: PropTypes.number,
-  center: PropTypes.bool
+  center: PropTypes.bool,
 };
 
 Column.defaultProps = {
   spanHeightL: false,
   maxWidth: 600,
-  center: false
+  center: false,
 };
 
 export default Column;

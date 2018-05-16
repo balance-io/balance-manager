@@ -40,18 +40,18 @@ Wallet.propTypes = {
   accountUpdateAccountAddress: PropTypes.func.isRequired,
   accountAddress: PropTypes.string,
   fetching: PropTypes.bool.isRequired,
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
 };
 
 Wallet.defaultProps = {
-  accountAddress: null
+  accountAddress: null,
 };
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
-  accountAddress: account.accountAddress
+  accountAddress: account.accountAddress,
 });
 
 export default connect(reduxProps, {
-  accountUpdateAccountAddress
+  accountUpdateAccountAddress,
 })(Wallet);

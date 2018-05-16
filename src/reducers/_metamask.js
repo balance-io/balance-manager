@@ -11,7 +11,8 @@ const METAMASK_CONNECT_FAILURE = 'metamask/METAMASK_CONNECT_FAILURE';
 
 const METAMASK_NOT_AVAILABLE = 'metamask/METAMASK_NOT_AVAILABLE';
 
-const METAMASK_UPDATE_METAMASK_ACCOUNT = 'metamask/METAMASK_UPDATE_METAMASK_ACCOUNT';
+const METAMASK_UPDATE_METAMASK_ACCOUNT =
+  'metamask/METAMASK_UPDATE_METAMASK_ACCOUNT';
 
 // -- Actions --------------------------------------------------------------- //
 
@@ -21,14 +22,19 @@ export const metamaskUpdateMetamaskAccount = () => (dispatch, getState) => {
   if (window.web3.eth.defaultAccount !== getState().metamask.accountAddress) {
     const accountAddress = window.web3.eth.defaultAccount;
     dispatch(modalClose());
-    dispatch({ type: METAMASK_UPDATE_METAMASK_ACCOUNT, payload: accountAddress });
-    if (accountAddress) dispatch(accountUpdateAccountAddress(accountAddress, 'METAMASK'));
+    dispatch({
+      type: METAMASK_UPDATE_METAMASK_ACCOUNT,
+      payload: accountAddress,
+    });
+    if (accountAddress)
+      dispatch(accountUpdateAccountAddress(accountAddress, 'METAMASK'));
   }
 };
 
 export const metamaskConnectInit = () => (dispatch, getState) => {
   const accountAddress = getState().metamask.accountAddress;
-  if (accountAddress) dispatch(accountUpdateAccountAddress(accountAddress, 'METAMASK'));
+  if (accountAddress)
+    dispatch(accountUpdateAccountAddress(accountAddress, 'METAMASK'));
   dispatch({ type: METAMASK_CONNECT_REQUEST });
   if (typeof window.web3 !== 'undefined') {
     apiGetMetamaskNetwork()
@@ -36,7 +42,10 @@ export const metamaskConnectInit = () => (dispatch, getState) => {
         dispatch({ type: METAMASK_CONNECT_SUCCESS, payload: network });
         dispatch(accountUpdateNetwork(network));
         dispatch(metamaskUpdateMetamaskAccount());
-        accountInterval = setInterval(() => dispatch(metamaskUpdateMetamaskAccount()), 100);
+        accountInterval = setInterval(
+          () => dispatch(metamaskUpdateMetamaskAccount()),
+          100,
+        );
       })
       .catch(error => {
         const message = parseError(error);
@@ -57,7 +66,7 @@ const INITIAL_STATE = {
   fetching: false,
   accountAddress: '',
   web3Available: false,
-  network: 'mainnet'
+  network: 'mainnet',
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -66,31 +75,31 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: true,
-        web3Available: false
+        web3Available: false,
       };
     case METAMASK_CONNECT_SUCCESS:
       return {
         ...state,
         fetching: false,
         web3Available: true,
-        network: action.payload
+        network: action.payload,
       };
     case METAMASK_CONNECT_FAILURE:
       return {
         ...state,
         fetching: false,
-        web3Available: true
+        web3Available: true,
       };
     case METAMASK_NOT_AVAILABLE:
       return {
         ...state,
         fetching: false,
-        web3Available: false
+        web3Available: false,
       };
     case METAMASK_UPDATE_METAMASK_ACCOUNT:
       return {
         ...state,
-        accountAddress: action.payload
+        accountAddress: action.payload,
       };
     default:
       return state;

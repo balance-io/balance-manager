@@ -66,7 +66,9 @@ const StyledRow = styled.div`
 
 const StyledSelected = styled(StyledRow)`
   background: ${({ noOptions }) =>
-    noOptions ? `rgb(${colors.white})` : `rgb(${colors.white}) url(${selector})`};
+    noOptions
+      ? `rgb(${colors.white})`
+      : `rgb(${colors.white}) url(${selector})`};
   background-size: 8px;
   background-position: 98% 50%;
   background-repeat: no-repeat;
@@ -98,7 +100,7 @@ const StyledDropdown = styled(StyledRow)`
 
 class DropdownAsset extends Component {
   state = {
-    showDropdown: false
+    showDropdown: false,
   };
   onChangeSelected = selected => {
     this.setState({ showDropdown: false });
@@ -109,14 +111,19 @@ class DropdownAsset extends Component {
       this.setState({ showDropdown: false });
     }
   };
-  toggleDropdown = () => this.setState({ showDropdown: !this.state.showDropdown });
+  toggleDropdown = () =>
+    this.setState({ showDropdown: !this.state.showDropdown });
   render() {
     const { selected, assets, noBalance, ...props } = this.props;
     const options = {};
     if (assets.length) {
       const ethereum = assets.filter(asset => asset.symbol === 'ETH')[0];
-      const tokensWithValue = assets.filter(asset => asset.symbol !== 'ETH' && asset.native);
-      const tokensWithNoValue = assets.filter(asset => asset.symbol !== 'ETH' && !asset.native);
+      const tokensWithValue = assets.filter(
+        asset => asset.symbol !== 'ETH' && asset.native,
+      );
+      const tokensWithNoValue = assets.filter(
+        asset => asset.symbol !== 'ETH' && !asset.native,
+      );
       let _assets = [ethereum, ...tokensWithValue, ...tokensWithNoValue];
       _assets.forEach(option => {
         if (option) {
@@ -142,17 +149,25 @@ class DropdownAsset extends Component {
                   size={18}
                   asset={
                     !empty
-                      ? this.props.selected === 'ETH' ? 'ETH' : options[this.props.selected].address
+                      ? this.props.selected === 'ETH'
+                        ? 'ETH'
+                        : options[this.props.selected].address
                       : 'ETH'
                   }
                 />
-                <p>{!empty ? ellipseText(options[this.props.selected].name, 30) : 'Ethereum'}</p>
+                <p>
+                  {!empty
+                    ? ellipseText(options[this.props.selected].name, 30)
+                    : 'Ethereum'}
+                </p>
               </StyledAsset>
               <p>
                 {!noBalance &&
                   `${options[this.props.selected].balance.display}${
                     options[this.props.selected].native
-                      ? ` ≈ ${options[this.props.selected].native.balance.display}`
+                      ? ` ≈ ${
+                          options[this.props.selected].native.balance.display
+                        }`
                       : ''
                   }`}
               </p>
@@ -167,13 +182,18 @@ class DropdownAsset extends Component {
                   onClick={() => this.onChangeSelected(options[key].symbol)}
                 >
                   <StyledAsset data-toggle="tooltip" title={options[key].name}>
-                    <AssetIcon size={18} asset={key === 'ETH' ? 'ETH' : options[key].address} />
+                    <AssetIcon
+                      size={18}
+                      asset={key === 'ETH' ? 'ETH' : options[key].address}
+                    />
                     <p>{ellipseText(options[key].name, 30)}</p>
                   </StyledAsset>
                   <p>
                     {!noBalance &&
                       `${options[key].balance.display}${
-                        options[key].native ? ` ≈ ${options[key].native.balance.display}` : ''
+                        options[key].native
+                          ? ` ≈ ${options[key].native.balance.display}`
+                          : ''
                       }`}
                   </p>
                 </div>
@@ -189,11 +209,11 @@ DropdownAsset.propTypes = {
   selected: PropTypes.string.isRequired,
   assets: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
-  noBalance: PropTypes.bool
+  noBalance: PropTypes.bool,
 };
 
 DropdownAsset.defaultProps = {
-  noBalance: false
+  noBalance: false,
 };
 
 export default DropdownAsset;

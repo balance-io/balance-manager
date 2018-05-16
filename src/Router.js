@@ -12,14 +12,12 @@ import NotFound from './pages/NotFound';
 import { warningOnline, warningOffline } from './reducers/_warning';
 
 class Router extends Component {
-  componentWillMount() {
+  componentDidMount() {
     lang.init({
       lng: 'en',
       debug: process.env.NODE_ENV === 'development',
-      resources
+      resources,
     });
-  }
-  componentDidMount() {
     window.browserHistory = this.context.router.history;
     window.onoffline = () => this.props.warningOffline();
     window.ononline = () => this.props.warningOnline();
@@ -40,12 +38,12 @@ Router.contextTypes = {
   router: PropTypes.object.isRequired,
   store: PropTypes.object.isRequired,
   email: PropTypes.string,
-  signup: PropTypes.any
+  signup: PropTypes.any,
 };
 
 export default withRouter(
   connect(null, {
     warningOffline,
-    warningOnline
-  })(Router)
+    warningOnline,
+  })(Router),
 );

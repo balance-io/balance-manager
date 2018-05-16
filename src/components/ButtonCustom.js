@@ -37,13 +37,15 @@ const StyledButton = styled.button`
 
   &:disabled {
     opacity: 0.6;
-    box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)} !important;
+    box-shadow: ${({ outline }) =>
+      outline ? 'none' : `${shadows.soft}`} !important;
   }
 
   &:active,
   &:focus {
     opacity: 1;
-    box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)} !important;
+    box-shadow: ${({ outline }) =>
+      outline ? 'none' : `${shadows.soft}`} !important;
   }
 
   & ${StyledIconImage} {
@@ -55,7 +57,8 @@ const StyledButton = styled.button`
   @media (hover: hover) {
     &:hover {
       opacity: 0.6;
-      box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)} !important;
+      box-shadow: ${({ outline }) =>
+        outline ? 'none' : `${shadows.soft}`} !important;
     }
   }
 `;
@@ -85,7 +88,11 @@ const Button = ({
     <StyledIconImage>
       <img src={img} alt="icon" />
     </StyledIconImage>
-    {fetching ? <Loader size={20} color={txtColor} background={bgColor} /> : children}
+    {fetching ? (
+      <Loader size={20} color={txtColor} background={bgColor} />
+    ) : (
+      children
+    )}
   </StyledButton>
 );
 
@@ -97,7 +104,7 @@ Button.propTypes = {
   txtColor: PropTypes.string,
   bgColor: PropTypes.string,
   disabled: PropTypes.bool,
-  left: PropTypes.bool
+  left: PropTypes.bool,
 };
 
 Button.defaultProps = {
@@ -106,7 +113,7 @@ Button.defaultProps = {
   txtColor: 'dark',
   bgColor: 'white',
   disabled: false,
-  left: false
+  left: false,
 };
 
 export default Button;

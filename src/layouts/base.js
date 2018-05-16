@@ -14,7 +14,10 @@ import balanceManagerLogo from '../assets/balance-manager-logo.svg';
 import ethereumNetworks from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
 import { ledgerUpdateNetwork } from '../reducers/_ledger';
-import { accountChangeNativeCurrency, accountUpdateAccountAddress } from '../reducers/_account';
+import {
+  accountChangeNativeCurrency,
+  accountUpdateAccountAddress,
+} from '../reducers/_account';
 import { colors, responsive } from '../styles';
 
 const StyledLayout = styled.div`
@@ -111,7 +114,8 @@ const BaseLayout = ({
   const showToolbar =
     window.location.pathname !== '/' &&
     (!metamaskFetching || !ledgerFetching) &&
-    ((accountType === 'METAMASK' && web3Available) || accountType !== 'METAMASK') &&
+    ((accountType === 'METAMASK' && web3Available) ||
+      accountType !== 'METAMASK') &&
     accountAddress;
   return (
     <StyledLayout>
@@ -133,7 +137,9 @@ const BaseLayout = ({
                     displayKey={`address`}
                     selected={accountAddress}
                     options={addresses}
-                    onChange={address => accountUpdateAccountAddress(address, 'LEDGER')}
+                    onChange={address =>
+                      accountUpdateAccountAddress(address, 'LEDGER')
+                    }
                   />
                   <StyledVerticalLine />
                 </Fragment>
@@ -175,7 +181,7 @@ BaseLayout.propTypes = {
   nativeCurrency: PropTypes.string.isRequired,
   network: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
-  online: PropTypes.bool.isRequired
+  online: PropTypes.bool.isRequired,
 };
 
 const reduxProps = ({ account, ledger, metamask, warning }) => ({
@@ -187,11 +193,11 @@ const reduxProps = ({ account, ledger, metamask, warning }) => ({
   network: account.network,
   ledgerAccounts: ledger.accounts,
   web3Available: metamask.web3Available,
-  online: warning.online
+  online: warning.online,
 });
 
 export default connect(reduxProps, {
   ledgerUpdateNetwork,
   accountChangeNativeCurrency,
-  accountUpdateAccountAddress
+  accountUpdateAccountAddress,
 })(BaseLayout);

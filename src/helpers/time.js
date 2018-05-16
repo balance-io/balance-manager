@@ -1,4 +1,9 @@
-import { convertStringToNumber, formatFixedDecimals, multiply, divide } from './bignumber';
+import {
+  convertStringToNumber,
+  formatFixedDecimals,
+  multiply,
+  divide,
+} from './bignumber';
 import timeUnits from '../references/time-units.json';
 import lang from '../languages';
 
@@ -29,7 +34,10 @@ export const getTimeString = (value = '', unit = '', short = false) => {
       if (_value === 1) {
         _unit = lang.t('time.milisecond');
         _unitShort = lang.t('time.ms');
-      } else if (_value >= timeUnits.ms.second && _value < timeUnits.ms.minute) {
+      } else if (
+        _value >= timeUnits.ms.second &&
+        _value < timeUnits.ms.minute
+      ) {
         _value = formatFixedDecimals(divide(_value, timeUnits.ms.second), 2);
         if (_value === 1) {
           _unit = lang.t('time.second');
@@ -82,7 +90,10 @@ export const getTimeString = (value = '', unit = '', short = false) => {
           _unit = lang.t('time.miliseconds');
           _unitShort = lang.t('time.ms');
         }
-      } else if (_value >= timeUnits.secs.minute && _value < timeUnits.secs.hour) {
+      } else if (
+        _value >= timeUnits.secs.minute &&
+        _value < timeUnits.secs.hour
+      ) {
         _value = formatFixedDecimals(divide(_value, timeUnits.secs.minute), 2);
         if (_value === 1) {
           _unit = lang.t('time.minute');

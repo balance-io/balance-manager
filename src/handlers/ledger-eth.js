@@ -2,7 +2,10 @@ import EthereumTx from 'ethereumjs-tx';
 import TransportU2F from '@ledgerhq/hw-transport-u2f';
 import AppEth from '@ledgerhq/hw-app-eth';
 import ethereumNetworks from '../references/ethereum-networks.json';
-import { removeHexPrefix, getDerivationPathComponents } from '../helpers/utilities';
+import {
+  removeHexPrefix,
+  getDerivationPathComponents,
+} from '../helpers/utilities';
 
 /**
  * @desc Ledger ETH App instance
@@ -14,7 +17,7 @@ export let ledgerEthInstance = {
   networkId: 1,
   getTransport: () => TransportU2F.create(),
   transport: null,
-  eth: null
+  eth: null,
 };
 
 /**
@@ -69,7 +72,7 @@ export const ledgerEthSignTransaction = async transaction => {
     accounts = await ledgerEthAccounts();
   }
   const account = accounts.filter(
-    account => account.address.toLowerCase() === transaction.from.toLowerCase()
+    account => account.address.toLowerCase() === transaction.from.toLowerCase(),
   )[0];
   if (!account) throw new Error("address unknown '" + transaction.from + "'");
   const path = account.path;
@@ -82,7 +85,7 @@ export const ledgerEthSignTransaction = async transaction => {
     tx.raw[8] = Buffer.from([]); // s
     const result = await ledgerEthInstance.eth.signTransaction(
       path,
-      tx.serialize().toString('hex')
+      tx.serialize().toString('hex'),
     );
 
     tx.v = Buffer.from(result.v, 'hex');
@@ -96,7 +99,7 @@ export const ledgerEthSignTransaction = async transaction => {
         'Invalid ledgerEthInstance.networkId signature returned. Expected: ' +
           ledgerEthInstance.networkId +
           ', Got: ' +
-          signedChainId
+          signedChainId,
       );
     }
 
@@ -117,7 +120,7 @@ export const signPersonalMessage = async message => {
     accounts = await ledgerEthAccounts();
   }
   const account = accounts.filter(
-    account => account.address.toLowerCase() === message.from.toLowerCase()
+    account => account.address.toLowerCase() === message.from.toLowerCase(),
   )[0];
   if (!account) throw new Error("address unknown '" + message.from + "'");
   const path = account.path;
@@ -125,7 +128,7 @@ export const signPersonalMessage = async message => {
   try {
     const result = await ledgerEthInstance.eth.signPersonalMessage(
       path,
-      removeHexPrefix(message.data)
+      removeHexPrefix(message.data),
     );
     const v = parseInt(result.v, 10) - 27;
     let vHex = v.toString(16);

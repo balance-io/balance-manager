@@ -252,20 +252,21 @@ const StyledActions = styled.div`
 `;
 
 class SendModal extends Component {
-  componentDidMount() {
-    this.props.sendModalInit();
-  }
   state = {
     isValidAddress: true,
     showQRCodeReader: false,
   };
-  componentWillReceiveProps(newProps) {
-    if (newProps.recipient.length >= 42) {
-      if (newProps.selected.symbol !== this.props.selected.symbol) {
+
+  componentDidMount() {
+    this.props.sendModalInit();
+  }
+  componentDidUpdate(prevProps) {
+    if (this.props.recipient.length >= 42) {
+      if (this.props.selected.symbol !== prevProps.selected.symbol) {
         this.props.sendUpdateGasPrice();
-      } else if (newProps.recipient !== this.props.recipient) {
+      } else if (this.props.recipient !== prevProps.recipient) {
         this.props.sendUpdateGasPrice();
-      } else if (newProps.assetAmount !== this.props.assetAmount) {
+      } else if (this.props.assetAmount !== prevProps.assetAmount) {
         this.props.sendUpdateGasPrice();
       }
     }

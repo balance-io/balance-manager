@@ -3,8 +3,8 @@ import TransportU2F from '@ledgerhq/hw-transport-u2f';
 import AppEth from '@ledgerhq/hw-app-eth';
 import ethereumNetworks from '../references/ethereum-networks.json';
 import {
-  getNakedAddress,
-  obtainPathComponentsFromDerivationPath,
+  removeHexPrefix,
+  getDerivationPathComponents,
 } from '../helpers/utilities';
 
 /**
@@ -47,9 +47,7 @@ export const ledgerEthAccounts = async () => {
   const transport = await ledgerEthInstance.getTransport();
   try {
     const accounts = [];
-    const pathComponents = obtainPathComponentsFromDerivationPath(
-      ledgerEthInstance.path,
-    );
+    const pathComponents = getDerivationPathComponents(ledgerEthInstance.path);
     for (let i = 0; i < ledgerEthInstance.length; i++) {
       const path = `${pathComponents.basePath}${pathComponents.index + i}`;
       const address = await ledgerEthInstance.eth.getAddress(path);
@@ -130,7 +128,7 @@ export const signPersonalMessage = async message => {
   try {
     const result = await ledgerEthInstance.eth.signPersonalMessage(
       path,
-      getNakedAddress(message.data),
+      removeHexPrefix(message.data),
     );
     const v = parseInt(result.v, 10) - 27;
     let vHex = v.toString(16);

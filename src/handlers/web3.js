@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import { isValidAddress } from '../helpers/validators';
-import { getDataString, getNakedAddress } from '../helpers/utilities';
+import { getDataString, removeHexPrefix } from '../helpers/utilities';
 import {
   convertStringToNumber,
   convertNumberToString,
@@ -91,6 +91,21 @@ export const getTransactionCount = address =>
   web3Instance.eth.getTransactionCount(address, 'pending');
 
 /**
+ * @desc get transaction by hash
+ * @param   {String}  hash
+ * @return  {Promise}
+ */
+export const getTransactionByHash = hash =>
+  web3Instance.eth.getTransaction(hash);
+
+/**
+ * @desc get block by hash
+ * @param   {String}  hash
+ * @return  {Promise}
+ */
+export const getBlockByHash = hash => web3Instance.eth.getBlock(hash);
+
+/**
  * @desc get account ether balance
  * @param  {String} accountAddress
  * @param  {String} tokenAddress
@@ -114,7 +129,7 @@ export const getTokenBalanceOf = (accountAddress, tokenAddress) =>
   new Promise((resolve, reject) => {
     const balanceMethodHash = smartContractMethods.token_balance.hash;
     const dataString = getDataString(balanceMethodHash, [
-      getNakedAddress(accountAddress),
+      removeHexPrefix(accountAddress),
     ]);
     web3Instance.eth
       .call({ to: tokenAddress, data: dataString })
@@ -166,7 +181,7 @@ export const getTransferTokenTransaction = transaction => {
   const value = convertStringToHex(
     convertAmountToAssetAmount(transaction.amount, transaction.asset.decimals),
   );
-  const recipient = getNakedAddress(transaction.to);
+  const recipient = removeHexPrefix(transaction.to);
   const dataString = getDataString(transferMethodHash, [recipient, value]);
   return {
     from: transaction.from,
@@ -433,7 +448,7 @@ export const estimateGasLimit = async ({
     let value = convertAssetAmountFromBigNumber(_amount, asset.decimals);
     value = convertStringToHex(value);
     data = getDataString(transferMethodHash, [
-      getNakedAddress(_recipient),
+      removeHexPrefix(_recipient),
       value,
     ]);
     estimateGasData = { from: address, to: asset.address, data, value: '0x0' };

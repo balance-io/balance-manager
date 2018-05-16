@@ -332,6 +332,19 @@ export const convertAmountToAssetAmount = (value, decimals) =>
   BigNumber(value).times(BigNumber(10).pow(decimals));
 
 /**
+ * @desc format fixed number of decimals
+ * @param  {String}   value
+ * @param  {Number}   decimals
+ * @return {String}
+ */
+export const formatFixedDecimals = (value, decimals) => {
+  const _value = convertNumberToString(value);
+  const _decimals = convertStringToNumber(decimals);
+  const result = BigNumber(BigNumber(_value).toFixed(_decimals)).toString();
+  return result;
+};
+
+/**
  * @desc format inputOne value to signficant decimals given inputTwo
  * @param  {String}   inputOne
  * @param  {String}   inputTwo
@@ -341,9 +354,7 @@ export const formatInputDecimals = (inputOne, inputTwo) => {
   const _nativeAmountDecimalPlaces = countDecimalPlaces(inputTwo);
   const decimals =
     _nativeAmountDecimalPlaces > 8 ? _nativeAmountDecimalPlaces : 8;
-  const result = BigNumber(
-    BigNumber(`${inputOne}`).toFixed(convertStringToNumber(decimals)),
-  )
+  const result = BigNumber(formatFixedDecimals(inputOne, decimals))
     .toFormat()
     .replace(/,/g, '');
   return result;

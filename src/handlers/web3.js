@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import { isValidAddress } from '../helpers/validators';
-import { getDataString, getNakedAddress } from '../helpers/utilities';
+import { getDataString, removeHexPrefix } from '../helpers/utilities';
 import {
   convertStringToNumber,
   convertNumberToString,
@@ -110,7 +110,7 @@ export const getAccountBalance = async address => {
 export const getTokenBalanceOf = (accountAddress, tokenAddress) =>
   new Promise((resolve, reject) => {
     const balanceMethodHash = smartContractMethods.token_balance.hash;
-    const dataString = getDataString(balanceMethodHash, [getNakedAddress(accountAddress)]);
+    const dataString = getDataString(balanceMethodHash, [removeHexPrefix(accountAddress)]);
     web3Instance.eth
       .call({ to: tokenAddress, data: dataString })
       .then(balanceHexResult => {
@@ -153,7 +153,7 @@ export const getTransferTokenTransaction = transaction => {
   const value = convertStringToHex(
     convertAmountToAssetAmount(transaction.amount, transaction.asset.decimals)
   );
-  const recipient = getNakedAddress(transaction.to);
+  const recipient = removeHexPrefix(transaction.to);
   const dataString = getDataString(transferMethodHash, [recipient, value]);
   return {
     from: transaction.from,
@@ -397,7 +397,7 @@ export const estimateGasLimit = async ({ asset, address, recipient, amount }) =>
     const transferMethodHash = smartContractMethods.token_transfer.hash;
     let value = convertAssetAmountFromBigNumber(_amount, asset.decimals);
     value = convertStringToHex(value);
-    data = getDataString(transferMethodHash, [getNakedAddress(_recipient), value]);
+    data = getDataString(transferMethodHash, [removeHexPrefix(_recipient), value]);
     estimateGasData = { from: address, to: asset.address, data, value: '0x0' };
     gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
   }

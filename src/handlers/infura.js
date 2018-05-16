@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { convertHexToString } from '../helpers/bignumber';
-import { getNakedAddress, getDataString } from '../helpers/utilities';
+import { removeHexPrefix, getDataString } from '../helpers/utilities';
 import smartContractMethods from '../references/smartcontract-methods.json';
 
 /**
@@ -53,7 +53,7 @@ export const infuraCallTokenBalance = async (
 ) => {
   try {
     const balanceMethodHash = smartContractMethods.token_balance.hash;
-    const dataString = getDataString(balanceMethodHash, [getNakedAddress(accountAddress)]);
+    const dataString = getDataString(balanceMethodHash, [removeHexPrefix(accountAddress)]);
     const response = await axios.get(
       `https://api.infura.io/v1/jsonrpc/${network}/eth_call?params=[{"to":"${tokenAddress}","data":"${dataString}"},"latest"]`
     );

@@ -18,7 +18,7 @@ import {
   getLocal,
   updateLocalTransactions,
   updateLocalBalances
-} from '../helpers/utilities';
+} from '../handlers/localstorage';
 import { web3SetHttpProvider } from '../handlers/web3';
 import { notificationShow } from './_notification';
 import nativeCurrencies from '../references/native-currencies.json';
@@ -194,7 +194,7 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
   apiGetAccountBalances(accountAddress, network)
     .then(accountInfo => {
       accountInfo = { ...accountInfo, type: accountType };
-      updateLocalBalances(accountInfo, network);
+      updateLocalBalances(accountAddress, accountInfo, network);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS });
       dispatch(accountGetNativePrices(accountInfo));
     })

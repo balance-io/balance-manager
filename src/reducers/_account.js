@@ -18,7 +18,7 @@ import {
   getLocal,
   updateLocalTransactions,
   updateLocalBalances
-} from '../helpers/utilities';
+} from '../handlers/localstorage';
 import { web3SetHttpProvider } from '../handlers/web3';
 import { notificationShow } from './_notification';
 import nativeCurrencies from '../references/native-currencies.json';
@@ -50,8 +50,10 @@ const ACCOUNT_GET_NATIVE_PRICES_SUCCESS = 'account/ACCOUNT_GET_NATIVE_PRICES_SUC
 const ACCOUNT_GET_NATIVE_PRICES_FAILURE = 'account/ACCOUNT_GET_NATIVE_PRICES_FAILURE';
 
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
-const ACCOUNT_UPDATE_WEB3_NETWORK = 'account/ACCOUNT_UPDATE_WEB3_NETWORK';
+
 const ACCOUNT_UPDATE_ACCOUNT_ADDRESS = 'account/ACCOUNT_UPDATE_ACCOUNT_ADDRESS';
+
+const ACCOUNT_UPDATE_NETWORK = 'account/ACCOUNT_UPDATE_NETWORK';
 
 const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 
@@ -110,6 +112,7 @@ export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
 export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { accountAddress, network } = getState().account;
   let cachedTransactions = [];
+  let confirmedTransactions = [];
   const accountLocal = getLocal(accountAddress) || null;
   if (accountLocal && accountLocal[network]) {
     if (accountLocal[network].pending) {
@@ -119,11 +122,13 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
       );
     }
     if (accountLocal[network].transactions) {
+      confirmedTransactions = accountLocal[network].transactions;
       cachedTransactions = _.unionBy(
         cachedTransactions,
         accountLocal[network].transactions,
         'hash'
       );
+      updateLocalTransactions(accountAddress, cachedTransactions, network);
     }
   }
   dispatch({
@@ -137,19 +142,17 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
         !accountLocal[network].transactions.length
     }
   });
-  const lastTxHash = cachedTransactions.length ? cachedTransactions[0].hash : '';
+  const lastTxHash = confirmedTransactions.length ? confirmedTransactions[0].hash : '';
   apiGetAccountTransactions(accountAddress, network, lastTxHash)
-    .then(transactions => {
+    .then(({ data }) => {
+      const transactions = data;
       const address = getState().account.accountAddress;
-      let _transactions = [...transactions, ...cachedTransactions];
-      if (accountLocal && accountLocal[network] && accountLocal[network].pending) {
-        _transactions = _.unionBy(accountLocal[network].pending, _transactions, 'hash');
-      }
+      const currentTransactions = getState().account.transactions;
+      let _transactions = _.unionBy(transactions, currentTransactions, 'hash');
       updateLocalTransactions(address, _transactions, network);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_SUCCESS, payload: _transactions });
     })
     .catch(error => {
-      // const message = parseError(error);
       dispatch(notificationShow(lang.t('notification.error.failed_get_account_tx'), true));
       dispatch({ type: ACCOUNT_GET_ACCOUNT_TRANSACTIONS_FAILURE });
     });
@@ -180,6 +183,7 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
         accountLocal[network].transactions,
         'hash'
       );
+      updateLocalTransactions(accountAddress, cachedTransactions, network);
     }
   }
   dispatch({
@@ -192,9 +196,9 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
     }
   });
   apiGetAccountBalances(accountAddress, network)
-    .then(accountInfo => {
-      accountInfo = { ...accountInfo, type: accountType };
-      updateLocalBalances(accountInfo, network);
+    .then(({ data }) => {
+      let accountInfo = { ...data, type: accountType };
+      updateLocalBalances(accountAddress, accountInfo, network);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS });
       dispatch(accountGetNativePrices(accountInfo));
     })
@@ -209,9 +213,9 @@ export const accountUpdateBalances = () => (dispatch, getState) => {
   const { network, accountAddress, accountType } = getState().account;
   dispatch({ type: ACCOUNT_UPDATE_BALANCES_REQUEST });
   apiGetAccountBalances(accountAddress, network)
-    .then(accountInfo => {
+    .then(({ data }) => {
       const prices = getState().account.prices;
-      accountInfo = { ...accountInfo, type: accountType };
+      let accountInfo = { ...data, type: accountType };
       const parsedAccountInfo = parseAccountBalancesPrices(accountInfo, prices, network);
       dispatch({
         type: ACCOUNT_UPDATE_BALANCES_SUCCESS,
@@ -228,7 +232,7 @@ export const accountUpdateBalances = () => (dispatch, getState) => {
 
 export const accountUpdateNetwork = network => dispatch => {
   web3SetHttpProvider(`https://${network}.infura.io/`);
-  dispatch({ type: ACCOUNT_UPDATE_WEB3_NETWORK, payload: network });
+  dispatch({ type: ACCOUNT_UPDATE_NETWORK, payload: network });
 };
 
 export const accountClearIntervals = () => dispatch => {
@@ -239,15 +243,16 @@ export const accountUpdateAccountAddress = (accountAddress, accountType) => (
   dispatch,
   getState
 ) => {
+  if (!accountAddress || !accountType) return;
+  const { network } = getState().account;
   if (getState().account.accountType !== accountType) dispatch(accountClearState());
   dispatch({
     type: ACCOUNT_UPDATE_ACCOUNT_ADDRESS,
     payload: { accountAddress, accountType }
   });
-  if (accountAddress) {
-    dispatch(accountGetAccountTransactions());
-    dispatch(accountGetAccountBalances());
-  }
+  dispatch(accountUpdateNetwork(network));
+  dispatch(accountGetAccountTransactions());
+  dispatch(accountGetAccountBalances());
 };
 
 export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
@@ -412,7 +417,7 @@ export default (state = INITIAL_STATE, action) => {
         prices: action.payload.prices,
         accountInfo: action.payload.accountInfo
       };
-    case ACCOUNT_UPDATE_WEB3_NETWORK:
+    case ACCOUNT_UPDATE_NETWORK:
       return {
         ...state,
         network: action.payload

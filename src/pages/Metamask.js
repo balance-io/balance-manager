@@ -6,7 +6,6 @@ import lang from '../languages';
 import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
-import { accountClearState } from '../reducers/_account';
 import {
   metamaskUpdateMetamaskAccount,
   metamaskConnectInit,
@@ -78,7 +77,6 @@ const reduxProps = ({ account, metamask }) => ({
 });
 
 export default connect(reduxProps, {
-  accountClearState,
   metamaskUpdateMetamaskAccount,
   metamaskConnectInit,
   metamaskClearIntervals

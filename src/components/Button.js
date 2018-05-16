@@ -37,6 +37,39 @@ const StyledButton = styled.button`
     box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)};
   }
 
+  .tooltiptext {
+    opacity: 0;
+    transition: opacity 1s;
+    width: 120px;
+    background-color: #99d387;
+    color: #154908;
+    font-weight: 100;
+    text-align: center;
+    padding: 12px;
+    border-radius: 6px;
+    position: absolute;
+    top: 100%;
+    left: 50%; 
+    margin-left: -60px;
+    z-index: 999999;
+    line-height: 18px;
+  }
+
+  .tooltiptext::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;  /* At the top of the tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #99d387 transparent;
+  }
+
+  &:hover .tooltiptext {
+    opacity: 1;
+  }
+
   @media (hover: hover) {
     &:hover {
       transform: ${({ disabled }) => !disabled ? 'translateY(-1px)' : 'none'};
@@ -79,6 +112,7 @@ const Button = ({
   icon,
   left,
   round,
+  title,
   ...props
 }) => (
   <StyledButton
@@ -94,6 +128,7 @@ const Button = ({
   >
     <StyledIcon />
     {fetching ? <Loader size={20} color="white" background={color} /> : children}
+    {props['data-toggle'] === 'tooltip' && <span class="tooltiptext">{title}</span>}
   </StyledButton>
 );
 

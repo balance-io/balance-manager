@@ -17,7 +17,7 @@ import { getLocal } from '../helpers/utilities';
 import { modalOpen } from '../reducers/_modal';
 import { fonts, responsive } from '../styles';
 
-const StyledCard = styled(Card)`
+const StyledCard = styled(Card) `
   width: 100%;
   height: 102px;
   margin-bottom: 18px;
@@ -151,7 +151,7 @@ const StyledTrezorLogo = styled.div`
   background-size: 100%;
 `;
 
-const StyledConnectButton = styled(Button)`
+const StyledConnectButton = styled(Button) `
   position: absolute;
   right: 29px;
   top: 29px;
@@ -206,7 +206,11 @@ class Home extends Component {
             <StyledMetamaskLogo />
             <p>Connect to the MetaMask Chrome extension.</p>
             <Link to="/metamask">
-              <StyledMetamaskButton left color="orange">
+              <StyledMetamaskButton
+                data-toggle="tooltip"
+                title={lang.t('button.connect_metamask_tooltip')}
+                left color="orange"
+              >
                 {lang.t('button.connect_metamask')}
               </StyledMetamaskButton>
             </Link>
@@ -220,7 +224,11 @@ class Home extends Component {
             <StyledLedgerLogo />
             <p>Connect and sign with your Ledger hardware wallet.</p>
             <Link to="/ledger">
-              <StyledLedgerButton left color="ledger">
+              <StyledLedgerButton
+                data-toggle="tooltip"
+                title={lang.t('button.connect_ledger_tooltip')}
+                left color="ledger"
+              >
                 {lang.t('button.connect_ledger')}
               </StyledLedgerButton>
             </Link>

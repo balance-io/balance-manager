@@ -32,7 +32,7 @@ const StyledCardContainer = styled.div`
   justify-content: center;
 `;
 
-const StyledButton = styled(Button)`
+const StyledButton = styled(Button) `
   margin: 10px;
 `;
 
@@ -54,15 +54,19 @@ class Ledger extends Component {
               match={this.props.match}
             />
           ) : (
-            <Card minHeight={200} fetching={this.props.fetching}>
-              <StyledCardContainer>
-                <StyledMessage>{lang.t('message.failed_ledger_connection')}</StyledMessage>
-                <StyledButton color="grey" onClick={this.connectLedger}>
-                  {lang.t('button.try_again')}
-                </StyledButton>
-              </StyledCardContainer>
-            </Card>
-          )}
+              <Card minHeight={200} fetching={this.props.fetching}>
+                <StyledCardContainer>
+                  <StyledMessage>{lang.t('message.failed_ledger_connection')}</StyledMessage>
+                  <StyledButton
+                    data-toggle="tooltip"
+                    title={lang.t('button.try_again_tooltip')}
+                    color="grey" onClick={this.connectLedger}
+                  >
+                    {lang.t('button.try_again')}
+                  </StyledButton>
+                </StyledCardContainer>
+              </Card>
+            )}
         </StyledWrapper>
       </BaseLayout>
     );

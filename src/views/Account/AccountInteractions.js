@@ -61,7 +61,7 @@ const StyledRow = styled.div`
   }
 `;
 
-const StyledLabelsRow = styled(StyledRow)`
+const StyledLabelsRow = styled(StyledRow) `
   width: 100%;
   border-width: 0 0 2px 0;
   border-color: rgba(${colors.lightGrey}, 0.4);
@@ -96,13 +96,13 @@ const StyledTransactionWrapper = styled.div`
       &:hover {
         z-index: 10;
         box-shadow: ${({ showTxDetails }) =>
-          showTxDetails ? `${shadows.big}` : `${shadows.soft}`};
+    showTxDetails ? `${shadows.big}` : `${shadows.soft}`};
       }
     }
   }
 `;
 
-const StyledTransaction = styled(StyledRow)`
+const StyledTransaction = styled(StyledRow) `
   width: 100%;
   box-shadow: none;
   & > * {
@@ -117,7 +117,7 @@ const StyledTransaction = styled(StyledRow)`
   }
 `;
 
-const StyledTransactionMainRow = styled(StyledTransaction)`
+const StyledTransactionMainRow = styled(StyledTransaction) `
   cursor: pointer;
   border-radius: ${({ showTxDetails }) => (showTxDetails ? '0' : `0`)};
   &:nth-child(n + 3) {
@@ -125,7 +125,7 @@ const StyledTransactionMainRow = styled(StyledTransaction)`
   }
 `;
 
-const StyledTransactionDetails = styled(StyledTransaction)`
+const StyledTransactionDetails = styled(StyledTransaction) `
   border-top-color: rgba(${colors.rowDivider});
   border-top-style: solid;
   border-top-width: ${({ showTxDetails }) => (showTxDetails ? `1px` : '0')};
@@ -141,22 +141,22 @@ const StyledTransactionDetails = styled(StyledTransaction)`
   }
 `;
 
-const StyledTransactionTopDetails = styled(StyledTransactionDetails)`
+const StyledTransactionTopDetails = styled(StyledTransactionDetails) `
   border-radius: 0;
   grid-template-columns: 2fr 1fr 1fr;
 `;
 
-const StyledTransactionBottomDetails = styled(StyledTransactionDetails)`
+const StyledTransactionBottomDetails = styled(StyledTransactionDetails) `
   border-radius: 0 0 8px 8px;
   grid-template-columns: 3fr 1fr;
 `;
 
-const StyledLineBreak = styled(LineBreak)`
+const StyledLineBreak = styled(LineBreak) `
   border-top: 1px solid rgba(${colors.rowDivider});
   opacity: ${({ showTxDetails }) => (showTxDetails ? '0' : '1')};
 `;
 
-const StyledBlockie = styled(Blockie)`
+const StyledBlockie = styled(Blockie) `
   margin-right: 10px;
 `;
 
@@ -181,11 +181,11 @@ const StyledAsset = styled.div`
   }
 `;
 
-const StyledToggleIndicator = styled(ToggleIndicator)`
+const StyledToggleIndicator = styled(ToggleIndicator) `
   left: 18px;
 `;
 
-const StyledShowAllInteractions = styled(StyledRow)`
+const StyledShowAllInteractions = styled(StyledRow) `
   grid-template-columns: auto;
   min-height: 0;
   min-width: 0;
@@ -204,7 +204,7 @@ const StyledShowAllInteractions = styled(StyledRow)`
   }
 `;
 
-const StyledCard = styled(Card)`
+const StyledCard = styled(Card) `
   box-shadow: none;
 `;
 
@@ -312,7 +312,7 @@ class AccountInteractions extends Component {
                           tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].txFee
                             ? tx.native[nativeCurrency].txFee.display
                             : '———'
-                        })`}</p>
+                          })`}</p>
                       </div>
                     </div>
                     <div>
@@ -340,11 +340,15 @@ class AccountInteractions extends Component {
                       <a
                         href={`https://${
                           this.props.network !== 'mainnet' ? `${this.props.network}.` : ''
-                        }etherscan.io/tx/${tx.hash.replace(/-.*/g, '')}`}
+                          }etherscan.io/tx/${tx.hash.replace(/-.*/g, '')}`}
                         target="_blank"
                         rel="noreferrer noopener"
                       >
-                        <ButtonCustom left txtColor="etherscan" img={etherscanLogo}>
+                        <ButtonCustom
+                          data-toggle="tooltip"
+                          title={lang.t('button.etherscan_tooltip')}
+                          left txtColor="etherscan" img={etherscanLogo}
+                        >
                           {'Etherscan'}
                         </ButtonCustom>
                       </a>
@@ -354,6 +358,8 @@ class AccountInteractions extends Component {
                         rel="noreferrer noopener"
                       >
                         <ButtonCustom
+                          data-toggle="tooltip"
+                          title={lang.t('button.ethplorer_tooltip')}
                           left
                           disabled={this.props.network !== 'mainnet'}
                           txtColor="ethplorer"
@@ -380,21 +386,21 @@ class AccountInteractions extends Component {
                   !this.state.showAllInteractions
                     ? lang.t('account.show_all')
                     : lang.t('account.show_less')
-                } ${lang.t('account.tab_interactions').toLowerCase()}`}
+                  } ${lang.t('account.tab_interactions').toLowerCase()}`}
               </p>
             </StyledShowAllInteractions>
           )}
         </StyledGrid>
       ) : (
-        <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
-          <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
-        </StyledCard>
-      )
+          <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
+            <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
+          </StyledCard>
+        )
     ) : (
-      <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
-        <StyledMessage>{lang.t('message.no_interactions')}</StyledMessage>
-      </StyledCard>
-    );
+        <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
+          <StyledMessage>{lang.t('message.no_interactions')}</StyledMessage>
+        </StyledCard>
+      );
   };
 }
 

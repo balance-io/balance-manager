@@ -24,7 +24,7 @@ const StyledContainer = styled.div`
   }
 `;
 
-const StyledQRCodeDisplay = styled(QRCodeDisplay)`
+const StyledQRCodeDisplay = styled(QRCodeDisplay) `
   margin: 35px auto;
 `;
 
@@ -47,11 +47,16 @@ class WalletConnectInit extends Component {
         {this.props.webConnector && (
           <StyledQRCodeDisplay
             data={`{"domain":"https://walletconnect.balance.io","sessionId":"${
-              this.props.webConnector.sessionId }","sharedKey":"${this.props.webConnector.sharedKey}", "dappName":"${this.props.webConnector.dappName}"}`}
+              this.props.webConnector.sessionId}","sharedKey":"${this.props.webConnector.sharedKey}", "dappName":"${this.props.webConnector.dappName}"}`}
           />
         )}
         <StyledCenter>
-          <Button color="walletconnect" onClick={this.onClose}>
+          <Button
+            data-toggle="tooltip"
+            title={lang.t('button.cancel_tooltip')}
+            color="walletconnect"
+            onClick={this.onClose}
+          >
             {lang.t('button.cancel')}
           </Button>
         </StyledCenter>

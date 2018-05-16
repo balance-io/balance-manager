@@ -105,7 +105,7 @@ const StyledHelperText = styled.div`
   }
 `;
 
-const StyledBottomModal = styled(StyledFlex)`
+const StyledBottomModal = styled(StyledFlex) `
   & p {
     font-size: ${fonts.size.h6};
   }
@@ -287,8 +287,8 @@ class ExchangeModal extends Component {
     )[0].native;
     const total = depositNative
       ? this.props.accountInfo.assets.filter(
-          asset => asset.symbol === this.props.depositSelected.symbol
-        )[0].native.balance.display
+        asset => asset.symbol === this.props.depositSelected.symbol
+      )[0].native.balance.display
       : '';
     const exchangeDetails =
       Object.keys(this.props.exchangeDetails).length && this.props.exchangeDetails.rate
@@ -296,64 +296,64 @@ class ExchangeModal extends Component {
         : null;
     const price = exchangeDetails
       ? convertAmountToDisplay(
-          convertAmountToBigNumber(divide(1, exchangeDetails.rate)),
-          null,
-          this.props.depositSelected
-        )
+        convertAmountToBigNumber(divide(1, exchangeDetails.rate)),
+        null,
+        this.props.depositSelected
+      )
       : null;
     const depositPrices =
       exchangeDetails &&
-      this.props.prices[this.props.nativeCurrency] &&
-      this.props.prices[this.props.nativeCurrency][this.props.depositSelected.symbol] &&
-      Object.keys(exchangeDetails).length
+        this.props.prices[this.props.nativeCurrency] &&
+        this.props.prices[this.props.nativeCurrency][this.props.depositSelected.symbol] &&
+        Object.keys(exchangeDetails).length
         ? this.props.prices[this.props.nativeCurrency][this.props.depositSelected.symbol]
         : null;
     const native =
       exchangeDetails && depositPrices
         ? convertAmountToDisplay(
-            convertAmountToBigNumber(
-              multiply(
-                convertAmountFromBigNumber(depositPrices.price.amount),
-                divide(1, exchangeDetails.rate)
-              )
-            ),
-            this.props.prices
-          )
+          convertAmountToBigNumber(
+            multiply(
+              convertAmountFromBigNumber(depositPrices.price.amount),
+              divide(1, exchangeDetails.rate)
+            )
+          ),
+          this.props.prices
+        )
         : null;
     const depositMin = exchangeDetails
       ? convertAmountToDisplay(
-          convertAmountToBigNumber(exchangeDetails.min),
-          null,
-          this.props.depositSelected
-        )
+        convertAmountToBigNumber(exchangeDetails.min),
+        null,
+        this.props.depositSelected
+      )
       : null;
     const depositMax = exchangeDetails
       ? convertAmountToDisplay(
-          convertAmountToBigNumber(exchangeDetails.maxLimit),
-          null,
-          this.props.depositSelected
-        )
+        convertAmountToBigNumber(exchangeDetails.maxLimit),
+        null,
+        this.props.depositSelected
+      )
       : null;
     const withdrawalMin = exchangeDetails
       ? convertAmountToDisplay(
-          convertAmountToBigNumber(
-            subtract(multiply(exchangeDetails.min, exchangeDetails.rate), exchangeDetails.minerFee)
-          ),
-          null,
-          this.props.withdrawalSelected
-        )
+        convertAmountToBigNumber(
+          subtract(multiply(exchangeDetails.min, exchangeDetails.rate), exchangeDetails.minerFee)
+        ),
+        null,
+        this.props.withdrawalSelected
+      )
       : null;
     const withdrawalMax = exchangeDetails
       ? convertAmountToDisplay(
-          convertAmountToBigNumber(
-            subtract(
-              multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
-              exchangeDetails.minerFee
-            )
-          ),
-          null,
-          this.props.withdrawalSelected
-        )
+        convertAmountToBigNumber(
+          subtract(
+            multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
+            exchangeDetails.minerFee
+          )
+        ),
+        null,
+        this.props.withdrawalSelected
+      )
       : null;
     const depositUnder = exchangeDetails
       ? this.props.depositAmount !== ''
@@ -368,43 +368,43 @@ class ExchangeModal extends Component {
     const withdrawalUnder = exchangeDetails
       ? this.props.withdrawalAmount !== ''
         ? smallerThan(
-            this.props.withdrawalAmount,
-            subtract(multiply(exchangeDetails.min, exchangeDetails.rate), exchangeDetails.minerFee)
-          )
+          this.props.withdrawalAmount,
+          subtract(multiply(exchangeDetails.min, exchangeDetails.rate), exchangeDetails.minerFee)
+        )
         : false
       : false;
     const withdrawalOver = exchangeDetails
       ? this.props.withdrawalAmount !== ''
         ? greaterThan(
-            this.props.withdrawalAmount,
-            subtract(
-              multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
-              exchangeDetails.minerFee
-            )
+          this.props.withdrawalAmount,
+          subtract(
+            multiply(exchangeDetails.maxLimit, exchangeDetails.rate),
+            exchangeDetails.minerFee
           )
+        )
         : false
       : false;
     const exchangeFeeValue = exchangeDetails
       ? convertAmountToDisplay(
-          convertAmountToBigNumber(exchangeDetails.minerFee),
-          null,
-          this.props.withdrawalSelected
-        )
+        convertAmountToBigNumber(exchangeDetails.minerFee),
+        null,
+        this.props.withdrawalSelected
+      )
       : null;
     const exchangeFeeNative =
       exchangeDetails && depositPrices
         ? convertAmountToDisplay(
-            convertAmountToBigNumber(
+          convertAmountToBigNumber(
+            multiply(
+              exchangeDetails.minerFee,
               multiply(
-                exchangeDetails.minerFee,
-                multiply(
-                  convertAmountFromBigNumber(depositPrices.price.amount),
-                  divide(1, exchangeDetails.rate)
-                )
+                convertAmountFromBigNumber(depositPrices.price.amount),
+                divide(1, exchangeDetails.rate)
               )
-            ),
-            this.props.prices
-          )
+            )
+          ),
+          this.props.prices
+        )
         : null;
     return (
       <Card allowOverflow background="lightGrey" fetching={this.props.fetching}>
@@ -438,16 +438,16 @@ class ExchangeModal extends Component {
                         <p>{quantity}</p>
                       </StyledHelperText>
                     ) : (
-                      <div />
-                    )}
+                        <div />
+                      )}
                     {total ? (
                       <StyledHelperText>
                         <strong>Total</strong>
                         <p>{total}</p>
                       </StyledHelperText>
                     ) : (
-                      <div />
-                    )}
+                        <div />
+                      )}
                   </StyledHelperContainer>
                 </StyledHelperWrapper>
                 <StyledFlex>
@@ -472,16 +472,16 @@ class ExchangeModal extends Component {
                         <p>{price}</p>
                       </StyledHelperText>
                     ) : (
-                      <div />
-                    )}
+                        <div />
+                      )}
                     {native ? (
                       <StyledHelperText>
                         <strong>Native</strong>
                         <p>{native}</p>
                       </StyledHelperText>
                     ) : (
-                      <div />
-                    )}
+                        <div />
+                      )}
                   </StyledHelperContainer>
                 </StyledHelperWrapper>
               </StyledFlex>
@@ -513,16 +513,16 @@ class ExchangeModal extends Component {
                           <p>{depositMin}</p>
                         </StyledHelperText>
                       ) : (
-                        <div />
-                      )}
+                          <div />
+                        )}
                       {depositMax ? (
                         <StyledHelperText warn={depositOver}>
                           <strong>Max</strong>
                           <p>{depositMax}</p>
                         </StyledHelperText>
                       ) : (
-                        <div />
-                      )}
+                          <div />
+                        )}
                     </StyledHelperContainer>
                   </StyledHelperWrapper>
                 </StyledFlex>
@@ -556,16 +556,16 @@ class ExchangeModal extends Component {
                           <p>{withdrawalMin}</p>
                         </StyledHelperText>
                       ) : (
-                        <div />
-                      )}
+                          <div />
+                        )}
                       {withdrawalMax ? (
                         <StyledHelperText warn={withdrawalOver}>
                           <strong>Max</strong>
                           <p>{withdrawalMax}</p>
                         </StyledHelperText>
                       ) : (
-                        <div />
-                      )}
+                          <div />
+                        )}
                     </StyledHelperContainer>
                   </StyledHelperWrapper>
                 </StyledFlex>
@@ -575,7 +575,13 @@ class ExchangeModal extends Component {
 
               <StyledBottomModal>
                 <StyledActions>
-                  <Button onClick={this.onClose}>{lang.t('button.cancel')}</Button>
+                  <Button
+                    data-toggle="tooltip"
+                    title={lang.t('button.cancel_tooltip')}
+                    onClick={this.onClose}
+                  >
+                    {lang.t('button.cancel')}
+                  </Button>
                   <StyledFees>
                     <StyledParagraph>
                       <span>{`${lang.t('modal.tx_fee')}: `}</span>
@@ -583,24 +589,33 @@ class ExchangeModal extends Component {
                         Object.keys(this.props.gasPrice).length
                           ? this.props.gasPrice.txFee.native.value.display
                           : '$0.00'
-                      }${
+                        }${
                         this.props.nativeCurrency !== 'ETH'
                           ? ` (${
-                              Object.keys(this.props.gasPrice).length
-                                ? this.props.gasPrice.txFee.value.display
-                                : '0.000 ETH'
-                            })`
+                          Object.keys(this.props.gasPrice).length
+                            ? this.props.gasPrice.txFee.value.display
+                            : '0.000 ETH'
+                          })`
                           : ''
-                      }`}</span>
+                        }`}</span>
                     </StyledParagraph>
                     <StyledParagraph>
                       <span>{`${lang.t('modal.exchange_fee')}: `}</span>
                       <span>{`${exchangeFeeNative ? exchangeFeeNative : '$0.00'}${
                         exchangeFeeValue ? ` (${exchangeFeeValue})` : ''
-                      }`}</span>
+                        }`}</span>
                     </StyledParagraph>
                   </StyledFees>
                   <Button
+                    data-toggle="tooltip"
+                    title={lang.t('button.cancel_tooltip')}
+                    onClick={this.onClose}
+                  >
+                    {lang.t('button.cancel')}
+                  </Button>
+                  <Button
+                    data-toggle="tooltip"
+                    title={lang.t('button.exchange_tooltip')}
                     left
                     color="brightGreen"
                     hoverColor="brightGreenHover"
@@ -622,59 +637,70 @@ class ExchangeModal extends Component {
               </StyledBottomModal>
             </Form>
           ) : (
-            <StyledApproveTransaction>
-              {(() => {
-                switch (this.props.accountType) {
-                  case 'METAMASK':
-                    return <MetamaskLogo />;
-                  case 'LEDGER':
-                    return <LedgerLogo />;
-                  case 'TREZOR':
-                    return <TrezorLogo />;
-                  default:
-                    return <div />;
-                }
-              })()}
-              <StyledParagraph>
-                {lang.t('modal.approve_tx', {
-                  walletType: capitalize(this.props.accountType)
-                })}
-              </StyledParagraph>
-              <StyledActions single>
-                <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
-              </StyledActions>
-            </StyledApproveTransaction>
-          )
+              <StyledApproveTransaction>
+                {(() => {
+                  switch (this.props.accountType) {
+                    case 'METAMASK':
+                      return <MetamaskLogo />;
+                    case 'LEDGER':
+                      return <LedgerLogo />;
+                    case 'TREZOR':
+                      return <TrezorLogo />;
+                    default:
+                      return <div />;
+                  }
+                })()}
+                <StyledParagraph>
+                  {lang.t('modal.approve_tx', {
+                    walletType: capitalize(this.props.accountType)
+                  })}
+                </StyledParagraph>
+                <StyledActions single>
+                  <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
+                </StyledActions>
+              </StyledApproveTransaction>
+            )
         ) : (
-          <StyledSuccessMessage>
-            <StyledSubTitle>
-              <StyledIcon color="grey" icon={arrowUp} />
-              {`Success`}
-            </StyledSubTitle>
-            <div>
+            <StyledSuccessMessage>
+              <StyledSubTitle>
+                <StyledIcon color="grey" icon={arrowUp} />
+                {`Success`}
+              </StyledSubTitle>
+              <div>
+                <StyledParagraph>
+                  <strong>{`${lang.t('modal.tx_hash')}:`}</strong>
+                </StyledParagraph>
+                <StyledHash>{` ${this.props.txHash}`}</StyledHash>
+              </div>
               <StyledParagraph>
-                <strong>{`${lang.t('modal.tx_hash')}:`}</strong>
+                <a
+                  href={`https://${
+                    this.props.network !== 'mainnet' ? `${this.props.network}.` : ''
+                    }etherscan.io/tx/${this.props.txHash}`}
+                  target="_blank"
+                >
+                  {lang.t('modal.tx_verify')}
+                </a>
               </StyledParagraph>
-              <StyledHash>{` ${this.props.txHash}`}</StyledHash>
-            </div>
-            <StyledParagraph>
-              <a
-                href={`https://${
-                  this.props.network !== 'mainnet' ? `${this.props.network}.` : ''
-                }etherscan.io/tx/${this.props.txHash}`}
-                target="_blank"
-              >
-                {lang.t('modal.tx_verify')}
-              </a>
-            </StyledParagraph>
-            <StyledActions>
-              <Button onClick={this.onExchangeAnother}>{lang.t('button.exchange_another')}</Button>
-              <Button color="red" onClick={this.onClose}>
-                {lang.t('button.close')}
-              </Button>
-            </StyledActions>
-          </StyledSuccessMessage>
-        )}
+              <StyledActions>
+                <Button
+                  data-toggle="tooltip"
+                  title={lang.t('button.exchange_another_tooltip')}
+                  onClick={this.onExchangeAnother}
+                >
+                  {lang.t('button.exchange_another')}
+                </Button>
+                <Button
+                  data-toggle="tooltip"
+                  title={lang.t('button.close_tooltip')}
+                  color="red"
+                  onClick={this.onClose}
+                >
+                  {lang.t('button.close')}
+                </Button>
+              </StyledActions>
+            </StyledSuccessMessage>
+          )}
       </Card>
     );
   };

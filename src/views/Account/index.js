@@ -14,7 +14,6 @@ import AccountInteractions from './AccountInteractions';
 import arrowUp from '../../assets/arrow-up.svg';
 import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
-import { accountClearState } from '../../reducers/_account';
 import { modalOpen } from '../../reducers/_modal';
 import { capitalize } from '../../helpers/utilities';
 import { colors, fonts, responsive } from '../../styles';
@@ -169,7 +168,6 @@ class Account extends Component {
 Account.propTypes = {
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
-  accountClearState: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
   accountInfo: PropTypes.object.isRequired,
   accountAddress: PropTypes.string.isRequired,
@@ -196,6 +194,5 @@ const reduxProps = ({ account }) => ({
 });
 
 export default connect(reduxProps, {
-  modalOpen,
-  accountClearState
+  modalOpen
 })(Account);

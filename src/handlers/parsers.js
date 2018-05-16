@@ -810,7 +810,7 @@ export const parseHistoricalPrices = async (transactions = null) => {
             const valuePriceDisplay = convertAmountToDisplay(valuePriceAmount, prices);
             const valuePrice = !tx.error
               ? { amount: valuePriceAmount, display: valuePriceDisplay }
-              : { amount: '', display: '' };
+              : null;
             const txFeePriceAmount = convertAssetAmountToNativeValue(
               tx.txFee.amount,
               asset,

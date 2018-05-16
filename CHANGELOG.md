@@ -13,11 +13,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Changed
 
-\*
+* Refactor time and bignumber helper functions
+* Fix network change not updating
+* Fix failed transactions display
+* Update Github PR and Issue templates
+* More consistent api handlers
+* Fix pending transaction never confirmed (#163)
+* Fix lastTxHash incorrect because of pending tx (#167)
+* Updated .gitignore file
+* Updated dependencies
 
 ### Removed
 
-\*
+* Unused helper functions
+* Infura handlers
+* Unused references (kovan and rinkeby tokens)
+* Deprecated componentWillReceiveProps lifecycle
 
 ## [0.5.2](https://github.com/balance-io/balance-manager/releases/tag/0.5.2)
 

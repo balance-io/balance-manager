@@ -1,4 +1,4 @@
-### PR Checklist
+### PR Checklist (check all)
 
 * [ ] Updated `CHANGELOG.md` to describe the included fixes and changes made
 * [ ] Included issue number on the description of the PR

@@ -10,10 +10,12 @@ const SLink = styled(Link)`
   padding: 0;
 `;
 
-const LinkWrapper = ({ children, ...props }) => <SLink {...props}>{children}</SLink>;
+const LinkWrapper = ({ children, ...props }) => (
+  <SLink {...props}>{children}</SLink>
+);
 
 LinkWrapper.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 };
 
 export default LinkWrapper;

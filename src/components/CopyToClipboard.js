@@ -97,7 +97,9 @@ class CopyToClipboard extends Component {
     target.select();
     document.execCommand('Copy');
     target.blur();
-    this.props.notificationShow(lang.t('notification.info.address_copied_to_clipboard'));
+    this.props.notificationShow(
+      lang.t('notification.info.address_copied_to_clipboard'),
+    );
   };
   simulateCopyToClipboard = () => {
     const str = this.props.text;
@@ -107,7 +109,9 @@ class CopyToClipboard extends Component {
     element.select();
     document.execCommand('copy');
     document.body.removeChild(element);
-    this.props.notificationShow(lang.t('notification.info.address_copied_to_clipboard'));
+    this.props.notificationShow(
+      lang.t('notification.info.address_copied_to_clipboard'),
+    );
   };
   render() {
     let { notificationShow, iconOnHover, text, ...props } = this.props;
@@ -122,8 +126,14 @@ class CopyToClipboard extends Component {
             onChange={() => {}}
             onClick={this.copyToCopyToClipboard}
           />
-          <StyledText>{lang.t('message.click_to_copy_to_clipboard')}</StyledText>
-          <StyledIcon src={clipboardIcon} alt="copy" onClick={this.simulateCopyToClipboard} />
+          <StyledText>
+            {lang.t('message.click_to_copy_to_clipboard')}
+          </StyledText>
+          <StyledIcon
+            src={clipboardIcon}
+            alt="copy"
+            onClick={this.simulateCopyToClipboard}
+          />
         </StyledContainer>
       </StyledCopyToClipboard>
     );
@@ -133,11 +143,11 @@ class CopyToClipboard extends Component {
 CopyToClipboard.propTypes = {
   notificationShow: PropTypes.func.isRequired,
   text: PropTypes.string.isRequired,
-  iconOnHover: PropTypes.bool
+  iconOnHover: PropTypes.bool,
 };
 
 CopyToClipboard.defaultProps = {
-  iconOnHover: false
+  iconOnHover: false,
 };
 
 export default connect(null, { notificationShow })(CopyToClipboard);

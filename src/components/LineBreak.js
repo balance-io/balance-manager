@@ -8,7 +8,8 @@ const StyledLineBreakWrapper = styled.div`
   width: 100% !important;
   padding: 0 !important;
   margin: 0 !important;
-  margin-top: ${({ noMargin }) => (noMargin ? `0 !important` : `25px !important`)};
+  margin-top: ${({ noMargin }) =>
+    noMargin ? `0 !important` : `25px !important`};
   border-top: 2px solid rgb(241, 242, 246);
 `;
 
@@ -33,13 +34,13 @@ const LineBreak = ({ noMargin, color, percentage, ...props }) => (
 LineBreak.propTypes = {
   noMargin: PropTypes.bool,
   color: PropTypes.string,
-  percentage: PropTypes.number
+  percentage: PropTypes.number,
 };
 
 LineBreak.defaultProps = {
   noMargin: false,
   color: '',
-  percentage: 0
+  percentage: 0,
 };
 
 export default LineBreak;

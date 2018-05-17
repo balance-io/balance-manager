@@ -9,10 +9,17 @@ import {
   convertStringToNumber,
   formatInputDecimals,
   greaterThan,
-  subtract
+  subtract,
 } from '../helpers/bignumber';
-import { parseError, parseGasPrices, parseGasPricesTxFee } from '../handlers/parsers';
-import { web3SendTransactionMultiWallet, estimateGasLimit } from '../handlers/web3';
+import {
+  parseError,
+  parseGasPrices,
+  parseGasPricesTxFee,
+} from '../handlers/parsers';
+import {
+  web3SendTransactionMultiWallet,
+  estimateGasLimit,
+} from '../handlers/web3';
 import { notificationShow } from './_notification';
 import { accountUpdateTransactions } from './_account';
 
@@ -45,24 +52,33 @@ const SEND_CLEAR_FIELDS = 'send/SEND_CLEAR_FIELDS';
 export const sendModalInit = () => (dispatch, getState) => {
   const { accountAddress, accountInfo, prices } = getState().account;
   const { gasLimit } = getState().send;
-  const selected = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+  const selected = accountInfo.assets.filter(
+    asset => asset.symbol === 'ETH',
+  )[0];
   const fallbackGasPrices = parseGasPrices(null, prices, gasLimit);
   dispatch({
     type: SEND_GET_GAS_PRICES_REQUEST,
-    payload: { address: accountAddress, selected, gasPrices: fallbackGasPrices }
+    payload: {
+      address: accountAddress,
+      selected,
+      gasPrices: fallbackGasPrices,
+    },
   });
   apiGetGasPrices()
     .then(({ data }) => {
       const gasPrices = parseGasPrices(data, prices, gasLimit);
       dispatch({
         type: SEND_GET_GAS_PRICES_SUCCESS,
-        payload: gasPrices
+        payload: gasPrices,
       });
     })
     .catch(error => {
       console.error(error);
 
-      dispatch({ type: SEND_GET_GAS_PRICES_FAILURE, payload: fallbackGasPrices });
+      dispatch({
+        type: SEND_GET_GAS_PRICES_FAILURE,
+        payload: fallbackGasPrices,
+      });
     });
 };
 
@@ -74,7 +90,7 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     assetAmount,
     gasPrice,
     gasPriceOption,
-    fetchingGasPrices
+    fetchingGasPrices,
   } = getState().send;
   if (fetchingGasPrices) return;
   let gasPrices = getState().send.gasPrices;
@@ -86,14 +102,19 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     asset: selected,
     address,
     recipient,
-    amount: assetAmount
+    amount: assetAmount,
   })
     .then(gasLimit => {
       const { prices } = getState().account;
       gasPrices = parseGasPricesTxFee(gasPrices, prices, gasLimit);
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_SUCCESS,
-        payload: { gasLimit, gasPrice: _gasPrice, gasPriceOption: _gasPriceOption, gasPrices }
+        payload: {
+          gasLimit,
+          gasPrice: _gasPrice,
+          gasPriceOption: _gasPriceOption,
+          gasPrices,
+        },
       });
     })
     .catch(error => {
@@ -102,26 +123,40 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
         const requestedAmount = convertAmountToBigNumber(`${assetAmount}`);
         const availableBalance = selected.balance.amount;
         if (greaterThan(requestedAmount, availableBalance)) {
-          dispatch(notificationShow(lang.t('notification.error.insufficient_balance'), true));
+          dispatch(
+            notificationShow(
+              lang.t('notification.error.insufficient_balance'),
+              true,
+            ),
+          );
         }
       } else {
-        dispatch(notificationShow(message || lang.t('notification.error.failed_get_tx_fee'), true));
+        dispatch(
+          notificationShow(
+            message || lang.t('notification.error.failed_get_tx_fee'),
+            true,
+          ),
+        );
       }
       dispatch({
         type: SEND_UPDATE_GAS_PRICE_FAILURE,
         payload: {
           gasPrice: _gasPrice,
           gasPriceOption: _gasPriceOption,
-          gasPrices: gasPrices
-        }
+          gasPrices: gasPrices,
+        },
       });
     });
 };
 
-export const sendTransaction = ({ address, recipient, amount, asset, gasPrice, gasLimit }) => (
-  dispatch,
-  getState
-) => {
+export const sendTransaction = ({
+  address,
+  recipient,
+  amount,
+  asset,
+  gasPrice,
+  gasLimit,
+}) => (dispatch, getState) => {
   dispatch({ type: SEND_TRANSACTION_REQUEST });
   const { accountType } = getState().account;
   const txDetails = {
@@ -131,7 +166,7 @@ export const sendTransaction = ({ address, recipient, amount, asset, gasPrice, g
     nonce: null,
     amount: amount,
     gasPrice: gasPrice.value.amount,
-    gasLimit: gasLimit
+    gasLimit: gasLimit,
   };
   web3SendTransactionMultiWallet(txDetails, accountType)
     .then(txHash => {
@@ -139,7 +174,7 @@ export const sendTransaction = ({ address, recipient, amount, asset, gasPrice, g
       dispatch(accountUpdateTransactions(txDetails));
       dispatch({
         type: SEND_TRANSACTION_SUCCESS,
-        payload: txHash
+        payload: txHash,
       });
     })
     .catch(error => {
@@ -162,7 +197,7 @@ export const sendUpdateRecipient = recipient => dispatch => {
   if (input.length <= 42) {
     dispatch({
       type: SEND_UPDATE_RECIPIENT,
-      payload: input
+      payload: input,
     });
   }
 };
@@ -173,12 +208,16 @@ export const sendUpdateAssetAmount = assetAmount => (dispatch, getState) => {
   const _assetAmount = assetAmount.replace(/[^0-9.]/g, '');
   let _nativeAmount = '';
   if (_assetAmount.length && prices[nativeCurrency][selected.symbol]) {
-    const nativeAmount = convertAssetAmountToNativeValue(_assetAmount, selected, prices);
+    const nativeAmount = convertAssetAmountToNativeValue(
+      _assetAmount,
+      selected,
+      prices,
+    );
     _nativeAmount = formatInputDecimals(nativeAmount, _assetAmount);
   }
   dispatch({
     type: SEND_UPDATE_ASSET_AMOUNT,
-    payload: { assetAmount: _assetAmount, nativeAmount: _nativeAmount }
+    payload: { assetAmount: _assetAmount, nativeAmount: _nativeAmount },
   });
 };
 
@@ -188,12 +227,16 @@ export const sendUpdateNativeAmount = nativeAmount => (dispatch, getState) => {
   const _nativeAmount = nativeAmount.replace(/[^0-9.]/g, '');
   let _assetAmount = '';
   if (_nativeAmount.length && prices[nativeCurrency][selected.symbol]) {
-    const assetAmount = convertAssetAmountFromNativeValue(_nativeAmount, selected, prices);
+    const assetAmount = convertAssetAmountFromNativeValue(
+      _nativeAmount,
+      selected,
+      prices,
+    );
     _assetAmount = formatInputDecimals(assetAmount, _nativeAmount);
   }
   dispatch({
     type: SEND_UPDATE_ASSET_AMOUNT,
-    payload: { assetAmount: _assetAmount, nativeAmount: _nativeAmount }
+    payload: { assetAmount: _assetAmount, nativeAmount: _nativeAmount },
   });
 };
 
@@ -215,14 +258,22 @@ export const sendMaxBalance = () => (dispatch, getState) => {
   const { selected, gasPrice } = getState().send;
   const { accountInfo } = getState().account;
   if (selected.symbol === 'ETH') {
-    const ethereum = accountInfo.assets.filter(asset => asset.symbol === 'ETH')[0];
+    const ethereum = accountInfo.assets.filter(
+      asset => asset.symbol === 'ETH',
+    )[0];
     const balanceAmount = ethereum.balance.amount;
     const txFeeAmount = gasPrice.txFee.value.amount;
-    const remaining = convertStringToNumber(subtract(balanceAmount, txFeeAmount));
+    const remaining = convertStringToNumber(
+      subtract(balanceAmount, txFeeAmount),
+    );
     const ether = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
     dispatch(sendUpdateAssetAmount(ether));
   } else {
-    dispatch(sendUpdateAssetAmount(convertAmountFromBigNumber(selected.balance.amount)));
+    dispatch(
+      sendUpdateAssetAmount(
+        convertAmountFromBigNumber(selected.balance.amount),
+      ),
+    );
   }
 };
 
@@ -242,7 +293,7 @@ const INITIAL_STATE = {
   assetAmount: '',
   txHash: '',
   confirm: false,
-  selected: { symbol: 'ETH' }
+  selected: { symbol: 'ETH' },
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -255,7 +306,7 @@ export default (state = INITIAL_STATE, action) => {
         selected: action.payload.selected,
         gasPrice: action.payload.gasPrices.average,
         gasPrices: action.payload.gasPrices,
-        gasPriceOption: action.payload.gasPrices.average.option
+        gasPriceOption: action.payload.gasPrices.average.option,
       };
     case SEND_GET_GAS_PRICES_SUCCESS:
       return {
@@ -263,7 +314,7 @@ export default (state = INITIAL_STATE, action) => {
         fetchingGasPrices: false,
         gasPrice: action.payload.average,
         gasPrices: action.payload,
-        gasPriceOption: action.payload.average.option
+        gasPriceOption: action.payload.average.option,
       };
     case SEND_GET_GAS_PRICES_FAILURE:
       return {
@@ -271,7 +322,7 @@ export default (state = INITIAL_STATE, action) => {
         fetchingGasPrices: false,
         gasPrice: action.payload.average,
         gasPrices: action.payload,
-        gasPriceOption: action.payload.average.option
+        gasPriceOption: action.payload.average.option,
       };
     case SEND_UPDATE_GAS_PRICE_REQUEST:
       return { ...state, fetchingGasPrices: true };
@@ -282,7 +333,7 @@ export default (state = INITIAL_STATE, action) => {
         gasLimit: action.payload.gasLimit,
         gasPrice: action.payload.gasPrice,
         gasPrices: action.payload.gasPrices,
-        gasPriceOption: action.payload.gasPriceOption
+        gasPriceOption: action.payload.gasPriceOption,
       };
 
     case SEND_UPDATE_GAS_PRICE_FAILURE:
@@ -291,7 +342,7 @@ export default (state = INITIAL_STATE, action) => {
         fetchingGasPrices: false,
         gasPrice: action.payload.gasPrice,
         gasPrices: action.payload.gasPrices,
-        gasPriceOption: action.payload.gasPriceOption
+        gasPriceOption: action.payload.gasPriceOption,
       };
     case SEND_TRANSACTION_REQUEST:
       return { ...state, fetching: true };
@@ -300,19 +351,19 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         fetching: false,
         gasPrices: {},
-        txHash: action.payload
+        txHash: action.payload,
       };
     case SEND_TRANSACTION_FAILURE:
       return {
         ...state,
         fetching: false,
         txHash: '',
-        confirm: false
+        confirm: false,
       };
     case SEND_TOGGLE_CONFIRMATION_VIEW:
       return {
         ...state,
-        confirm: action.payload
+        confirm: action.payload,
       };
     case SEND_UPDATE_RECIPIENT:
       return { ...state, recipient: action.payload };
@@ -321,7 +372,7 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         assetAmount: action.payload.assetAmount,
-        nativeAmount: action.payload.nativeAmount
+        nativeAmount: action.payload.nativeAmount,
       };
     case SEND_UPDATE_SELECTED:
       return { ...state, selected: action.payload };

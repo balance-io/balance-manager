@@ -88,29 +88,39 @@ const StyledTab = styled(Button)`
     mask-size: auto !important;
     margin: 1px 0 0 16px;
     background-color: ${({ active }) =>
-      active ? `rgb(${colors.blue})` : `rgb(${colors.purpleTextTransparent})`} !important;
+      active
+        ? `rgb(${colors.blue})`
+        : `rgb(${colors.purpleTextTransparent})`} !important;
   }
 `;
 
 class TabMenu extends Component {
   state = {
     activeTab: 'BALANCES_TAB',
-    tabPosition: 40
+    tabPosition: -47,
   };
-  componentWillReceiveProps(newProps) {
-    const tabRoute = window.browserHistory.location.pathname.replace(newProps.match.url, '') || '/';
+  componentDidUpdate() {
+    const tabRoute =
+      window.browserHistory.location.pathname.replace(
+        this.props.match.url,
+        '',
+      ) || '/';
+    let newState = this.state;
     switch (tabRoute) {
       case '/':
-        this.setState({ activeTab: 'BALANCES_TAB', tabPosition: -47 });
+        newState = { activeTab: 'BALANCES_TAB', tabPosition: -47 };
         break;
       case '/transactions':
-        this.setState({ activeTab: 'TRANSACTIONS_TAB', tabPosition: 91 });
+        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: 91 };
         break;
       case '/interactions':
-        this.setState({ activeTab: 'INTERACTIONS_TAB', tabPosition: 229 });
+        newState = { activeTab: 'INTERACTIONS_TAB', tabPosition: 229 };
         break;
       default:
         break;
+    }
+    if (this.state.activeTab !== newState.activeTab) {
+      this.setState(newState);
     }
   }
   render() {
@@ -158,7 +168,7 @@ class TabMenu extends Component {
 }
 
 TabMenu.propTypes = {
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
 };
 
 export default TabMenu;

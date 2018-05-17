@@ -24,7 +24,8 @@ const StyledInput = styled.input`
   padding: 12px;
   border: none;
   border-style: none;
-  font-family: ${({ monospace }) => (monospace ? `${fonts.family.SFMono}` : `inherit`)};
+  font-family: ${({ monospace }) =>
+    monospace ? `${fonts.family.SFMono}` : `inherit`};
   font-size: ${fonts.size.h6};
   font-weight: ${fonts.weight.semibold};
   font-style: normal;
@@ -46,7 +47,15 @@ const StyledInput = styled.input`
   }
 `;
 
-const Input = ({ label, type, disabled, value, placeholder, monospace, ...props }) => {
+const Input = ({
+  label,
+  type,
+  disabled,
+  value,
+  placeholder,
+  monospace,
+  ...props
+}) => {
   let _label = label;
   let _placeholder = placeholder;
   if (!label) {
@@ -89,14 +98,14 @@ Input.propTypes = {
   label: PropTypes.string,
   placeholder: PropTypes.string,
   monospace: PropTypes.bool,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
 };
 
 Input.defaultProps = {
   label: '',
   placeholder: '',
   monospace: false,
-  disabled: false
+  disabled: false,
 };
 
 export default Input;

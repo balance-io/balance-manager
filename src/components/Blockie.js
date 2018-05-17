@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -9,43 +9,23 @@ const StyledWrapper = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 3px;
-  overflow:hidden;
+  margin-right: 10px;
+  overflow: hidden;
   & img {
     width: 100%;
   }
 `;
 
-class Blockie extends Component {
-  state = {
-    imgUrl: ''
-  };
-  componentDidMount() {
-    this.updateBlockie(this.props);
-  }
-  componentWillReceiveProps(newProps) {
-    this.updateBlockie(newProps);
-  }
-  updateBlockie = props => {
-    const imgUrl = window.blockies
-      .create({
-        seed: props.seed,
-        color: props.color,
-        bgcolor: props.bgcolor,
-        size: props.size,
-        scale: props.scale,
-        spotcolor: props.spotcolor
-      })
-      .toDataURL();
-    this.setState({ imgUrl });
-  };
-  render() {
-    return (
-      <StyledWrapper size={this.props.size} {...this.props}>
-        <img src={this.state.imgUrl} alt="address" />
-      </StyledWrapper>
-    );
-  }
-}
+const Blockie = ({ seed, color, bgcolor, size, scale, spotcolor }) => {
+  const imgUrl = window.blockies
+    .create({ seed, color, bgcolor, size, scale, spotcolor })
+    .toDataURL();
+  return (
+    <StyledWrapper size={size}>
+      <img src={imgUrl} alt="address" />
+    </StyledWrapper>
+  );
+};
 
 Blockie.propTypes = {
   seed: PropTypes.string.isRequired,
@@ -53,7 +33,7 @@ Blockie.propTypes = {
   bgcolor: PropTypes.string,
   size: PropTypes.number,
   scale: PropTypes.number,
-  spotcolor: PropTypes.string
+  spotcolor: PropTypes.string,
 };
 
 Blockie.defaultProps = {
@@ -61,7 +41,7 @@ Blockie.defaultProps = {
   bgcolor: null,
   size: null,
   scale: null,
-  spotcolor: null
+  spotcolor: null,
 };
 
 export default Blockie;

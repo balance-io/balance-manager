@@ -14,7 +14,6 @@ import AccountInteractions from './AccountInteractions';
 import arrowUp from '../../assets/arrow-up.svg';
 // import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
-import { accountClearState } from '../../reducers/_account';
 import { modalOpen } from '../../reducers/_modal';
 import { capitalize } from '../../helpers/utilities';
 import { colors, fonts, responsive } from '../../styles';
@@ -94,7 +93,10 @@ class Account extends Component {
               <StyledTop>
                 <StyledAddressWrapper>
                   <h6>{capitalize(this.props.accountType)} </h6>
-                  <CopyToClipboard iconOnHover text={this.props.accountAddress} />
+                  <CopyToClipboard
+                    iconOnHover
+                    text={this.props.accountAddress}
+                  />
                 </StyledAddressWrapper>
 
                 <StyledActions>
@@ -136,7 +138,11 @@ class Account extends Component {
               <TabMenu match={this.props.match} />
 
               <Switch>
-                <Route exact path={this.props.match.url} component={AccountBalances} />
+                <Route
+                  exact
+                  path={this.props.match.url}
+                  component={AccountBalances}
+                />
                 <Route
                   exact
                   path={`${this.props.match.url}/transactions`}
@@ -162,18 +168,17 @@ class Account extends Component {
 Account.propTypes = {
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
-  accountClearState: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
   accountInfo: PropTypes.object.isRequired,
   accountAddress: PropTypes.string.isRequired,
   accountType: PropTypes.string.isRequired,
   fetchingWallet: PropTypes.bool,
-  fetchingMessage: PropTypes.string
+  fetchingMessage: PropTypes.string,
 };
 
 Account.defaultProps = {
   fetchingWallet: false,
-  fetchingMessage: ''
+  fetchingMessage: '',
 };
 
 const reduxProps = ({ account }) => ({
@@ -181,10 +186,9 @@ const reduxProps = ({ account }) => ({
   fetching: account.fetching,
   accountInfo: account.accountInfo,
   accountAddress: account.accountAddress,
-  accountType: account.accountType
+  accountType: account.accountType,
 });
 
 export default connect(reduxProps, {
   modalOpen,
-  accountClearState
 })(Account);

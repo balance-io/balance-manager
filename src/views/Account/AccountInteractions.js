@@ -21,8 +21,8 @@ const StyledGrid = styled.div`
   text-align: right;
   position: relative;
   z-index: 0;
-  box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08), 0 0 1px 0 rgba(50, 50, 93, 0.02),
-    0 3px 6px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08),
+    0 0 1px 0 rgba(50, 50, 93, 0.02), 0 3px 6px 0 rgba(0, 0, 0, 0.06);
   background-color: rgb(${colors.white});
   border-radius: 0 0 10px 10px;
 `;
@@ -87,11 +87,11 @@ const StyledTransactionWrapper = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 8px;
+  border-radius: 0;
   z-index: 0;
   & > div {
-    transition: box-shadow 0.2s ease-in-out;
-    border-radius: 8px;
+    transition: box-shadow 0.1s ease;
+    border-radius: 0;
     @media (hover: hover) {
       &:hover {
         z-index: 10;
@@ -107,7 +107,8 @@ const StyledTransaction = styled(StyledRow)`
   box-shadow: none;
   & > * {
     font-weight: ${fonts.weight.medium};
-    color: ${({ failed }) => (failed ? `rgba(${colors.dark}, 0.3)` : `rgba(${colors.dark}, 0.6)`)};
+    color: ${({ failed }) =>
+      failed ? `rgba(${colors.dark}, 0.3)` : `rgba(${colors.dark}, 0.6)`};
   }
   & > p:first-child {
     justify-content: flex-start;
@@ -119,7 +120,7 @@ const StyledTransaction = styled(StyledRow)`
 
 const StyledTransactionMainRow = styled(StyledTransaction)`
   cursor: pointer;
-  border-radius: ${({ showTxDetails }) => (showTxDetails ? '8px 8px 0 0' : `8px`)};
+  border-radius: ${({ showTxDetails }) => (showTxDetails ? '0' : `0`)};
   &:nth-child(n + 3) {
     border-top: 1px solid rgba(${colors.rowDivider});
   }
@@ -219,7 +220,7 @@ const StyledMessage = styled.div`
 class AccountInteractions extends Component {
   state = {
     showTxDetails: null,
-    showAllInteractions: false
+    showAllInteractions: false,
   };
   onShowTxDetails = hash => {
     if (this.state.showTxDetails === hash) {
@@ -262,10 +263,17 @@ class AccountInteractions extends Component {
                     onClick={() => this.onShowTxDetails(tx.hash)}
                   >
                     <StyledAsset>
-                      <AssetIcon asset={tx.asset.symbol === 'ETH' ? 'ETH' : tx.asset.address} />
+                      <AssetIcon
+                        asset={
+                          tx.asset.symbol === 'ETH' ? 'ETH' : tx.asset.address
+                        }
+                      />
                       <p>{tx.asset.name}</p>
                     </StyledAsset>
-                    <TransactionStatus tx={tx} accountAddress={this.props.accountAddress} />
+                    <TransactionStatus
+                      tx={tx}
+                      accountAddress={this.props.accountAddress}
+                    />
 
                     <p>
                       {tx.from === this.props.accountAddress
@@ -273,22 +281,32 @@ class AccountInteractions extends Component {
                         : `${tx.value.display}`}
                     </p>
                     <p>
-                      {tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].price
+                      {tx.native &&
+                      tx.native[nativeCurrency] &&
+                      tx.native[nativeCurrency].price
                         ? tx.native[nativeCurrency].price.display
                         : '———'}
                     </p>
                     <p>
-                      {tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].value
+                      {tx.native &&
+                      tx.native[nativeCurrency] &&
+                      tx.native[nativeCurrency].value
                         ? tx.from === this.props.accountAddress
                           ? `- ${tx.native[nativeCurrency].value.display}`
                           : `${tx.native[nativeCurrency].value.display}`
                         : '———'}
                     </p>
                   </StyledTransactionMainRow>
-                  <StyledTransactionTopDetails showTxDetails={this.state.showTxDetails === tx.hash}>
+                  <StyledTransactionTopDetails
+                    showTxDetails={this.state.showTxDetails === tx.hash}
+                  >
                     <div>
                       <StyledBlockie
-                        seed={tx.from === this.props.accountAddress ? tx.to : tx.from}
+                        seed={
+                          tx.from === this.props.accountAddress
+                            ? tx.to
+                            : tx.from
+                        }
                       />
                       <div>
                         <p>
@@ -300,16 +318,24 @@ class AccountInteractions extends Component {
                                 : lang.t('account.tx_from').toUpperCase()}
                           </strong>
                         </p>
-                        <p>{tx.from === this.props.accountAddress ? tx.to : tx.from}</p>
+                        <p>
+                          {tx.from === this.props.accountAddress
+                            ? tx.to
+                            : tx.from}
+                        </p>
                       </div>
                     </div>
                     <div>
                       <div>
                         <p>
-                          <strong>{lang.t('account.tx_fee').toUpperCase()}</strong>
+                          <strong>
+                            {lang.t('account.tx_fee').toUpperCase()}
+                          </strong>
                         </p>
                         <p>{`${tx.txFee.display} (${
-                          tx.native && tx.native[nativeCurrency] && tx.native[nativeCurrency].txFee
+                          tx.native &&
+                          tx.native[nativeCurrency] &&
+                          tx.native[nativeCurrency].txFee
                             ? tx.native[nativeCurrency].txFee.display
                             : '———'
                         })`}</p>
@@ -318,9 +344,15 @@ class AccountInteractions extends Component {
                     <div>
                       <div>
                         <p>
-                          <strong>{lang.t('account.tx_timestamp').toUpperCase()}</strong>
+                          <strong>
+                            {lang.t('account.tx_timestamp').toUpperCase()}
+                          </strong>
                         </p>
-                        <p>{tx.timestamp ? getLocalTimeDate(tx.timestamp.ms) : '———'}</p>
+                        <p>
+                          {tx.timestamp
+                            ? getLocalTimeDate(tx.timestamp.ms)
+                            : '———'}
+                        </p>
                       </div>
                     </div>
                   </StyledTransactionTopDetails>
@@ -330,7 +362,9 @@ class AccountInteractions extends Component {
                     <div>
                       <div>
                         <p>
-                          <strong>{lang.t('account.tx_hash').toUpperCase()}</strong>
+                          <strong>
+                            {lang.t('account.tx_hash').toUpperCase()}
+                          </strong>
                         </p>
                         <p>{tx.hash.replace(/-.*/g, '')}</p>
                       </div>
@@ -339,17 +373,26 @@ class AccountInteractions extends Component {
                     <div>
                       <a
                         href={`https://${
-                          this.props.network !== 'mainnet' ? `${this.props.network}.` : ''
+                          this.props.network !== 'mainnet'
+                            ? `${this.props.network}.`
+                            : ''
                         }etherscan.io/tx/${tx.hash.replace(/-.*/g, '')}`}
                         target="_blank"
                         rel="noreferrer noopener"
                       >
-                        <ButtonCustom left txtColor="etherscan" img={etherscanLogo}>
+                        <ButtonCustom
+                          left
+                          txtColor="etherscan"
+                          img={etherscanLogo}
+                        >
                           {'Etherscan'}
                         </ButtonCustom>
                       </a>
                       <a
-                        href={`https://ethplorer.io/tx/${tx.hash.replace(/-.*/g, '')}`}
+                        href={`https://ethplorer.io/tx/${tx.hash.replace(
+                          /-.*/g,
+                          '',
+                        )}`}
                         target="_blank"
                         rel="noreferrer noopener"
                       >
@@ -367,7 +410,10 @@ class AccountInteractions extends Component {
                 </HoverWrapper>
                 <StyledLineBreak
                   noMargin
-                  showTxDetails={this.state.showTxDetails === tx.hash || idx + 1 === arr.length}
+                  showTxDetails={
+                    this.state.showTxDetails === tx.hash ||
+                    idx + 1 === arr.length
+                  }
                 />
               </StyledTransactionWrapper>
             );
@@ -403,7 +449,7 @@ AccountInteractions.propTypes = {
   fetchingTransactions: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
   network: PropTypes.string.isRequired,
-  nativeCurrency: PropTypes.string.isRequired
+  nativeCurrency: PropTypes.string.isRequired,
 };
 
 const reduxProps = ({ account }) => ({
@@ -412,7 +458,7 @@ const reduxProps = ({ account }) => ({
   accountAddress: account.accountAddress,
   account: account.accountInfo,
   network: account.network,
-  nativeCurrency: account.nativeCurrency
+  nativeCurrency: account.nativeCurrency,
 });
 
 export default connect(reduxProps, null)(AccountInteractions);

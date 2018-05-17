@@ -18,5 +18,5 @@ export default combineReducers({
   metamask,
   notification,
   warning,
-  walletconnect
+  walletconnect,
 });

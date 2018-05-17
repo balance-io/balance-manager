@@ -204,7 +204,7 @@ class Home extends Component {
         <StyledCardContainer>
           <StyledMetamaskConnect>
             <StyledMetamaskLogo />
-            <p>Connect to the MetaMask Chrome extension.</p>
+            <p>{lang.t('homepage.connect_metamask')}</p>
             <Link to="/metamask">
               <StyledMetamaskButton left color="orange">
                 {lang.t('button.connect_metamask')}
@@ -218,7 +218,7 @@ class Home extends Component {
         <StyledCardContainer>
           <StyledHardwareWallets>
             <StyledLedgerLogo />
-            <p>Connect and sign with your Ledger hardware wallet.</p>
+            <p>{lang.t('homepage.connect_ledger')}</p>
             <Link to="/ledger">
               <StyledLedgerButton left color="ledger">
                 {lang.t('button.connect_ledger')}
@@ -232,7 +232,7 @@ class Home extends Component {
         <StyledCardContainer>
           <StyledHardwareWalletsTrezor>
             <StyledTrezorLogo />
-            <p>Coming soon.</p>
+            <p>{lang.t('homepage.coming_soon')}</p>
             <SubscribeForm />
           </StyledHardwareWalletsTrezor>
         </StyledCardContainer>
@@ -243,7 +243,7 @@ class Home extends Component {
         <StyledCardContainer>
           <StyledWalletConnect>
             <StyledWalletConnectLogo />
-            <p>Connect and sign with your WalletConnect-enabled mobile wallet.</p>
+            <p>{lang.t('homepage.connect_walletconnect')}</p>
             <StyledWalletConnectButton
               left
               color="walletconnect"

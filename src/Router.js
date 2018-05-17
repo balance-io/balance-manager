@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import lang, { resources } from './languages';
 import Homepage from './pages';
 import Wallet from './pages/Wallet';
 import Metamask from './pages/Metamask';
@@ -13,11 +12,6 @@ import { warningOnline, warningOffline } from './reducers/_warning';
 
 class Router extends Component {
   componentDidMount() {
-    lang.init({
-      lng: 'en',
-      debug: process.env.NODE_ENV === 'development',
-      resources,
-    });
     window.browserHistory = this.context.router.history;
     window.onoffline = () => this.props.warningOffline();
     window.ononline = () => this.props.warningOnline();

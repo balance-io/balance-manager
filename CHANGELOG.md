@@ -9,7 +9,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-\*
+*
+
+### Changed
+
+*
+
+### Removed
+
+*
+
+## [0.5.3](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
+
+### Added
+
+* Add prettier and pre-commit rules
 
 ### Changed
 
@@ -22,7 +36,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Fix lastTxHash incorrect because of pending tx (#167)
 * Updated .gitignore file
 * Updated dependencies
-* Add prettier and pre-commit rules
 * Fix languages (i18n) initialization
 
 ### Removed

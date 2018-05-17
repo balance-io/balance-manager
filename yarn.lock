@@ -1637,12 +1637,12 @@ caniuse-api@^1.5.2:
     lodash.uniq "^4.5.0"
 
 caniuse-db@^1.0.30000529, caniuse-db@^1.0.30000634, caniuse-db@^1.0.30000639:
-  version "1.0.30000841"
-  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000841.tgz#dba400895990348e2de3b71795a50e837f13b3f6"
+  version "1.0.30000842"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000842.tgz#8a82c377b8b3d6f2594478e8431ff4fd303e160c"
 
 caniuse-lite@^1.0.30000748, caniuse-lite@^1.0.30000792, caniuse-lite@^1.0.30000835:
-  version "1.0.30000841"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000841.tgz#200079f853ca2839cb80852348d09a551f92f70a"
+  version "1.0.30000842"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000842.tgz#7a198e3181a207f4b5749b8f5a1817685bf3d7df"
 
 capture-stack-trace@^1.0.0:
   version "1.0.0"
@@ -4990,8 +4990,8 @@ jest@20.0.4:
     jest-cli "^20.0.4"
 
 js-base64@^2.1.9:
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.4.3.tgz#2e545ec2b0f2957f41356510205214e98fad6582"
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.4.5.tgz#e293cd3c7c82f070d700fc7a1ca0a2e69f101f92"
 
 js-sha3@^0.3.1:
   version "0.3.1"
@@ -7474,8 +7474,8 @@ scryptsy@^1.2.1:
     pbkdf2 "^3.0.3"
 
 sdp@^2.6.0, sdp@^2.7.0:
-  version "2.7.3"
-  resolved "https://registry.yarnpkg.com/sdp/-/sdp-2.7.3.tgz#ed177eb4074aa3213e150e74a9ab2d06ae6e5dbf"
+  version "2.7.4"
+  resolved "https://registry.yarnpkg.com/sdp/-/sdp-2.7.4.tgz#cac76b0e2f16f55243d25bc0432f6bbb5488bfc1"
 
 secp256k1@^3.0.1:
   version "3.5.0"
@@ -9133,8 +9133,8 @@ xhr2@0.1.4, xhr2@^0.1.4:
   resolved "https://registry.yarnpkg.com/xhr2/-/xhr2-0.1.4.tgz#7f87658847716db5026323812f818cadab387a5f"
 
 xhr@^2.0.4, xhr@^2.3.3:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/xhr/-/xhr-2.4.1.tgz#ba982cced205ae5eec387169ac9dc77ca4853d38"
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/xhr/-/xhr-2.5.0.tgz#bed8d1676d5ca36108667692b74b316c496e49dd"
   dependencies:
     global "~4.3.0"
     is-function "^1.0.1"

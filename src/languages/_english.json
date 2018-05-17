@@ -1,5 +1,11 @@
 {
   "translation": {
+    "homepage": {
+      "connect_metamask": "Connect to the MetaMask Chrome extension.",
+      "connect_ledger": "Connect and sign with your Ledger hardware wallet.",
+      "connect_walletconnect": "Connect and sign with your WalletConnect-enabled mobile wallet.",
+      "coming_soon": "Coming soon.",
+    },
     "account": {
       "tab_balances": "Balances",
       "tab_transactions": "Transactions",

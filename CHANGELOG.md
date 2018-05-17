@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Updated .gitignore file
 * Updated dependencies
 * Add prettier and pre-commit rules
+* Fix languages (i18n) initialization
 
 ### Removed
 

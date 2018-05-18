@@ -7,35 +7,66 @@ import nativeCurrencies from '../references/native-currencies.json';
  * @param  {String}   value
  * @return {String}
  */
-export const countDecimalPlaces = value => BigNumber(`${value}`).dp();
+export const countDecimalPlaces = value => {
+  const result = BigNumber(`${value}`).dp();
+  if (!result || BigNumber(result).isNaN()) {
+    return null;
+  }
+  return result;
+};
 
 /**
  * @desc convert from number to string
  * @param  {Number}  value
  * @return {String}
  */
-export const convertNumberToString = value => BigNumber(`${value}`).toString();
+export const convertNumberToString = value => {
+  const result = BigNumber(`${value}`).toString();
+  if (!result || BigNumber(result).isNaN()) {
+    return '0';
+  }
+  return result;
+};
 
 /**
  * @desc convert from string to number
  * @param  {String}  value
  * @return {Number}
  */
-export const convertStringToNumber = value => BigNumber(`${value}`).toNumber();
+export const convertStringToNumber = value => {
+  const result = BigNumber(`${value}`).toNumber();
+  if (!result || BigNumber(result).isNaN()) {
+    return 0;
+  }
+  return result;
+};
 
 /**
  * @desc convert hex to number string
  * @param  {String} hex
  * @return {String}
  */
-export const convertHexToString = hex => BigNumber(`${hex}`).toString();
+export const convertHexToString = hex => {
+  if (!hex.startsWith('0x')) hex = `0x${hex}`;
+  const result = BigNumber(`${hex}`).toString();
+  if (BigNumber(result).isNaN()) {
+    return '';
+  }
+  return result;
+};
 
 /**
  * @desc convert number to string to hex
  * @param  {String} string
  * @return {String}
  */
-export const convertStringToHex = string => BigNumber(`${string}`).toString(16);
+export const convertStringToHex = string => {
+  const result = BigNumber(`${string}`).toString(16);
+  if (!convertHexToString(result)) {
+    return '0x';
+  }
+  return result;
+};
 
 /**
  * @desc compares if numberOne is greater than numberTwo
@@ -43,8 +74,11 @@ export const convertStringToHex = string => BigNumber(`${string}`).toString(16);
  * @param  {Number}   numberTwo
  * @return {String}
  */
-export const greaterThan = (numberOne, numberTwo) =>
-  BigNumber(`${numberOne}`).comparedTo(BigNumber(`${numberTwo}`)) === 1;
+export const greaterThan = (numberOne, numberTwo) => {
+  if (BigNumber(`${numberOne}`).isNaN() || BigNumber(`${numberTwo}`).isNaN())
+    return false;
+  return BigNumber(`${numberOne}`).comparedTo(BigNumber(`${numberTwo}`)) === 1;
+};
 
 /**
  * @desc compares if numberOne is smaller than numberTwo
@@ -52,8 +86,11 @@ export const greaterThan = (numberOne, numberTwo) =>
  * @param  {Number}   numberTwo
  * @return {String}
  */
-export const smallerThan = (numberOne, numberTwo) =>
-  BigNumber(`${numberOne}`).comparedTo(BigNumber(`${numberTwo}`)) === -1;
+export const smallerThan = (numberOne, numberTwo) => {
+  if (BigNumber(`${numberOne}`).isNaN() || BigNumber(`${numberTwo}`).isNaN())
+    return false;
+  return BigNumber(`${numberOne}`).comparedTo(BigNumber(`${numberTwo}`)) === -1;
+};
 
 /**
  * @desc multiplies two numbers

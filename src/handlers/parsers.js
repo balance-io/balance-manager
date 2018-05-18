@@ -811,9 +811,10 @@ export const parseAccountTransactions = async (
               pending: false,
               asset,
             };
-            const name = !transferData.contract.name.startsWith('0x')
-              ? transferData.contract.name
-              : transferData.contract.symbol || 'Unknown Token';
+            const name =
+              transferData.contract.name !== transferData.contract.address
+                ? transferData.contract.name
+                : transferData.contract.symbol || 'Unknown Token';
             transferTx.asset = {
               name: name,
               symbol: transferData.contract.symbol || '———',

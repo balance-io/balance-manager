@@ -435,7 +435,7 @@ export const estimateGasLimit = async ({
   let gasLimit = ethUnits.basic_tx;
   let data = '0x';
   let _amount =
-    amount && Number(amount)
+    amount && convertStringToNumber(amount)
       ? convertAmountToBigNumber(amount)
       : asset.balance.amount * 0.1;
   let _recipient =
@@ -452,6 +452,7 @@ export const estimateGasLimit = async ({
       value,
     ]);
     estimateGasData = { from: address, to: asset.address, data, value: '0x0' };
+    console.log('estimateGasData', estimateGasData);
     gasLimit = await web3Instance.eth.estimateGas(estimateGasData);
   }
   return gasLimit;

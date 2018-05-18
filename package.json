@@ -41,19 +41,18 @@
     "start": "HTTPS=true NODE_ENV=development react-scripts start",
     "build": "react-scripts build",
     "build:lambda": "netlify-lambda build src/lambda",
-    "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "precommit": "lint-staged",
-    "format": "prettier --write \"src/**/*.{js,json}\"",
-    "lint": "eslint src --ext .js"
+    "test": "react-scripts test --env=jsdom",
+    "lint": "eslint src --ext .js",
+    "format": "prettier --write \"src/**/*.js\"",
+    "precommit": "lint-staged"
+
   },
   "lint-staged": {
     "src/**/*.js": [
-      "yarn test",
-      "yarn lint",
-      "yarn format",
-      "git add"
-    ]
+      "eslint src --ext .js",
+      "prettier --write",
+      "git add"    ]
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",

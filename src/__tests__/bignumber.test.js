@@ -6,6 +6,8 @@ import {
   convertStringToHex,
   greaterThan,
   smallerThan,
+  multiply,
+  divide,
 } from '../helpers/bignumber';
 
 describe(`countDecimalPlaces`, () => {
@@ -171,6 +173,40 @@ describe(`smallerThan`, () => {
     const numberTwo = 2;
     const output = smallerThan(numberOne, numberTwo);
     const expected = true;
+    expect(output).toBe(expected);
+  });
+});
+
+describe(`multiply`, () => {
+  it(`returns '25' if given parameters (5, 5)`, () => {
+    const numberOne = 5;
+    const numberTwo = 5;
+    const output = multiply(numberOne, numberTwo);
+    const expected = '25';
+    expect(output).toBe(expected);
+  });
+  it(`returns '25' if given parameters ('5', '5')`, () => {
+    const numberOne = '5';
+    const numberTwo = '5';
+    const output = multiply(numberOne, numberTwo);
+    const expected = '25';
+    expect(output).toBe(expected);
+  });
+});
+
+describe(`divide`, () => {
+  it(`returns '5' if given parameters (25, 5)`, () => {
+    const numberOne = 25;
+    const numberTwo = 5;
+    const output = divide(numberOne, numberTwo);
+    const expected = '5';
+    expect(output).toBe(expected);
+  });
+  it(`returns '5' if given parameters ('25', '5')`, () => {
+    const numberOne = '25';
+    const numberTwo = '5';
+    const output = divide(numberOne, numberTwo);
+    const expected = '5';
     expect(output).toBe(expected);
   });
 });

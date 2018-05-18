@@ -12,19 +12,23 @@ const StyledToggleIndicator = styled.div`
   left: 0;
   top: calc((100% - 16px) / 2);
   mask: ${({ show }) =>
-    show ? `url(${circle}) center no-repeat` : `url(${balancesTabIcon}) center no-repeat`};
+    show
+      ? `url(${circle}) center no-repeat`
+      : `url(${balancesTabIcon}) center no-repeat`};
   mask-size: ${({ show }) => (show ? `70%` : `auto`)};
   background-color: rgb(${colors.grey});
 `;
 
-const ToggleIndicator = ({ show, ...props }) => <StyledToggleIndicator show={show} {...props} />;
+const ToggleIndicator = ({ show, ...props }) => (
+  <StyledToggleIndicator show={show} {...props} />
+);
 
 ToggleIndicator.propTypes = {
-  show: PropTypes.bool
+  show: PropTypes.bool,
 };
 
 ToggleIndicator.defaultProps = {
-  show: false
+  show: false,
 };
 
 export default ToggleIndicator;

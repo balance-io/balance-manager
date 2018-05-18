@@ -17,7 +17,8 @@ const StyledTransactionStatus = styled.p`
     position: absolute;
     border-radius: 8px;
     color: transparent;
-    background: ${({ color }) => (color ? `rgba(${colors[color]}, 0.1)` : 'transparent')};
+    background: ${({ color }) =>
+      color ? `rgba(${colors[color]}, 0.1)` : 'transparent'};
     padding: 4px 8px;
     right: -20px;
     padding-right: 20px;
@@ -69,7 +70,11 @@ const TransactionStatus = ({ tx, accountAddress, ...props }) => {
     }
   }
   return (
-    <StyledTransactionStatus color={color} icon={!tx.pending ? icon : null} {...props}>
+    <StyledTransactionStatus
+      color={color}
+      icon={!tx.pending ? icon : null}
+      {...props}
+    >
       {tx.pending && <StyledSpinner size={9} />}
       <span>{text}</span>
       {text}
@@ -79,7 +84,7 @@ const TransactionStatus = ({ tx, accountAddress, ...props }) => {
 
 TransactionStatus.propTypes = {
   tx: PropTypes.object.isRequired,
-  accountAddress: PropTypes.string.isRequired
+  accountAddress: PropTypes.string.isRequired,
 };
 
 export default TransactionStatus;

@@ -14,7 +14,9 @@ const WARNING_USER_IS_ONLINE = 'warning/WARNING_USER_IS_ONLINE';
 export const warningShow = warning => (dispatch, getState) => {
   dispatch({ type: WARNING_PARSE });
   const warnings = getState().warning.active;
-  const isActive = warnings.filter(activeWarning => activeWarning.key === warning.key).length;
+  const isActive = warnings.filter(
+    activeWarning => activeWarning.key === warning.key,
+  ).length;
   if (!isActive) {
     warnings.push(warning);
   }
@@ -35,8 +37,8 @@ export const warningOffline = () => dispatch => {
       key: 'USER_IS_OFFLINE',
       color: 'red',
       message: lang.t('warning.user_is_offline'),
-      action: () => {}
-    })
+      action: () => {},
+    }),
   );
 };
 
@@ -51,8 +53,8 @@ export const warningOnline = () => dispatch => {
       key: 'USER_IS_ONLINE',
       color: 'green',
       message: lang.t('warning.user_is_online'),
-      action: () => {}
-    })
+      action: () => {},
+    }),
   );
   timeoutHide = setTimeout(() => dispatch(warningHide('USER_IS_ONLINE')), 3000);
 };
@@ -63,7 +65,7 @@ export const warningClear = () => dispatch => dispatch({ type: WARNING_CLEAR });
 const INITIAL_STATE = {
   online: true,
   show: true,
-  active: []
+  active: [],
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -71,24 +73,24 @@ export default (state = INITIAL_STATE, action) => {
     case WARNING_USER_IS_OFFLINE:
       return {
         ...state,
-        online: false
+        online: false,
       };
     case WARNING_USER_IS_ONLINE:
       return {
         ...state,
-        online: true
+        online: true,
       };
     case WARNING_PARSE:
       return {
         ...state,
-        show: false
+        show: false,
       };
     case WARNING_SHOW:
     case WARNING_HIDE:
       return {
         ...state,
         show: true,
-        active: action.payload
+        active: action.payload,
       };
     case WARNING_CLEAR:
       return { ...state, show: false, active: [] };

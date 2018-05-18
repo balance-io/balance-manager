@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
-import { getLocal } from '../helpers/utilities';
-import { accountUpdateAccountAddress, accountClearState } from '../reducers/_account';
+import { getLocal } from '../handlers/localstorage';
+import { accountUpdateAccountAddress } from '../reducers/_account';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -20,9 +20,6 @@ class Wallet extends Component {
     } else {
       this.props.history.push('/');
     }
-  }
-  componentWillUnmount() {
-    this.props.accountClearState();
   }
   render = () => (
     <BaseLayout>
@@ -41,22 +38,20 @@ class Wallet extends Component {
 
 Wallet.propTypes = {
   accountUpdateAccountAddress: PropTypes.func.isRequired,
-  accountClearState: PropTypes.func.isRequired,
   accountAddress: PropTypes.string,
   fetching: PropTypes.bool.isRequired,
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
 };
 
 Wallet.defaultProps = {
-  accountAddress: null
+  accountAddress: null,
 };
 
 const reduxProps = ({ account }) => ({
   fetching: account.fetching,
-  accountAddress: account.accountAddress
+  accountAddress: account.accountAddress,
 });
 
 export default connect(reduxProps, {
   accountUpdateAccountAddress,
-  accountClearState
 })(Wallet);

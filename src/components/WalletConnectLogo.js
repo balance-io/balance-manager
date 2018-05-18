@@ -18,11 +18,11 @@ const WalletConnectLogo = ({ size, ...props }) => (
 );
 
 WalletConnectLogo.propTypes = {
-  size: PropTypes.number
+  size: PropTypes.number,
 };
 
 WalletConnectLogo.defaultProps = {
-  size: 250
+  size: 250,
 };
 
 export default WalletConnectLogo;

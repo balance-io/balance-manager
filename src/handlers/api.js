@@ -1,6 +1,10 @@
 import axios from 'axios';
-import { parseHistoricalPrices, parseAccountAssets, parseAccountTransactions } from './parsers';
-import { infuraGetTransactionByHash, infuraGetBlockByHash } from '../handlers/infura';
+import {
+  parseHistoricalPrices,
+  parseAccountAssets,
+  parseAccountTransactions,
+} from './parsers';
+import { getTransactionByHash, getBlockByHash } from '../handlers/web3';
 import { convertHexToString } from '../helpers/bignumber';
 import networkList from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
@@ -12,9 +16,12 @@ import nativeCurrencies from '../references/native-currencies.json';
  */
 export const apiGetPrices = (assets = []) => {
   const assetsQuery = JSON.stringify(assets).replace(/[[\]"]/gi, '');
-  const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(/[[\]"]/gi, '');
+  const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(
+    /[[\]"]/gi,
+    '',
+  );
   return axios.get(
-    `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}`
+    `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}`,
   );
 };
 
@@ -24,8 +31,14 @@ export const apiGetPrices = (assets = []) => {
  * @param  {Number}  [timestamp=Date.now()]
  * @return {Promise}
  */
-export const apiGetHistoricalPrices = (assetSymbol = '', timestamp = Date.now()) => {
-  const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(/[[\]"]/gi, '');
+export const apiGetHistoricalPrices = (
+  assetSymbol = '',
+  timestamp = Date.now(),
+) => {
+  const nativeQuery = JSON.stringify(Object.keys(nativeCurrencies)).replace(
+    /[[\]"]/gi,
+    '',
+  );
   const url = `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`;
   return axios.get(url);
 };
@@ -57,22 +70,27 @@ export const apiGetMetamaskNetwork = () =>
  * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
-export const apiGetTransactionStatus = async (hash = '', network = 'mainnet') => {
+export const apiGetTransactionStatus = async (
+  hash = '',
+  network = 'mainnet',
+) => {
   try {
-    let result = await infuraGetTransactionByHash(hash, network);
-    if (!result || !result.blockNumber || !result.blockHash) return null;
-    if (result) {
-      const blockData = await infuraGetBlockByHash(result.blockHash, network);
-      result.timestamp = null;
+    let result = { data: null };
+    let tx = await getTransactionByHash(hash);
+    if (!tx || !tx.blockNumber || !tx.blockHash) return result;
+    if (tx) {
+      const blockData = await getBlockByHash(tx.blockHash);
+      tx.timestamp = null;
       if (blockData) {
         const blockTimestamp = convertHexToString(blockData.timestamp);
-        result.timestamp = {
+        tx.timestamp = {
           secs: blockTimestamp,
-          ms: `${blockTimestamp}000`
+          ms: `${blockTimestamp}000`,
         };
       }
     }
-    return { data: result };
+    result = { data: tx };
+    return result;
   } catch (error) {
     throw error;
   }
@@ -87,8 +105,8 @@ const api = axios.create({
   timeout: 30000, // 30 secs
   headers: {
     'Content-Type': 'application/json',
-    Accept: 'application/json'
-  }
+    Accept: 'application/json',
+  },
 });
 
 /**
@@ -97,11 +115,15 @@ const api = axios.create({
  * @param  {String}   [network = 'mainnet']
  * @return {Promise}
  */
-export const apiGetAccountBalances = async (address = '', network = 'mainnet') => {
+export const apiGetAccountBalances = async (
+  address = '',
+  network = 'mainnet',
+) => {
   try {
     const { data } = await api.get(`/get_balances/${network}/${address}`);
     const accountInfo = parseAccountAssets(data, address);
-    return accountInfo;
+    const result = { data: accountInfo };
+    return result;
   } catch (error) {
     throw error;
   }
@@ -114,8 +136,11 @@ export const apiGetAccountBalances = async (address = '', network = 'mainnet') =
  * @param  {Number}   [page = 1]
  * @return {Promise}
  */
-export const apiGetTransactionData = (address = '', network = 'mainnet', page = 1) =>
-  api.get(`/get_transactions/${network}/${address}/${page}`);
+export const apiGetTransactionData = (
+  address = '',
+  network = 'mainnet',
+  page = 1,
+) => api.get(`/get_transactions/${network}/${address}/${page}`);
 
 /**
  * @desc get account transactions
@@ -126,7 +151,7 @@ export const apiGetTransactionData = (address = '', network = 'mainnet', page = 
 export const apiGetAccountTransactions = async (
   address = '',
   network = 'mainnet',
-  lastTxHash = ''
+  lastTxHash = '',
 ) => {
   try {
     let { data } = await apiGetTransactionData(address, network, 1);
@@ -145,7 +170,8 @@ export const apiGetAccountTransactions = async (
       });
     }
     transactions = await parseHistoricalPrices(transactions);
-    return transactions;
+    const result = { data: transactions };
+    return result;
   } catch (error) {
     throw error;
   }
@@ -169,8 +195,13 @@ export const apiShapeshiftGetCurrencies = () => api.get(`/get_currencies`);
  * @param  {String}   [withdrawalSelected = '']
  * @return {Promise}
  */
-export const apiShapeshiftGetMarketInfo = (depositSelected = '', withdrawalSelected = '') =>
-  api.get(`/get_market_info?deposit=${depositSelected}&withdrawal=${withdrawalSelected}`);
+export const apiShapeshiftGetMarketInfo = (
+  depositSelected = '',
+  withdrawalSelected = '',
+) =>
+  api.get(
+    `/get_market_info?deposit=${depositSelected}&withdrawal=${withdrawalSelected}`,
+  );
 
 /**
  * @desc shapeshift get fixed price
@@ -179,12 +210,16 @@ export const apiShapeshiftGetMarketInfo = (depositSelected = '', withdrawalSelec
  * @param  {String}   [address = '']
  * @return {Promise}
  */
-export const apiShapeshiftGetFixedPrice = (amount = '', exchangePair = '', address = '') =>
+export const apiShapeshiftGetFixedPrice = (
+  amount = '',
+  exchangePair = '',
+  address = '',
+) =>
   api.post(`/shapeshift_send_amount`, {
     amount,
     withdrawal: address,
     pair: exchangePair,
-    returnAddress: address
+    returnAddress: address,
   });
 
 /**
@@ -196,5 +231,5 @@ export const apiShapeshiftGetFixedPrice = (amount = '', exchangePair = '', addre
 export const apiShapeshiftGetQuotedPrice = (amount = '', exchangePair = '') =>
   api.post(`/shapeshift_quoted_price_request`, {
     amount,
-    pair: exchangePair
+    pair: exchangePair,
   });

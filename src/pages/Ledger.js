@@ -7,7 +7,6 @@ import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import Account from '../views/Account';
-import { accountClearState } from '../reducers/_account';
 import { ledgerConnectInit } from '../reducers/_ledger';
 import { fonts, colors } from '../styles';
 
@@ -49,14 +48,18 @@ class Ledger extends Component {
             <Account
               fetchingWallet={this.props.fetching}
               fetchingMessage={
-                !this.props.accounts.length ? lang.t('message.please_connect_ledger') : ''
+                !this.props.accounts.length
+                  ? lang.t('message.please_connect_ledger')
+                  : ''
               }
               match={this.props.match}
             />
           ) : (
             <Card minHeight={200} fetching={this.props.fetching}>
               <StyledCardContainer>
-                <StyledMessage>{lang.t('message.failed_ledger_connection')}</StyledMessage>
+                <StyledMessage>
+                  {lang.t('message.failed_ledger_connection')}
+                </StyledMessage>
                 <StyledButton color="grey" onClick={this.connectLedger}>
                   {lang.t('button.try_again')}
                 </StyledButton>
@@ -73,16 +76,15 @@ Ledger.propTypes = {
   ledgerConnectInit: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired,
-  accounts: PropTypes.array.isRequired
+  accounts: PropTypes.array.isRequired,
 };
 
 const reduxProps = ({ account, ledger }) => ({
   accountType: account.accountType,
   accounts: ledger.accounts,
-  fetching: ledger.fetching
+  fetching: ledger.fetching,
 });
 
 export default connect(reduxProps, {
-  accountClearState,
-  ledgerConnectInit
+  ledgerConnectInit,
 })(Ledger);

@@ -30,10 +30,12 @@ const StyledQRCodeDisplay = styled(QRCodeDisplay)`
 const StyledIcon = styled.div`
   width: 14px;
   height: 14px;
-  transform: ${({ rotation }) => (rotation ? `rotate(${rotation}deg)` : 'rotate(0deg)')};
+  transform: ${({ rotation }) =>
+    rotation ? `rotate(${rotation}deg)` : 'rotate(0deg)'};
   mask: ${({ icon }) => (icon ? `url(${icon}) center no-repeat` : 'none')};
   mask-size: 90%;
-  background-color: ${({ color }) => (color ? `rgb(${colors[color]})` : `rgb(${colors.dark})`)};
+  background-color: ${({ color }) =>
+    color ? `rgb(${colors[color]})` : `rgb(${colors.dark})`};
 `;
 
 const StyledSubTitle = styled.div`
@@ -85,7 +87,9 @@ class ReceiveModal extends Component {
             <StyledSubTitle>
               <StyledIcon color="grey" icon={arrowUp} rotation={180} />
               {lang.t('modal.receive_title', {
-                walletName: capitalize(`${this.props.accountType}${lang.t('modal.default_wallet')}`)
+                walletName: capitalize(
+                  `${this.props.accountType}${lang.t('modal.default_wallet')}`,
+                ),
               })}
             </StyledSubTitle>
             <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
@@ -101,14 +105,14 @@ class ReceiveModal extends Component {
 ReceiveModal.propTypes = {
   modalClose: PropTypes.func.isRequired,
   accountAddress: PropTypes.string.isRequired,
-  accountType: PropTypes.string.isRequired
+  accountType: PropTypes.string.isRequired,
 };
 
 const reduxProps = ({ account }) => ({
   accountAddress: account.accountAddress,
-  accountType: account.accountType
+  accountType: account.accountType,
 });
 
 export default connect(reduxProps, {
-  modalClose
+  modalClose,
 })(ReceiveModal);

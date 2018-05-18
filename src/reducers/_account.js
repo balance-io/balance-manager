@@ -500,7 +500,7 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetchingShapeshift: false,
-        shapeshiftAvailable: action.payload,
+        shapeshiftAvailable: false,
       };
     case ACCOUNT_CHANGE_NATIVE_CURRENCY:
       return {

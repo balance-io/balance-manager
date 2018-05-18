@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import * as ENS from 'ethjs-ens';
 import lang from '../languages';
 import QRCodeReader from '../components/QRCodeReader';
 import Card from '../components/Card';
@@ -39,6 +40,8 @@ import {
 } from '../helpers/bignumber';
 import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
+
+let ens;
 
 const StyledSuccessMessage = styled.div`
   width: 100%;
@@ -259,6 +262,18 @@ class SendModal extends Component {
 
   componentDidMount() {
     this.props.sendModalInit();
+    if (typeof window.web3 !== 'undefined') {
+      console.log('web3 browser detected, using.');
+      window.web3.version.getNetwork(function(err, network) {
+        if (err) {
+          console.log(err);
+        }
+        ens = new ENS({
+          provider: window.web3.currentProvider,
+          network: network,
+        });
+      });
+    }
   }
   componentDidUpdate(prevProps) {
     if (this.props.recipient.length >= 42) {
@@ -427,9 +442,26 @@ class SendModal extends Component {
                   value={this.props.recipient}
                   onFocus={this.onAddressInputFocus}
                   onBlur={this.onAddressInputBlur}
-                  onChange={({ target }) =>
-                    this.props.sendUpdateRecipient(target.value)
-                  }
+                  onChange={({ target }) => {
+                    if (target.value.includes('.')) {
+                      ens
+                        .lookup(target.value.trim())
+                        .then(address => {
+                          this.props.sendUpdateRecipient(
+                            address,
+                            this.props.selected.symbol,
+                          );
+                        })
+                        .catch(reason => {
+                          console.log('ENS failed');
+                          // console.error(reason);
+                        });
+                    }
+                    this.props.sendUpdateRecipient(
+                      target.value.trim(),
+                      this.props.selected.symbol,
+                    );
+                  }}
                 />
                 {this.props.recipient &&
                   !this.state.isValidAddress && (

@@ -19,6 +19,7 @@ import {
   accountUpdateAccountAddress,
 } from '../reducers/_account';
 import { colors, responsive } from '../styles';
+import ReminderRibbon from '../components/ReminderRibbon';
 
 const StyledLayout = styled.div`
   position: relative;
@@ -26,11 +27,11 @@ const StyledLayout = styled.div`
   height: 100%;
   min-height: 100vh;
   text-align: center;
-  padding: 0 16px;
 `;
 
 const StyledContent = styled(Wrapper)`
   width: 100%;
+  padding: 0 16px;
 `;
 
 const StyledHeader = styled.div`
@@ -41,6 +42,7 @@ const StyledHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 16px;
 `;
 
 const StyledBranding = styled.div`
@@ -119,6 +121,7 @@ const BaseLayout = ({
     accountAddress;
   return (
     <StyledLayout>
+      <ReminderRibbon maxWidth={1000} />
       <Background />
       <Column maxWidth={1000}>
         <StyledHeader>

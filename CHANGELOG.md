@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-*
+* Bookmark Reminder (anti-phishing) Ribbon
 
 ### Changed
 
-*
+* Layout padding definition locations
 
 ### Removed
 

@@ -49,8 +49,9 @@
   },
   "lint-staged": {
     "src/**/*.js": [
-      "eslint src --ext .js",
-      "prettier --write",
+      "yarn test",
+      "yarn lint",
+      "yarn format",
       "git add"
     ]
   },

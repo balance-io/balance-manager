@@ -6,6 +6,7 @@ import lang from '../languages';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import LineBreak from '../components/LineBreak';
+import GasPriceLineBreak from '../components/GasPriceLineBreak';
 import DropdownAsset from '../components/DropdownAsset';
 import Button from '../components/Button';
 import Form from '../components/Form';
@@ -215,27 +216,28 @@ class DonationModal extends Component {
       return;
     }
     if (!this.props.confirm) {
-      if (this.props.selected.symbol === 'ETH') {
-        const ethereum = getEth(this.props.accountInfo.assets);
-        const balanceAmount = ethereum.balance.amount;
-        const balance = convertAmountFromBigNumber(balanceAmount);
-        const requestedAmount = convertNumberToString(this.props.assetAmount);
-        const txFeeAmount = this.props.gasPrice.txFee.value.amount;
-        const txFee = convertAmountFromBigNumber(txFeeAmount);
-        const includingFees = add(requestedAmount, txFee);
-        if (greaterThan(requestedAmount, balance)) {
-          this.props.notificationShow(
-            lang.t('notification.error.insufficient_balance'),
-            true,
-          );
-          return;
-        } else if (greaterThan(includingFees, balance)) {
-          this.props.notificationShow(
-            lang.t('notification.error.insufficient_for_fees'),
-            true,
-          );
-          return;
-        }
+      if (this.props.selected.symbol !== 'ETH') {
+        return;
+      }
+      const ethereum = getEth(this.props.accountInfo.assets);
+      const balanceAmount = ethereum.balance.amount;
+      const balance = convertAmountFromBigNumber(balanceAmount);
+      const requestedAmount = convertNumberToString(this.props.assetAmount);
+      const txFeeAmount = this.props.gasPrice.txFee.value.amount;
+      const txFee = convertAmountFromBigNumber(txFeeAmount);
+      const includingFees = add(requestedAmount, txFee);
+      if (greaterThan(requestedAmount, balance)) {
+        this.props.notificationShow(
+          lang.t('notification.error.insufficient_balance'),
+          true,
+        );
+        return;
+      } else if (greaterThan(includingFees, balance)) {
+        this.props.notificationShow(
+          lang.t('notification.error.insufficient_for_fees'),
+          true,
+        );
+        return;
       }
       this.props.sendTransaction(request);
     }
@@ -266,8 +268,6 @@ class DonationModal extends Component {
                 <DropdownAsset
                   selected={'ETH'}
                   assets={this.props.accountInfo.assets}
-                  onChange={() => {}}
-                  disableClick={true}
                 />
               </div>
 
@@ -279,7 +279,7 @@ class DonationModal extends Component {
                   type="text"
                   value={balanceManagerEthAddress}
                   placeholder={balanceManagerEthAddress}
-                  disabled={true}
+                  disabled
                 />
               </StyledFlex>
 
@@ -329,23 +329,7 @@ class DonationModal extends Component {
                   </StyledAmountCurrency>
                 </StyledFlex>
               </StyledFlex>
-
-              <LineBreak
-                color={
-                  this.props.gasPriceOption === 'slow'
-                    ? 'red'
-                    : this.props.gasPriceOption === 'average'
-                      ? 'gold'
-                      : 'lightGreen'
-                }
-                percentage={
-                  this.props.gasPriceOption === 'slow'
-                    ? 33
-                    : this.props.gasPriceOption === 'average'
-                      ? 66
-                      : 100
-                }
-              />
+              <GasPriceLineBreak gasPriceOption={this.props.gasPriceOption} />
               <StyledGasOptions>
                 <StyledGasButton
                   dark

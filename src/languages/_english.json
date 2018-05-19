@@ -45,7 +45,7 @@
       "connect_ledger": "Connect to Ledger",
       "exchange": "Exchange",
       "send": "Send",
-      "donate": "Donate",
+      "donate": "Donate ETH",
       "receive": "Receive",
       "close": "Close",
       "cancel": "Cancel",

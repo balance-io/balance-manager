@@ -143,3 +143,19 @@ export const bootIntercom = () => {
   if (typeof window.Intercom !== 'undefined') setup();
   else setTimeout(setup, 500);
 };
+
+/**
+ * @desc returns an eth aseet object
+ * @param  {Array} assets
+ * @return {Object}
+ */
+export const getEth = assets => {
+  return assets.filter(asset => asset.symbol === 'ETH')[0];
+};
+
+/**
+ * @desc returns default eth address for donations
+ * @return {String}
+ */
+export const balanceManagerEthAddress =
+  '0x8F12DA507508138993EB3BAA610D18E036cD9936';

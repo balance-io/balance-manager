@@ -111,10 +111,14 @@ class DropdownAsset extends Component {
       this.setState({ showDropdown: false });
     }
   };
-  toggleDropdown = () =>
+  toggleDropdown = () => {
+    if (this.props.disableClick) {
+      return;
+    }
     this.setState({ showDropdown: !this.state.showDropdown });
+  };
   render() {
-    const { selected, assets, noBalance, ...props } = this.props;
+    const { selected, assets, noBalance, disableClick, ...props } = this.props;
     const options = {};
     if (assets.length) {
       const ethereum = assets.filter(asset => asset.symbol === 'ETH')[0];
@@ -210,10 +214,12 @@ DropdownAsset.propTypes = {
   assets: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
   noBalance: PropTypes.bool,
+  disableClick: PropTypes.bool,
 };
 
 DropdownAsset.defaultProps = {
   noBalance: false,
+  disableClick: false,
 };
 
 export default DropdownAsset;

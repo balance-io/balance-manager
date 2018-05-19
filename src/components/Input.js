@@ -17,7 +17,7 @@ const shimmer = keyframes`
 
 const StyledInputWrapper = styled.div`
   width: 100%;
-  opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
+  opacity: ${({ fetching, disabled }) => (disabled && !fetching ? '0.5' : '1')};
 `;
 
 const StyledLabel = styled.label`
@@ -106,11 +106,11 @@ const Input = ({
     }
   }
   return (
-    <StyledInputWrapper disabled={disabled}>
+    <StyledInputWrapper disabled={fetching || disabled}>
       <StyledLabel hide={_label === 'Input'}>{_label}</StyledLabel>
       <StyledInput
         fetching={fetching}
-        disabled={disabled}
+        disabled={fetching || disabled}
         type={type}
         value={!disabled ? value : ''}
         placeholder={_placeholder}

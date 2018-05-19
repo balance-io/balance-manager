@@ -9,21 +9,20 @@ import LineBreak from '../components/LineBreak';
 import DropdownAsset from '../components/DropdownAsset';
 import Button from '../components/Button';
 import Form from '../components/Form';
-import MetamaskLogo from '../components/MetamaskLogo';
-import LedgerLogo from '../components/LedgerLogo';
-import TrezorLogo from '../components/TrezorLogo';
+import AssetIcon from '../components/AssetIcon';
 import exchangeIcon from '../assets/exchange-icon.svg';
 import arrowUp from '../assets/arrow-up.svg';
 import { modalClose } from '../reducers/_modal';
 import {
   exchangeClearFields,
   exchangeModalInit,
-  exchangeTransaction,
+  exchangeSendTransaction,
   exchangeUpdateWithdrawalAmount,
   exchangeUpdateDepositAmount,
   exchangeUpdateDepositSelected,
   exchangeUpdateWithdrawalSelected,
   exchangeToggleConfirmationView,
+  exchangeConfirmTransaction,
   exchangeMaxBalance,
 } from '../reducers/_exchange';
 import { notificationShow } from '../reducers/_notification';
@@ -39,6 +38,7 @@ import {
   smallerThan,
   convertAmountToBigNumber,
 } from '../helpers/bignumber';
+import { getTimeString } from '../helpers/time';
 import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
@@ -67,6 +67,12 @@ const StyledFlex = styled.div`
   display: flex;
   position: relative;
   transform: none;
+`;
+
+const StyledColumn = styled(StyledFlex)`
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyledDropdownLabel = styled.p`
@@ -226,13 +232,13 @@ class ExchangeModal extends Component {
     this.props.exchangeUpdateDepositSelected(value);
   onChangeWithdrawalSelected = value =>
     this.props.exchangeUpdateWithdrawalSelected(value);
-  onGoBack = () => this.props.exchangeToggleConfirmationView(false);
   onExchangeMaxBalance = () => this.props.exchangeMaxBalance();
   onExchangeAnother = () => {
-    this.props.exchangeToggleConfirmationView(false);
+    this.props.exchangeToggleConfirmationView();
     this.props.exchangeClearFields();
     this.props.exchangeModalInit();
   };
+  onGoBack = () => this.props.exchangeToggleConfirmationView();
   onFocus = activeInput => this.setState({ activeInput });
   onBlur = () => this.setState({ activeInput: '' });
   onSubmit = e => {
@@ -241,7 +247,7 @@ class ExchangeModal extends Component {
       address: this.props.accountInfo.address,
       recipient: this.props.recipient,
       amount: this.props.depositAmount,
-      depositSelectedAsset: this.props.depositSelected,
+      asset: this.props.depositSelected,
       gasPrice: this.props.gasPrice,
       gasLimit: this.props.gasLimit,
     };
@@ -302,9 +308,9 @@ class ExchangeModal extends Component {
           return;
         }
       }
-      this.props.exchangeToggleConfirmationView(true);
+      this.props.exchangeConfirmTransaction();
     } else {
-      this.props.exchangeTransaction(request);
+      this.props.exchangeSendTransaction(request);
     }
   };
   onClose = () => {
@@ -674,25 +680,64 @@ class ExchangeModal extends Component {
             </Form>
           ) : (
             <StyledApproveTransaction>
-              {(() => {
-                switch (this.props.accountType) {
-                  case 'METAMASK':
-                    return <MetamaskLogo />;
-                  case 'LEDGER':
-                    return <LedgerLogo />;
-                  case 'TREZOR':
-                    return <TrezorLogo />;
-                  default:
-                    return <div />;
-                }
-              })()}
+              <StyledFlex>
+                <StyledColumn>
+                  <AssetIcon
+                    size={35}
+                    asset={
+                      this.props.depositSelected.symbol === 'ETH'
+                        ? 'ETH'
+                        : this.props.depositSelected.address
+                    }
+                  />
+                  <StyledParagraph>{`${this.props.depositAmount} ${
+                    this.props.depositSelected.symbol
+                  }`}</StyledParagraph>
+                </StyledColumn>
+                <StyledFlex>
+                  <StyledExchangeIcon>
+                    <img src={exchangeIcon} alt="conversion" />
+                  </StyledExchangeIcon>
+                </StyledFlex>
+                <StyledColumn>
+                  <AssetIcon
+                    size={35}
+                    asset={
+                      this.props.withdrawalSelected.symbol === 'ETH'
+                        ? 'ETH'
+                        : this.props.withdrawalSelected.address
+                    }
+                  />
+                  <StyledParagraph>{`${this.props.withdrawalAmount} ${
+                    this.props.withdrawalSelected.symbol
+                  }`}</StyledParagraph>
+                </StyledColumn>
+              </StyledFlex>
+              <StyledFlex>
+                <StyledParagraph>
+                  {getTimeString(this.props.countdown, 'ms')}
+                </StyledParagraph>
+              </StyledFlex>
               <StyledParagraph>
                 {lang.t('modal.approve_tx', {
                   walletType: capitalize(this.props.accountType),
                 })}
               </StyledParagraph>
               <StyledActions single>
-                <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
+                <Button onClick={this.onGoBack}>
+                  {lang.t('button.cancel')}
+                </Button>
+                <Button
+                  left
+                  color="brightGreen"
+                  hoverColor="brightGreenHover"
+                  activeColor="brightGreenHover"
+                  fetching={this.props.fetchingFinal}
+                  icon={exchangeIcon}
+                  onClick={this.onSubmit}
+                >
+                  {lang.t('button.exchange')}
+                </Button>
               </StyledActions>
             </StyledApproveTransaction>
           )
@@ -739,21 +784,24 @@ ExchangeModal.propTypes = {
   modalClose: PropTypes.func.isRequired,
   exchangeClearFields: PropTypes.func.isRequired,
   exchangeModalInit: PropTypes.func.isRequired,
-  exchangeTransaction: PropTypes.func.isRequired,
+  exchangeSendTransaction: PropTypes.func.isRequired,
   exchangeUpdateWithdrawalAmount: PropTypes.func.isRequired,
   exchangeUpdateDepositAmount: PropTypes.func.isRequired,
   exchangeUpdateDepositSelected: PropTypes.func.isRequired,
   exchangeUpdateWithdrawalSelected: PropTypes.func.isRequired,
   exchangeToggleConfirmationView: PropTypes.func.isRequired,
+  exchangeConfirmTransaction: PropTypes.func.isRequired,
   exchangeMaxBalance: PropTypes.func.isRequired,
   notificationShow: PropTypes.func.isRequired,
   fetchingRate: PropTypes.bool.isRequired,
+  fetchingFinal: PropTypes.bool.isRequired,
   fetching: PropTypes.bool.isRequired,
   gasPrice: PropTypes.object.isRequired,
   address: PropTypes.string.isRequired,
   recipient: PropTypes.string.isRequired,
   txHash: PropTypes.string.isRequired,
   confirm: PropTypes.bool.isRequired,
+  countdown: PropTypes.string.isRequired,
   exchangeDetails: PropTypes.object.isRequired,
   depositAssets: PropTypes.array.isRequired,
   withdrawalAssets: PropTypes.array.isRequired,
@@ -770,12 +818,14 @@ ExchangeModal.propTypes = {
 
 const reduxProps = ({ modal, exchange, account }) => ({
   fetchingRate: exchange.fetchingRate,
+  fetchingFinal: exchange.fetchingFinal,
   fetching: exchange.fetching,
   gasPrice: exchange.gasPrice,
   address: exchange.address,
   recipient: exchange.recipient,
   txHash: exchange.txHash,
   confirm: exchange.confirm,
+  countdown: exchange.countdown,
   exchangeDetails: exchange.exchangeDetails,
   depositAssets: exchange.depositAssets,
   withdrawalAssets: exchange.withdrawalAssets,
@@ -794,12 +844,13 @@ export default connect(reduxProps, {
   modalClose,
   exchangeClearFields,
   exchangeModalInit,
-  exchangeTransaction,
+  exchangeSendTransaction,
   exchangeUpdateWithdrawalAmount,
   exchangeUpdateDepositAmount,
   exchangeUpdateDepositSelected,
   exchangeUpdateWithdrawalSelected,
   exchangeToggleConfirmationView,
+  exchangeConfirmTransaction,
   exchangeMaxBalance,
   notificationShow,
 })(ExchangeModal);

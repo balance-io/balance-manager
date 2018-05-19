@@ -203,41 +203,23 @@ const shapeshift = axios.create({
 });
 
 /**
- * @desc shapeshift get fixed price
- * @param  {String}   [amount = '']
- * @param  {String}   [exchangePair = '']
- * @param  {String}   [address = '']
- * @return {Promise}
- */
-export const apiShapeshiftGetFixedPrice = (
-  amount = '',
-  exchangePair = '',
-  address = '',
-) =>
-  shapeshift.post(`/sendamount`, {
-    amount,
-    withdrawal: address,
-    pair: exchangePair,
-    returnAddress: address,
-  });
-
-/**
  * @desc shapeshift get market info
- * @param  {String}   [exchangePair = '']
+ * @param  {String}   [pair = '']
  * @return {Promise}
  */
-export const apiShapeshiftGetMarketInfo = (exchangePair = '') =>
-  shapeshift.get(`/marketinfo/${exchangePair}`);
+export const apiShapeshiftGetMarketInfo = (pair = '') =>
+  shapeshift.get(`/marketinfo/${pair}`);
 
 /**
- * @desc shapeshift get quoted price
- * @param  {String}   [depositSelected = '']
- * @param  {String}   [withdrawalSelected = '']
+ * @desc shapeshift get fixed or quoted price
+ * @param  {String}   [depositSymbol = '']
+ * @param  {String}   [withdrawalSymbol = '']
  * @param  {String}   [depositAmount = '']
  * @param  {String}   [withdrawalAmount = '']
  * @return {Promise}
  */
-export const apiShapeshiftGetQuotedPrice = async ({
+export const apiShapeshiftSendAmount = async ({
+  address = '',
   depositSymbol = '',
   withdrawalSymbol = '',
   depositAmount = '',
@@ -247,7 +229,13 @@ export const apiShapeshiftGetQuotedPrice = async ({
     const pair = `${depositSymbol.toLowerCase()}_${withdrawalSymbol.toLowerCase()}`;
     const marketInfo = await apiShapeshiftGetMarketInfo(pair);
     const min = marketInfo.data.minimum;
-    const body = { pair };
+    const body = address
+      ? {
+          pair,
+          withdrawal: address,
+          returnAddress: address,
+        }
+      : { pair };
     if (withdrawalAmount) {
       body.amount = withdrawalAmount;
     } else if (depositAmount) {
@@ -260,7 +248,7 @@ export const apiShapeshiftGetQuotedPrice = async ({
       response.data.success.min = min;
       return response;
     } else {
-      console.log(marketInfo);
+      /* Fallback for when sendamount endpoint fails */
       return {
         data: {
           pair,

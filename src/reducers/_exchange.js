@@ -1,6 +1,6 @@
 import {
   apiShapeshiftGetCurrencies,
-  apiShapeshiftGetQuotedPrice,
+  apiShapeshiftSendAmount,
   apiGetGasPrices,
 } from '../handlers/api';
 import { parseError, parseGasPrices } from '../handlers/parsers';
@@ -36,8 +36,12 @@ const EXCHANGE_TRANSACTION_REQUEST = 'exchange/EXCHANGE_TRANSACTION_REQUEST';
 const EXCHANGE_TRANSACTION_SUCCESS = 'exchange/EXCHANGE_TRANSACTION_SUCCESS';
 const EXCHANGE_TRANSACTION_FAILURE = 'exchange/EXCHANGE_TRANSACTION_FAILURE';
 
-const EXCHANGE_TOGGLE_CONFIRMATION_VIEW =
-  'exchange/EXCHANGE_TOGGLE_CONFIRMATION_VIEW';
+const EXCHANGE_CONFIRM_TRANSACTION_REQUEST =
+  'exchange/EXCHANGE_CONFIRM_TRANSACTION_REQUEST';
+const EXCHANGE_CONFIRM_TRANSACTION_SUCCESS =
+  'exchange/EXCHANGE_CONFIRM_TRANSACTION_SUCCESS';
+const EXCHANGE_CONFIRM_TRANSACTION_FAILURE =
+  'exchange/EXCHANGE_CONFIRM_TRANSACTION_FAILURE';
 
 const EXCHANGE_UPDATE_DEPOSIT_AMOUNT_REQUEST =
   'exchange/EXCHANGE_UPDATE_DEPOSIT_AMOUNT_REQUEST';
@@ -57,6 +61,11 @@ const EXCHANGE_UPDATE_DEPOSIT_SELECTED =
   'exchange/EXCHANGE_UPDATE_DEPOSIT_SELECTED';
 const EXCHANGE_UPDATE_WITHDRAWAL_SELECTED =
   'exchange/EXCHANGE_UPDATE_WITHDRAWAL_SELECTED';
+
+const EXCHANGE_UPDATE_COUNTDOWN = 'exchange/EXCHANGE_UPDATE_COUNTDOWN';
+
+const EXCHANGE_TOGGLE_CONFIRMATION_VIEW =
+  'exchange/EXCHANGE_TOGGLE_CONFIRMATION_VIEW';
 
 const EXCHANGE_CLEAR_FIELDS = 'exchange/EXCHANGE_CLEAR_FIELDS';
 
@@ -162,7 +171,7 @@ export const exchangeUpdateDepositAmount = (
     payload: { depositAmount, withdrawalAmount },
   });
   const getRate = () => {
-    apiShapeshiftGetQuotedPrice({
+    apiShapeshiftSendAmount({
       depositSymbol: depositSelected.symbol,
       withdrawalSymbol: withdrawalSelected.symbol,
       depositAmount,
@@ -222,7 +231,7 @@ export const exchangeUpdateWithdrawalAmount = (
     payload: { withdrawalAmount, depositAmount },
   });
   const getRate = () =>
-    apiShapeshiftGetQuotedPrice({
+    apiShapeshiftSendAmount({
       depositSymbol: depositSelected.symbol,
       withdrawalSymbol: withdrawalSelected.symbol,
       withdrawalAmount,
@@ -322,7 +331,7 @@ export const exchangeModalInit = () => (dispatch, getState) => {
     });
 };
 
-export const exchangeTransaction = ({
+export const exchangeSendTransaction = ({
   address,
   recipient,
   amount,
@@ -357,15 +366,66 @@ export const exchangeTransaction = ({
     });
 };
 
-export const exchangeToggleConfirmationView = boolean => (
-  dispatch,
-  getState,
-) => {
-  let confirm = boolean;
-  if (!confirm) {
-    confirm = !getState().exchange.confirm;
+export const exchangeToggleConfirmationView = () => ({
+  type: EXCHANGE_TOGGLE_CONFIRMATION_VIEW,
+});
+
+let countdownTimeout = null;
+
+export const exchangeUpdateCountdown = () => (dispatch, getState) => {
+  const { exchangeDetails } = getState().exchange;
+  clearTimeout(countdownTimeout);
+  const countdown = subtract(exchangeDetails.expiration, Date.now());
+  if (greaterThan(countdown, 0)) {
+    dispatch({ type: EXCHANGE_UPDATE_COUNTDOWN, payload: countdown });
+    setTimeout(() => dispatch(exchangeUpdateCountdown()), 1000); // 1sec
+  } else {
+    dispatch(exchangeToggleConfirmationView);
   }
-  dispatch({ type: EXCHANGE_TOGGLE_CONFIRMATION_VIEW, payload: confirm });
+};
+
+export const exchangeConfirmTransaction = () => (dispatch, getState) => {
+  const {
+    address,
+    priorityInput,
+    depositAmount,
+    withdrawalAmount,
+    depositSelected,
+    withdrawalSelected,
+  } = getState().exchange;
+  let request = {
+    address,
+    depositSymbol: depositSelected.symbol,
+    withdrawalSymbol: withdrawalSelected.symbol,
+  };
+  if (priorityInput === 'DEPOSIT') {
+    request.depositAmount = depositAmount;
+  } else if (priorityInput === 'WITHDRAWAL') {
+    request.withdrawalAmount = withdrawalAmount;
+  }
+  dispatch({ type: EXCHANGE_CONFIRM_TRANSACTION_REQUEST });
+  apiShapeshiftSendAmount(request)
+    .then(({ data }) => {
+      if (data.success) {
+        const exchangeDetails = data.success;
+        const recipient = exchangeDetails.deposit;
+        const withdrawalAmount = exchangeDetails.withdrawalAmount;
+        const depositAmount = exchangeDetails.depositAmount;
+        dispatch({
+          type: EXCHANGE_CONFIRM_TRANSACTION_SUCCESS,
+          payload: {
+            exchangeDetails,
+            recipient,
+            withdrawalAmount,
+            depositAmount,
+          },
+        });
+        dispatch(exchangeUpdateCountdown());
+      }
+    })
+    .catch(error => {
+      dispatch({ type: EXCHANGE_CONFIRM_TRANSACTION_FAILURE });
+    });
 };
 
 export const exchangeClearFields = () => ({ type: EXCHANGE_CLEAR_FIELDS });
@@ -374,13 +434,16 @@ export const exchangeClearFields = () => ({ type: EXCHANGE_CLEAR_FIELDS });
 const INITIAL_STATE = {
   fetching: false,
   fetchingRate: false,
+  fetchingFinal: false,
   address: '',
   recipient: '',
   txHash: '',
   confirm: false,
   gasLimit: ethUnits.basic_tx,
   gasPrice: {},
+  countdown: '',
   exchangeDetails: {},
+  priorityInput: 'DEPOSIT',
   depositAssets: [],
   withdrawalAssets: [],
   depositSelected: { symbol: 'ETH', decimals: 18 },
@@ -428,10 +491,26 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         fetching: false,
       };
-    case EXCHANGE_TOGGLE_CONFIRMATION_VIEW:
+    case EXCHANGE_CONFIRM_TRANSACTION_REQUEST:
       return {
         ...state,
-        confirm: action.payload,
+        fetchingFinal: true,
+      };
+    case EXCHANGE_CONFIRM_TRANSACTION_SUCCESS:
+      return {
+        ...state,
+        fetchingFinal: false,
+        confirm: true,
+        exchangeDetails: action.payload.exchangeDetails,
+        recipient: action.payload.recipient,
+        withdrawalAmount: action.payload.withdrawalAmount,
+        depositAmount: action.payload.depositAmount,
+      };
+    case EXCHANGE_CONFIRM_TRANSACTION_FAILURE:
+      return {
+        ...state,
+        fetchingFinal: false,
+        confirm: false,
       };
     case EXCHANGE_TRANSACTION_REQUEST:
       return { ...state, fetching: true };
@@ -449,9 +528,17 @@ export default (state = INITIAL_STATE, action) => {
         confirm: false,
       };
     case EXCHANGE_UPDATE_DEPOSIT_AMOUNT_REQUEST:
+      return {
+        ...state,
+        priorityInput: 'DEPOSIT',
+        fetchingRate: true,
+        depositAmount: action.payload.depositAmount,
+        withdrawalAmount: action.payload.withdrawalAmount,
+      };
     case EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_REQUEST:
       return {
         ...state,
+        priorityInput: 'WITHDRAWAL',
         fetchingRate: true,
         depositAmount: action.payload.depositAmount,
         withdrawalAmount: action.payload.withdrawalAmount,
@@ -486,7 +573,10 @@ export default (state = INITIAL_STATE, action) => {
         depositSelected: action.payload.depositSelected,
         withdrawalSelected: action.payload.withdrawalSelected,
       };
-
+    case EXCHANGE_UPDATE_COUNTDOWN:
+      return { ...state, countdown: action.payload };
+    case EXCHANGE_TOGGLE_CONFIRMATION_VIEW:
+      return { ...state, countdown: '', confirm: !state.confirm };
     case EXCHANGE_CLEAR_FIELDS:
       return { ...state, ...INITIAL_STATE };
     default:

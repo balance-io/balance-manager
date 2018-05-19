@@ -21,11 +21,12 @@ export const getLocalTimeDate = (timestamp = null) => {
 /**
  * @desc get time string for minimal unit
  * @param {String} [value='']
- * @param {String} [unit='']
+ * @param {String} [unit='ms']
  * @param {Boolean} [short=false]
  * @return {String}
  */
-export const getTimeString = (value = '', unit = '', short = false) => {
+export const getTimeString = (value = '', unit = 'ms', short = false) => {
+  if (!value) return null;
   let _value = convertStringToNumber(value);
   let _unit = '';
   let _unitShort = '';

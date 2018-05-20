@@ -736,7 +736,7 @@ class ExchangeModal extends Component {
                   icon={exchangeIcon}
                   onClick={this.onSubmit}
                 >
-                  {lang.t('button.exchange')}
+                  {lang.t('button.confirm')}
                 </Button>
               </StyledActions>
             </StyledApproveTransaction>

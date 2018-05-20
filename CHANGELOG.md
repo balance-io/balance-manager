@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ### Added
 
 * Bookmark Reminder (anti-phishing) Ribbon
+* Ddropdown on account view for choosing language. Displays available langs from resources
 
 ### Changed
 
@@ -18,10 +19,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Add link to Ledger support page on Ledger connection page
 * Add Ledger affiliate link to wallet selection screen
 * Add Donate ETH button and modal
+* Update spanish translation with consistent voice (tu vs usted)
+* Changed a few strings that weren't handled by i18n
 
 ### Removed
 
-*
 
 ## [0.5.3](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 

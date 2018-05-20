@@ -145,7 +145,7 @@ export const bootIntercom = () => {
 };
 
 /**
- * @desc returns an eth aseet object
+ * @desc returns an eth asset object
  * @param  {Array} assets
  * @return {Object}
  */

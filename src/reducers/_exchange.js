@@ -494,13 +494,13 @@ export default (state = INITIAL_STATE, action) => {
     case EXCHANGE_CONFIRM_TRANSACTION_REQUEST:
       return {
         ...state,
-        fetchingFinal: true,
+        confirm: true,
+        fetching: true,
       };
     case EXCHANGE_CONFIRM_TRANSACTION_SUCCESS:
       return {
         ...state,
-        fetchingFinal: false,
-        confirm: true,
+        fetching: false,
         exchangeDetails: action.payload.exchangeDetails,
         recipient: action.payload.recipient,
         withdrawalAmount: action.payload.withdrawalAmount,
@@ -509,7 +509,7 @@ export default (state = INITIAL_STATE, action) => {
     case EXCHANGE_CONFIRM_TRANSACTION_FAILURE:
       return {
         ...state,
-        fetchingFinal: false,
+        fetching: false,
         confirm: false,
       };
     case EXCHANGE_TRANSACTION_REQUEST:

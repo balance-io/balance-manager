@@ -47,6 +47,7 @@
       "send": "Send",
       "receive": "Receive",
       "close": "Close",
+      "confirm": "Confirm",
       "cancel": "Cancel",
       "go_back": "Go Back",
       "send_another": "Send Another",

@@ -767,7 +767,7 @@ class ExchangeModal extends Component {
             </StyledParagraph>
             <StyledActions>
               <Button onClick={this.onExchangeAnother}>
-                {lang.t('button.exchange_another')}
+                {lang.t('button.exchange_again')}
               </Button>
               <Button color="red" onClick={this.onClose}>
                 {lang.t('button.close')}

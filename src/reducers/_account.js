@@ -340,7 +340,11 @@ export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
             prices,
             network,
           );
-          updateLocalBalances(parsedAccountInfo, network);
+          updateLocalBalances(
+            parsedAccountInfo.address,
+            parsedAccountInfo,
+            network,
+          );
           saveLocal('native_prices', prices);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,

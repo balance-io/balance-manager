@@ -257,6 +257,7 @@ export const sendUpdateSelected = value => (dispatch, getState) => {
 export const sendMaxBalance = () => (dispatch, getState) => {
   const { selected, gasPrice } = getState().send;
   const { accountInfo } = getState().account;
+  let amount = '';
   if (selected.symbol === 'ETH') {
     const ethereum = accountInfo.assets.filter(
       asset => asset.symbol === 'ETH',
@@ -266,15 +267,11 @@ export const sendMaxBalance = () => (dispatch, getState) => {
     const remaining = convertStringToNumber(
       subtract(balanceAmount, txFeeAmount),
     );
-    const ether = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
-    dispatch(sendUpdateAssetAmount(ether));
+    amount = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
   } else {
-    dispatch(
-      sendUpdateAssetAmount(
-        convertAmountFromBigNumber(selected.balance.amount),
-      ),
-    );
+    amount = convertAmountFromBigNumber(selected.balance.amount);
   }
+  dispatch(sendUpdateAssetAmount(amount));
 };
 
 export const sendClearFields = () => ({ type: SEND_CLEAR_FIELDS });

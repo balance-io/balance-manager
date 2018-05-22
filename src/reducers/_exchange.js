@@ -84,7 +84,7 @@ export const exchangeGetGasPrices = () => (dispatch, getState) => {
   apiGetGasPrices()
     .then(({ data }) => {
       const gasPrices = parseGasPrices(data, prices, gasLimit);
-      const gasPrice = gasPrices.average;
+      const gasPrice = gasPrices.fast;
       dispatch({ type: EXCHANGE_GET_GAS_PRICE_SUCCESS, payload: gasPrice });
     })
     .catch(error => {

@@ -371,8 +371,11 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
     recipient,
     depositAmount,
     depositSelected,
+    withdrawalAmount,
+    withdrawalSelected,
     gasPrice,
     gasLimit,
+    exchangeDetails,
   } = getState().exchange;
   dispatch({ type: EXCHANGE_TRANSACTION_REQUEST });
   const { accountType } = getState().account;
@@ -393,6 +396,16 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
         type: EXCHANGE_TRANSACTION_SUCCESS,
         payload: txHash,
       });
+      const incomingTx = {
+        hash: `shapeshift_${exchangeDetails.orderId}`,
+        asset: withdrawalSelected,
+        from: '',
+        to: address,
+        amount: withdrawalAmount,
+        gasPrice: '',
+        gasLimit: '',
+      };
+      dispatch(accountUpdateTransactions(incomingTx));
     })
     .catch(error => {
       const message = parseError(error);

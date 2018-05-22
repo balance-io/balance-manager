@@ -234,11 +234,7 @@ class AccountViewTransactions extends Component {
 
   render = () => {
     const nativeCurrency = this.props.nativeCurrency;
-    let _transactions = [];
-    if (this.props.transactions && this.props.transactions.length) {
-      _transactions = this.props.transactions.filter(tx => !tx.interaction);
-    }
-    return !!_transactions.length ? (
+    return !!this.props.transactions.length ? (
       !this.props.fetchingTransactions ? (
         <StyledGrid>
           <StyledLabelsRow>
@@ -249,7 +245,7 @@ class AccountViewTransactions extends Component {
             <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
           </StyledLabelsRow>
 
-          {_transactions.map((tx, idx, arr) => {
+          {this.props.transactions.map((tx, idx, arr) => {
             if (!this.state.showAllTransactions && idx > 10) return null;
             return (
               <StyledTransactionWrapper
@@ -418,7 +414,7 @@ class AccountViewTransactions extends Component {
               </StyledTransactionWrapper>
             );
           })}
-          {_transactions.length > 10 && (
+          {this.props.transactions.length > 10 && (
             <StyledShowAllTransactions onClick={this.onShowAllTransactions}>
               <StyledToggleIndicator show={this.state.showAllTransactions} />
               <p>

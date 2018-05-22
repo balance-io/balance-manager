@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
-*
+* Account interactions tab
 
 ## [0.5.3](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 

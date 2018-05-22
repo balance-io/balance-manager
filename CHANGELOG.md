@@ -10,10 +10,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ### Added
 
 * Bookmark Reminder (anti-phishing) Ribbon
+* Exchange button and modal
+* Shapeshift endpoints
+* Account Type component for displaying active wallet logo
 
 ### Changed
 
 * Layout padding definition locations
+* DrodpownAsset improved logic
+* Refactor Send and Exchange modals/reducers for consistency
+* Fix unit time references
+* Moved missing language strings
 
 ### Removed
 

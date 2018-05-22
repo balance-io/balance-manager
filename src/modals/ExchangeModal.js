@@ -31,7 +31,6 @@ import {
   convertAmountToDisplay,
   convertNumberToString,
   add,
-  subtract,
   multiply,
   divide,
   greaterThan,
@@ -64,6 +63,7 @@ const StyledIcon = styled.div`
 `;
 
 const StyledFlex = styled.div`
+  width: ${({ spanWidth }) => (spanWidth ? '100%' : 'auto')};
   display: flex;
   position: relative;
   transform: none;
@@ -91,16 +91,17 @@ const StyledHelperWrapper = styled.div`
 const StyledHelperContainer = styled.div`
   width: 100%;
   display: grid;
-  height: 34px;
   grid-template-columns: 1fr 1fr;
-  padding-top: 16px;
+  padding-top: ${({ noPadding }) => (noPadding ? '0' : '16px')};
 `;
 
 const StyledHelperText = styled.div`
   width: 100%;
-  text-align: right;
-  padding-right: 16px;
+  text-align: left;
+  padding-left: 8px;
   opacity: ${({ fetching }) => (fetching ? `0.5` : `1.0`)};
+  cursor: ${({ onClick }) =>
+    typeof onClick !== 'undefined' ? 'pointer' : 'default'};
   & p {
     color: ${({ warn }) =>
       warn ? `rgb(${colors.red})` : `rgb(${colors.grey})`};
@@ -219,6 +220,17 @@ const StyledFees = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  ${StyledHelperText} {
+    text-align: center;
+  }
+`;
+
+const StyledMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(${colors.grey});
+  font-weight: ${fonts.weight.medium};
 `;
 
 class ExchangeModal extends Component {
@@ -232,6 +244,16 @@ class ExchangeModal extends Component {
     this.props.exchangeUpdateDepositSelected(value);
   onChangeWithdrawalSelected = value =>
     this.props.exchangeUpdateWithdrawalSelected(value);
+  onExchangeMin = () => {
+    const exchangeDetails =
+      Object.keys(this.props.exchangeDetails).length &&
+      this.props.exchangeDetails.quotedRate
+        ? this.props.exchangeDetails
+        : null;
+    if (exchangeDetails) {
+      this.props.exchangeUpdateDepositAmount(exchangeDetails.min);
+    }
+  };
   onExchangeMaxBalance = () => this.props.exchangeMaxBalance();
   onExchangeAnother = () => {
     this.props.exchangeToggleConfirmationView();
@@ -318,13 +340,22 @@ class ExchangeModal extends Component {
     this.props.modalClose();
   };
   render = () => {
-    const quantity = this.props.accountInfo.assets.filter(
+    if (!this.props.shapeshiftAvailable) {
+      return (
+        <Card maxWidth={700} minHeight={200} background="lightGrey">
+          <StyledMessage>
+            {lang.t('message.exchange_not_available')}
+          </StyledMessage>
+        </Card>
+      );
+    }
+    const balance = this.props.accountInfo.assets.filter(
       asset => asset.symbol === this.props.depositSelected.symbol,
     )[0].balance.display;
     const depositNative = this.props.accountInfo.assets.filter(
       asset => asset.symbol === this.props.depositSelected.symbol,
     )[0].native;
-    const total = depositNative
+    const value = depositNative
       ? this.props.accountInfo.assets.filter(
           asset => asset.symbol === this.props.depositSelected.symbol,
         )[0].native.balance.display
@@ -334,7 +365,7 @@ class ExchangeModal extends Component {
       this.props.exchangeDetails.quotedRate
         ? this.props.exchangeDetails
         : null;
-    const price = exchangeDetails
+    const rate = exchangeDetails
       ? convertAmountToDisplay(
           convertAmountToBigNumber(divide(1, exchangeDetails.quotedRate)),
           null,
@@ -352,7 +383,7 @@ class ExchangeModal extends Component {
             this.props.depositSelected.symbol
           ]
         : null;
-    const native =
+    const price =
       exchangeDetails && depositPrices
         ? convertAmountToDisplay(
             convertAmountToBigNumber(
@@ -378,30 +409,6 @@ class ExchangeModal extends Component {
           this.props.depositSelected,
         )
       : null;
-    const withdrawalMin = exchangeDetails
-      ? convertAmountToDisplay(
-          convertAmountToBigNumber(
-            subtract(
-              multiply(exchangeDetails.min, exchangeDetails.quotedRate),
-              exchangeDetails.minerFee,
-            ),
-          ),
-          null,
-          this.props.withdrawalSelected,
-        )
-      : null;
-    const withdrawalMax = exchangeDetails
-      ? convertAmountToDisplay(
-          convertAmountToBigNumber(
-            subtract(
-              multiply(exchangeDetails.maxLimit, exchangeDetails.quotedRate),
-              exchangeDetails.minerFee,
-            ),
-          ),
-          null,
-          this.props.withdrawalSelected,
-        )
-      : null;
     const depositUnder = exchangeDetails
       ? this.props.depositAmount !== ''
         ? smallerThan(this.props.depositAmount, exchangeDetails.min)
@@ -410,28 +417,6 @@ class ExchangeModal extends Component {
     const depositOver = exchangeDetails
       ? this.props.depositAmount !== ''
         ? greaterThan(this.props.depositAmount, exchangeDetails.maxLimit)
-        : false
-      : false;
-    const withdrawalUnder = exchangeDetails
-      ? this.props.withdrawalAmount !== ''
-        ? smallerThan(
-            this.props.withdrawalAmount,
-            subtract(
-              multiply(exchangeDetails.min, exchangeDetails.quotedRate),
-              exchangeDetails.minerFee,
-            ),
-          )
-        : false
-      : false;
-    const withdrawalOver = exchangeDetails
-      ? this.props.withdrawalAmount !== ''
-        ? greaterThan(
-            this.props.withdrawalAmount,
-            subtract(
-              multiply(exchangeDetails.maxLimit, exchangeDetails.quotedRate),
-              exchangeDetails.minerFee,
-            ),
-          )
         : false
       : false;
     const exchangeFeeValue = exchangeDetails
@@ -456,8 +441,25 @@ class ExchangeModal extends Component {
             this.props.prices,
           )
         : null;
+    const withdrawalValue =
+      exchangeDetails && depositPrices && this.props.withdrawalAmount
+        ? convertAmountToDisplay(
+            convertAmountToBigNumber(
+              multiply(
+                convertAmountFromBigNumber(depositPrices.price.amount),
+                divide(this.props.withdrawalAmount, exchangeDetails.quotedRate),
+              ),
+            ),
+            this.props.prices,
+          )
+        : null;
     return (
-      <Card allowOverflow background="lightGrey" fetching={this.props.fetching}>
+      <Card
+        maxWidth={700}
+        allowOverflow
+        background="lightGrey"
+        fetching={this.props.fetching || this.props.fetchingShapeshift}
+      >
         {!this.props.txHash ? (
           !this.props.confirm ? (
             <Form onSubmit={this.onSubmit}>
@@ -471,9 +473,8 @@ class ExchangeModal extends Component {
                   ),
                 })}
               </StyledSubTitle>
-
               <StyledFlex>
-                <StyledHelperWrapper>
+                <StyledHelperWrapper spanWidth>
                   <StyledDropdownLabel>
                     {lang.t('modal.deposit_dropdown_label')}
                   </StyledDropdownLabel>
@@ -485,12 +486,12 @@ class ExchangeModal extends Component {
                   />
                   <StyledHelperContainer>
                     <StyledHelperText fetching={this.props.fetchingRate}>
-                      <strong>Quantity</strong>
-                      <p>{quantity || '———'}</p>
+                      <strong>{lang.t('modal.helper_balance')}</strong>
+                      <p>{balance || '———'}</p>
                     </StyledHelperText>
                     <StyledHelperText fetching={this.props.fetchingRate}>
-                      <strong>Total</strong>
-                      <p>{total || '———'}</p>
+                      <strong>{lang.t('modal.helper_value')}</strong>
+                      <p>{value || '———'}</p>
                     </StyledHelperText>
                   </StyledHelperContainer>
                 </StyledHelperWrapper>
@@ -499,7 +500,7 @@ class ExchangeModal extends Component {
                     <img src={exchangeIcon} alt="conversion" />
                   </StyledExchangeIcon>
                 </StyledFlex>
-                <StyledHelperWrapper>
+                <StyledHelperWrapper spanWidth>
                   <StyledDropdownLabel>
                     {lang.t('modal.withdrawal_dropdown_label')}
                   </StyledDropdownLabel>
@@ -511,19 +512,19 @@ class ExchangeModal extends Component {
                   />
                   <StyledHelperContainer>
                     <StyledHelperText fetching={this.props.fetchingRate}>
-                      <strong>Price</strong>
-                      <p>{price || '———'}</p>
+                      <strong>{lang.t('modal.helper_rate')}</strong>
+                      <p>{rate || '———'}</p>
                     </StyledHelperText>
                     <StyledHelperText fetching={this.props.fetchingRate}>
-                      <strong>Native</strong>
-                      <p>{native || '———'}</p>
+                      <strong>{lang.t('modal.helper_price')}</strong>
+                      <p>{price || '———'}</p>
                     </StyledHelperText>
                   </StyledHelperContainer>
                 </StyledHelperWrapper>
               </StyledFlex>
 
               <StyledFlex>
-                <StyledFlex>
+                <StyledFlex spanWidth>
                   <StyledHelperWrapper>
                     <Input
                       fetching={
@@ -554,17 +555,19 @@ class ExchangeModal extends Component {
                     </StyledAmountCurrency>
                     <StyledHelperContainer>
                       <StyledHelperText
+                        onClick={this.onExchangeMin}
                         fetching={this.props.fetchingRate}
                         warn={!this.props.fetchingRate && depositUnder}
                       >
-                        <strong>Min</strong>
+                        <strong>{lang.t('modal.helper_min')}</strong>
                         <p>{depositMin || '———'}</p>
                       </StyledHelperText>
                       <StyledHelperText
+                        onClick={this.onExchangeMaxBalance}
                         fetching={this.props.fetchingRate}
                         warn={!this.props.fetchingRate && depositOver}
                       >
-                        <strong>Max</strong>
+                        <strong>{lang.t('modal.helper_max')}</strong>
                         <p>{depositMax || '———'}</p>
                       </StyledHelperText>
                     </StyledHelperContainer>
@@ -575,7 +578,7 @@ class ExchangeModal extends Component {
                     <img src={exchangeIcon} alt="conversion" />
                   </StyledExchangeIcon>
                 </StyledFlex>
-                <StyledFlex>
+                <StyledFlex spanWidth>
                   <StyledHelperWrapper>
                     <Input
                       fetching={
@@ -604,18 +607,19 @@ class ExchangeModal extends Component {
                     <StyledHelperContainer>
                       <StyledHelperText
                         fetching={this.props.fetchingRate}
-                        warn={!this.props.fetchingRate && withdrawalUnder}
+                        warn={!this.props.fetchingRate && depositUnder}
                       >
-                        <strong>Min</strong>
-                        <p>{withdrawalMin || '———'}</p>
+                        <strong>{lang.t('modal.helper_value')}</strong>
+                        <p>
+                          {withdrawalValue ||
+                            `${
+                              this.props.prices && this.props.prices.selected
+                                ? this.props.prices.selected.symbol
+                                : '$'
+                            }0.00`}
+                        </p>
                       </StyledHelperText>
-                      <StyledHelperText
-                        fetching={this.props.fetchingRate}
-                        warn={!this.props.fetchingRate && withdrawalOver}
-                      >
-                        <strong>Max</strong>
-                        <p>{withdrawalMax || '———'}</p>
-                      </StyledHelperText>
+                      <StyledHelperText />
                     </StyledHelperContainer>
                   </StyledHelperWrapper>
                 </StyledFlex>
@@ -629,33 +633,35 @@ class ExchangeModal extends Component {
                     {lang.t('button.cancel')}
                   </Button>
                   <StyledFees>
-                    <StyledParagraph>
-                      <span>{`${lang.t('modal.tx_fee')}: `}</span>
-                      <span>{`${
-                        Object.keys(this.props.gasPrice).length &&
-                        this.props.gasPrice.txFee &&
-                        this.props.gasPrice.txFee.native
-                          ? this.props.gasPrice.txFee.native.value.display
-                          : '$0.00'
-                      }${
-                        this.props.nativeCurrency !== 'ETH'
-                          ? ` (${
-                              Object.keys(this.props.gasPrice).length &&
-                              this.props.gasPrice.txFee
-                                ? this.props.gasPrice.txFee.value.display
-                                : '0.000 ETH'
-                            })`
-                          : ''
-                      }`}</span>
-                    </StyledParagraph>
-                    <StyledParagraph>
-                      <span>{`${lang.t('modal.exchange_fee')}: `}</span>
-                      <span>{`${
-                        exchangeFeeNative ? exchangeFeeNative : '$0.00'
-                      }${
-                        exchangeFeeValue ? ` (${exchangeFeeValue})` : ''
-                      }`}</span>
-                    </StyledParagraph>
+                    <StyledHelperContainer noPadding>
+                      <StyledHelperText>
+                        <strong>{lang.t('modal.tx_fee')}</strong>
+                        <p>{`${
+                          Object.keys(this.props.gasPrice).length &&
+                          this.props.gasPrice.txFee &&
+                          this.props.gasPrice.txFee.native
+                            ? this.props.gasPrice.txFee.native.value.display
+                            : '$0.00'
+                        }${
+                          this.props.nativeCurrency !== 'ETH'
+                            ? ` (${
+                                Object.keys(this.props.gasPrice).length &&
+                                this.props.gasPrice.txFee
+                                  ? this.props.gasPrice.txFee.value.display
+                                  : '0.000 ETH'
+                              })`
+                            : ''
+                        }`}</p>
+                      </StyledHelperText>
+                      <StyledHelperText>
+                        <strong>{lang.t('modal.exchange_fee')}</strong>
+                        <p>{`${
+                          exchangeFeeNative ? exchangeFeeNative : '$0.00'
+                        }${
+                          exchangeFeeValue ? ` (${exchangeFeeValue})` : ''
+                        }`}</p>
+                      </StyledHelperText>
+                    </StyledHelperContainer>
                   </StyledFees>
                   <Button
                     left
@@ -667,9 +673,7 @@ class ExchangeModal extends Component {
                       !this.props.depositAmount ||
                       !this.props.withdrawalAmount ||
                       depositUnder ||
-                      depositOver ||
-                      withdrawalUnder ||
-                      withdrawalOver
+                      depositOver
                     }
                     type="submit"
                   >
@@ -814,6 +818,8 @@ ExchangeModal.propTypes = {
   network: PropTypes.string.isRequired,
   prices: PropTypes.object.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
+  shapeshiftAvailable: PropTypes.bool.isRequired,
+  fetchingShapeshift: PropTypes.bool.isRequired,
 };
 
 const reduxProps = ({ modal, exchange, account }) => ({
@@ -838,6 +844,8 @@ const reduxProps = ({ modal, exchange, account }) => ({
   network: account.network,
   prices: account.prices,
   nativeCurrency: account.nativeCurrency,
+  shapeshiftAvailable: account.shapeshiftAvailable,
+  fetchingShapeshift: account.fetchingShapeshift,
 });
 
 export default connect(reduxProps, {

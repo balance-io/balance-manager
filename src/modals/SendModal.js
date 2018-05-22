@@ -394,7 +394,7 @@ class SendModal extends Component {
 
   render = () => {
     return (
-      <Card background="lightGrey">
+      <Card maxWidth={600} background="lightGrey">
         {!this.props.txHash ? (
           !this.props.confirm ? (
             <Form onSubmit={this.onSubmit}>
@@ -518,7 +518,11 @@ class SendModal extends Component {
                     this.props.gasPrices.slow &&
                     this.props.gasPrices.slow.txFee.native
                       ? this.props.gasPrices.slow.txFee.native.value.display
-                      : '$0.00'
+                      : `${
+                          this.props.prices && this.props.prices.selected
+                            ? this.props.prices.selected.symbol
+                            : '$'
+                        }0.00`
                   }`}</p>
                   <p>{`~ ${
                     this.props.gasPrices.slow
@@ -535,7 +539,11 @@ class SendModal extends Component {
                     this.props.gasPrices.average &&
                     this.props.gasPrices.average.txFee.native
                       ? this.props.gasPrices.average.txFee.native.value.display
-                      : '$0.00'
+                      : `${
+                          this.props.prices && this.props.prices.selected
+                            ? this.props.prices.selected.symbol
+                            : '$'
+                        }0.00`
                   }`}</p>
                   <p>{`~ ${
                     this.props.gasPrices.average
@@ -552,7 +560,11 @@ class SendModal extends Component {
                     this.props.gasPrices.fast &&
                     this.props.gasPrices.fast.txFee.native
                       ? this.props.gasPrices.fast.txFee.native.value.display
-                      : '$0.00'
+                      : `${
+                          this.props.prices && this.props.prices.selected
+                            ? this.props.prices.selected.symbol
+                            : '$'
+                        }0.00`
                   }`}</p>
                   <p>{`~ ${
                     this.props.gasPrices.fast
@@ -575,7 +587,11 @@ class SendModal extends Component {
                         .native
                         ? this.props.gasPrices[this.props.gasPriceOption].txFee
                             .native.value.display
-                        : '$0.00'
+                        : `${
+                            this.props.prices
+                              ? this.props.prices.selected.symbol
+                              : '$'
+                          }0.00`
                     }${
                       this.props.nativeCurrency !== 'ETH'
                         ? ` (${

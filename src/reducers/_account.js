@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import lang from '../languages';
 import {
-  apiShapeshiftVerify,
+  apiShapeshiftSendAmount,
   apiGetAccountBalances,
   apiGetAccountTransactions,
   apiGetPrices,
@@ -22,6 +22,7 @@ import {
 } from '../handlers/localstorage';
 import { web3SetHttpProvider } from '../handlers/web3';
 import { notificationShow } from './_notification';
+import { exchangeUpdateExchangeDetails } from './_exchange';
 import nativeCurrencies from '../references/native-currencies.json';
 
 // -- Constants ------------------------------------------------------------- //
@@ -298,8 +299,15 @@ export const accountShapeshiftVerify = () => dispatch => {
   dispatch({
     type: ACCOUNT_SHAPESHIFT_VERIFY_REQUEST,
   });
-  apiShapeshiftVerify()
-    .then(() => dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS }))
+  apiShapeshiftSendAmount({
+    depositSymbol: 'ETH',
+    withdrawalSymbol: 'BNT',
+    withdrawalAmount: '0.5',
+  })
+    .then(({ data }) => {
+      dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS });
+      dispatch(exchangeUpdateExchangeDetails(data.success));
+    })
     .catch(() => dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_FAILURE }));
 };
 
@@ -414,7 +422,7 @@ const INITIAL_STATE = {
     total: '———',
   },
   transactions: [],
-  shapeshiftAvailable: false,
+  shapeshiftAvailable: true,
   fetchingShapeshift: false,
   fetchingTransactions: false,
   fetching: false,

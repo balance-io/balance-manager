@@ -53,8 +53,7 @@
       "send_another": "Send Another",
       "exchange_another": "Exchange Again",
       "notify_me": "Get notified",
-      "try_again": "Try again",
-      "exchange_not_available": "Exchange is not available in your area"
+      "try_again": "Try again"
     },
     "input": {
       "recipient_address": "Recipient Address",
@@ -88,16 +87,22 @@
       "tx_hash": "Transaction Hash",
       "tx_verify": "Verify your transaction here",
       "deposit_dropdown_label": "Exchange my",
-      "withdrawal_dropdown_label": "for",
+      "withdrawal_dropdown_label": "For",
       "deposit_input_label": "Pay",
       "withdrawal_input_label": "Get",
       "tx_fee": "Transaction Fee",
-      "exchange_fee": "Exchange Fee"
+      "exchange_fee": "Exchange Fee",
+      "helper_balance": "Balance",
+      "helper_value": "Value",
+      "helper_rate": "Rate",
+      "helper_price": "Price",
+      "helper_min": "Min",
+      "helper_max": "Max"
     },
     "message": {
       "web3_not_available": "Please install the MetaMask Chrome extension",
       "web3_not_unlocked": "Please unlock your MetaMask wallet",
-      "web3_unknown_network": "Unknown network, please switch to another one",
+      "web3_unknown_network": "Unknown network, please switch to anothers one",
       "page_not_found": "404 Page Not Found",
       "coming_soon": "Coming soon...",
       "click_to_copy_to_clipboard": "Click to copy to clipboard",
@@ -105,7 +110,8 @@
       "failed_ledger_connection": "Failed to connect to Ledger, please check your device",
       "no_transactions": "No transactions found for this account",
       "no_interactions": "No interactions found for this account",
-      "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum"
+      "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum",
+      "exchange_not_available": "Exchange is not available in your area"
     },
     "notification": {
       "error": {

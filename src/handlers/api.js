@@ -5,7 +5,7 @@ import {
   parseAccountTransactions,
 } from './parsers';
 import { getTransactionByHash, getBlockByHash } from '../handlers/web3';
-import { convertHexToString } from '../helpers/bignumber';
+import { convertHexToString, formatInputDecimals } from '../helpers/bignumber';
 import networkList from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
 
@@ -248,15 +248,19 @@ export const apiShapeshiftSendAmount = async ({
       response.data.success.min = min;
       return response;
     } else {
-      /* Fallback for when sendamount endpoint fails */
+      /* Error Fallback */
       return {
         data: {
-          pair,
-          quotedRate: marketInfo.data.rate,
-          maxLimit: marketInfo.data.maxLimit,
-          min: marketInfo.data.minimum,
-          minerFee: marketInfo.data.minerFee,
-          error: response.data.error,
+          success: {
+            pair,
+            depositAmount: '',
+            withdrawalAmount: '',
+            quotedRate: marketInfo.data.rate,
+            maxLimit: marketInfo.data.maxLimit,
+            min: marketInfo.data.minimum,
+            minerFee: marketInfo.data.minerFee,
+            error: response.data.error,
+          },
         },
       };
     }
@@ -266,12 +270,37 @@ export const apiShapeshiftSendAmount = async ({
 };
 
 /**
- * @desc shapeshift verify availability
- * @param  {String}   [depositSelected = '']
- * @param  {String}   [withdrawalSelected = '']
- * @param  {String}   [depositAmount = '']
- * @param  {String}   [withdrawalAmount = '']
+ * @desc shapeshift get exchange details
+ * @param  {Object}     [request = [object Object]]
+ * @param  {String}     [inputOne = '']
+ * @param  {String}     [inputTwo = '']
+ * @param  {Boolean}    [withdrawal = false]
  * @return {Promise}
  */
-export const apiShapeshiftVerify = async () =>
-  shapeshift.post(`/sendamount`, { pair: 'eth_bnt', amount: '0.5' });
+export const apiShapeshiftGetExchangeDetails = ({
+  request = {
+    depositSymbol: 'ETH',
+    withdrawalSymbol: 'BNT',
+    withdrawalAmount: '0.5',
+  },
+  inputOne = '',
+  inputTwo = '',
+  withdrawal = false,
+}) =>
+  apiShapeshiftSendAmount(request).then(({ data }) => {
+    const inputTwoName = withdrawal ? 'depositAmount' : 'withdrawalAmount';
+    let result = {};
+    let exchangeDetails = null;
+    exchangeDetails = data.success;
+    result = { exchangeDetails };
+    if (exchangeDetails.error) {
+      inputTwo = '0';
+    } else if (!inputOne) {
+      inputTwo = '';
+    } else {
+      inputTwo = exchangeDetails[inputTwoName] || '';
+      inputTwo = formatInputDecimals(inputTwo, inputOne);
+    }
+    result[inputTwoName] = inputTwo;
+    return result;
+  });

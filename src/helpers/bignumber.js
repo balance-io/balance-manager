@@ -47,6 +47,15 @@ export const greaterThan = (numberOne, numberTwo) =>
   BigNumber(`${numberOne}`).comparedTo(BigNumber(`${numberTwo}`)) === 1;
 
 /**
+ * @desc compares if numberOne is greater than or equal to numberTwo
+ * @param  {Number}   numberOne
+ * @param  {Number}   numberTwo
+ * @return {String}
+ */
+export const greaterThanOrEqual = (numberOne, numberTwo) =>
+  BigNumber(`${numberOne}`).comparedTo(BigNumber(`${numberTwo}`)) >= 0;
+
+/**
  * @desc compares if numberOne is smaller than numberTwo
  * @param  {Number}   numberOne
  * @param  {Number}   numberTwo
@@ -54,6 +63,15 @@ export const greaterThan = (numberOne, numberTwo) =>
  */
 export const smallerThan = (numberOne, numberTwo) =>
   BigNumber(`${numberOne}`).comparedTo(BigNumber(`${numberTwo}`)) === -1;
+
+/**
+ * @desc compares if numberOne is smaller than or equal to numberTwo
+ * @param  {Number}   numberOne
+ * @param  {Number}   numberTwo
+ * @return {String}
+ */
+export const smallerThanOrEqual = (numberOne, numberTwo) =>
+  BigNumber(`${numberOne}`).comparedTo(BigNumber(`${numberTwo}`)) <= 0;
 
 /**
  * @desc multiplies two numbers
@@ -75,6 +93,28 @@ export const multiply = (numberOne, numberTwo) =>
 export const divide = (numberOne, numberTwo) =>
   BigNumber(`${numberOne}`)
     .dividedBy(BigNumber(`${numberTwo}`))
+    .toString();
+
+/**
+ * @desc real flor divides two numbers
+ * @param  {Number}   numberOne
+ * @param  {Number}   numberTwo
+ * @return {String}
+ */
+export const floorDivide = (numberOne, numberTwo) =>
+  BigNumber(`${numberOne}`)
+    .dividedToIntegerBy(BigNumber(`${numberTwo}`))
+    .toString();
+
+/**
+ * @desc modulos of two numbers
+ * @param  {Number}   numberOne
+ * @param  {Number}   numberTwo
+ * @return {String}
+ */
+export const mod = (numberOne, numberTwo) =>
+  BigNumber(`${numberOne}`)
+    .mod(BigNumber(`${numberTwo}`))
     .toString();
 
 /**

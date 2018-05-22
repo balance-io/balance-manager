@@ -10,9 +10,7 @@ import LineBreak from '../components/LineBreak';
 import DropdownAsset from '../components/DropdownAsset';
 import Button from '../components/Button';
 import Form from '../components/Form';
-import MetamaskLogo from '../components/MetamaskLogo';
-import LedgerLogo from '../components/LedgerLogo';
-import TrezorLogo from '../components/TrezorLogo';
+import AccountType from '../components/AccountType';
 import convertIcon from '../assets/convert-icon.svg';
 import arrowUp from '../assets/arrow-up.svg';
 import qrIcon from '../assets/qr-code-bnw.png';
@@ -285,14 +283,6 @@ class SendModal extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    const request = {
-      address: this.props.accountInfo.address,
-      recipient: this.props.recipient,
-      amount: this.props.assetAmount,
-      asset: this.props.selected,
-      gasPrice: this.props.gasPrice,
-      gasLimit: this.props.gasLimit,
-    };
     if (!this.props.gasPrice.txFee) {
       this.props.notificationShow(
         lang.t('notification.error.generic_error'),
@@ -356,7 +346,7 @@ class SendModal extends Component {
           return;
         }
       }
-      this.props.sendTransaction(request);
+      this.props.sendTransaction();
     }
     this.props.sendToggleConfirmationView(true);
   };
@@ -629,18 +619,7 @@ class SendModal extends Component {
             </Form>
           ) : (
             <StyledApproveTransaction>
-              {(() => {
-                switch (this.props.accountType) {
-                  case 'METAMASK':
-                    return <MetamaskLogo />;
-                  case 'LEDGER':
-                    return <LedgerLogo />;
-                  case 'TREZOR':
-                    return <TrezorLogo />;
-                  default:
-                    return <div />;
-                }
-              })()}
+              <AccountType accountType={this.props.accountType} />
               <StyledParagraph>
                 {lang.t('modal.approve_tx', {
                   walletType: capitalize(this.props.accountType),

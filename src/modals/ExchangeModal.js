@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import lang from '../languages';
 import Card from '../components/Card';
 import Input from '../components/Input';
+import AccountType from '../components/AccountType';
 import LineBreak from '../components/LineBreak';
 import DropdownAsset from '../components/DropdownAsset';
 import Button from '../components/Button';
@@ -37,7 +38,7 @@ import {
   smallerThan,
   convertAmountToBigNumber,
 } from '../helpers/bignumber';
-import { getTimeString } from '../helpers/time';
+import { getCountdown } from '../helpers/time';
 import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
@@ -265,14 +266,6 @@ class ExchangeModal extends Component {
   onBlur = () => this.setState({ activeInput: '' });
   onSubmit = e => {
     e.preventDefault();
-    const request = {
-      address: this.props.accountInfo.address,
-      recipient: this.props.recipient,
-      amount: this.props.depositAmount,
-      asset: this.props.depositSelected,
-      gasPrice: this.props.gasPrice,
-      gasLimit: this.props.gasLimit,
-    };
     if (!this.props.gasPrice.txFee) {
       this.props.notificationShow(
         lang.t('notification.error.generic_error'),
@@ -332,7 +325,7 @@ class ExchangeModal extends Component {
       }
       this.props.exchangeConfirmTransaction();
     } else {
-      this.props.exchangeSendTransaction(request);
+      this.props.exchangeSendTransaction();
     }
   };
   onClose = () => {
@@ -340,15 +333,9 @@ class ExchangeModal extends Component {
     this.props.modalClose();
   };
   render = () => {
-    if (!this.props.shapeshiftAvailable) {
-      return (
-        <Card maxWidth={700} minHeight={200} background="lightGrey">
-          <StyledMessage>
-            {lang.t('message.exchange_not_available')}
-          </StyledMessage>
-        </Card>
-      );
-    }
+    const withdrawalAssets = this.props.withdrawalAssets.filter(
+      asset => asset.symbol !== this.props.depositSelected.symbol,
+    );
     const balance = this.props.accountInfo.assets.filter(
       asset => asset.symbol === this.props.depositSelected.symbol,
     )[0].balance.display;
@@ -460,324 +447,322 @@ class ExchangeModal extends Component {
         background="lightGrey"
         fetching={this.props.fetching || this.props.fetchingShapeshift}
       >
-        {!this.props.txHash ? (
-          !this.props.confirm ? (
-            <Form onSubmit={this.onSubmit}>
-              <StyledSubTitle>
-                <StyledIcon color="grey" icon={arrowUp} />
-                {lang.t('modal.exchange_title', {
-                  walletName: capitalize(
-                    `${this.props.accountType}${lang.t(
-                      'modal.default_wallet',
-                    )}`,
-                  ),
-                })}
-              </StyledSubTitle>
-              <StyledFlex>
-                <StyledHelperWrapper spanWidth>
-                  <StyledDropdownLabel>
-                    {lang.t('modal.deposit_dropdown_label')}
-                  </StyledDropdownLabel>
-                  <DropdownAsset
-                    noBalance
-                    selected={this.props.depositSelected.symbol}
-                    assets={this.props.depositAssets}
-                    onChange={this.onChangeDepositSelected}
-                  />
-                  <StyledHelperContainer>
-                    <StyledHelperText fetching={this.props.fetchingRate}>
-                      <strong>{lang.t('modal.helper_balance')}</strong>
-                      <p>{balance || '———'}</p>
-                    </StyledHelperText>
-                    <StyledHelperText fetching={this.props.fetchingRate}>
-                      <strong>{lang.t('modal.helper_value')}</strong>
-                      <p>{value || '———'}</p>
-                    </StyledHelperText>
-                  </StyledHelperContainer>
-                </StyledHelperWrapper>
+        {this.props.shapeshiftAvailable ? (
+          !this.props.txHash ? (
+            !this.props.confirm ? (
+              <Form onSubmit={this.onSubmit}>
+                <StyledSubTitle>
+                  <StyledIcon color="grey" icon={arrowUp} />
+                  {lang.t('modal.exchange_title', {
+                    walletName: capitalize(
+                      `${this.props.accountType}${lang.t(
+                        'modal.default_wallet',
+                      )}`,
+                    ),
+                  })}
+                </StyledSubTitle>
                 <StyledFlex>
-                  <StyledExchangeIcon>
-                    <img src={exchangeIcon} alt="conversion" />
-                  </StyledExchangeIcon>
-                </StyledFlex>
-                <StyledHelperWrapper spanWidth>
-                  <StyledDropdownLabel>
-                    {lang.t('modal.withdrawal_dropdown_label')}
-                  </StyledDropdownLabel>
-                  <DropdownAsset
-                    noBalance
-                    selected={this.props.withdrawalSelected.symbol}
-                    assets={this.props.withdrawalAssets}
-                    onChange={this.onChangeWithdrawalSelected}
-                  />
-                  <StyledHelperContainer>
-                    <StyledHelperText fetching={this.props.fetchingRate}>
-                      <strong>{lang.t('modal.helper_rate')}</strong>
-                      <p>{rate || '———'}</p>
-                    </StyledHelperText>
-                    <StyledHelperText fetching={this.props.fetchingRate}>
-                      <strong>{lang.t('modal.helper_price')}</strong>
-                      <p>{price || '———'}</p>
-                    </StyledHelperText>
-                  </StyledHelperContainer>
-                </StyledHelperWrapper>
-              </StyledFlex>
-
-              <StyledFlex>
-                <StyledFlex spanWidth>
-                  <StyledHelperWrapper>
-                    <Input
-                      fetching={
-                        this.props.fetchingRate &&
-                        this.state.activeInput !== 'DEPOSIT'
-                      }
-                      onFocus={() => this.onFocus('DEPOSIT')}
-                      onBlur={this.onBlur}
-                      monospace
-                      label={lang.t('modal.deposit_input_label')}
-                      placeholder="0.0"
-                      type="text"
-                      value={this.props.depositAmount}
-                      onChange={({ target }) =>
-                        this.props.exchangeUpdateDepositAmount(target.value)
-                      }
+                  <StyledHelperWrapper spanWidth>
+                    <StyledDropdownLabel>
+                      {lang.t('modal.deposit_dropdown_label')}
+                    </StyledDropdownLabel>
+                    <DropdownAsset
+                      noBalance
+                      selected={this.props.depositSelected.symbol}
+                      assets={this.props.depositAssets}
+                      onChange={this.onChangeDepositSelected}
                     />
-                    <StyledMaxBalance onClick={this.onExchangeMaxBalance}>
-                      {lang.t('modal.exchange_max')}
-                    </StyledMaxBalance>
-                    <StyledAmountCurrency
-                      fetching={
-                        this.props.fetchingRate &&
-                        this.state.activeInput !== 'DEPOSIT'
-                      }
-                    >
-                      {this.props.depositSelected.symbol}
-                    </StyledAmountCurrency>
                     <StyledHelperContainer>
-                      <StyledHelperText
-                        onClick={this.onExchangeMin}
-                        fetching={this.props.fetchingRate}
-                        warn={!this.props.fetchingRate && depositUnder}
-                      >
-                        <strong>{lang.t('modal.helper_min')}</strong>
-                        <p>{depositMin || '———'}</p>
+                      <StyledHelperText fetching={this.props.fetchingRate}>
+                        <strong>{lang.t('modal.helper_balance')}</strong>
+                        <p>{balance || '———'}</p>
                       </StyledHelperText>
-                      <StyledHelperText
-                        onClick={this.onExchangeMaxBalance}
-                        fetching={this.props.fetchingRate}
-                        warn={!this.props.fetchingRate && depositOver}
-                      >
-                        <strong>{lang.t('modal.helper_max')}</strong>
-                        <p>{depositMax || '———'}</p>
-                      </StyledHelperText>
-                    </StyledHelperContainer>
-                  </StyledHelperWrapper>
-                </StyledFlex>
-                <StyledFlex>
-                  <StyledExchangeIcon>
-                    <img src={exchangeIcon} alt="conversion" />
-                  </StyledExchangeIcon>
-                </StyledFlex>
-                <StyledFlex spanWidth>
-                  <StyledHelperWrapper>
-                    <Input
-                      fetching={
-                        this.props.fetchingRate &&
-                        this.state.activeInput !== 'WITHDRAWAL'
-                      }
-                      onFocus={() => this.onFocus('WITHDRAWAL')}
-                      onBlur={this.onBlur}
-                      monospace
-                      placeholder="0.0"
-                      label={lang.t('modal.withdrawal_input_label')}
-                      type="text"
-                      value={this.props.withdrawalAmount}
-                      onChange={({ target }) =>
-                        this.props.exchangeUpdateWithdrawalAmount(target.value)
-                      }
-                    />
-                    <StyledAmountCurrency
-                      fetching={
-                        this.props.fetchingRate &&
-                        this.state.activeInput !== 'WITHDRAWAL'
-                      }
-                    >
-                      {this.props.withdrawalSelected.symbol}
-                    </StyledAmountCurrency>
-                    <StyledHelperContainer>
-                      <StyledHelperText
-                        fetching={this.props.fetchingRate}
-                        warn={!this.props.fetchingRate && depositUnder}
-                      >
+                      <StyledHelperText fetching={this.props.fetchingRate}>
                         <strong>{lang.t('modal.helper_value')}</strong>
-                        <p>
-                          {withdrawalValue ||
-                            `${
-                              this.props.prices && this.props.prices.selected
-                                ? this.props.prices.selected.symbol
-                                : '$'
-                            }0.00`}
-                        </p>
+                        <p>{value || '———'}</p>
                       </StyledHelperText>
-                      <StyledHelperText />
+                    </StyledHelperContainer>
+                  </StyledHelperWrapper>
+                  <StyledFlex>
+                    <StyledExchangeIcon>
+                      <img src={exchangeIcon} alt="conversion" />
+                    </StyledExchangeIcon>
+                  </StyledFlex>
+                  <StyledHelperWrapper spanWidth>
+                    <StyledDropdownLabel>
+                      {lang.t('modal.withdrawal_dropdown_label')}
+                    </StyledDropdownLabel>
+                    <DropdownAsset
+                      noBalance
+                      selected={this.props.withdrawalSelected.symbol}
+                      assets={withdrawalAssets}
+                      onChange={this.onChangeWithdrawalSelected}
+                    />
+                    <StyledHelperContainer>
+                      <StyledHelperText fetching={this.props.fetchingRate}>
+                        <strong>{lang.t('modal.helper_rate')}</strong>
+                        <p>{rate || '———'}</p>
+                      </StyledHelperText>
+                      <StyledHelperText fetching={this.props.fetchingRate}>
+                        <strong>{lang.t('modal.helper_price')}</strong>
+                        <p>{price || '———'}</p>
+                      </StyledHelperText>
                     </StyledHelperContainer>
                   </StyledHelperWrapper>
                 </StyledFlex>
-              </StyledFlex>
 
-              <LineBreak />
+                <StyledFlex>
+                  <StyledFlex spanWidth>
+                    <StyledHelperWrapper>
+                      <Input
+                        fetching={
+                          this.props.fetchingRate &&
+                          this.state.activeInput !== 'DEPOSIT'
+                        }
+                        onFocus={() => this.onFocus('DEPOSIT')}
+                        onBlur={this.onBlur}
+                        monospace
+                        label={lang.t('modal.deposit_input_label')}
+                        placeholder="0.0"
+                        type="text"
+                        value={this.props.depositAmount}
+                        onChange={({ target }) =>
+                          this.props.exchangeUpdateDepositAmount(target.value)
+                        }
+                      />
+                      <StyledMaxBalance onClick={this.onExchangeMaxBalance}>
+                        {lang.t('modal.exchange_max')}
+                      </StyledMaxBalance>
+                      <StyledAmountCurrency
+                        fetching={
+                          this.props.fetchingRate &&
+                          this.state.activeInput !== 'DEPOSIT'
+                        }
+                      >
+                        {this.props.depositSelected.symbol}
+                      </StyledAmountCurrency>
+                      <StyledHelperContainer>
+                        <StyledHelperText
+                          onClick={this.onExchangeMin}
+                          fetching={this.props.fetchingRate}
+                          warn={!this.props.fetchingRate && depositUnder}
+                        >
+                          <strong>{lang.t('modal.helper_min')}</strong>
+                          <p>{depositMin || '———'}</p>
+                        </StyledHelperText>
+                        <StyledHelperText
+                          onClick={this.onExchangeMaxBalance}
+                          fetching={this.props.fetchingRate}
+                          warn={!this.props.fetchingRate && depositOver}
+                        >
+                          <strong>{lang.t('modal.helper_max')}</strong>
+                          <p>{depositMax || '———'}</p>
+                        </StyledHelperText>
+                      </StyledHelperContainer>
+                    </StyledHelperWrapper>
+                  </StyledFlex>
+                  <StyledFlex>
+                    <StyledExchangeIcon>
+                      <img src={exchangeIcon} alt="conversion" />
+                    </StyledExchangeIcon>
+                  </StyledFlex>
+                  <StyledFlex spanWidth>
+                    <StyledHelperWrapper>
+                      <Input
+                        fetching={
+                          this.props.fetchingRate &&
+                          this.state.activeInput !== 'WITHDRAWAL'
+                        }
+                        onFocus={() => this.onFocus('WITHDRAWAL')}
+                        onBlur={this.onBlur}
+                        monospace
+                        placeholder="0.0"
+                        label={lang.t('modal.withdrawal_input_label')}
+                        type="text"
+                        value={this.props.withdrawalAmount}
+                        onChange={({ target }) =>
+                          this.props.exchangeUpdateWithdrawalAmount(
+                            target.value,
+                          )
+                        }
+                      />
+                      <StyledAmountCurrency
+                        fetching={
+                          this.props.fetchingRate &&
+                          this.state.activeInput !== 'WITHDRAWAL'
+                        }
+                      >
+                        {this.props.withdrawalSelected.symbol}
+                      </StyledAmountCurrency>
+                      <StyledHelperContainer>
+                        <StyledHelperText
+                          fetching={this.props.fetchingRate}
+                          warn={!this.props.fetchingRate && depositUnder}
+                        >
+                          <strong>{lang.t('modal.helper_value')}</strong>
+                          <p>
+                            {withdrawalValue ||
+                              `${
+                                this.props.prices && this.props.prices.selected
+                                  ? this.props.prices.selected.symbol
+                                  : '$'
+                              }0.00`}
+                          </p>
+                        </StyledHelperText>
+                        <StyledHelperText />
+                      </StyledHelperContainer>
+                    </StyledHelperWrapper>
+                  </StyledFlex>
+                </StyledFlex>
 
-              <StyledBottomModal>
-                <StyledActions>
-                  <Button onClick={this.onClose}>
+                <LineBreak />
+
+                <StyledBottomModal>
+                  <StyledActions>
+                    <Button onClick={this.onClose}>
+                      {lang.t('button.cancel')}
+                    </Button>
+                    <StyledFees>
+                      <StyledHelperContainer noPadding>
+                        <StyledHelperText>
+                          <strong>{lang.t('modal.tx_fee')}</strong>
+                          <p>{`${
+                            Object.keys(this.props.gasPrice).length &&
+                            this.props.gasPrice.txFee &&
+                            this.props.gasPrice.txFee.native
+                              ? this.props.gasPrice.txFee.native.value.display
+                              : '$0.00'
+                          }${
+                            this.props.nativeCurrency !== 'ETH'
+                              ? ` (${
+                                  Object.keys(this.props.gasPrice).length &&
+                                  this.props.gasPrice.txFee
+                                    ? this.props.gasPrice.txFee.value.display
+                                    : '0.000 ETH'
+                                })`
+                              : ''
+                          }`}</p>
+                        </StyledHelperText>
+                        <StyledHelperText>
+                          <strong>{lang.t('modal.exchange_fee')}</strong>
+                          <p>{`${
+                            exchangeFeeNative ? exchangeFeeNative : '$0.00'
+                          }${
+                            exchangeFeeValue ? ` (${exchangeFeeValue})` : ''
+                          }`}</p>
+                        </StyledHelperText>
+                      </StyledHelperContainer>
+                    </StyledFees>
+                    <Button
+                      left
+                      color="brightGreen"
+                      hoverColor="brightGreenHover"
+                      activeColor="brightGreenHover"
+                      icon={exchangeIcon}
+                      disabled={
+                        !this.props.depositAmount ||
+                        !this.props.withdrawalAmount ||
+                        depositUnder ||
+                        depositOver
+                      }
+                      type="submit"
+                    >
+                      {lang.t('button.exchange')}
+                    </Button>
+                  </StyledActions>
+                </StyledBottomModal>
+              </Form>
+            ) : (
+              <StyledApproveTransaction>
+                <StyledFlex>
+                  <StyledColumn>
+                    <AssetIcon
+                      size={35}
+                      asset={
+                        this.props.depositSelected.symbol === 'ETH'
+                          ? 'ETH'
+                          : this.props.depositSelected.address
+                      }
+                    />
+                    <StyledParagraph>{`${this.props.depositAmount} ${
+                      this.props.depositSelected.symbol
+                    }`}</StyledParagraph>
+                  </StyledColumn>
+                  <StyledFlex>
+                    <StyledExchangeIcon>
+                      <img src={exchangeIcon} alt="conversion" />
+                    </StyledExchangeIcon>
+                  </StyledFlex>
+                  <StyledColumn>
+                    <AssetIcon
+                      size={35}
+                      asset={
+                        this.props.withdrawalSelected.symbol === 'ETH'
+                          ? 'ETH'
+                          : this.props.withdrawalSelected.address
+                      }
+                    />
+                    <StyledParagraph>{`${this.props.withdrawalAmount} ${
+                      this.props.withdrawalSelected.symbol
+                    }`}</StyledParagraph>
+                  </StyledColumn>
+                </StyledFlex>
+                <StyledFlex>
+                  <StyledParagraph>
+                    {`Expiration time: ${getCountdown(this.props.countdown)}`}
+                  </StyledParagraph>
+                </StyledFlex>
+                <AccountType accountType={this.props.accountType} />
+                <StyledParagraph>
+                  {lang.t('modal.approve_tx', {
+                    walletType: capitalize(this.props.accountType),
+                  })}
+                </StyledParagraph>
+                <StyledActions single>
+                  <Button onClick={this.onGoBack}>
                     {lang.t('button.cancel')}
                   </Button>
-                  <StyledFees>
-                    <StyledHelperContainer noPadding>
-                      <StyledHelperText>
-                        <strong>{lang.t('modal.tx_fee')}</strong>
-                        <p>{`${
-                          Object.keys(this.props.gasPrice).length &&
-                          this.props.gasPrice.txFee &&
-                          this.props.gasPrice.txFee.native
-                            ? this.props.gasPrice.txFee.native.value.display
-                            : '$0.00'
-                        }${
-                          this.props.nativeCurrency !== 'ETH'
-                            ? ` (${
-                                Object.keys(this.props.gasPrice).length &&
-                                this.props.gasPrice.txFee
-                                  ? this.props.gasPrice.txFee.value.display
-                                  : '0.000 ETH'
-                              })`
-                            : ''
-                        }`}</p>
-                      </StyledHelperText>
-                      <StyledHelperText>
-                        <strong>{lang.t('modal.exchange_fee')}</strong>
-                        <p>{`${
-                          exchangeFeeNative ? exchangeFeeNative : '$0.00'
-                        }${
-                          exchangeFeeValue ? ` (${exchangeFeeValue})` : ''
-                        }`}</p>
-                      </StyledHelperText>
-                    </StyledHelperContainer>
-                  </StyledFees>
-                  <Button
-                    left
-                    color="brightGreen"
-                    hoverColor="brightGreenHover"
-                    activeColor="brightGreenHover"
-                    icon={exchangeIcon}
-                    disabled={
-                      !this.props.depositAmount ||
-                      !this.props.withdrawalAmount ||
-                      depositUnder ||
-                      depositOver
-                    }
-                    type="submit"
-                  >
-                    {lang.t('button.exchange')}
-                  </Button>
                 </StyledActions>
-              </StyledBottomModal>
-            </Form>
+              </StyledApproveTransaction>
+            )
           ) : (
-            <StyledApproveTransaction>
-              <StyledFlex>
-                <StyledColumn>
-                  <AssetIcon
-                    size={35}
-                    asset={
-                      this.props.depositSelected.symbol === 'ETH'
-                        ? 'ETH'
-                        : this.props.depositSelected.address
-                    }
-                  />
-                  <StyledParagraph>{`${this.props.depositAmount} ${
-                    this.props.depositSelected.symbol
-                  }`}</StyledParagraph>
-                </StyledColumn>
-                <StyledFlex>
-                  <StyledExchangeIcon>
-                    <img src={exchangeIcon} alt="conversion" />
-                  </StyledExchangeIcon>
-                </StyledFlex>
-                <StyledColumn>
-                  <AssetIcon
-                    size={35}
-                    asset={
-                      this.props.withdrawalSelected.symbol === 'ETH'
-                        ? 'ETH'
-                        : this.props.withdrawalSelected.address
-                    }
-                  />
-                  <StyledParagraph>{`${this.props.withdrawalAmount} ${
-                    this.props.withdrawalSelected.symbol
-                  }`}</StyledParagraph>
-                </StyledColumn>
-              </StyledFlex>
-              <StyledFlex>
+            <StyledSuccessMessage>
+              <StyledSubTitle>
+                <StyledIcon color="grey" icon={arrowUp} />
+                {`Success`}
+              </StyledSubTitle>
+              <div>
                 <StyledParagraph>
-                  {getTimeString(this.props.countdown, 'ms')}
+                  <strong>{`${lang.t('modal.tx_hash')}:`}</strong>
                 </StyledParagraph>
-              </StyledFlex>
+                <StyledHash>{` ${this.props.txHash}`}</StyledHash>
+              </div>
               <StyledParagraph>
-                {lang.t('modal.approve_tx', {
-                  walletType: capitalize(this.props.accountType),
-                })}
-              </StyledParagraph>
-              <StyledActions single>
-                <Button onClick={this.onGoBack}>
-                  {lang.t('button.cancel')}
-                </Button>
-                <Button
-                  left
-                  color="brightGreen"
-                  hoverColor="brightGreenHover"
-                  activeColor="brightGreenHover"
-                  fetching={this.props.fetchingFinal}
-                  icon={exchangeIcon}
-                  onClick={this.onSubmit}
+                <a
+                  href={`https://${
+                    this.props.network !== 'mainnet'
+                      ? `${this.props.network}.`
+                      : ''
+                  }etherscan.io/tx/${this.props.txHash}`}
+                  target="_blank"
                 >
-                  {lang.t('button.confirm')}
+                  {lang.t('modal.tx_verify')}
+                </a>
+              </StyledParagraph>
+              <StyledActions>
+                <Button onClick={this.onExchangeAnother}>
+                  {lang.t('button.exchange_again')}
+                </Button>
+                <Button color="red" onClick={this.onClose}>
+                  {lang.t('button.close')}
                 </Button>
               </StyledActions>
-            </StyledApproveTransaction>
+            </StyledSuccessMessage>
           )
         ) : (
-          <StyledSuccessMessage>
-            <StyledSubTitle>
-              <StyledIcon color="grey" icon={arrowUp} />
-              {`Success`}
-            </StyledSubTitle>
-            <div>
-              <StyledParagraph>
-                <strong>{`${lang.t('modal.tx_hash')}:`}</strong>
-              </StyledParagraph>
-              <StyledHash>{` ${this.props.txHash}`}</StyledHash>
-            </div>
-            <StyledParagraph>
-              <a
-                href={`https://${
-                  this.props.network !== 'mainnet'
-                    ? `${this.props.network}.`
-                    : ''
-                }etherscan.io/tx/${this.props.txHash}`}
-                target="_blank"
-              >
-                {lang.t('modal.tx_verify')}
-              </a>
-            </StyledParagraph>
-            <StyledActions>
-              <Button onClick={this.onExchangeAnother}>
-                {lang.t('button.exchange_again')}
-              </Button>
-              <Button color="red" onClick={this.onClose}>
-                {lang.t('button.close')}
-              </Button>
-            </StyledActions>
-          </StyledSuccessMessage>
+          <StyledMessage>
+            {lang.t('message.exchange_not_available')}
+          </StyledMessage>
         )}
       </Card>
     );

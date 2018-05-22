@@ -9,6 +9,7 @@ import { web3SendTransactionMultiWallet } from '../handlers/web3';
 import {
   subtract,
   greaterThan,
+  greaterThanOrEqual,
   convertAmountFromBigNumber,
   convertStringToNumber,
 } from '../helpers/bignumber';
@@ -364,22 +365,23 @@ export const exchangeModalInit = () => (dispatch, getState) => {
     });
 };
 
-export const exchangeSendTransaction = ({
-  address,
-  recipient,
-  amount,
-  asset,
-  gasPrice,
-  gasLimit,
-}) => (dispatch, getState) => {
+export const exchangeSendTransaction = () => (dispatch, getState) => {
+  const {
+    address,
+    recipient,
+    depositAmount,
+    depositSelected,
+    gasPrice,
+    gasLimit,
+  } = getState().exchange;
   dispatch({ type: EXCHANGE_TRANSACTION_REQUEST });
   const { accountType } = getState().account;
   const txDetails = {
-    asset: asset,
+    asset: depositSelected,
     from: address,
     to: recipient,
     nonce: null,
-    amount: amount,
+    amount: depositAmount,
     gasPrice: gasPrice.value.amount,
     gasLimit: gasLimit,
   };
@@ -406,18 +408,20 @@ export const exchangeToggleConfirmationView = () => ({
 let countdownTimeout = null;
 
 export const exchangeUpdateCountdown = () => (dispatch, getState) => {
-  const { exchangeDetails } = getState().exchange;
+  const { confirm, exchangeDetails } = getState().exchange;
   clearTimeout(countdownTimeout);
   const countdown = subtract(exchangeDetails.expiration, Date.now());
-  if (greaterThan(countdown, 0)) {
-    dispatch({ type: EXCHANGE_UPDATE_COUNTDOWN, payload: countdown });
+  if (confirm) {
     setTimeout(() => dispatch(exchangeUpdateCountdown()), 1000); // 1sec
-  } else {
-    dispatch(exchangeToggleConfirmationView);
+    if (greaterThanOrEqual(countdown, 1000)) {
+      dispatch({ type: EXCHANGE_UPDATE_COUNTDOWN, payload: countdown });
+    } else {
+      dispatch(exchangeToggleConfirmationView());
+    }
   }
 };
 
-export const exchangeConfirmTransaction = () => (dispatch, getState) => {
+export const exchangeConfirmTransaction = request => (dispatch, getState) => {
   const {
     address,
     priorityInput,
@@ -453,6 +457,7 @@ export const exchangeConfirmTransaction = () => (dispatch, getState) => {
             depositAmount,
           },
         });
+        dispatch(exchangeSendTransaction());
         dispatch(exchangeUpdateCountdown());
       }
     })
@@ -548,12 +553,12 @@ export default (state = INITIAL_STATE, action) => {
     case EXCHANGE_CONFIRM_TRANSACTION_REQUEST:
       return {
         ...state,
-        confirm: true,
         fetching: true,
       };
     case EXCHANGE_CONFIRM_TRANSACTION_SUCCESS:
       return {
         ...state,
+        confirm: true,
         fetching: false,
         exchangeDetails: action.payload.exchangeDetails,
         recipient: action.payload.recipient,
@@ -566,12 +571,9 @@ export default (state = INITIAL_STATE, action) => {
         fetching: false,
         confirm: false,
       };
-    case EXCHANGE_TRANSACTION_REQUEST:
-      return { ...state, fetching: true };
     case EXCHANGE_TRANSACTION_SUCCESS:
       return {
         ...state,
-        fetching: false,
         txHash: action.payload,
       };
     case EXCHANGE_TRANSACTION_FAILURE:

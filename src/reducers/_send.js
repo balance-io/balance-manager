@@ -149,22 +149,23 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     });
 };
 
-export const sendTransaction = ({
-  address,
-  recipient,
-  amount,
-  asset,
-  gasPrice,
-  gasLimit,
-}) => (dispatch, getState) => {
+export const sendTransaction = () => (dispatch, getState) => {
   dispatch({ type: SEND_TRANSACTION_REQUEST });
-  const { accountType } = getState().account;
+  const {
+    address,
+    recipient,
+    assetAmount,
+    selected,
+    gasPrice,
+    gasLimit,
+    accountType,
+  } = getState().account;
   const txDetails = {
-    asset: asset,
+    asset: selected,
     from: address,
     to: recipient,
     nonce: null,
-    amount: amount,
+    amount: assetAmount,
     gasPrice: gasPrice.value.amount,
     gasLimit: gasLimit,
   };

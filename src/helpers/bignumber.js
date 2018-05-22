@@ -96,7 +96,7 @@ export const divide = (numberOne, numberTwo) =>
     .toString();
 
 /**
- * @desc real flor divides two numbers
+ * @desc real floor divides two numbers
  * @param  {Number}   numberOne
  * @param  {Number}   numberTwo
  * @return {String}

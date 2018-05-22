@@ -103,7 +103,13 @@ const StyledHelperText = styled.div`
   opacity: ${({ fetching }) => (fetching ? `0.5` : `1.0`)};
   cursor: ${({ onClick }) =>
     typeof onClick !== 'undefined' ? 'pointer' : 'default'};
-  & p {
+  ${({ onClick }) =>
+    typeof onClick !== 'undefined' &&
+    `
+    &:hover {
+      opacity: 0.7;
+    }
+  `} & p {
     color: ${({ warn }) =>
       warn ? `rgb(${colors.red})` : `rgb(${colors.grey})`};
     font-size: 13px;

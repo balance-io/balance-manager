@@ -102,7 +102,7 @@
     "message": {
       "web3_not_available": "Please install the MetaMask Chrome extension",
       "web3_not_unlocked": "Please unlock your MetaMask wallet",
-      "web3_unknown_network": "Unknown network, please switch to anothers one",
+      "web3_unknown_network": "Unknown network, please switch to another one",
       "page_not_found": "404 Page Not Found",
       "coming_soon": "Coming soon...",
       "click_to_copy_to_clipboard": "Click to copy to clipboard",

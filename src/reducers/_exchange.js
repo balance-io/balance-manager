@@ -98,6 +98,8 @@ export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
     withdrawalAssets,
     depositAssets,
     depositAmount,
+    withdrawalAmount,
+    priorityInput,
   } = getState().exchange;
   let { withdrawalSelected, depositSelected } = getState().exchange;
   if (value === withdrawalSelected.symbol) {
@@ -118,7 +120,11 @@ export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
     type: EXCHANGE_UPDATE_DEPOSIT_SELECTED,
     payload: { depositSelected, withdrawalSelected },
   });
-  dispatch(exchangeUpdateDepositAmount(depositAmount, false));
+  if (priorityInput === 'DEPOSIT') {
+    dispatch(exchangeUpdateDepositAmount(depositAmount, false));
+  } else {
+    dispatch(exchangeUpdateWithdrawalAmount(withdrawalAmount, false));
+  }
 };
 
 export const exchangeUpdateWithdrawalSelected = value => (
@@ -129,6 +135,8 @@ export const exchangeUpdateWithdrawalSelected = value => (
     withdrawalAssets,
     depositAssets,
     depositAmount,
+    withdrawalAmount,
+    priorityInput,
   } = getState().exchange;
   let { withdrawalSelected, depositSelected } = getState().exchange;
   if (value === depositSelected.symbol) {
@@ -153,7 +161,11 @@ export const exchangeUpdateWithdrawalSelected = value => (
     type: EXCHANGE_UPDATE_WITHDRAWAL_SELECTED,
     payload: { depositSelected, withdrawalSelected },
   });
-  dispatch(exchangeUpdateDepositAmount(depositAmount, false));
+  if (priorityInput === 'DEPOSIT') {
+    dispatch(exchangeUpdateDepositAmount(depositAmount, false));
+  } else {
+    dispatch(exchangeUpdateWithdrawalAmount(withdrawalAmount, false));
+  }
 };
 
 export const exchangeUpdateDepositAmount = (

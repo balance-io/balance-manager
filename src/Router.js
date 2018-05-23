@@ -12,8 +12,6 @@ import { warningOnline, warningOffline } from './reducers/_warning';
 
 class Router extends Component {
   componentDidMount() {
-    const sak = process.env.REACT_APP_SHAPESHIFT_API_KEY || '';
-    console.log(`shapeshift api key: ${sak}`);
     window.browserHistory = this.context.router.history;
     window.onoffline = () => this.props.warningOffline();
     window.ononline = () => this.props.warningOnline();

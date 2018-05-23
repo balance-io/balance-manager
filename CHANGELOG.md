@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 * Layout padding definition locations
 * Fix mobile layout on the wallet selection screen (#232)
+* Add link to Ledger support page on Ledger connection page
+* Add Ledger affiliate link to wallet selection screen
 
 ### Removed
 

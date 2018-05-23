@@ -15,7 +15,7 @@ import trezorLogoImage from '../assets/trezor-logo.svg';
 import { accountUpdateAccountAddress } from '../reducers/_account';
 import { getLocal } from '../handlers/localstorage';
 import { modalOpen } from '../reducers/_modal';
-import { fonts, responsive } from '../styles';
+import { colors, fonts, responsive } from '../styles';
 
 const StyledCard = styled(Card)`
   background: #f5f6fa;
@@ -65,6 +65,17 @@ const LogoText = styled.p`
   opacity: ${({ disabled }) => (disabled ? 0.7 : 1)};
   @media screen and (max-width: 736px) {
     display: ${({ isAlwaysVisible }) => (isAlwaysVisible ? 'block' : 'none')};
+  }
+`;
+
+const LedgerAffiliateLink = styled.a`
+  color: rgb(${colors.blue});
+
+  &:hover {
+    color: rgb(${colors.blueHover});
+  }
+  &:active {
+    color: rgb(${colors.blueActive});
   }
 `;
 
@@ -191,7 +202,17 @@ class Home extends Component {
         <CardContainer>
           <LogoSection>
             <LedgerLogo />
-            <LogoText>{lang.t('homepage.connect_ledger')}</LogoText>
+            <LogoText>
+              {lang.t('homepage.connect_ledger')}
+              <LedgerAffiliateLink
+                href="https://www.ledgerwallet.com/r/7931"
+                target="_blank"
+                title="Buy a Ledger hardware wallet"
+              >
+                {lang.t('homepage.connect_ledger_link')}
+              </LedgerAffiliateLink>
+              .
+            </LogoText>
           </LogoSection>
           <Link to="/ledger">
             <LedgerButton left color="ledger">

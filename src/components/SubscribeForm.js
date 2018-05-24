@@ -160,7 +160,7 @@ class SubscribeForm extends Component {
   render() {
     return (
       <SForm
-        className={this.props.className}
+        {...this.props}
         noValidate
         success={this.state.status === 'success'}
         onSubmit={this.onSubmit}

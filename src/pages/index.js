@@ -111,7 +111,7 @@ const MetamaskCard = StyledCard.extend`
 `;
 
 const MetamaskLogo = styled.div`
-  background-size: 100%;
+  background-size: cover;
   background-image: url(${metamaskLogoImage});
   background-repeat: no-repeat;
   border-radius: 10px 0 0 10px;

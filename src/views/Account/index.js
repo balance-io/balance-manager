@@ -20,7 +20,6 @@ import { colors, fonts, responsive } from '../../styles';
 
 const StyledAccount = styled.div`
   width: 100%;
-  margin-bottom: 60px;
 `;
 
 const StyledFlex = styled.div`

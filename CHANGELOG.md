@@ -13,19 +13,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Exchange button and modal
 * Shapeshift endpoints
 * Account Type component for displaying active wallet logo
+* Link to Ledger support page on Ledger connection page
+* Ledger affiliate link to wallet selection screen
+* Donate ETH button and modal
+* Input fetching animation
 
 ### Changed
 
 * Layout padding definition locations
 * Fix mobile layout on the wallet selection screen (#232)
-* Add link to Ledger support page on Ledger connection page
-* Add Ledger affiliate link to wallet selection screen
-* Add Donate ETH button and modal
 * DrodpownAsset improved logic
 * Refactor Send and Exchange modals/reducers for consistency
 * Fix unit time references
 * Moved missing language strings
-* Added fetching animation to input
+
 
 ### Removed
 

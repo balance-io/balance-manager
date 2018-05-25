@@ -305,7 +305,6 @@ export const exchangeUpdateWithdrawalAmount = (
   if (!withdrawalAmount) {
     depositAmount = '';
   }
-  console.log('disableNative', disableNative);
   withdrawalNative = disableNative
     ? withdrawalNative
     : withdrawalAmount

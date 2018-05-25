@@ -3,6 +3,7 @@ import {
   apiShapeshiftSendAmount,
   apiShapeshiftGetExchangeDetails,
   apiGetGasPrices,
+  apiGetSinglePrice,
 } from '../handlers/api';
 import { parseError, parseGasPrices } from '../handlers/parsers';
 import { web3SendTransactionMultiWallet } from '../handlers/web3';
@@ -12,6 +13,8 @@ import {
   greaterThanOrEqual,
   convertAmountFromBigNumber,
   convertStringToNumber,
+  convertAmountToBigNumber,
+  convertAmountToDisplay,
 } from '../helpers/bignumber';
 import { notificationShow } from './_notification';
 import { accountUpdateTransactions } from './_account';
@@ -57,6 +60,13 @@ const EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_SUCCESS =
   'exchange/EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_SUCCESS';
 const EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_FAILURE =
   'exchange/EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_FAILURE';
+
+const EXCHANGE_GET_WITHDRAWAL_PRICE_REQUEST =
+  'exchange/EXCHANGE_GET_WITHDRAWAL_PRICE_REQUEST';
+const EXCHANGE_GET_WITHDRAWAL_PRICE_SUCCESS =
+  'exchange/EXCHANGE_GET_WITHDRAWAL_PRICE_SUCCESS';
+const EXCHANGE_GET_WITHDRAWAL_PRICE_FAILURE =
+  'exchange/EXCHANGE_GET_WITHDRAWAL_PRICE_FAILURE';
 
 const EXCHANGE_UPDATE_DEPOSIT_SELECTED =
   'exchange/EXCHANGE_UPDATE_DEPOSIT_SELECTED';
@@ -324,6 +334,29 @@ export const exchangeMaxBalance = () => (dispatch, getState) => {
   dispatch(exchangeUpdateDepositAmount(amount));
 };
 
+export const exchangeGetWithdrawalPrice = () => (dispatch, getState) => {
+  const { withdrawalSelected } = getState().exchange;
+  const { prices } = getState().account;
+  dispatch({ type: EXCHANGE_GET_WITHDRAWAL_PRICE_REQUEST });
+  const nativeSelected = prices.selected.currency;
+  const withdrawalSymbol = withdrawalSelected.symbol;
+  apiGetSinglePrice(withdrawalSymbol, nativeSelected)
+    .then(({ data }) => {
+      const amount = convertAmountToBigNumber(data[nativeSelected]);
+      const display = convertAmountToDisplay(amount, prices);
+      const withdrawalPrice = { amount, display };
+      dispatch({
+        type: EXCHANGE_GET_WITHDRAWAL_PRICE_SUCCESS,
+        payload: withdrawalPrice,
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: EXCHANGE_GET_WITHDRAWAL_PRICE_FAILURE });
+    });
+};
+
 export const exchangeModalInit = () => (dispatch, getState) => {
   const {
     accountAddress,
@@ -356,7 +389,7 @@ export const exchangeModalInit = () => (dispatch, getState) => {
         },
       });
       dispatch(exchangeGetGasPrices());
-      // dispatch(exchangeUpdateDepositAmount());
+      dispatch(exchangeGetWithdrawalPrice());
     })
     .catch(error => {
       const message = parseError(error);
@@ -522,6 +555,7 @@ const INITIAL_STATE = {
   withdrawalSelected: { symbol: 'ZRX', decimals: 18 },
   depositAmount: '',
   withdrawalAmount: '',
+  withdrawalPrice: { amount: '', display: '' },
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -559,6 +593,22 @@ export default (state = INITIAL_STATE, action) => {
         gasPrice: action.payload,
       };
     case EXCHANGE_GET_GAS_PRICE_FAILURE:
+      return {
+        ...state,
+        fetching: false,
+      };
+    case EXCHANGE_GET_WITHDRAWAL_PRICE_REQUEST:
+      return {
+        ...state,
+        fetching: true,
+      };
+    case EXCHANGE_GET_WITHDRAWAL_PRICE_SUCCESS:
+      return {
+        ...state,
+        fetching: false,
+        withdrawalPrice: action.payload,
+      };
+    case EXCHANGE_GET_WITHDRAWAL_PRICE_FAILURE:
       return {
         ...state,
         fetching: false,

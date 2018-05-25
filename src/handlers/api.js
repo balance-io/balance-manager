@@ -10,7 +10,29 @@ import networkList from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
 
 /**
- * @desc get prices
+ * Configuration for cryptocompare api
+ * @type axios instance
+ */
+const cryptocompare = axios.create({
+  baseURL: 'https://min-api.cryptocompare.com/data/',
+  timeout: 30000, // 30 secs
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+});
+
+/**
+ * @desc get single asset price
+ * @param  {String}   [asset='']
+ * @param  {String}   [native='USD']
+ * @return {Promise}
+ */
+export const apiGetSinglePrice = (asset = '', native = 'USD') =>
+  cryptocompare.get(`/price?fsym=${asset}&tsyms=${native}`);
+
+/**
+ * @desc get all assets prices
  * @param  {Array}   [asset=[]]
  * @return {Promise}
  */
@@ -20,8 +42,8 @@ export const apiGetPrices = (assets = []) => {
     /[[\]"]/gi,
     '',
   );
-  return axios.get(
-    `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}`,
+  return cryptocompare.get(
+    `/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}`,
   );
 };
 

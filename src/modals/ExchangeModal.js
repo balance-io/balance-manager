@@ -40,7 +40,7 @@ import {
 } from '../helpers/bignumber';
 import { getCountdown } from '../helpers/time';
 import { capitalize } from '../helpers/utilities';
-import { fonts, colors } from '../styles';
+import { fonts, colors, transitions } from '../styles';
 
 const StyledSuccessMessage = styled.div`
   width: 100%;
@@ -156,10 +156,21 @@ const StyledAmountCurrency = styled.div`
   right: 6px;
   padding: 4px;
   border-radius: 6px;
-  background: ${({ fetching }) => (fetching ? 'none' : `rgb(${colors.white})`)};
+  transition: ${transitions.base};
+  color: ${({ selected }) =>
+    selected ? `rgb(${colors.white})` : `rgba(${colors.darkGrey}, 0.7)`};
+  background: ${({ fetching, selected }) =>
+    fetching
+      ? 'none'
+      : selected
+        ? `rgb(${colors.dark})`
+        : `rgb(${colors.white})`};
   font-size: ${fonts.size.medium};
-  color: rgba(${colors.darkGrey}, 0.7);
   opacity: ${({ fetching }) => (fetching ? '0.5' : '1')};
+`;
+
+const StyledNativeCurrency = styled(StyledAmountCurrency)`
+  right: 44px;
 `;
 
 const StyledExchangeIcon = styled.div`
@@ -243,6 +254,7 @@ const StyledMessage = styled.div`
 class ExchangeModal extends Component {
   state = {
     activeInput: '',
+    withdrawalNative: false,
   };
   componentDidMount() {
     this.props.exchangeModalInit();
@@ -261,6 +273,11 @@ class ExchangeModal extends Component {
       this.props.exchangeUpdateDepositAmount(exchangeDetails.min);
     }
   };
+  toggleWithdrawalNative = bool =>
+    this.setState({
+      withdrawalNative:
+        typeof bool !== 'undefined' ? bool : !this.state.withdrawalNative,
+    });
   onExchangeMaxBalance = () => this.props.exchangeMaxBalance();
   onExchangeAnother = () => {
     this.props.exchangeToggleConfirmationView();
@@ -376,18 +393,6 @@ class ExchangeModal extends Component {
             this.props.depositSelected.symbol
           ]
         : null;
-    const price =
-      exchangeDetails && depositPrices
-        ? convertAmountToDisplay(
-            convertAmountToBigNumber(
-              multiply(
-                convertAmountFromBigNumber(depositPrices.price.amount),
-                divide(1, exchangeDetails.quotedRate),
-              ),
-            ),
-            this.props.prices,
-          )
-        : null;
     const depositMin = exchangeDetails
       ? convertAmountToDisplay(
           convertAmountToBigNumber(exchangeDetails.min),
@@ -435,12 +440,14 @@ class ExchangeModal extends Component {
           )
         : null;
     const withdrawalValue =
-      exchangeDetails && depositPrices && this.props.withdrawalAmount
+      this.props.withdrawalAmount &&
+      this.props.withdrawalPrice &&
+      this.props.withdrawalPrice.amount
         ? convertAmountToDisplay(
-            convertAmountToBigNumber(
+            convertAmountFromBigNumber(
               multiply(
-                convertAmountFromBigNumber(depositPrices.price.amount),
-                divide(this.props.withdrawalAmount, exchangeDetails.quotedRate),
+                convertAmountToBigNumber(this.props.withdrawalAmount),
+                this.props.withdrawalPrice.amount,
               ),
             ),
             this.props.prices,
@@ -511,7 +518,7 @@ class ExchangeModal extends Component {
                       </StyledHelperText>
                       <StyledHelperText fetching={this.props.fetchingRate}>
                         <strong>{lang.t('modal.helper_price')}</strong>
-                        <p>{price || '———'}</p>
+                        <p>{this.props.withdrawalPrice.display || '———'}</p>
                       </StyledHelperText>
                     </StyledHelperContainer>
                   </StyledHelperWrapper>
@@ -586,13 +593,33 @@ class ExchangeModal extends Component {
                         label={lang.t('modal.withdrawal_input_label')}
                         type="text"
                         value={this.props.withdrawalAmount}
-                        onChange={({ target }) =>
-                          this.props.exchangeUpdateWithdrawalAmount(
-                            target.value,
-                          )
-                        }
+                        onChange={({ target }) => {
+                          if (this.state.withdrawalNative) {
+                            this.props.exchangeUpdateWithdrawalAmount(
+                              target.value,
+                            );
+                          } else {
+                            this.props.exchangeUpdateWithdrawalAmount(
+                              target.value,
+                            );
+                          }
+                        }}
                       />
+                      <StyledNativeCurrency
+                        onClick={() => this.toggleWithdrawalNative(true)}
+                        selected={this.state.withdrawalNative}
+                        fetching={
+                          this.props.fetchingRate &&
+                          this.state.activeInput !== 'WITHDRAWAL'
+                        }
+                      >
+                        {this.props.prices && this.props.prices.selected
+                          ? this.props.prices.selected.currency
+                          : 'USD'}
+                      </StyledNativeCurrency>
                       <StyledAmountCurrency
+                        onClick={() => this.toggleWithdrawalNative(false)}
+                        selected={!this.state.withdrawalNative}
                         fetching={
                           this.props.fetchingRate &&
                           this.state.activeInput !== 'WITHDRAWAL'
@@ -804,6 +831,7 @@ ExchangeModal.propTypes = {
   withdrawalSelected: PropTypes.object.isRequired,
   depositAmount: PropTypes.string.isRequired,
   withdrawalAmount: PropTypes.string.isRequired,
+  withdrawalPrice: PropTypes.object.isRequired,
   accountInfo: PropTypes.object.isRequired,
   accountType: PropTypes.string.isRequired,
   network: PropTypes.string.isRequired,
@@ -830,6 +858,7 @@ const reduxProps = ({ modal, exchange, account }) => ({
   withdrawalSelected: exchange.withdrawalSelected,
   depositAmount: exchange.depositAmount,
   withdrawalAmount: exchange.withdrawalAmount,
+  withdrawalPrice: exchange.withdrawalPrice,
   accountInfo: account.accountInfo,
   accountType: account.accountType,
   network: account.network,

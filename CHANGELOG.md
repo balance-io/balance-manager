@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Changed
 
+* Fix txn fee conversion
 * Layout padding definition locations
 * DrodpownAsset improved logic
 * Refactor Send and Exchange modals/reducers for consistency

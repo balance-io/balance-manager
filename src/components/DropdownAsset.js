@@ -136,7 +136,6 @@ class DropdownAsset extends Component {
       });
     }
     const empty = !Object.keys(options).length;
-    console.log(options);
     return (
       <ClickOutside onClickOutside={this.onClickOutside}>
         <StyledWrapper show={this.state.showDropdown} {...props}>

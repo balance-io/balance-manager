@@ -265,6 +265,11 @@ export const apiShapeshiftSendAmount = async ({
     } else {
       body.depositAmount = min;
     }
+    const shapeshiftApiKey = process.env.REACT_APP_SHAPESHIFT_API_KEY || '';
+    if (shapeshiftApiKey) {
+      body.apiKey = shapeshiftApiKey;
+    }
+    console.log('shapeshift sendamount body', body);
     const response = await shapeshift.post(`/sendamount`, body);
     if (response.data.success) {
       response.data.success.min = min;

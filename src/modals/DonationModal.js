@@ -33,11 +33,7 @@ import {
   add,
   greaterThan,
 } from '../helpers/bignumber';
-import {
-  capitalize,
-  getEth,
-  balanceManagerEthAddress,
-} from '../helpers/utilities';
+import { capitalize, getEth } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 
 const StyledSuccessMessage = styled.div`
@@ -194,6 +190,10 @@ const StyledActions = styled.div`
   }
 `;
 
+const balanceManagerEthAddress =
+  process.env.REACT_APP_SHAPESHIFT_API_KEY ||
+  '0x0000000000000000000000000000000000000000';
+
 class DonationModal extends Component {
   componentDidMount() {
     this.props.sendModalInit();
@@ -267,7 +267,7 @@ class DonationModal extends Component {
               <div>
                 <DropdownAsset
                   selected={'ETH'}
-                  assets={this.props.accountInfo.assets}
+                  assets={[getEth(this.props.accountInfo.assets)]}
                 />
               </div>
 

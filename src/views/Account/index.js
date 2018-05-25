@@ -58,6 +58,9 @@ const StyledAddressWrapper = styled.div`
 const StyledActions = styled.div`
   display: flex;
   justify-content: flex-end;
+  & button {
+    margin-left: 8px;
+  }
   @media screen and (${responsive.sm.max}) {
     justify-content: space-between;
     & button {

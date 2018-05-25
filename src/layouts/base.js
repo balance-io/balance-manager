@@ -6,7 +6,7 @@ import lang from '../languages';
 import Link from '../components/Link';
 import Dropdown from '../components/Dropdown';
 import Background from '../components/Background';
-import Button from '../components/Button';
+import TextButton from '../components/TextButton';
 import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
 import Notification from '../components/Notification';
@@ -94,6 +94,28 @@ const StyledVerticalLine = styled.div`
   border-left: 2px solid rgba(${colors.lightGrey}, 0.1);
 `;
 
+const StyledFooter = styled.div`
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  display: flex;
+`;
+
+const StyledFooterLeft = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+`;
+
+const StyledFooterRight = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`;
+
 const BaseLayout = ({
   children,
   metamaskFetching,
@@ -166,12 +188,20 @@ const BaseLayout = ({
               options={nativeCurrencies}
               onChange={accountChangeNativeCurrency}
             />
-            <StyledVerticalLine />
-            <Button onClick={openSendModal}>{lang.t('button.donate')}</Button>
           </StyledIndicators>
         </StyledHeader>
         <StyledContent>{children}</StyledContent>
       </Column>
+      <StyledFooter>
+        <StyledFooterLeft>
+          <div />
+        </StyledFooterLeft>
+        <StyledFooterRight>
+          <TextButton onClick={openSendModal}>
+            {lang.t('button.donate')}
+          </TextButton>
+        </StyledFooterRight>
+      </StyledFooter>
       <Modals />
       <Notification />
       <Warning />

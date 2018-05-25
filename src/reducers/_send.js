@@ -159,7 +159,7 @@ export const sendTransaction = () => (dispatch, getState) => {
     gasPrice,
     gasLimit,
     accountType,
-  } = getState().account;
+  } = getState().send;
   const txDetails = {
     asset: selected,
     from: address,

@@ -112,7 +112,8 @@ const StyledHelperText = styled.div`
     &:hover {
       opacity: 0.7;
     }
-  `} & p {
+  `};
+  & p {
     color: ${({ warn }) =>
       warn ? `rgb(${colors.red})` : `rgb(${colors.grey})`};
     font-size: 13px;
@@ -159,6 +160,19 @@ const StyledAmountCurrency = styled.div`
   right: 6px;
   padding: 4px;
   border-radius: 6px;
+  color: rgba(${colors.darkGrey}, 0.7);
+  background: rgb(${colors.white});
+  font-size: ${fonts.size.medium};
+  opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
+`;
+
+const StyledStaticCurrency = styled(StyledAmountCurrency)`
+  cursor: default;
+  color: rgb(${colors.dark});
+`;
+
+const StyledDynamicCurrency = styled(StyledAmountCurrency)`
+  cursor: pointer;
   transition: ${transitions.short};
   color: ${({ selected }) =>
     selected ? `rgb(${colors.white})` : `rgba(${colors.darkGrey}, 0.7)`};
@@ -170,11 +184,13 @@ const StyledAmountCurrency = styled.div`
       : selected
         ? `rgb(${colors.dark})`
         : `rgb(${colors.white})`};
-  font-size: ${fonts.size.medium};
-  opacity: ${({ fetching }) => (fetching ? '0.5' : '1')};
+  &:hover {
+    background: ${({ disabled, fetching, selected }) =>
+      !fetching && !selected && !disabled && `rgb(${colors.dark}, 0.1)`};
+  }
 `;
 
-const StyledNativeCurrency = styled(StyledAmountCurrency)`
+const StyledNativeCurrency = styled(StyledDynamicCurrency)`
   right: 46px;
 `;
 
@@ -287,11 +303,11 @@ class ExchangeModal extends Component {
       this.props.exchangeUpdateDepositAmount(exchangeDetails.min);
     }
   };
-  toggleWithdrawalNative = bool =>
-    this.setState({
-      showWithdrawalNative:
-        typeof bool !== 'undefined' ? bool : !this.props.showWithdrawalNative,
-    });
+  onToggleWithdrawalNative = bool => {
+    if (this.props.fetchingRate && this.state.activeInput !== 'WITHDRAWAL')
+      return;
+    this.props.exchangeToggleWithdrawalNative(bool);
+  };
   onExchangeMaxBalance = () => this.props.exchangeMaxBalance();
   onExchangeAnother = () => {
     this.props.exchangeToggleConfirmationView();
@@ -562,14 +578,14 @@ class ExchangeModal extends Component {
                       <StyledMaxBalance onClick={this.onExchangeMaxBalance}>
                         {lang.t('modal.exchange_max')}
                       </StyledMaxBalance>
-                      <StyledAmountCurrency
-                        fetching={
+                      <StyledStaticCurrency
+                        disabled={
                           this.props.fetchingRate &&
                           this.state.activeInput !== 'DEPOSIT'
                         }
                       >
                         {this.props.depositSelected.symbol}
-                      </StyledAmountCurrency>
+                      </StyledStaticCurrency>
                       <StyledHelperContainer>
                         <StyledHelperText
                           onClick={this.onExchangeMin}
@@ -612,11 +628,9 @@ class ExchangeModal extends Component {
                         onChange={this.onChangeWithdrawalInput}
                       />
                       <StyledNativeCurrency
-                        onClick={() =>
-                          this.props.exchangeToggleWithdrawalNative(true)
-                        }
+                        onClick={() => this.onToggleWithdrawalNative(true)}
                         selected={this.props.showWithdrawalNative}
-                        fetching={
+                        disabled={
                           this.props.fetchingRate &&
                           this.state.activeInput !== 'WITHDRAWAL'
                         }
@@ -625,18 +639,16 @@ class ExchangeModal extends Component {
                           ? this.props.prices.selected.currency
                           : 'USD'}
                       </StyledNativeCurrency>
-                      <StyledAmountCurrency
-                        onClick={() =>
-                          this.props.exchangeToggleWithdrawalNative(false)
-                        }
+                      <StyledDynamicCurrency
+                        onClick={() => this.onToggleWithdrawalNative(false)}
                         selected={!this.props.showWithdrawalNative}
-                        fetching={
+                        disabled={
                           this.props.fetchingRate &&
                           this.state.activeInput !== 'WITHDRAWAL'
                         }
                       >
                         {this.props.withdrawalSelected.symbol}
-                      </StyledAmountCurrency>
+                      </StyledDynamicCurrency>
                       <StyledHelperContainer>
                         <StyledHelperText
                           fetching={this.props.fetchingRate}
@@ -681,12 +693,12 @@ class ExchangeModal extends Component {
                               : '$0.00'
                           }${
                             this.props.nativeCurrency !== 'ETH'
-                              ? ` (${
+                              ? ` ≈ ${
                                   Object.keys(this.props.gasPrice).length &&
                                   this.props.gasPrice.txFee
                                     ? this.props.gasPrice.txFee.value.display
                                     : '0.000 ETH'
-                                })`
+                                }`
                               : ''
                           }`}</p>
                         </StyledHelperText>
@@ -695,7 +707,7 @@ class ExchangeModal extends Component {
                           <p>{`${
                             exchangeFeeNative ? exchangeFeeNative : '$0.00'
                           }${
-                            exchangeFeeValue ? ` (${exchangeFeeValue})` : ''
+                            exchangeFeeValue ? ` ≈ ${exchangeFeeValue}` : ''
                           }`}</p>
                         </StyledHelperText>
                       </StyledHelperContainer>

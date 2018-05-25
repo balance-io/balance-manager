@@ -80,6 +80,22 @@ const StyledParagraph = styled.p`
   font-weight: ${fonts.weight.medium};
 `;
 
+const StyledFees = styled.div`
+  margin: 10px 0;
+  text-align: center;
+  & p {
+    color: rgb(${colors.grey});
+    font-size: 13px;
+    font-weight: ${fonts.weight.normal};
+  }
+  & strong {
+    color: rgb(${colors.grey});
+    font-size: 13px;
+    font-weight: ${fonts.weight.semibold};
+    margin-bottom: 8px;
+  }
+`;
+
 const StyledHash = styled.p`
   font-size: ${fonts.size.small};
   font-weight: 600;
@@ -569,9 +585,9 @@ class SendModal extends Component {
                   <Button onClick={this.onClose}>
                     {lang.t('button.cancel')}
                   </Button>
-                  <StyledParagraph>
-                    <span>{`${lang.t('modal.gas_fee')}: `}</span>
-                    <span>{`${
+                  <StyledFees>
+                    <strong>{lang.t('modal.tx_fee')}</strong>
+                    <p>{`${
                       this.props.gasPrices[this.props.gasPriceOption] &&
                       this.props.gasPrices[this.props.gasPriceOption].txFee
                         .native
@@ -584,15 +600,15 @@ class SendModal extends Component {
                           }0.00`
                     }${
                       this.props.nativeCurrency !== 'ETH'
-                        ? ` (${
+                        ? ` ≈ ${
                             this.props.gasPrices[this.props.gasPriceOption]
                               ? this.props.gasPrices[this.props.gasPriceOption]
                                   .txFee.value.display
                               : '0.000 ETH'
-                          })`
+                          }`
                         : ''
-                    }`}</span>
-                  </StyledParagraph>
+                    }`}</p>
+                  </StyledFees>
                   <Button
                     left
                     color="blue"

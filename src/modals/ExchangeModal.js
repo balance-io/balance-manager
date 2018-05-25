@@ -489,7 +489,6 @@ class ExchangeModal extends Component {
           : null;
     return (
       <Card
-        maxWidth={700}
         allowOverflow
         background="lightGrey"
         fetching={this.props.fetching || this.props.fetchingShapeshift}

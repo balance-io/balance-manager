@@ -400,7 +400,7 @@ class SendModal extends Component {
 
   render = () => {
     return (
-      <Card maxWidth={600} background="lightGrey">
+      <Card background="lightGrey">
         {!this.props.txHash ? (
           !this.props.confirm ? (
             <Form onSubmit={this.onSubmit}>

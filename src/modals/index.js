@@ -78,9 +78,7 @@ class Modal extends Component {
       <StyledLightbox modal={this.props.modal}>
         <StyledContainer>
           <StyledHitbox onClick={this.onClose} />
-          <Column maxWidth={1000} center>
-            {this.modalController()}
-          </Column>
+          <Column center>{this.modalController()}</Column>
         </StyledContainer>
       </StyledLightbox>
     );

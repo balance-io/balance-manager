@@ -19,7 +19,6 @@ import { colors, fonts, responsive } from '../../styles';
 
 const StyledAccount = styled.div`
   width: 100%;
-  margin-bottom: 60px;
 `;
 
 const StyledFlex = styled.div`
@@ -58,6 +57,9 @@ const StyledAddressWrapper = styled.div`
 const StyledActions = styled.div`
   display: flex;
   justify-content: flex-end;
+  & button {
+    margin-left: 8px;
+  }
   @media screen and (${responsive.sm.max}) {
     justify-content: space-between;
     & button {

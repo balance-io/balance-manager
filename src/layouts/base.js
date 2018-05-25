@@ -2,13 +2,16 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
+import lang from '../languages';
 import Link from '../components/Link';
 import Dropdown from '../components/Dropdown';
 import Background from '../components/Background';
+import TextButton from '../components/TextButton';
 import Wrapper from '../components/Wrapper';
 import Column from '../components/Column';
 import Notification from '../components/Notification';
 import Warning from '../components/Warning';
+import { modalOpen } from '../reducers/_modal';
 import Modals from '../modals';
 import balanceManagerLogo from '../assets/balance-manager-logo.svg';
 import ethereumNetworks from '../references/ethereum-networks.json';
@@ -91,6 +94,28 @@ const StyledVerticalLine = styled.div`
   border-left: 2px solid rgba(${colors.lightGrey}, 0.1);
 `;
 
+const StyledFooter = styled.div`
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  display: flex;
+`;
+
+const StyledFooterLeft = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+`;
+
+const StyledFooterRight = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`;
+
 const BaseLayout = ({
   children,
   metamaskFetching,
@@ -105,6 +130,7 @@ const BaseLayout = ({
   network,
   web3Available,
   online,
+  modalOpen,
   ...props
 }) => {
   const addresses = {};
@@ -119,6 +145,7 @@ const BaseLayout = ({
     ((accountType === 'METAMASK' && web3Available) ||
       accountType !== 'METAMASK') &&
     accountAddress;
+  const openSendModal = () => modalOpen('DONATION_MODAL');
   return (
     <StyledLayout>
       <ReminderRibbon maxWidth={1000} />
@@ -165,6 +192,18 @@ const BaseLayout = ({
         </StyledHeader>
         <StyledContent>{children}</StyledContent>
       </Column>
+      <StyledFooter>
+        <StyledFooterLeft>
+          <div />
+        </StyledFooterLeft>
+        <StyledFooterRight>
+          {window.location.pathname !== '/' && (
+            <TextButton onClick={openSendModal}>
+              {lang.t('button.donate')}
+            </TextButton>
+          )}
+        </StyledFooterRight>
+      </StyledFooter>
       <Modals />
       <Notification />
       <Warning />
@@ -185,6 +224,7 @@ BaseLayout.propTypes = {
   network: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
   online: PropTypes.bool.isRequired,
+  modalOpen: PropTypes.func.isRequired,
 };
 
 const reduxProps = ({ account, ledger, metamask, warning }) => ({
@@ -203,4 +243,5 @@ export default connect(reduxProps, {
   ledgerUpdateNetwork,
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
+  modalOpen,
 })(BaseLayout);

@@ -686,28 +686,28 @@ class ExchangeModal extends Component {
                         <StyledHelperText>
                           <strong>{lang.t('modal.tx_fee')}</strong>
                           <p>{`${
+                            this.props.nativeCurrency !== 'ETH'
+                              ? `${
+                                  Object.keys(this.props.gasPrice).length &&
+                                  this.props.gasPrice.txFee
+                                    ? this.props.gasPrice.txFee.value.display
+                                    : '0.000 ETH'
+                                }  ≈ `
+                              : ''
+                          }${
                             Object.keys(this.props.gasPrice).length &&
                             this.props.gasPrice.txFee &&
                             this.props.gasPrice.txFee.native
                               ? this.props.gasPrice.txFee.native.value.display
                               : '$0.00'
-                          }${
-                            this.props.nativeCurrency !== 'ETH'
-                              ? ` ≈ ${
-                                  Object.keys(this.props.gasPrice).length &&
-                                  this.props.gasPrice.txFee
-                                    ? this.props.gasPrice.txFee.value.display
-                                    : '0.000 ETH'
-                                }`
-                              : ''
                           }`}</p>
                         </StyledHelperText>
                         <StyledHelperText>
                           <strong>{lang.t('modal.exchange_fee')}</strong>
                           <p>{`${
-                            exchangeFeeNative ? exchangeFeeNative : '$0.00'
+                            exchangeFeeValue ? `${exchangeFeeValue}  ≈ ` : ''
                           }${
-                            exchangeFeeValue ? ` ≈ ${exchangeFeeValue}` : ''
+                            exchangeFeeNative ? exchangeFeeNative : '$0.00'
                           }`}</p>
                         </StyledHelperText>
                       </StyledHelperContainer>

@@ -8,6 +8,8 @@ import {
 import { parseError, parseGasPrices } from '../handlers/parsers';
 import { web3SendTransactionMultiWallet } from '../handlers/web3';
 import {
+  divide,
+  multiply,
   subtract,
   greaterThan,
   greaterThanOrEqual,
@@ -73,10 +75,16 @@ const EXCHANGE_UPDATE_DEPOSIT_SELECTED =
 const EXCHANGE_UPDATE_WITHDRAWAL_SELECTED =
   'exchange/EXCHANGE_UPDATE_WITHDRAWAL_SELECTED';
 
+const EXCHANGE_UPDATE_WITHDRAWAL_NATIVE =
+  'exchange/EXCHANGE_UPDATE_WITHDRAWAL_NATIVE';
+
 const EXCHANGE_UPDATE_COUNTDOWN = 'exchange/EXCHANGE_UPDATE_COUNTDOWN';
 
 const EXCHANGE_TOGGLE_CONFIRMATION_VIEW =
   'exchange/EXCHANGE_TOGGLE_CONFIRMATION_VIEW';
+
+const EXCHANGE_TOGGLE_WITHDRAWAL_NATIVE =
+  'exchange/EXCHANGE_TOGGLE_WITHDRAWAL_NATIVE';
 
 const EXCHANGE_UPDATE_EXCHANGE_DETAILS =
   'exchange/EXCHANGE_UPDATE_EXCHANGE_DETAILS';
@@ -101,6 +109,29 @@ export const exchangeGetGasPrices = () => (dispatch, getState) => {
       const message = parseError(error);
       dispatch(notificationShow(message, true));
       dispatch({ type: EXCHANGE_GET_GAS_PRICE_FAILURE });
+    });
+};
+
+export const exchangeGetWithdrawalPrice = () => (dispatch, getState) => {
+  const { withdrawalSelected } = getState().exchange;
+  const { prices } = getState().account;
+  dispatch({ type: EXCHANGE_GET_WITHDRAWAL_PRICE_REQUEST });
+  const nativeSelected = prices.selected.currency;
+  const withdrawalSymbol = withdrawalSelected.symbol;
+  apiGetSinglePrice(withdrawalSymbol, nativeSelected)
+    .then(({ data }) => {
+      const amount = convertAmountToBigNumber(data[nativeSelected]);
+      const display = convertAmountToDisplay(amount, prices);
+      const withdrawalPrice = { amount, display };
+      dispatch({
+        type: EXCHANGE_GET_WITHDRAWAL_PRICE_SUCCESS,
+        payload: withdrawalPrice,
+      });
+    })
+    .catch(error => {
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+      dispatch({ type: EXCHANGE_GET_WITHDRAWAL_PRICE_FAILURE });
     });
 };
 
@@ -172,6 +203,7 @@ export const exchangeUpdateWithdrawalSelected = value => (
     type: EXCHANGE_UPDATE_WITHDRAWAL_SELECTED,
     payload: { depositSelected, withdrawalSelected },
   });
+  dispatch(exchangeGetWithdrawalPrice());
   if (priorityInput === 'DEPOSIT') {
     dispatch(exchangeUpdateDepositAmount(depositAmount, false));
   } else {
@@ -187,14 +219,21 @@ export const exchangeUpdateDepositAmount = (
     withdrawalAmount,
     depositSelected,
     withdrawalSelected,
+    withdrawalPrice,
   } = getState().exchange;
   depositAmount = `${depositAmount}`.replace(/[^0-9.]/g, '');
   if (!depositAmount) {
     withdrawalAmount = '';
   }
+  const withdrawalNative = withdrawalAmount
+    ? multiply(
+        withdrawalAmount,
+        convertAmountFromBigNumber(withdrawalPrice.amount),
+      )
+    : '';
   dispatch({
     type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_REQUEST,
-    payload: { depositAmount, withdrawalAmount },
+    payload: { depositAmount, withdrawalAmount, withdrawalNative },
   });
   const getExchangeDetailsPromise = timeoutEnabled => {
     if (depositAmount || !timeoutEnabled) {
@@ -212,6 +251,13 @@ export const exchangeUpdateDepositAmount = (
           if (!result.exchangeDetails) {
             result.exchangeDetails = getState().exchange.exchangeDetails;
           }
+          const withdrawalNative = result.withdrawalAmount
+            ? multiply(
+                result.withdrawalAmount,
+                convertAmountFromBigNumber(withdrawalPrice.amount),
+              )
+            : '';
+          result.withdrawalNative = withdrawalNative;
           dispatch({
             type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_SUCCESS,
             payload: result,
@@ -246,21 +292,34 @@ export const exchangeUpdateDepositAmount = (
 export const exchangeUpdateWithdrawalAmount = (
   withdrawalAmount = '',
   timeout = false,
+  disableNative = false,
 ) => (dispatch, getState) => {
   let {
     depositAmount,
     depositSelected,
     withdrawalSelected,
+    withdrawalPrice,
+    withdrawalNative,
   } = getState().exchange;
   withdrawalAmount = `${withdrawalAmount}`.replace(/[^0-9.]/g, '');
   if (!withdrawalAmount) {
     depositAmount = '';
   }
+  console.log('disableNative', disableNative);
+  withdrawalNative = disableNative
+    ? withdrawalNative
+    : withdrawalAmount
+      ? multiply(
+          withdrawalAmount,
+          convertAmountFromBigNumber(withdrawalPrice.amount),
+        )
+      : '';
   dispatch({
     type: EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_REQUEST,
     payload: {
       fetchingRate: !!withdrawalAmount,
       withdrawalAmount,
+      withdrawalNative,
       depositAmount,
     },
   });
@@ -311,6 +370,22 @@ export const exchangeUpdateWithdrawalAmount = (
   }
 };
 
+export const exchangeUpdateWithdrawalNative = withdrawalNative => (
+  dispatch,
+  getState,
+) => {
+  const { withdrawalPrice } = getState().exchange;
+  const withdrawalAmount = divide(
+    withdrawalNative,
+    convertAmountFromBigNumber(withdrawalPrice.amount),
+  );
+  dispatch({
+    type: EXCHANGE_UPDATE_WITHDRAWAL_NATIVE,
+    payload: { withdrawalNative, withdrawalAmount },
+  });
+  dispatch(exchangeUpdateWithdrawalAmount(withdrawalAmount, false, true));
+};
+
 export const exchangeMaxBalance = () => (dispatch, getState) => {
   const { depositSelected, gasPrice, exchangeDetails } = getState().exchange;
   const { accountInfo } = getState().account;
@@ -332,29 +407,6 @@ export const exchangeMaxBalance = () => (dispatch, getState) => {
     amount = exchangeDetails.maxLimit;
   }
   dispatch(exchangeUpdateDepositAmount(amount));
-};
-
-export const exchangeGetWithdrawalPrice = () => (dispatch, getState) => {
-  const { withdrawalSelected } = getState().exchange;
-  const { prices } = getState().account;
-  dispatch({ type: EXCHANGE_GET_WITHDRAWAL_PRICE_REQUEST });
-  const nativeSelected = prices.selected.currency;
-  const withdrawalSymbol = withdrawalSelected.symbol;
-  apiGetSinglePrice(withdrawalSymbol, nativeSelected)
-    .then(({ data }) => {
-      const amount = convertAmountToBigNumber(data[nativeSelected]);
-      const display = convertAmountToDisplay(amount, prices);
-      const withdrawalPrice = { amount, display };
-      dispatch({
-        type: EXCHANGE_GET_WITHDRAWAL_PRICE_SUCCESS,
-        payload: withdrawalPrice,
-      });
-    })
-    .catch(error => {
-      const message = parseError(error);
-      dispatch(notificationShow(message, true));
-      dispatch({ type: EXCHANGE_GET_WITHDRAWAL_PRICE_FAILURE });
-    });
 };
 
 export const exchangeModalInit = () => (dispatch, getState) => {
@@ -517,6 +569,23 @@ export const exchangeUpdateExchangeDetails = exchangeDetails => ({
   payload: exchangeDetails,
 });
 
+export const exchangeToggleWithdrawalNative = bool => (dispatch, getState) => {
+  let {
+    showWithdrawalNative,
+    withdrawalNative,
+    withdrawalAmount,
+  } = getState().exchange;
+  showWithdrawalNative =
+    typeof bool !== 'undefined' ? bool : !showWithdrawalNative;
+  const withdrawalInput = showWithdrawalNative
+    ? withdrawalNative
+    : withdrawalAmount;
+  dispatch({
+    type: EXCHANGE_TOGGLE_WITHDRAWAL_NATIVE,
+    payload: { showWithdrawalNative, withdrawalInput },
+  });
+};
+
 export const exchangeClearFields = () => (dispatch, getState) => {
   dispatch({ type: EXCHANGE_CLEAR_FIELDS });
   const { shapeshiftAvailable } = getState().account;
@@ -555,6 +624,9 @@ const INITIAL_STATE = {
   withdrawalSelected: { symbol: 'ZRX', decimals: 18 },
   depositAmount: '',
   withdrawalAmount: '',
+  withdrawalNative: '',
+  showWithdrawalNative: false,
+  withdrawalInput: '',
   withdrawalPrice: { amount: '', display: '' },
 };
 
@@ -597,21 +669,10 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         fetching: false,
       };
-    case EXCHANGE_GET_WITHDRAWAL_PRICE_REQUEST:
-      return {
-        ...state,
-        fetching: true,
-      };
     case EXCHANGE_GET_WITHDRAWAL_PRICE_SUCCESS:
       return {
         ...state,
-        fetching: false,
         withdrawalPrice: action.payload,
-      };
-    case EXCHANGE_GET_WITHDRAWAL_PRICE_FAILURE:
-      return {
-        ...state,
-        fetching: false,
       };
     case EXCHANGE_CONFIRM_TRANSACTION_REQUEST:
       return {
@@ -653,6 +714,10 @@ export default (state = INITIAL_STATE, action) => {
         fetchingRate: true,
         depositAmount: action.payload.depositAmount,
         withdrawalAmount: action.payload.withdrawalAmount,
+        withdrawalNative: action.payload.withdrawalNative,
+        withdrawalInput: state.showWithdrawalNative
+          ? action.payload.withdrawalNative
+          : action.payload.withdrawalAmount,
       };
     case EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_REQUEST:
       return {
@@ -661,6 +726,10 @@ export default (state = INITIAL_STATE, action) => {
         fetchingRate: action.payload.fetchingRate,
         depositAmount: action.payload.depositAmount,
         withdrawalAmount: action.payload.withdrawalAmount,
+        withdrawalNative: action.payload.withdrawalNative,
+        withdrawalInput: state.showWithdrawalNative
+          ? action.payload.withdrawalNative
+          : action.payload.withdrawalAmount,
       };
     case EXCHANGE_UPDATE_DEPOSIT_AMOUNT_SUCCESS:
       return {
@@ -668,6 +737,10 @@ export default (state = INITIAL_STATE, action) => {
         fetchingRate: false,
         exchangeDetails: action.payload.exchangeDetails,
         withdrawalAmount: action.payload.withdrawalAmount,
+        withdrawalNative: action.payload.withdrawalNative,
+        withdrawalInput: state.showWithdrawalNative
+          ? action.payload.withdrawalNative
+          : action.payload.withdrawalAmount,
       };
     case EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_SUCCESS:
       return {
@@ -701,6 +774,21 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, countdown: action.payload };
     case EXCHANGE_TOGGLE_CONFIRMATION_VIEW:
       return { ...state, countdown: '', confirm: !state.confirm };
+    case EXCHANGE_UPDATE_WITHDRAWAL_NATIVE:
+      return {
+        ...state,
+        withdrawalAmount: action.payload.withdrawalAmount,
+        withdrawalNative: action.payload.withdrawalNative,
+        withdrawalInput: state.showWithdrawalNative
+          ? action.payload.withdrawalNative
+          : action.payload.withdrawalAmount,
+      };
+    case EXCHANGE_TOGGLE_WITHDRAWAL_NATIVE:
+      return {
+        ...state,
+        showWithdrawalNative: action.payload.showWithdrawalNative,
+        withdrawalInput: action.payload.withdrawalInput,
+      };
     case EXCHANGE_CLEAR_FIELDS:
       return { ...state, ...INITIAL_STATE };
     default:

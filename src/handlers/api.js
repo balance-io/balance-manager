@@ -316,7 +316,7 @@ export const apiShapeshiftGetExchangeDetails = ({
     exchangeDetails = data.success;
     result = { exchangeDetails };
     if (exchangeDetails.error) {
-      inputTwo = '0';
+      inputTwo = '';
     } else if (!inputOne) {
       inputTwo = '';
     } else {

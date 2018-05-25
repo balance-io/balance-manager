@@ -197,9 +197,11 @@ const BaseLayout = ({
           <div />
         </StyledFooterLeft>
         <StyledFooterRight>
-          <TextButton onClick={openSendModal}>
-            {lang.t('button.donate')}
-          </TextButton>
+          {window.location.pathname !== '/' && (
+            <TextButton onClick={openSendModal}>
+              {lang.t('button.donate')}
+            </TextButton>
+          )}
         </StyledFooterRight>
       </StyledFooter>
       <Modals />

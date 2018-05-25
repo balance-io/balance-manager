@@ -191,7 +191,7 @@ const StyledActions = styled.div`
 `;
 
 const balanceManagerEthAddress =
-  process.env.REACT_APP_SHAPESHIFT_API_KEY ||
+  process.env.REACT_APP_DONATION_ADDRESS ||
   '0x0000000000000000000000000000000000000000';
 
 class DonationModal extends Component {

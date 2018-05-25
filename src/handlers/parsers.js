@@ -879,6 +879,12 @@ export const parseAccountTransactions = async (
  */
 export const parseHistoricalPrices = async (transactions = null) => {
   if (!transactions.length) return transactions;
+  const ethFeeAsset = {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    address: null,
+    decimals: 18,
+  };
   const _transactions = await Promise.all(
     transactions.map(async (tx, idx) => {
       const timestamp = tx.timestamp ? tx.timestamp.secs : Date.now();
@@ -888,11 +894,13 @@ export const parseHistoricalPrices = async (transactions = null) => {
       }
       if (!tx.native || (tx.native && Object.keys(tx.native).length < 1)) {
         try {
-          const response = await debounceRequest(
-            apiGetHistoricalPrices,
-            [assetSymbol, timestamp],
-            100 * idx,
+          const priceAssets = [assetSymbol, 'ETH'];
+          const promises = priceAssets.map(x =>
+            debounceRequest(apiGetHistoricalPrices, [x, timestamp], 100 * idx),
           );
+          const historicalPriceResponses = await Promise.all(promises);
+          const response = historicalPriceResponses[0];
+          const feeResponse = historicalPriceResponses[1];
 
           if (
             response.data.response === 'Error' ||
@@ -917,6 +925,18 @@ export const parseHistoricalPrices = async (transactions = null) => {
             prices[nativeCurrency][
               assetSymbol
             ].price.display = assetPriceDisplay;
+
+            const feePriceAmount = convertAmountToBigNumber(
+              feeResponse.data['ETH'][nativeCurrency],
+            );
+            prices[nativeCurrency]['ETH'] = {
+              price: { amount: feePriceAmount, display: null },
+            };
+            const feePriceDisplay = convertAmountToDisplay(
+              feePriceAmount,
+              prices,
+            );
+            prices[nativeCurrency]['ETH'].price.display = feePriceDisplay;
             const assetPrice = prices[nativeCurrency][assetSymbol].price;
             let asset = { ...tx.asset };
             if (asset.symbol === 'WETH') {
@@ -936,7 +956,7 @@ export const parseHistoricalPrices = async (transactions = null) => {
               : null;
             const txFeePriceAmount = convertAssetAmountToNativeValue(
               tx.txFee.amount,
-              asset,
+              ethFeeAsset,
               prices,
               tx,
             );

@@ -42,7 +42,7 @@ const StyledRow = styled.div`
   text-align: center;
   outline: none;
   & > div {
-    cursor: pointer;
+    cursor: ${({ noOptions }) => (noOptions ? 'default' : 'pointer')};
     padding: ${({ noOptions }) => (noOptions ? `10px` : `10px 26px 10px 10px`)};
     background-size: 8px;
     display: flex;
@@ -136,6 +136,7 @@ class DropdownAsset extends Component {
       });
     }
     const empty = !Object.keys(options).length;
+    console.log(options);
     return (
       <ClickOutside onClickOutside={this.onClickOutside}>
         <StyledWrapper show={this.state.showDropdown} {...props}>

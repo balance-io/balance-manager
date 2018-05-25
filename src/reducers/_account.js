@@ -399,7 +399,7 @@ export const accountClearState = () => dispatch => {
 const INITIAL_STATE = {
   nativePriceRequest: getLocal('native_currency') || 'USD',
   nativeCurrency: getLocal('native_currency') || 'USD',
-  prices: {},
+  prices: getLocal('native_prices') || {},
   network: 'mainnet',
   accountType: '',
   accountAddress: '',

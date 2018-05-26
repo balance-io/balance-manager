@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Ledger affiliate link to wallet selection screen
 * Donate ETH button and modal
 * Input fetching animation
+* Fix overflow padding for dropdowns
 
 ### Changed
 

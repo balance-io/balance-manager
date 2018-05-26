@@ -43,7 +43,7 @@ const walletConnectListenTransactionStatus = transactionId =>
 
 /**
  * @desc WalletConnect sign transaction
- * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
+ * @param  {Object}  transaction { from, to, data, value, gasPrice, gasLimit }
  * @return {String}
  */
 export const walletConnectSignTransaction = async transaction => {

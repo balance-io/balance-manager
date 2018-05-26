@@ -98,14 +98,9 @@ class TabMenu extends Component {
   constructor() {
     super();
 
-    const tabCharSizes = ['account.tab_balances', 'account.tab_transactions', 'account.tab_interactions']
-      .map(resourceName => lang.t(resourceName).length);
-  
-    this.tabOffset = tabCharSizes[0] * 5;
-
     this.state = {
       activeTab: 'BALANCES_TAB',
-      tabPosition: -87 + this.tabOffset,
+      tabPosition: -87 + this._firstTabOffset()
     };
   }
 
@@ -117,12 +112,13 @@ class TabMenu extends Component {
       ) || '/';
     let newState = this.state;
 
+    const offset = this._firstTabOffset();
     switch (tabRoute) {
       case '/':
-        newState = { activeTab: 'BALANCES_TAB', tabPosition: -87 + this.tabOffset };
+        newState = { activeTab: 'BALANCES_TAB', tabPosition: -87 + offset };
         break;
       case '/transactions':
-        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: this.tabOffset + 51 };
+        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: offset + 51 };
         break;
       case '/interactions':
         newState = { activeTab: 'INTERACTIONS_TAB', tabPosition: 229 };
@@ -176,6 +172,13 @@ class TabMenu extends Component {
         </StyledTabsWrapper>
       </StyledTabMenu>
     );
+  }
+
+  _firstTabOffset() {
+    const tabCharSizes = ['account.tab_balances', 'account.tab_transactions', 'account.tab_interactions']
+        .map(resourceName => lang.t(resourceName).length);
+
+    return tabCharSizes[0] * 5;
   }
 }
 

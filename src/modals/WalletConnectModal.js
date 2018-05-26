@@ -36,7 +36,6 @@ const StyledCenter = styled.div`
 
 class WalletConnectModal extends Component {
   componentDidMount() {
-    console.log('WalletConnectModal', WalletConnectModal);
     this.props.walletConnectModalInit();
   }
   onClose = () => {

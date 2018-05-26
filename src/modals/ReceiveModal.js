@@ -81,7 +81,7 @@ class ReceiveModal extends Component {
   };
   render = () => {
     return (
-      <Card maxWidth={600} background="lightGrey">
+      <Card background="lightGrey">
         <StyledContainer>
           <StyledJustifyContent>
             <StyledSubTitle>

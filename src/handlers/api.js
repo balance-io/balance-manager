@@ -61,8 +61,9 @@ export const apiGetHistoricalPrices = (
     /[[\]"]/gi,
     '',
   );
-  const url = `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`;
-  return axios.get(url);
+  return cryptocompare.get(
+    `/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`,
+  );
 };
 
 /**

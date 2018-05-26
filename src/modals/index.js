@@ -6,6 +6,7 @@ import Column from '../components/Column';
 import ExchangeModal from './ExchangeModal';
 import SendModal from './SendModal';
 import ReceiveModal from './ReceiveModal';
+import DonationModal from './DonationModal';
 import WalletConnectInit from './WalletConnectInit';
 import { modalClose } from '../reducers/_modal';
 import { sendClearFields } from '../reducers/_send';
@@ -51,6 +52,8 @@ class Modal extends Component {
         return <ExchangeModal />;
       case 'SEND_MODAL':
         return <SendModal />;
+      case 'DONATION_MODAL':
+        return <DonationModal />;
       case 'RECEIVE_MODAL':
         return <ReceiveModal />;
       case 'WALLET_CONNECT_INIT':
@@ -75,9 +78,7 @@ class Modal extends Component {
       <StyledLightbox modal={this.props.modal}>
         <StyledContainer>
           <StyledHitbox onClick={this.onClose} />
-          <Column maxWidth={1000} center>
-            {this.modalController()}
-          </Column>
+          <Column center>{this.modalController()}</Column>
         </StyledContainer>
       </StyledLightbox>
     );

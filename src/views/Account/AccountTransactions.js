@@ -326,13 +326,13 @@ class AccountViewTransactions extends Component {
                             {lang.t('account.tx_fee').toUpperCase()}
                           </strong>
                         </p>
-                        <p>{`${tx.txFee.display} (${
+                        <p>{`${tx.txFee.display} ≈ ${
                           tx.native &&
                           tx.native[nativeCurrency] &&
                           tx.native[nativeCurrency].txFee
                             ? tx.native[nativeCurrency].txFee.display
                             : '———'
-                        })`}</p>
+                        }`}</p>
                       </div>
                     </div>
                     <div>

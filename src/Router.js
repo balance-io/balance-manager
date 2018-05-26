@@ -37,8 +37,8 @@ Router.contextTypes = {
 
 const reduxProps = ({ account }) => ({
     language: account.language
-  });
-  
+});
+
 export default withRouter(
   connect(reduxProps, {
     warningOffline,

@@ -13,7 +13,7 @@ export let walletConnectInstance = {
  * @desc init WalletConnect webConnector instance
  * @return {Object}
  */
-export const walletConnectEthInit = async () => {
+export const walletConnectInit = async () => {
   const webConnector = new WebConnector(walletConnectInstance.bridgeDomain, {
     dappName: walletConnectInstance.dappName,
   });

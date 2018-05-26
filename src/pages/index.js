@@ -164,7 +164,7 @@ class Home extends Component {
       this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
       this.props.history.push('/wallet');
     } else {
-      this.props.modalOpen('WALLET_CONNECT_INIT', null);
+      this.props.modalOpen('WALLET_CONNECT', null);
     }
   };
   render = () => (

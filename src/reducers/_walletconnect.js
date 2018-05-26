@@ -4,7 +4,7 @@ import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
 import { accountUpdateAccountAddress } from './_account';
 import {
-  walletConnectEthInit,
+  walletConnectInit,
   walletConnectEthAccounts,
 } from '../handlers/walletconnect';
 
@@ -31,9 +31,9 @@ const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
 let getSessionInterval = null;
 let getTransactionStatusInterval = null;
 
-export const walletConnectInit = () => async (dispatch, getState) => {
+export const walletConnectModalInit = () => async (dispatch, getState) => {
   dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST });
-  walletConnectEthInit()
+  walletConnectInit()
     .then(walletConnectInstance => {
       dispatch({
         type: WALLET_CONNECT_NEW_SESSION_SUCCESS,

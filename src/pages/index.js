@@ -10,7 +10,7 @@ import SubscribeForm from '../components/SubscribeForm';
 import Button from '../components/Button';
 import metamaskLogoImage from '../assets/metamask-logo.png';
 import ledgerLogoImage from '../assets/ledger-logo.svg';
-// import walletConnectLogoImage from '../assets/walletconnect-blue.svg';
+import walletConnectLogoImage from '../assets/walletconnect-blue.svg';
 import trezorLogoImage from '../assets/trezor-logo.svg';
 import { accountUpdateAccountAddress } from '../reducers/_account';
 import { getLocal } from '../handlers/localstorage';
@@ -140,37 +140,22 @@ const TrezorLogo = styled.div`
   width: 109px;
 `;
 
-// const StyledWalletConnect = styled.div`
-//   & p {
-//     margin: 43px 20px 0 196px;
-//   }
-//
-//   @media screen and (max-width: 736px) {
-//     & p {
-//       display: none;
-//     }
-//   }
-// `;
+const StyledWalletConnectLogo = styled.div`
+  margin: 8px 0;
+  height: 54px;
+  background: url(${walletConnectLogoImage});
+  background-size: contain;
+  background-repeat: no-repeat;
+`;
 
-// const StyledWalletConnectLogo = styled.div`
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   width: 173px;
-//   height: 102px;
-//   background: url(${walletConnectLogoImage});
-//   background-size: contain;
-//   background-repeat: no-repeat;
-// `;
-
-// const StyledWalletConnectButton = StyledConnectButton.extend`
-//   &:hover {
-//     background: #454852;
-//   }
-//   &:active {
-//     background: #2b2d33;
-//   }
-// `;
+const StyledWalletConnectButton = ConnectButton.extend`
+  &:hover {
+    background: #454852;
+  }
+  &:active {
+    background: #2b2d33;
+  }
+`;
 
 class Home extends Component {
   onWalletConnectInit = () => {
@@ -179,7 +164,7 @@ class Home extends Component {
       this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
       this.props.history.push('/wallet');
     } else {
-      this.props.modalOpen('WALLET_CONNECT_INIT', null);
+      this.props.modalOpen('WALLET_CONNECT', null);
     }
   };
   render = () => (
@@ -234,23 +219,21 @@ class Home extends Component {
         </CardContainer>
       </StyledCard>
 
-      {/*
       <StyledCard>
         <CardContainer>
-          <StyledWalletConnect>
+          <LogoSection>
             <StyledWalletConnectLogo />
-            <p>{lang.t('homepage.connect_walletconnect')}</p>
-            <StyledWalletConnectButton
-              left
-              color="walletconnect"
-              onClick={this.onWalletConnectInit}
-            >
-              {lang.t('button.connect_walletconnect')}
-            </StyledWalletConnectButton>
-          </StyledWalletConnect>
+            <LogoText>{lang.t('homepage.connect_walletconnect')}</LogoText>
+          </LogoSection>
+          <StyledWalletConnectButton
+            left
+            color="walletconnect"
+            onClick={this.onWalletConnectInit}
+          >
+            {lang.t('button.connect_walletconnect')}
+          </StyledWalletConnectButton>
         </CardContainer>
       </StyledCard>
-    */}
     </BaseLayout>
   );
 }

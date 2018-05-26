@@ -26,7 +26,7 @@ export const walletConnectInit = async () => {
  * @desc WalletConnect get accounts
  * @return {Array}
  */
-export const walletConnectEthAccounts = cb => {
+export const walletConnectGetAccounts = cb => {
   walletConnectInstance.webConnector.listenSessionStatus(cb);
 };
 

@@ -5,7 +5,7 @@ import { modalClose } from './_modal';
 import { accountUpdateAccountAddress } from './_account';
 import {
   walletConnectInit,
-  walletConnectEthAccounts,
+  walletConnectGetAccounts,
 } from '../handlers/walletconnect';
 
 // -- Constants ------------------------------------------------------------- //
@@ -51,7 +51,7 @@ export const walletConnectModalInit = () => async (dispatch, getState) => {
 
 export const walletConnectGetSession = () => (dispatch, getState) => {
   dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
-  walletConnectEthAccounts((error, data) => {
+  walletConnectGetAccounts((error, data) => {
     if (error) {
       const message = parseError(error);
       dispatch(notificationShow(message), true);

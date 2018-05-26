@@ -2,7 +2,8 @@
   "translation": {
     "homepage": {
       "connect_metamask": "Connect to the MetaMask Chrome extension.",
-      "connect_ledger": "Connect and sign with your Ledger hardware wallet.",
+      "connect_ledger": "Connect and sign with your ",
+      "connect_ledger_link": "Ledger hardware wallet",
       "connect_walletconnect": "Connect and sign with your WalletConnect-enabled mobile wallet.",
       "coming_soon": "Coming soon."
     },
@@ -45,6 +46,7 @@
       "connect_ledger": "Connect to Ledger",
       "exchange": "Exchange",
       "send": "Send",
+      "donate": "Donate ETH",
       "receive": "Receive",
       "close": "Close",
       "cancel": "Cancel",
@@ -56,6 +58,7 @@
     "input": {
       "recipient_address": "Recipient Address",
       "private_key": "Private Key",
+      "donation_address": "Balance Manager Address",
       "asset_amount": "Amount",
       "email": "Email",
       "password": "Password",
@@ -67,6 +70,7 @@
     "modal": {
       "receive_title": "Receive to {{walletName}}",
       "exchange_title": "Exchange from {{walletName}}",
+      "donate_title": "Send from {{walletName}} to Balance Manager",
       "send_title": "Send from {{walletName}}",
       "approve_tx": "Approve transaction on {{walletType}}",
       "confirm_tx": "Confirm transaction from {{walletName}}",

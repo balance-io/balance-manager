@@ -9,11 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-*
+* Bookmark Reminder (anti-phishing) Ribbon
 
 ### Changed
 
-*
+* Layout padding definition locations
+* Fix mobile layout on the wallet selection screen (#232)
+* Add link to Ledger support page on Ledger connection page
+* Add Ledger affiliate link to wallet selection screen
+* Add Donate ETH button and modal
 
 ### Removed
 

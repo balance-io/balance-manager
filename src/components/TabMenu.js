@@ -106,12 +106,18 @@ class TabMenu extends Component {
         '',
       ) || '/';
     let newState = this.state;
+
+    const tabCharSizes = ['account.tab_balances', 'account.tab_transactions', 'account.tab_interactions']
+        .map(resourceName => lang.t(resourceName).length);
+
+    const tabOffset = tabCharSizes[0] * 5;
+
     switch (tabRoute) {
       case '/':
-        newState = { activeTab: 'BALANCES_TAB', tabPosition: -47 };
+        newState = { activeTab: 'BALANCES_TAB', tabPosition: -87 + tabOffset };
         break;
       case '/transactions':
-        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: 91 };
+        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: tabOffset + 51 };
         break;
       case '/interactions':
         newState = { activeTab: 'INTERACTIONS_TAB', tabPosition: 229 };

@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Refactor Send and Exchange modals/reducers for consistency
 * Fix unit time references
 * Moved missing language strings
-
+* Fix overflow padding for dropdowns
 
 ### Removed
 

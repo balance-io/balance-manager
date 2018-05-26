@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import lang from '../languages';
 import {
+  apiShapeshiftSendAmount,
   apiGetAccountBalances,
   apiGetAccountTransactions,
   apiGetPrices,
@@ -21,6 +22,7 @@ import {
 } from '../handlers/localstorage';
 import { web3SetHttpProvider } from '../handlers/web3';
 import { notificationShow } from './_notification';
+import { exchangeUpdateExchangeDetails } from './_exchange';
 import nativeCurrencies from '../references/native-currencies.json';
 
 // -- Constants ------------------------------------------------------------- //
@@ -66,6 +68,13 @@ const ACCOUNT_GET_NATIVE_PRICES_SUCCESS =
   'account/ACCOUNT_GET_NATIVE_PRICES_SUCCESS';
 const ACCOUNT_GET_NATIVE_PRICES_FAILURE =
   'account/ACCOUNT_GET_NATIVE_PRICES_FAILURE';
+
+const ACCOUNT_SHAPESHIFT_VERIFY_REQUEST =
+  'account/ACCOUNT_SHAPESHIFT_VERIFY_REQUEST';
+const ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS =
+  'account/ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS';
+const ACCOUNT_SHAPESHIFT_VERIFY_FAILURE =
+  'account/ACCOUNT_SHAPESHIFT_VERIFY_FAILURE';
 
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 
@@ -286,6 +295,22 @@ export const accountClearIntervals = () => dispatch => {
   clearInterval(getPricesInterval);
 };
 
+export const accountShapeshiftVerify = () => dispatch => {
+  dispatch({
+    type: ACCOUNT_SHAPESHIFT_VERIFY_REQUEST,
+  });
+  apiShapeshiftSendAmount({
+    depositSymbol: 'ETH',
+    withdrawalSymbol: 'BNT',
+    withdrawalAmount: '0.5',
+  })
+    .then(({ data }) => {
+      dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS });
+      dispatch(exchangeUpdateExchangeDetails(data.success));
+    })
+    .catch(() => dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_FAILURE }));
+};
+
 export const accountUpdateAccountAddress = (accountAddress, accountType) => (
   dispatch,
   getState,
@@ -298,6 +323,7 @@ export const accountUpdateAccountAddress = (accountAddress, accountType) => (
     type: ACCOUNT_UPDATE_ACCOUNT_ADDRESS,
     payload: { accountAddress, accountType },
   });
+  dispatch(accountShapeshiftVerify());
   dispatch(accountUpdateNetwork(network));
   dispatch(accountGetAccountTransactions());
   dispatch(accountGetAccountBalances());
@@ -322,7 +348,11 @@ export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
             prices,
             network,
           );
-          updateLocalBalances(parsedAccountInfo, network);
+          updateLocalBalances(
+            parsedAccountInfo.address,
+            parsedAccountInfo,
+            network,
+          );
           saveLocal('native_prices', prices);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
@@ -369,7 +399,7 @@ export const accountClearState = () => dispatch => {
 const INITIAL_STATE = {
   nativePriceRequest: getLocal('native_currency') || 'USD',
   nativeCurrency: getLocal('native_currency') || 'USD',
-  prices: {},
+  prices: getLocal('native_prices') || {},
   network: 'mainnet',
   accountType: '',
   accountAddress: '',
@@ -392,6 +422,8 @@ const INITIAL_STATE = {
     total: '———',
   },
   transactions: [],
+  shapeshiftAvailable: true,
+  fetchingShapeshift: false,
   fetchingTransactions: false,
   fetching: false,
 };
@@ -464,6 +496,23 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         fetchingNativePrices: false,
         nativePriceRequest: '',
+      };
+    case ACCOUNT_SHAPESHIFT_VERIFY_REQUEST:
+      return {
+        ...state,
+        fetchingShapeshift: true,
+      };
+    case ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS:
+      return {
+        ...state,
+        fetchingShapeshift: false,
+        shapeshiftAvailable: true,
+      };
+    case ACCOUNT_SHAPESHIFT_VERIFY_FAILURE:
+      return {
+        ...state,
+        fetchingShapeshift: false,
+        shapeshiftAvailable: false,
       };
     case ACCOUNT_CHANGE_NATIVE_CURRENCY:
       return {

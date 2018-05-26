@@ -10,9 +10,8 @@ import Button from '../../components/Button';
 import CopyToClipboard from '../../components/CopyToClipboard';
 import AccountBalances from './AccountBalances';
 import AccountTransactions from './AccountTransactions';
-import AccountInteractions from './AccountInteractions';
 import arrowUp from '../../assets/arrow-up.svg';
-// import exchangeIcon from '../../assets/exchange-icon.svg';
+import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { modalOpen } from '../../reducers/_modal';
 import { capitalize } from '../../helpers/utilities';
@@ -20,7 +19,6 @@ import { colors, fonts, responsive } from '../../styles';
 
 const StyledAccount = styled.div`
   width: 100%;
-  margin-bottom: 60px;
 `;
 
 const StyledFlex = styled.div`
@@ -59,6 +57,9 @@ const StyledAddressWrapper = styled.div`
 const StyledActions = styled.div`
   display: flex;
   justify-content: flex-end;
+  & button {
+    margin-left: 8px;
+  }
   @media screen and (${responsive.sm.max}) {
     justify-content: space-between;
     & button {
@@ -100,7 +101,7 @@ class Account extends Component {
                 </StyledAddressWrapper>
 
                 <StyledActions>
-                  {/* {this.props.network === 'mainnet' && (
+                  {this.props.network === 'mainnet' && (
                     <Button
                       left
                       color="brightGreen"
@@ -111,7 +112,7 @@ class Account extends Component {
                     >
                       {lang.t('button.exchange')}
                     </Button>
-                  )} */}
+                  )}
                   <Button
                     left
                     color="blue"
@@ -147,11 +148,6 @@ class Account extends Component {
                   exact
                   path={`${this.props.match.url}/transactions`}
                   component={AccountTransactions}
-                />
-                <Route
-                  exact
-                  path={`${this.props.match.url}/interactions`}
-                  component={AccountInteractions}
                 />
                 <Route render={() => <Redirect to={this.props.match.url} />} />
               </Switch>

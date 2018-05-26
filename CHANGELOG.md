@@ -9,7 +9,34 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-\*
+* Bookmark Reminder (anti-phishing) Ribbon
+* Exchange button and modal
+* Shapeshift endpoints
+* Account Type component for displaying active wallet logo
+* Link to Ledger support page on Ledger connection page
+* Ledger affiliate link to wallet selection screen
+* Donate ETH button and modal
+* Input fetching animation
+
+### Changed
+
+* Layout padding definition locations
+* Fix mobile layout on the wallet selection screen (#232)
+* DrodpownAsset improved logic
+* Refactor Send and Exchange modals/reducers for consistency
+* Fix unit time references
+* Moved missing language strings
+
+
+### Removed
+
+* Account interactions tab
+
+## [0.5.3](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
+
+### Added
+
+* Add prettier and pre-commit rules
 
 ### Changed
 
@@ -22,7 +49,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Fix lastTxHash incorrect because of pending tx (#167)
 * Updated .gitignore file
 * Updated dependencies
-* Add prettier and pre-commit rules
+* Fix languages (i18n) initialization
 
 ### Removed
 

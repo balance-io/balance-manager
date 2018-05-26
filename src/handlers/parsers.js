@@ -624,7 +624,6 @@ export const parseNewTransaction = async (
     to: txDetails.to,
     error: false,
     nonce: nonce,
-    interaction: false,
     value: value,
     txFee: txFee,
     native: null,
@@ -741,7 +740,6 @@ export const parseAccountTransactions = async (
         ms: `${tx.timeStamp}000`,
       };
       const error = !!tx.error;
-      let interaction = false;
       let from = tx.from;
       let to = tx.to;
       let asset = {
@@ -778,15 +776,12 @@ export const parseAccountTransactions = async (
         return false;
       })();
 
-      interaction = !includesTokenTransfer && tx.input !== '0x';
-
       let result = {
         hash,
         timestamp,
         from,
         to,
         error,
-        interaction,
         value,
         txFee,
         native: {},
@@ -804,7 +799,6 @@ export const parseAccountTransactions = async (
               from,
               to,
               error,
-              interaction,
               value,
               txFee,
               native: {},

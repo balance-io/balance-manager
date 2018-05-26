@@ -10,7 +10,6 @@ import { fonts, colors, transitions } from '../styles';
 const SForm = styled.form`
   position: relative;
   float: right;
-  margin: 29px 29px 0 0;
   width: 100%;
   max-width: 400px;
   border-radius: 8px;
@@ -161,6 +160,7 @@ class SubscribeForm extends Component {
   render() {
     return (
       <SForm
+        {...this.props}
         noValidate
         success={this.state.status === 'success'}
         onSubmit={this.onSubmit}

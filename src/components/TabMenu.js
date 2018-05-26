@@ -6,7 +6,6 @@ import Link from './Link';
 import Button from './Button';
 import balancesTabIcon from '../assets/balances-tab.svg';
 import transactionsTabIcon from '../assets/transactions-tab.svg';
-import interactionsTabIcon from '../assets/interactions-tab.svg';
 import tabBackground from '../assets/tab-background.png';
 import { colors, fonts, shadows, transitions } from '../styles';
 
@@ -113,9 +112,6 @@ class TabMenu extends Component {
       case '/transactions':
         newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: 91 };
         break;
-      case '/interactions':
-        newState = { activeTab: 'INTERACTIONS_TAB', tabPosition: 229 };
-        break;
       default:
         break;
     }
@@ -148,17 +144,6 @@ class TabMenu extends Component {
               left
             >
               {lang.t('account.tab_transactions')}
-            </StyledTab>
-          </Link>
-          <Link to={`${this.props.match.url}/interactions`}>
-            <StyledTab
-              data-toggle="tooltip"
-              title={lang.t('account.tab_interactions_tooltip')}
-              active={this.state.activeTab === 'INTERACTIONS_TAB'}
-              icon={interactionsTabIcon}
-              left
-            >
-              {lang.t('account.tab_interactions')}
             </StyledTab>
           </Link>
         </StyledTabsWrapper>

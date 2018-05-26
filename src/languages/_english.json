@@ -1,5 +1,12 @@
 {
   "translation": {
+    "homepage": {
+      "connect_metamask": "Connect to the MetaMask Chrome extension.",
+      "connect_ledger": "Connect and sign with your ",
+      "connect_ledger_link": "Ledger hardware wallet",
+      "connect_walletconnect": "Connect and sign with your WalletConnect-enabled mobile wallet.",
+      "coming_soon": "Coming soon."
+    },
     "account": {
       "tab_balances": "Balances",
       "tab_transactions": "Transactions",
@@ -39,17 +46,21 @@
       "connect_ledger": "Connect to Ledger",
       "exchange": "Exchange",
       "send": "Send",
+      "donate": "Donate ETH",
       "receive": "Receive",
       "close": "Close",
+      "confirm": "Confirm",
       "cancel": "Cancel",
       "go_back": "Go Back",
       "send_another": "Send Another",
+      "exchange_another": "Exchange Again",
       "notify_me": "Get notified",
       "try_again": "Try again"
     },
     "input": {
       "recipient_address": "Recipient Address",
       "private_key": "Private Key",
+      "donation_address": "Balance Manager Address",
       "asset_amount": "Amount",
       "email": "Email",
       "password": "Password",
@@ -61,6 +72,7 @@
     "modal": {
       "receive_title": "Receive to {{walletName}}",
       "exchange_title": "Exchange from {{walletName}}",
+      "donate_title": "Send from {{walletName}} to Balance Manager",
       "send_title": "Send from {{walletName}}",
       "approve_tx": "Approve transaction on {{walletType}}",
       "confirm_tx": "Confirm transaction from {{walletName}}",
@@ -79,11 +91,17 @@
       "tx_hash": "Transaction Hash",
       "tx_verify": "Verify your transaction here",
       "deposit_dropdown_label": "Exchange my",
-      "withdrawal_dropdown_label": "for",
+      "withdrawal_dropdown_label": "For",
       "deposit_input_label": "Pay",
       "withdrawal_input_label": "Get",
       "tx_fee": "Transaction Fee",
-      "exchange_fee": "Exchange Fee"
+      "exchange_fee": "Exchange Fee",
+      "helper_balance": "Balance",
+      "helper_value": "Value",
+      "helper_rate": "Rate",
+      "helper_price": "Price",
+      "helper_min": "Min",
+      "helper_max": "Max"
     },
     "message": {
       "web3_not_available": "Please install the MetaMask Chrome extension",
@@ -96,7 +114,8 @@
       "failed_ledger_connection": "Failed to connect to Ledger, please check your device",
       "no_transactions": "No transactions found for this account",
       "no_interactions": "No interactions found for this account",
-      "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum"
+      "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum",
+      "exchange_not_available": "Exchange is not available in your area"
     },
     "notification": {
       "error": {

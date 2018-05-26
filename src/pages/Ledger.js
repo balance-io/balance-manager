@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import lang from '../languages';
+import HelpSvg from '../assets/help.svg';
 import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
 import Button from '../components/Button';
@@ -10,29 +11,55 @@ import Account from '../views/Account';
 import { ledgerConnectInit } from '../reducers/_ledger';
 import { fonts, colors } from '../styles';
 
+const FailedConnectionMessage = styled.div`
+  align-items: center;
+  color: rgb(${colors.grey});
+  display: flex;
+  font-weight: ${fonts.weight.medium};
+  justify-content: center;
+  margin: 20px 20px 30px 20px;
+`;
+
+const StyledCardContainer = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+`;
+
 const StyledWrapper = styled.div`
   width: 100%;
 `;
 
-const StyledMessage = styled.div`
-  display: flex;
+const HelpFooter = styled.a`
   align-items: center;
+  background-color: rgb(${colors.blue});
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
   justify-content: center;
-  color: rgb(${colors.grey});
-  font-weight: ${fonts.weight.medium};
-  margin: 20px;
-`;
-
-const StyledCardContainer = styled.div`
+  margin-top: 20px;
+  padding: 15px;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+
+  &:hover {
+    background-color: rgb(${colors.blueHover});
+    & > img {
+      opacity: 1;
+    }
+  }
+  &:active {
+    background-color: rgb(${colors.blueActive});
+  }
 `;
 
-const StyledButton = styled(Button)`
-  margin: 10px;
+const HelpIcon = styled.img`
+  color: rgb(${colors.white});
+  height: ${fonts.size.smedium};
+  margin-left: 7px;
+  opacity: 0.75;
+  width: ${fonts.size.smedium};
 `;
 
 class Ledger extends Component {
@@ -41,30 +68,39 @@ class Ledger extends Component {
   }
   connectLedger = () => this.props.ledgerConnectInit();
   render() {
+    const { accounts, fetching, match } = this.props;
+
     return (
       <BaseLayout>
         <StyledWrapper>
-          {this.props.fetching || this.props.accounts.length ? (
+          {fetching || accounts.length ? (
             <Account
-              fetchingWallet={this.props.fetching}
+              fetchingWallet={fetching}
               fetchingMessage={
-                !this.props.accounts.length
-                  ? lang.t('message.please_connect_ledger')
-                  : ''
+                !accounts.length ? lang.t('message.please_connect_ledger') : ''
               }
-              match={this.props.match}
+              match={match}
             />
           ) : (
-            <Card minHeight={200} fetching={this.props.fetching}>
+            <Card minHeight={200} fetching={fetching}>
               <StyledCardContainer>
-                <StyledMessage>
+                <FailedConnectionMessage>
                   {lang.t('message.failed_ledger_connection')}
-                </StyledMessage>
-                <StyledButton color="grey" onClick={this.connectLedger}>
+                </FailedConnectionMessage>
+                <Button color="grey" onClick={this.connectLedger}>
                   {lang.t('button.try_again')}
-                </StyledButton>
+                </Button>
               </StyledCardContainer>
             </Card>
+          )}
+          {(fetching || !accounts.length) && (
+            <HelpFooter
+              href="https://support.balance.io/manager/how-do-i-connect-my-ledger"
+              target="_blank"
+            >
+              <div>Need help connecting your Ledger?</div>
+              <HelpIcon src={HelpSvg} />
+            </HelpFooter>
           )}
         </StyledWrapper>
       </BaseLayout>

@@ -149,22 +149,23 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     });
 };
 
-export const sendTransaction = ({
-  address,
-  recipient,
-  amount,
-  asset,
-  gasPrice,
-  gasLimit,
-}) => (dispatch, getState) => {
+export const sendTransaction = () => (dispatch, getState) => {
   dispatch({ type: SEND_TRANSACTION_REQUEST });
-  const { accountType } = getState().account;
+  const {
+    address,
+    recipient,
+    assetAmount,
+    selected,
+    gasPrice,
+    gasLimit,
+    accountType,
+  } = getState().send;
   const txDetails = {
-    asset: asset,
+    asset: selected,
     from: address,
     to: recipient,
     nonce: null,
-    amount: amount,
+    amount: assetAmount,
     gasPrice: gasPrice.value.amount,
     gasLimit: gasLimit,
   };
@@ -257,6 +258,7 @@ export const sendUpdateSelected = value => (dispatch, getState) => {
 export const sendMaxBalance = () => (dispatch, getState) => {
   const { selected, gasPrice } = getState().send;
   const { accountInfo } = getState().account;
+  let amount = '';
   if (selected.symbol === 'ETH') {
     const ethereum = accountInfo.assets.filter(
       asset => asset.symbol === 'ETH',
@@ -266,15 +268,11 @@ export const sendMaxBalance = () => (dispatch, getState) => {
     const remaining = convertStringToNumber(
       subtract(balanceAmount, txFeeAmount),
     );
-    const ether = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
-    dispatch(sendUpdateAssetAmount(ether));
+    amount = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
   } else {
-    dispatch(
-      sendUpdateAssetAmount(
-        convertAmountFromBigNumber(selected.balance.amount),
-      ),
-    );
+    amount = convertAmountFromBigNumber(selected.balance.amount);
   }
+  dispatch(sendUpdateAssetAmount(amount));
 };
 
 export const sendClearFields = () => ({ type: SEND_CLEAR_FIELDS });

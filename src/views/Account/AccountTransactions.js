@@ -233,13 +233,15 @@ class AccountViewTransactions extends Component {
     this.setState({ showAllTransactions: !this.state.showAllTransactions });
 
   render = () => {
-    const nativeCurrency = this.props.nativeCurrency;
-    let _transactions = [];
-    if (this.props.transactions && this.props.transactions.length) {
-      _transactions = this.props.transactions.filter(tx => !tx.interaction);
-    }
-    return !!_transactions.length ? (
-      !this.props.fetchingTransactions ? (
+    const {
+      transactions,
+      fetchingTransactions,
+      network,
+      accountAddress,
+      nativeCurrency,
+    } = this.props;
+    return !!transactions.length ? (
+      !fetchingTransactions ? (
         <StyledGrid>
           <StyledLabelsRow>
             <StyledLabels>{lang.t('account.label_asset')}</StyledLabels>
@@ -249,7 +251,7 @@ class AccountViewTransactions extends Component {
             <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
           </StyledLabelsRow>
 
-          {_transactions.map((tx, idx, arr) => {
+          {transactions.map((tx, idx, arr) => {
             if (!this.state.showAllTransactions && idx > 10) return null;
             return (
               <StyledTransactionWrapper
@@ -272,11 +274,11 @@ class AccountViewTransactions extends Component {
                     </StyledAsset>
                     <TransactionStatus
                       tx={tx}
-                      accountAddress={this.props.accountAddress}
+                      accountAddress={accountAddress}
                     />
 
                     <p>
-                      {tx.from === this.props.accountAddress
+                      {tx.from === accountAddress
                         ? `- ${tx.value.display}`
                         : `${tx.value.display}`}
                     </p>
@@ -291,7 +293,7 @@ class AccountViewTransactions extends Component {
                       {tx.native &&
                       tx.native[nativeCurrency] &&
                       tx.native[nativeCurrency].value
-                        ? tx.from === this.props.accountAddress
+                        ? tx.from === accountAddress
                           ? `- ${tx.native[nativeCurrency].value.display}`
                           : `${tx.native[nativeCurrency].value.display}`
                         : '———'}
@@ -302,27 +304,19 @@ class AccountViewTransactions extends Component {
                   >
                     <div>
                       <StyledBlockie
-                        seed={
-                          tx.from === this.props.accountAddress
-                            ? tx.to
-                            : tx.from
-                        }
+                        seed={tx.from === accountAddress ? tx.to : tx.from}
                       />
                       <div>
                         <p>
                           <strong>
                             {tx.from === tx.to
                               ? lang.t('account.tx_self').toUpperCase()
-                              : tx.from === this.props.accountAddress
+                              : tx.from === accountAddress
                                 ? lang.t('account.tx_to').toUpperCase()
                                 : lang.t('account.tx_from').toUpperCase()}
                           </strong>
                         </p>
-                        <p>
-                          {tx.from === this.props.accountAddress
-                            ? tx.to
-                            : tx.from}
-                        </p>
+                        <p>{tx.from === accountAddress ? tx.to : tx.from}</p>
                       </div>
                     </div>
                     <div>
@@ -332,13 +326,13 @@ class AccountViewTransactions extends Component {
                             {lang.t('account.tx_fee').toUpperCase()}
                           </strong>
                         </p>
-                        <p>{`${tx.txFee.display} (${
+                        <p>{`${tx.txFee.display} ≈ ${
                           tx.native &&
                           tx.native[nativeCurrency] &&
                           tx.native[nativeCurrency].txFee
                             ? tx.native[nativeCurrency].txFee.display
                             : '———'
-                        })`}</p>
+                        }`}</p>
                       </div>
                     </div>
                     <div>
@@ -373,9 +367,7 @@ class AccountViewTransactions extends Component {
                     <div>
                       <a
                         href={`https://${
-                          this.props.network !== 'mainnet'
-                            ? `${this.props.network}.`
-                            : ''
+                          network !== 'mainnet' ? `${network}.` : ''
                         }etherscan.io/tx/${tx.hash.replace(/-.*/g, '')}`}
                         target="_blank"
                         rel="noreferrer noopener"
@@ -398,7 +390,7 @@ class AccountViewTransactions extends Component {
                       >
                         <ButtonCustom
                           left
-                          disabled={this.props.network !== 'mainnet'}
+                          disabled={network !== 'mainnet'}
                           txtColor="ethplorer"
                           img={ethplorerLogo}
                         >
@@ -418,7 +410,7 @@ class AccountViewTransactions extends Component {
               </StyledTransactionWrapper>
             );
           })}
-          {_transactions.length > 10 && (
+          {transactions.length > 10 && (
             <StyledShowAllTransactions onClick={this.onShowAllTransactions}>
               <StyledToggleIndicator show={this.state.showAllTransactions} />
               <p>
@@ -432,12 +424,12 @@ class AccountViewTransactions extends Component {
           )}
         </StyledGrid>
       ) : (
-        <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
+        <StyledCard minHeight={280} fetching={fetchingTransactions}>
           <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
         </StyledCard>
       )
     ) : (
-      <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
+      <StyledCard minHeight={280} fetching={fetchingTransactions}>
         <StyledMessage>{lang.t('message.no_transactions')}</StyledMessage>
       </StyledCard>
     );

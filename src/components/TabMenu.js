@@ -115,7 +115,7 @@ class TabMenu extends Component {
     const offset = this._firstTabOffset();
     switch (tabRoute) {
       case '/':
-        newState = { activeTab: 'BALANCES_TAB', tabPosition: -87 + offset };
+        newState = { activeTab: 'BALANCES_TAB', tabPosition: offset - 87 };
         break;
       case '/transactions':
         newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: offset + 51 };

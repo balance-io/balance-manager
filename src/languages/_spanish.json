@@ -1,19 +1,21 @@
 {
   "translation": {
     "homepage": {
-        "connect_metamask": {
-            "description": "Conéctate a la extensión de Chrome de Metamask.",
-            "button": "Conectar MetaMask"
-        },
-        "connect_ledger": {
-            "description": "Conéctate y firma tus transacciones con tu Ledger Waller.",
-            "button": "Conectar Ledger"
-        },
-        "connect_walletconnect": {
-            "description": "Conéctate y firmat con tu wallet móvil de WalletConnect.",
-            "button": "Conectar Wallet Connect"
-        },
-        "coming_soon": "Coming soon."
+      "connect_metamask": {
+        "description": "Conéctate a la extensión de Chrome de Metamask.",
+        "button": "Conectar MetaMask"
+      },
+      "connect_ledger": {
+        "description": "Conéctate y firma tus transacciones con tu ",
+        "link_text": "Ledger Wallet",
+        "link_title": "Compra un Ledger hardware wallet",
+        "button": "Conectar Ledger"
+      },
+      "connect_walletconnect": {
+        "description": "Conéctate y firmat con tu wallet móvil de WalletConnect.",
+        "button": "Conectar Wallet Connect"
+      },
+      "coming_soon": "Próximamente."
     },
     "account": {
       "tab_balances": "Saldos",

@@ -9,42 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-* Added Czech language translation
-* Added Polish language translation
-* Added Brazilian Portuguese language translation #276
-* Added Portuguese translation
-* New util function for transaction prep
-* General componetisation of the modals
-* General improvement to readability/maintainability of the modals
 
 ### Changed
 
-### Removed
-
-## [0.6.0](https://github.com/balance-io/balance-manager/releases/tag/0.6.0)
-
-### Added
-* Support for Shapeshift
-* Support for Trezor
-* Support for Unique (non fungible) tokens
-* Added language selector to wallet connection page
-* Added English language fallback to i18n initialisation
-* Incoming and outgoing pending transactions for Shapeshift
-* Versioning for local storage
-* Exchange button and modal
-* Account Type component for displaying active wallet logo
-
-### Changed
-* Fix txn fee conversion
-* DrodpownAsset improved logic
-* Refactor Send and Exchange modals/reducers for consistency
-* Fix unit time references
-* Moved missing language strings
-* Automatically route users to '/transactions' when pending transaction is initiated
 
 ### Removed
-* Account interactions tab
-* Duplicative code
 
 ## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 
@@ -56,6 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Ledger affiliate link to wallet selection screen
 * Donate ETH button and modal
 * Input fetching animation
+* Actions that allow user to hide assets they don't want to see on their wallet
 
 
 ### Changed

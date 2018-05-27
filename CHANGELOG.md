@@ -27,7 +27,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Link to Ledger support page on Ledger connection page
 * Ledger affiliate link to wallet selection screen
 * Donate ETH button and modal
->>>>>>> 41e854024b3499b32cc81734349824c8f1c17634
 
 ### Changed
 

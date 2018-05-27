@@ -84,7 +84,8 @@ const StyledDropdownWrapper = styled(StyledRowWrapper)`
   -webkit-box-shadow: ${shadows.medium};
   box-shadow: ${shadows.medium};
   max-height: 280px;
-  overflow: scroll;
+  overflow-x: hidden;
+  overflow-y: auto;
 `;
 
 const StyledRow = styled.div`

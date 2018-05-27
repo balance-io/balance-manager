@@ -9,16 +9,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-* Bookmark Reminder (anti-phishing) Ribbon
 * ENS lookup support
+
+### Changed
+
+*
+
+### Removed
+
+*
+
+## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
+
+### Added
+
+* Bookmark Reminder (anti-phishing) Ribbon
+* Link to Ledger support page on Ledger connection page
+* Ledger affiliate link to wallet selection screen
+* Donate ETH button and modal
+>>>>>>> 41e854024b3499b32cc81734349824c8f1c17634
 
 ### Changed
 
 * Layout padding definition locations
 * Fix mobile layout on the wallet selection screen (#232)
-* Add link to Ledger support page on Ledger connection page
-* Add Ledger affiliate link to wallet selection screen
-* Add Donate ETH button and modal
+* Fix overflow padding for dropdowns
 
 ### Removed
 

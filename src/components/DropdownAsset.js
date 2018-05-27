@@ -42,7 +42,7 @@ const StyledRow = styled.div`
   text-align: center;
   outline: none;
   & > div {
-    cursor: pointer;
+    cursor: ${({ noOptions }) => (noOptions ? 'default' : 'pointer')};
     padding: ${({ noOptions }) => (noOptions ? `10px` : `10px 26px 10px 10px`)};
     background-size: 8px;
     display: flex;
@@ -111,10 +111,14 @@ class DropdownAsset extends Component {
       this.setState({ showDropdown: false });
     }
   };
-  toggleDropdown = () =>
+  toggleDropdown = () => {
+    if (!this.props.onChange) {
+      return;
+    }
     this.setState({ showDropdown: !this.state.showDropdown });
+  };
   render() {
-    const { selected, assets, noBalance, ...props } = this.props;
+    const { selected, assets, noBalance, onChange, ...props } = this.props;
     const options = {};
     if (assets.length) {
       const ethereum = assets.filter(asset => asset.symbol === 'ETH')[0];
@@ -208,7 +212,7 @@ class DropdownAsset extends Component {
 DropdownAsset.propTypes = {
   selected: PropTypes.string.isRequired,
   assets: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   noBalance: PropTypes.bool,
 };
 

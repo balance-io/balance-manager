@@ -10,17 +10,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ### Added
 
 * Bookmark Reminder (anti-phishing) Ribbon
-* Ddropdown on account view for choosing language. Displays available langs from resources
+* Dropdown on account view for choosing language
+* Link to Ledger support page on Ledger connection page
+* Ledger affiliate link to wallet selection screen
+* Donate ETH button and modal
+
 
 ### Changed
 
 * Layout padding definition locations
 * Fix mobile layout on the wallet selection screen (#232)
-* Add link to Ledger support page on Ledger connection page
-* Add Ledger affiliate link to wallet selection screen
-* Add Donate ETH button and modal
 * Update spanish translation with consistent voice (tu vs usted)
 * Changed a few strings that weren't handled by i18n
+* Fix overflow padding for dropdowns
 
 ### Removed
 

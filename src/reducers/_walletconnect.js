@@ -28,16 +28,21 @@ const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
-let getSessionInterval = null;
-let getTransactionStatusInterval = null;
-
 export const walletConnectModalInit = () => async (dispatch, getState) => {
   dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST });
   walletConnectInit()
     .then(walletConnectInstance => {
+      const webConnector = walletConnectInstance.webConnector;
+      const request = {
+        domain: walletConnectInstance.bridgeDomain,
+        sessionId: webConnector.sessionId,
+        sharedKey: webConnector.sharedKey,
+        dappName: webConnector.dappName,
+      };
+      const qrcode = JSON.stringify(request);
       dispatch({
         type: WALLET_CONNECT_NEW_SESSION_SUCCESS,
-        payload: walletConnectInstance.webConnector,
+        payload: { webConnector, qrcode },
       });
       dispatch(walletConnectGetSession());
     })
@@ -69,16 +74,15 @@ export const walletConnectGetSession = () => (dispatch, getState) => {
   });
 };
 
-export const walletConnectClearFields = () => dispatch => {
-  clearTimeout(getSessionInterval);
-  clearTimeout(getTransactionStatusInterval);
-  dispatch({ type: WALLET_CONNECT_CLEAR_FIELDS });
-};
+export const walletConnectClearFields = () => ({
+  type: WALLET_CONNECT_CLEAR_FIELDS,
+});
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
   fetching: false,
   webConnector: null,
+  qrcode: '',
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -92,13 +96,15 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: false,
-        webConnector: action.payload,
+        webConnector: action.payload.webConnector,
+        qrcode: action.payload.qrcode,
       };
     case WALLET_CONNECT_NEW_SESSION_FAILURE:
       return {
         ...state,
         fetching: false,
         webConnector: null,
+        qrcode: '',
       };
     case WALLET_CONNECT_GET_SESSION_REQUEST:
       return { ...state, fetching: true };
@@ -112,6 +118,7 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         fetching: false,
         webConnector: null,
+        qrcode: '',
       };
     case WALLET_CONNECT_CLEAR_FIELDS:
       return { ...state, ...INITIAL_STATE };

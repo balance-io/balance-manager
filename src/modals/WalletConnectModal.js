@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import lang from '../languages';
 import Card from '../components/Card';
+import Loader from '../components/Loader';
 import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import { modalClose } from '../reducers/_modal';
@@ -24,6 +25,13 @@ const StyledContainer = styled.div`
   }
 `;
 
+const StyledQRCodeWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+`;
+
 const StyledQRCodeDisplay = styled(QRCodeDisplay)`
   margin: 35px auto;
 `;
@@ -38,29 +46,29 @@ class WalletConnectModal extends Component {
   componentDidMount() {
     this.props.walletConnectModalInit();
   }
-  onClose = () => {
-    this.props.walletConnectClearFields();
+  onClose = () => this.props.walletConnectClearFields();
+
+  render = () => {
+    const { qrcode } = this.props;
+    return (
+      <Card maxWidth={500} background="white">
+        <StyledContainer>
+          <StyledQRCodeWrapper>
+            {qrcode ? (
+              <StyledQRCodeDisplay data={qrcode} />
+            ) : (
+              <Loader color="dark" background="white" />
+            )}
+          </StyledQRCodeWrapper>
+          <StyledCenter>
+            <Button color="walletconnect" onClick={this.onClose}>
+              {lang.t('button.cancel')}
+            </Button>
+          </StyledCenter>
+        </StyledContainer>
+      </Card>
+    );
   };
-  render = () => (
-    <Card maxWidth={400} background="white">
-      <StyledContainer>
-        {this.props.webConnector && (
-          <StyledQRCodeDisplay
-            data={`{"domain":"https://walletconnect.balance.io","sessionId":"${
-              this.props.webConnector.sessionId
-            }","sharedKey":"${
-              this.props.webConnector.sharedKey
-            }", "dappName":"${this.props.webConnector.dappName}"}`}
-          />
-        )}
-        <StyledCenter>
-          <Button color="walletconnect" onClick={this.onClose}>
-            {lang.t('button.cancel')}
-          </Button>
-        </StyledCenter>
-      </StyledContainer>
-    </Card>
-  );
 }
 
 WalletConnectModal.propTypes = {
@@ -70,7 +78,7 @@ WalletConnectModal.propTypes = {
 };
 
 const reduxProps = ({ modal, walletconnect }) => ({
-  webConnector: walletconnect.webConnector,
+  qrcode: walletconnect.qrcode,
 });
 
 export default connect(reduxProps, {

@@ -284,6 +284,24 @@ class SendModal extends Component {
     this.props.sendModalInit();
   };
 
+  updateEns = target => {
+    if (target.value.includes('.')) {
+      ens
+        .lookup(target.value.trim())
+        .then(address => {
+          this.props.sendUpdateRecipient(address, this.props.selected.symbol);
+        })
+        .catch(reason => {
+          console.log('ENS failed');
+          // console.error(reason);
+        });
+    }
+    this.props.sendUpdateRecipient(
+      target.value.trim(),
+      this.props.selected.symbol,
+    );
+  };
+
   onSubmit = e => {
     e.preventDefault();
     const request = {
@@ -428,24 +446,7 @@ class SendModal extends Component {
                   onFocus={this.onAddressInputFocus}
                   onBlur={this.onAddressInputBlur}
                   onChange={({ target }) => {
-                    if (target.value.includes('.')) {
-                      ens
-                        .lookup(target.value.trim())
-                        .then(address => {
-                          this.props.sendUpdateRecipient(
-                            address,
-                            this.props.selected.symbol,
-                          );
-                        })
-                        .catch(reason => {
-                          console.log('ENS failed');
-                          // console.error(reason);
-                        });
-                    }
-                    this.props.sendUpdateRecipient(
-                      target.value.trim(),
-                      this.props.selected.symbol,
-                    );
+                    this.updateEns(target);
                   }}
                 />
                 {this.props.recipient &&

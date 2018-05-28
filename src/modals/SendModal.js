@@ -425,7 +425,6 @@ class SendModal extends Component {
                   spellCheck="false"
                   placeholder="0x..."
                   type="text"
-                  value={this.props.recipient}
                   onFocus={this.onAddressInputFocus}
                   onBlur={this.onAddressInputBlur}
                   onChange={({ target }) => {

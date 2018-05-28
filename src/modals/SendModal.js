@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import * as ENS from 'ethjs-ens';
 import lang from '../languages';
 import QRCodeReader from '../components/QRCodeReader';
 import Card from '../components/Card';
@@ -40,8 +39,7 @@ import {
 } from '../helpers/bignumber';
 import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
-
-let ens;
+import { ens } from '../handlers/web3';
 
 const StyledSuccessMessage = styled.div`
   width: 100%;
@@ -262,18 +260,6 @@ class SendModal extends Component {
 
   componentDidMount() {
     this.props.sendModalInit();
-    if (typeof window.web3 !== 'undefined') {
-      console.log('web3 browser detected, using.');
-      window.web3.version.getNetwork(function(err, network) {
-        if (err) {
-          console.log(err);
-        }
-        ens = new ENS({
-          provider: window.web3.currentProvider,
-          network: network,
-        });
-      });
-    }
   }
   componentDidUpdate(prevProps) {
     if (this.props.recipient.length >= 42) {

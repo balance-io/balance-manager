@@ -15,162 +15,71 @@ import trezorLogoImage from '../assets/trezor-logo.svg';
 import { accountUpdateAccountAddress } from '../reducers/_account';
 import { getLocal } from '../handlers/localstorage';
 import { modalOpen } from '../reducers/_modal';
-import { fonts, responsive } from '../styles';
+import { colors, fonts, responsive } from '../styles';
 
 const StyledCard = styled(Card)`
-  width: 100%;
-  height: 102px;
-  margin-bottom: 18px;
   background: #f5f6fa;
   display: block;
+  margin-bottom: 18px;
+  min-height: 102px;
   overflow: visible;
-`;
-
-const StyledCardMetaMask = StyledCard.extend`
-  border-radius: 14px 10px 10px 14px;
-`;
-
-const StyledCardTrezor = StyledCard.extend`
-  @media screen and (max-width: 620px) {
-    & div:nth-child(3) {
-      display: none;
-    }
-  }
-`;
-
-const StyledCardContainer = styled.div`
   width: 100%;
+`;
+
+const CardContainer = styled.div`
   align-items: center;
+  display: flex;
   justify-content: space-between;
-
-  & p {
-    font-size: ${fonts.size.smedium};
-    font-weight: ${fonts.weight.medium};
-    color: #a1a2a9;
-  }
+  padding-left: 28px;
+  padding-right: 28px;
+  width: 100%;
 
   @media screen and (${responsive.sm.max}) {
+    align-items: flex-start;
     flex-direction: column;
-    justify-content: ;
+    padding-bottom: 28px;
+    padding-top: 28px;
   }
 `;
 
-const StyledMetamaskConnect = styled.div`
-  & p {
-    margin: 43px 20px 0 196px;
-  }
-
-  @media screen and (max-width: 736px) {
-    & p {
-      display: none;
-    }
-  }
-`;
-
-// const StyledWalletConnect = styled.div`
-//   & p {
-//     margin: 43px 20px 0 196px;
-//   }
-//
-//   @media screen and (max-width: 736px) {
-//     & p {
-//       display: none;
-//     }
-//   }
-// `;
-
-const StyledMetamaskLogo = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 173px;
-  height: 102px;
-  background: url(${metamaskLogoImage});
-  background-size: 100%;
-  border-radius: 10px 0 0 10px;
-`;
-
-const StyledHardwareWallets = styled.div`
-  & p {
-    margin: 60px 20px 0 28px;
-    color: #a1a2a9;
-  }
-
-  @media screen and (${responsive.sm.max}) {
-    & p {
-      display: none;
-    }
-  }
-`;
-
-const StyledHardwareWalletsTrezor = StyledHardwareWallets.extend`
-  & p {
-    position: absolute;
-    opacity: 0.7;
-  }
-
-  @media screen and (${responsive.sm.max}) {
-    & p {
-      display: block;
-    }
-  }
-`;
-
-const StyledLedgerLogo = styled.div`
-  position: absolute;
-  top: 27px;
-  left: 28px;
-  width: 100px;
-  height: 28px;
-  background: url(${ledgerLogoImage});
-  background-size: 100%;
-
-  @media screen and (${responsive.sm.max}) {
-    top: 38px;
-  }
-`;
-
-// const StyledWalletConnectLogo = styled.div`
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   width: 173px;
-//   height: 102px;
-//   background: url(${walletConnectLogoImage});
-//   background-size: contain;
-//   background-repeat: no-repeat;
-// `;
-
-const StyledTrezorLogo = styled.div`
-  position: absolute;
-  top: 22px;
-  left: 28px;
-  width: 109px;
-  height: 31px;
-  background: url(${trezorLogoImage});
-  background-size: 100%;
-`;
-
-const StyledConnectButton = styled(Button)`
+const ConnectButton = styled(Button)`
+  border-radius: 8px;
+  font-size: ${fonts.size.medium};
+  height: 44px;
+  padding: 0 15px 2px 15px;
   position: absolute;
   right: 29px;
   top: 29px;
-  padding: 0 15px 2px 15px;
-  height: 44px;
-  border-radius: 8px;
-  font-size: ${fonts.size.medium};
 `;
 
-const StyledMetamaskButton = StyledConnectButton.extend`
+const LogoSection = styled.div`
+  flex: none;
+  position: relative;
+`;
+
+const LogoText = styled.p`
+  color: #a1a2a9;
+  font-size: ${fonts.size.smedium};
+  font-weight: ${fonts.weight.medium};
+  margin-top: 6px;
+  opacity: ${({ disabled }) => (disabled ? 0.7 : 1)};
+  @media screen and (max-width: 736px) {
+    display: ${({ isAlwaysVisible }) => (isAlwaysVisible ? 'block' : 'none')};
+  }
+`;
+
+const LedgerAffiliateLink = styled.a`
+  color: rgb(${colors.blue});
+
   &:hover {
-    background: #ff932e;
+    color: rgb(${colors.blueHover});
   }
   &:active {
-    background: #f07f16;
+    color: rgb(${colors.blueActive});
   }
 `;
 
-const StyledLedgerButton = StyledConnectButton.extend`
+const LedgerButton = ConnectButton.extend`
   &:hover {
     background: #454852;
   }
@@ -179,7 +88,67 @@ const StyledLedgerButton = StyledConnectButton.extend`
   }
 `;
 
-// const StyledWalletConnectButton = StyledConnectButton.extend`
+const LedgerLogo = styled.div`
+  background-image: url(${ledgerLogoImage});
+  background-repeat: no-repeat;
+  background-size: 100%;
+  height: 28px;
+  width: 100px;
+`;
+
+const MetamaskButton = ConnectButton.extend`
+  &:hover {
+    background: #ff932e;
+  }
+  &:active {
+    background: #f07f16;
+  }
+`;
+
+// Necessary to fix weird border radius bug with the background image
+const MetamaskCard = StyledCard.extend`
+  border-radius: 14px 10px 10px 14px;
+`;
+
+const MetamaskLogo = styled.div`
+  background-size: cover;
+  background-image: url(${metamaskLogoImage});
+  background-repeat: no-repeat;
+  border-radius: 10px 0 0 10px;
+  height: 102px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 173px;
+`;
+
+const MetamaskLogoText = styled(LogoText)`
+  margin: 0 20px 0 196px;
+`;
+
+const StyledSubscribeForm = styled(SubscribeForm)`
+  @media screen and (${responsive.sm.max}) {
+    margin-top: 28px;
+  }
+`;
+
+const TrezorLogo = styled.div`
+  background-image: url(${trezorLogoImage});
+  background-repeat: no-repeat;
+  background-size: 100%;
+  height: 31px;
+  width: 109px;
+`;
+
+// const StyledWalletConnectLogo = styled.div`
+//   margin: 8px 0;
+//   height: 54px;
+//   background: url(${walletConnectLogoImage});
+//   background-size: contain;
+//   background-repeat: no-repeat;
+// `;
+//
+// const StyledWalletConnectButton = ConnectButton.extend`
 //   &:hover {
 //     background: #454852;
 //   }
@@ -195,66 +164,76 @@ class Home extends Component {
       this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
       this.props.history.push('/wallet');
     } else {
-      this.props.modalOpen('WALLET_CONNECT_INIT', null);
+      this.props.modalOpen('WALLET_CONNECT', null);
     }
   };
   render = () => (
     <BaseLayout>
-      <StyledCardMetaMask>
-        <StyledCardContainer>
-          <StyledMetamaskConnect>
-            <StyledMetamaskLogo />
-            <p>{lang.t('homepage.connect_metamask')}</p>
-            <Link to="/metamask">
-              <StyledMetamaskButton left color="orange">
-                {lang.t('button.connect_metamask')}
-              </StyledMetamaskButton>
-            </Link>
-          </StyledMetamaskConnect>
-        </StyledCardContainer>
-      </StyledCardMetaMask>
+      <MetamaskCard minHeight={102}>
+        <CardContainer>
+          <MetamaskLogo />
+          <MetamaskLogoText>
+            {lang.t('homepage.connect_metamask')}
+          </MetamaskLogoText>
+          <Link to="/metamask">
+            <MetamaskButton left color="orange">
+              {lang.t('button.connect_metamask')}
+            </MetamaskButton>
+          </Link>
+        </CardContainer>
+      </MetamaskCard>
 
-      <StyledCard>
-        <StyledCardContainer>
-          <StyledHardwareWallets>
-            <StyledLedgerLogo />
-            <p>{lang.t('homepage.connect_ledger')}</p>
-            <Link to="/ledger">
-              <StyledLedgerButton left color="ledger">
-                {lang.t('button.connect_ledger')}
-              </StyledLedgerButton>
-            </Link>
-          </StyledHardwareWallets>
-        </StyledCardContainer>
+      <StyledCard minHeight={102}>
+        <CardContainer>
+          <LogoSection>
+            <LedgerLogo />
+            <LogoText>
+              {lang.t('homepage.connect_ledger')}
+              <LedgerAffiliateLink
+                href="https://www.ledgerwallet.com/r/7931"
+                target="_blank"
+                title="Buy a Ledger hardware wallet"
+              >
+                {lang.t('homepage.connect_ledger_link')}
+              </LedgerAffiliateLink>
+              .
+            </LogoText>
+          </LogoSection>
+          <Link to="/ledger">
+            <LedgerButton left color="ledger">
+              {lang.t('button.connect_ledger')}
+            </LedgerButton>
+          </Link>
+        </CardContainer>
       </StyledCard>
 
-      <StyledCardTrezor>
-        <StyledCardContainer>
-          <StyledHardwareWalletsTrezor>
-            <StyledTrezorLogo />
-            <p>{lang.t('homepage.coming_soon')}</p>
-            <SubscribeForm />
-          </StyledHardwareWalletsTrezor>
-        </StyledCardContainer>
-      </StyledCardTrezor>
+      <StyledCard minHeight={102}>
+        <CardContainer>
+          <LogoSection>
+            <TrezorLogo />
+            <LogoText disabled isAlwaysVisible>
+              {lang.t('homepage.coming_soon')}
+            </LogoText>
+          </LogoSection>
+          <StyledSubscribeForm />
+        </CardContainer>
+      </StyledCard>
 
-      {/*
-      <StyledCard>
-        <StyledCardContainer>
-          <StyledWalletConnect>
+      {/* <StyledCard>
+        <CardContainer>
+          <LogoSection>
             <StyledWalletConnectLogo />
-            <p>{lang.t('homepage.connect_walletconnect')}</p>
-            <StyledWalletConnectButton
-              left
-              color="walletconnect"
-              onClick={this.onWalletConnectInit}
-            >
-              {lang.t('button.connect_walletconnect')}
-            </StyledWalletConnectButton>
-          </StyledWalletConnect>
-        </StyledCardContainer>
-      </StyledCard>
-    */}
+            <LogoText>{lang.t('homepage.connect_walletconnect')}</LogoText>
+          </LogoSection>
+          <StyledWalletConnectButton
+            left
+            color="walletconnect"
+            onClick={this.onWalletConnectInit}
+          >
+            {lang.t('button.connect_walletconnect')}
+          </StyledWalletConnectButton>
+        </CardContainer>
+      </StyledCard> */}
     </BaseLayout>
   );
 }

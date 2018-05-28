@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import MetamaskLogo from './MetamaskLogo';
 import LedgerLogo from './LedgerLogo';
 import TrezorLogo from './TrezorLogo';
+import WalletConnectLogo from './WalletConnectLogo';
 
 const AccountType = ({ accountType, ...props }) => {
   switch (accountType) {
@@ -12,6 +13,8 @@ const AccountType = ({ accountType, ...props }) => {
       return <LedgerLogo {...props} />;
     case 'TREZOR':
       return <TrezorLogo {...props} />;
+    case 'WALLETCONNECT':
+      return <WalletConnectLogo {...props} />;
     default:
       return <div {...props} />;
   }

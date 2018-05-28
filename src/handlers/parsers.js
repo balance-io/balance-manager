@@ -922,7 +922,9 @@ export const parseHistoricalPrices = async (transactions = null) => {
 
           if (
             response.data.response === 'Error' ||
-            !response.data[assetSymbol]
+            !response.data[assetSymbol] ||
+            feeResponse.data.response === 'Error' ||
+            !feeResponse.data['ETH']
           ) {
             return tx;
           }

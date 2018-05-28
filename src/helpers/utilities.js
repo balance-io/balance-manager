@@ -143,3 +143,12 @@ export const bootIntercom = () => {
   if (typeof window.Intercom !== 'undefined') setup();
   else setTimeout(setup, 500);
 };
+
+/**
+ * @desc returns an eth asset object
+ * @param  {Array} assets
+ * @return {Object}
+ */
+export const getEth = assets => {
+  return assets.filter(asset => asset.symbol === 'ETH')[0];
+};

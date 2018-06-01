@@ -84,4 +84,7 @@ const reduxProps = ({ warning }) => ({
   active: warning.active,
 });
 
-export default connect(reduxProps, null)(Warning);
+export default connect(
+  reduxProps,
+  null,
+)(Warning);

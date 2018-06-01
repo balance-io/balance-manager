@@ -11,6 +11,7 @@ import {
   hasHighMarketValue,
   hasLowMarketValue,
 } from '../../helpers/bignumber';
+import { getEthereumGraph } from '../../reducers/_graph';
 import { colors, fonts, responsive } from '../../styles';
 
 const StyledGrid = styled.div`
@@ -184,6 +185,9 @@ const StyledShowMoreTokens = styled(StyledToken)`
 `;
 
 class AccountBalances extends Component {
+  componentDidMount() {
+    this.props.getEthereumGraph();
+  }
   state = {
     disableToggle: false,
     showMoreTokens: false,
@@ -330,4 +334,9 @@ const reduxProps = ({ account }) => ({
   accountInfo: account.accountInfo,
 });
 
-export default connect(reduxProps, null)(AccountBalances);
+export default connect(
+  reduxProps,
+  {
+    getEthereumGraph,
+  },
+)(AccountBalances);

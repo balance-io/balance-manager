@@ -2,21 +2,21 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import lang from '../languages';
-import QRCodeReader from '../components/QRCodeReader';
-import Card from '../components/Card';
-import Input from '../components/Input';
-import LineBreak from '../components/LineBreak';
-import DropdownAsset from '../components/DropdownAsset';
-import Button from '../components/Button';
-import Form from '../components/Form';
-import MetamaskLogo from '../components/MetamaskLogo';
-import LedgerLogo from '../components/LedgerLogo';
-import TrezorLogo from '../components/TrezorLogo';
-import convertIcon from '../assets/convert-icon.svg';
-import arrowUp from '../assets/arrow-up.svg';
-import qrIcon from '../assets/qr-code-bnw.png';
-import { modalClose } from '../reducers/_modal';
+import lang from '../../languages';
+import QRCodeReader from '../../components/QRCodeReader';
+import Card from '../../components/Card';
+import Input from '../../components/Input';
+import LineBreak from '../../components/LineBreak';
+import DropdownAsset from '../../components/DropdownAsset';
+import Button from '../../components/Button';
+import Form from '../../components/Form';
+import MetamaskLogo from '../../components/MetamaskLogo';
+import LedgerLogo from '../../components/LedgerLogo';
+import TrezorLogo from '../../components/TrezorLogo';
+import convertIcon from '../../assets/convert-icon.svg';
+import arrowUp from '../../assets/arrow-up.svg';
+import qrIcon from '../../assets/qr-code-bnw.png';
+import { modalClose } from '../../reducers/_modal';
 import {
   sendModalInit,
   sendUpdateGasPrice,
@@ -28,17 +28,17 @@ import {
   sendUpdateSelected,
   sendMaxBalance,
   sendToggleConfirmationView,
-} from '../reducers/_send';
-import { notificationShow } from '../reducers/_notification';
-import { isValidAddress } from '../helpers/validators';
+} from '../../reducers/_send';
+import { notificationShow } from '../../reducers/_notification';
+import { isValidAddress } from '../../helpers/validators';
 import {
   convertAmountFromBigNumber,
   convertNumberToString,
   add,
   greaterThan,
-} from '../helpers/bignumber';
-import { capitalize } from '../helpers/utilities';
-import { fonts, colors } from '../styles';
+} from '../../helpers/bignumber';
+import { capitalize } from '../../helpers/utilities';
+import { fonts, colors } from '../../styles';
 
 const StyledSuccessMessage = styled.div`
   width: 100%;

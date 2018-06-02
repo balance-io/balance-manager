@@ -57,7 +57,6 @@ const balanceManagerEthAddress =
   '0x0000000000000000000000000000000000000000';
 
 const reduxProps = ({ modal, send, account }) => ({
-  fetching: send.fetching,
   recipient: send.recipient,
   nativeAmount: send.nativeAmount,
   assetAmount: send.assetAmount,
@@ -88,7 +87,6 @@ class DonationModal extends Component {
     sendToggleConfirmationView: PropTypes.func.isRequired,
     notificationShow: PropTypes.func.isRequired,
     modalClose: PropTypes.func.isRequired,
-    fetching: PropTypes.bool.isRequired,
     recipient: PropTypes.string.isRequired,
     nativeAmount: PropTypes.string.isRequired,
     assetAmount: PropTypes.string.isRequired,

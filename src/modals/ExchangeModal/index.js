@@ -2,19 +2,19 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import lang from '../languages';
-import Card from '../components/Card';
-import Input from '../components/Input';
-import LineBreak from '../components/LineBreak';
-import DropdownAsset from '../components/DropdownAsset';
-import Button from '../components/Button';
-import Form from '../components/Form';
-import MetamaskLogo from '../components/MetamaskLogo';
-import LedgerLogo from '../components/LedgerLogo';
-import TrezorLogo from '../components/TrezorLogo';
-import exchangeIcon from '../assets/exchange-icon.svg';
-import arrowUp from '../assets/arrow-up.svg';
-import { modalClose } from '../reducers/_modal';
+import lang from '../../languages';
+import Card from '../../components/Card';
+import Input from '../../components/Input';
+import LineBreak from '../../components/LineBreak';
+import DropdownAsset from '../../components/DropdownAsset';
+import Button from '../../components/Button';
+import Form from '../../components/Form';
+import MetamaskLogo from '../../components/MetamaskLogo';
+import LedgerLogo from '../../components/LedgerLogo';
+import TrezorLogo from '../../components/TrezorLogo';
+import exchangeIcon from '../../assets/exchange-icon.svg';
+import arrowUp from '../../assets/arrow-up.svg';
+import { modalClose } from '../../reducers/_modal';
 import {
   exchangeClearFields,
   exchangeModalInit,
@@ -25,8 +25,8 @@ import {
   exchangeUpdateWithdrawalSelected,
   exchangeToggleConfirmationView,
   exchangeMaxBalance,
-} from '../reducers/_exchange';
-import { notificationShow } from '../reducers/_notification';
+} from '../../reducers/_exchange';
+import { notificationShow } from '../../reducers/_notification';
 import {
   convertAmountFromBigNumber,
   convertAmountToDisplay,
@@ -38,9 +38,9 @@ import {
   greaterThan,
   smallerThan,
   convertAmountToBigNumber,
-} from '../helpers/bignumber';
-import { capitalize } from '../helpers/utilities';
-import { fonts, colors } from '../styles';
+} from '../../helpers/bignumber';
+import { capitalize } from '../../helpers/utilities';
+import { fonts, colors } from '../../styles';
 
 const StyledSuccessMessage = styled.div`
   width: 100%;

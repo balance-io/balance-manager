@@ -138,6 +138,7 @@ export const getUrlParameter = (
  * @return {Intercom}
  */
 export const bootIntercom = () => {
+  return;
   let appID = process.env.NODE_ENV === 'production' ? 'j0fl7v0m' : 'k8c9ptl1';
   const setup = () => window.Intercom('boot', { app_id: appID });
   if (typeof window.Intercom !== 'undefined') setup();

@@ -1,5 +1,5 @@
 import React from 'react';
-import LineBreak from '../components/LineBreak';
+import LineBreak from '../../components/LineBreak';
 
 const GasPriceLineBreak = ({ gasPriceOption }) => (
   <LineBreak
@@ -15,4 +15,5 @@ const GasPriceLineBreak = ({ gasPriceOption }) => (
     }
   />
 );
+
 export default GasPriceLineBreak;

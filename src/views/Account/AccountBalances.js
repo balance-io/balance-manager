@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../../languages';
 import AssetIcon from '../../components/AssetIcon';
+import Graph from '../../components/Graph';
 import ToggleIndicator from '../../components/ToggleIndicator';
 import { ellipseText } from '../../helpers/utilities';
 import {
@@ -11,7 +12,6 @@ import {
   hasHighMarketValue,
   hasLowMarketValue,
 } from '../../helpers/bignumber';
-import { getEthereumGraph } from '../../reducers/_graph';
 import { colors, fonts, responsive } from '../../styles';
 
 const StyledGrid = styled.div`
@@ -185,9 +185,6 @@ const StyledShowMoreTokens = styled(StyledToken)`
 `;
 
 class AccountBalances extends Component {
-  componentDidMount() {
-    this.props.getEthereumGraph();
-  }
   state = {
     disableToggle: false,
     showMoreTokens: false,
@@ -252,6 +249,7 @@ class AccountBalances extends Component {
           </StyledPercentage>
           <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
         </StyledEthereum>
+        <Graph symbol={ethereum.symbol} />
         {!!tokensAlwaysDisplay &&
           tokensAlwaysDisplay.map(token => (
             <StyledToken
@@ -329,14 +327,16 @@ class AccountBalances extends Component {
 
 AccountBalances.propTypes = {
   accountInfo: PropTypes.object.isRequired,
+  // graphs: PropTypes.object.isRequired,
 };
-const reduxProps = ({ account }) => ({
-  accountInfo: account.accountInfo,
-});
 
-export default connect(
-  reduxProps,
-  {
-    getEthereumGraph,
-  },
-)(AccountBalances);
+const mapStateToProps = state => {
+  return {
+    accountInfo: state.account.accountInfo,
+    graphs: {
+      ethereum: state.graph.ethereum,
+    },
+  };
+};
+
+export default connect(mapStateToProps)(AccountBalances);

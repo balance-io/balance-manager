@@ -66,6 +66,7 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-react": "^7.7.0",
+    "fusioncharts": "^3.12.2",
     "hapi": "^17.5.1",
     "husky": "^0.14.3",
     "inert": "^5.1.0",

@@ -217,26 +217,22 @@ export const exchangeUpdateDepositAmount = (
 ) => (dispatch, getState) => {
   let {
     withdrawalAmount,
+    withdrawalNative,
     depositSelected,
     withdrawalSelected,
     withdrawalPrice,
   } = getState().exchange;
-  depositAmount = `${depositAmount}`.replace(/[^0-9.]/g, '');
-  if (!depositAmount) {
+  const parsedDepositAmount = parseFloat(depositAmount);
+  if (!parsedDepositAmount || parsedDepositAmount <= 0) {
     withdrawalAmount = '';
   }
-  const withdrawalNative = withdrawalAmount
-    ? multiply(
-        withdrawalAmount,
-        convertAmountFromBigNumber(withdrawalPrice.amount),
-      )
-    : '';
+  withdrawalNative = withdrawalAmount ? withdrawalNative : '';
   dispatch({
     type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_REQUEST,
     payload: { depositAmount, withdrawalAmount, withdrawalNative },
   });
   const getExchangeDetailsPromise = timeoutEnabled => {
-    if (depositAmount || !timeoutEnabled) {
+    if (parsedDepositAmount && parsedDepositAmount > 0 && !timeoutEnabled) {
       apiShapeshiftGetExchangeDetails({
         request: {
           depositSymbol: depositSelected.symbol,
@@ -301,8 +297,8 @@ export const exchangeUpdateWithdrawalAmount = (
     withdrawalPrice,
     withdrawalNative,
   } = getState().exchange;
-  withdrawalAmount = `${withdrawalAmount}`.replace(/[^0-9.]/g, '');
-  if (!withdrawalAmount) {
+  const parsedWithdrawalAmount = parseFloat(withdrawalAmount);
+  if (!parsedWithdrawalAmount || parsedWithdrawalAmount <= 0) {
     depositAmount = '';
   }
   withdrawalNative = disableNative
@@ -323,7 +319,11 @@ export const exchangeUpdateWithdrawalAmount = (
     },
   });
   const getExchangeDetailsPromise = timeoutEnabled => {
-    if (withdrawalAmount || !timeoutEnabled) {
+    if (
+      parsedWithdrawalAmount &&
+      parsedWithdrawalAmount > 0 &&
+      !timeoutEnabled
+    ) {
       apiShapeshiftGetExchangeDetails({
         request: {
           depositSymbol: depositSelected.symbol,
@@ -459,7 +459,6 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
     withdrawalSelected,
     gasPrice,
     gasLimit,
-    exchangeDetails,
   } = getState().exchange;
   dispatch({ type: EXCHANGE_TRANSACTION_REQUEST });
   const { accountType } = getState().account;
@@ -480,9 +479,12 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
         type: EXCHANGE_TRANSACTION_SUCCESS,
         payload: txHash,
       });
+    })
+    .then(() => {
       const incomingTx = {
-        hash: `shapeshift_${exchangeDetails.orderId}`,
+        hash: `shapeshift_${recipient}`,
         asset: withdrawalSelected,
+        nonce: null,
         from: '',
         to: address,
         amount: withdrawalAmount,

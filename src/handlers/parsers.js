@@ -615,8 +615,11 @@ export const parseNewTransaction = async (
     amount,
     display: convertAmountToDisplay(amount, null, txDetails.asset),
   };
-  const nonce = txDetails.nonce || (await getTransactionCount(txDetails.from));
+  const nonce =
+    txDetails.nonce ||
+    (txDetails.from ? await getTransactionCount(txDetails.from) : '');
 
+  console.log('txdetails hash', txDetails.hash);
   let tx = {
     hash: txDetails.hash,
     timestamp: null,
@@ -690,6 +693,7 @@ export const parseNewTransaction = async (
     );
   }
 
+  console.log('parsed new tx', tx);
   _transactions = [tx, ..._transactions];
 
   return _transactions;
@@ -714,6 +718,45 @@ export const parseConfirmedTransaction = (
       tx.timestamp = timestamp;
     }
     _transactions.push(tx);
+  });
+  return _transactions;
+};
+
+/**
+ * @desc update successful shapeshift deposit
+ * @param  {Object} [transactions=null]
+ * @param  {String} [hash='']
+ * @param  {String} [newHash='']
+ * @return {Array}
+ */
+export const parseConfirmedDeposit = (
+  transactions = null,
+  hash = '',
+  newHash = '',
+) => {
+  let _transactions = [];
+  transactions.forEach(tx => {
+    if (tx.hash.toLowerCase() === hash.toLowerCase()) {
+      tx.pending = true;
+      tx.hash = newHash;
+    }
+    _transactions.push(tx);
+  });
+  return _transactions;
+};
+
+/**
+ * @desc update failed shapeshift deposit
+ * @param  {Object} [transactions=null]
+ * @param  {String} [hash='']
+ * @return {Array}
+ */
+export const parseFailedDeposit = (transactions = null, hash = '') => {
+  let _transactions = [];
+  transactions.forEach(tx => {
+    if (tx.hash.toLowerCase() !== hash.toLowerCase()) {
+      _transactions.push(tx);
+    }
   });
   return _transactions;
 };

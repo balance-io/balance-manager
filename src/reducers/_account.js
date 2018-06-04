@@ -2,6 +2,7 @@ import _ from 'lodash';
 import lang from '../languages';
 import {
   apiShapeshiftSendAmount,
+  apiShapeshiftGetDepositStatus,
   apiGetAccountBalances,
   apiGetAccountTransactions,
   apiGetPrices,
@@ -10,6 +11,8 @@ import {
 import {
   parseError,
   parseNewTransaction,
+  parseConfirmedDeposit,
+  parseFailedDeposit,
   parseAccountBalancesPrices,
   parsePricesObject,
   parseConfirmedTransaction,
@@ -89,8 +92,21 @@ const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 let getPricesInterval = null;
 
 export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
-  const network = getState().account.network;
   dispatch({ type: ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST });
+  if (txHash.startsWith('shapeshift')) {
+    console.log('checking shift status');
+    const depositAddress = txHash.split('_')[1];
+    dispatch(accountGetShiftStatus(txHash, depositAddress));
+  } else {
+    const network = getState().account.network;
+    dispatch(accountGetTransactionStatus(txHash, network));
+  }
+};
+
+export const accountGetTransactionStatus = (txHash, network) => (
+  dispatch,
+  getState,
+) => {
   apiGetTransactionStatus(txHash, network)
     .then(({ data }) => {
       if (data) {
@@ -108,7 +124,67 @@ export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
         });
         dispatch(accountUpdateBalances());
       } else {
-        setTimeout(() => dispatch(accountCheckTransactionStatus(txHash)), 1000);
+        setTimeout(
+          () => dispatch(accountGetTransactionStatus(txHash, network)),
+          1000,
+        );
+      }
+    })
+    .catch(error => {
+      dispatch({ type: ACCOUNT_CHECK_TRANSACTION_STATUS_FAILURE });
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+    });
+};
+
+export const accountGetShiftStatus = (txHash, depositAddress) => (
+  dispatch,
+  getState,
+) => {
+  dispatch({ type: ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST });
+  apiShapeshiftGetDepositStatus(depositAddress)
+    .then(({ data }) => {
+      if (data) {
+        console.log('shift status data', data);
+        const transactions = getState().account.transactions;
+        const address = getState().account.accountInfo.address;
+        const network = getState().account.network;
+        if (data['status'] === 'complete') {
+          console.log('deposit status is complete');
+          const updatedTxHash = data['transaction'];
+          console.log('updated txn hash', updatedTxHash);
+          const _transactions = parseConfirmedDeposit(
+            transactions,
+            txHash,
+            updatedTxHash,
+          );
+          updateLocalTransactions(address, _transactions, network);
+          dispatch({
+            type: ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS,
+            payload: _transactions,
+          });
+          dispatch(accountGetTransactionStatus(updatedTxHash));
+        } else if (data['status'] === 'failed') {
+          console.log('deposit status failed');
+          const _transactions = parseFailedDeposit(transactions, txHash);
+          dispatch({
+            type: ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS,
+            payload: _transactions,
+          });
+          updateLocalTransactions(address, _transactions, network);
+        } else {
+          console.log('deposit status calling again');
+          setTimeout(
+            () => dispatch(accountGetShiftStatus(txHash, depositAddress)),
+            1000,
+          );
+        }
+      } else {
+        console.log('deposit status calling again 2');
+        setTimeout(
+          () => dispatch(accountGetShiftStatus(txHash, depositAddress)),
+          1000,
+        );
       }
     })
     .catch(error => {
@@ -121,6 +197,7 @@ export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
 export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
   dispatch({ type: ACCOUNT_UPDATE_TRANSACTIONS_REQUEST });
   const currentTransactions = getState().account.transactions;
+  console.log(`current txns for hash: ${txDetails.hash}`, currentTransactions);
   const network = getState().account.network;
   const address = getState().account.accountInfo.address;
   const nativeCurrency = getState().account.nativeCurrency;
@@ -137,6 +214,7 @@ export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
         type: ACCOUNT_UPDATE_TRANSACTIONS_SUCCESS,
         payload: transactions,
       });
+      console.log('about to check txn status');
       dispatch(accountCheckTransactionStatus(txDetails.hash));
     })
     .catch(error => {

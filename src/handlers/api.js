@@ -234,6 +234,14 @@ export const apiShapeshiftGetMarketInfo = (pair = '') =>
   shapeshift.get(`/marketinfo/${pair}`);
 
 /**
+ * @desc shapeshift get txn status of deposit address
+ * @param  {String}   [depositAddress = '']
+ * @return {Promise}
+ */
+export const apiShapeshiftGetDepositStatus = (depositAddress = '') =>
+  shapeshift.get(`/txStat/${depositAddress}`);
+
+/**
  * @desc shapeshift get fixed or quoted price
  * @param  {String}   [depositSymbol = '']
  * @param  {String}   [withdrawalSymbol = '']

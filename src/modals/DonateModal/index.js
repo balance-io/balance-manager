@@ -74,7 +74,7 @@ const reduxProps = ({ modal, send, account }) => ({
   prices: account.prices,
 });
 
-class DonationModal extends Component {
+class DonateModal extends Component {
   propTypes = {
     sendModalInit: PropTypes.func.isRequired,
     sendUpdateGasPrice: PropTypes.func.isRequired,
@@ -355,4 +355,4 @@ export default connect(reduxProps, {
   sendUpdateAssetAmount,
   sendToggleConfirmationView,
   notificationShow,
-})(DonationModal);
+})(DonateModal);

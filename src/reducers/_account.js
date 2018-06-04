@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import lang from '../languages';
+import lang, { updateLanguage } from '../languages';
 import {
   apiGetAccountBalances,
   apiGetAccountTransactions,
@@ -74,9 +74,9 @@ const ACCOUNT_UPDATE_ACCOUNT_ADDRESS = 'account/ACCOUNT_UPDATE_ACCOUNT_ADDRESS';
 const ACCOUNT_UPDATE_NETWORK = 'account/ACCOUNT_UPDATE_NETWORK';
 
 const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
+const ACCOUNT_CHANGE_LANGUAGE = 'account/ACCOUNT_CHANGE_LANGUAGE';
 
 // -- Actions --------------------------------------------------------------- //
-
 let getPricesInterval = null;
 
 export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
@@ -303,6 +303,16 @@ export const accountUpdateAccountAddress = (accountAddress, accountType) => (
   dispatch(accountGetAccountBalances());
 };
 
+export const accountChangeLanguage = language => dispatch => {
+    //TODO: needs to trigger render after change
+    updateLanguage(language);
+    saveLocal('language', language);
+    dispatch({
+        type: ACCOUNT_CHANGE_LANGUAGE,
+        payload: { language }
+    });
+}
+
 export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
   const assetSymbols = accountInfo.assets.map(asset => asset.symbol);
   const getPrices = () => {
@@ -369,6 +379,7 @@ export const accountClearState = () => dispatch => {
 const INITIAL_STATE = {
   nativePriceRequest: getLocal('native_currency') || 'USD',
   nativeCurrency: getLocal('native_currency') || 'USD',
+  language: getLocal('language') || 'en',
   prices: {},
   network: 'mainnet',
   accountType: '',
@@ -442,6 +453,11 @@ export default (state = INITIAL_STATE, action) => {
         accountInfo: action.payload.accountInfo,
         transactions: action.payload.transactions,
       };
+    case ACCOUNT_CHANGE_LANGUAGE:
+      return {
+        ...state,
+        language: action.payload.language
+      }
     case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:
     case ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE:
       return { ...state, fetching: false };

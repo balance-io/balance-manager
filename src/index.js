@@ -4,6 +4,7 @@ import './helpers/intercom';
 import { injectGlobal } from 'styled-components';
 import { globalStyles } from './styles';
 import { bootIntercom } from './helpers/utilities';
+import { getLocal } from './handlers/localstorage';
 import lang, { resources } from './languages';
 import Root from './Root';
 
@@ -15,7 +16,7 @@ bootIntercom();
 
 // Languages (i18n)
 lang.init({
-  lng: 'en',
+  lng: getLocal('language') || 'en',
   debug: process.env.NODE_ENV === 'development',
   resources,
 });

@@ -32,13 +32,12 @@ import {
 } from '../../reducers/_send';
 import { notificationShow } from '../../reducers/_notification';
 
+import { greaterThan } from '../../helpers/bignumber';
 import {
-  convertAmountFromBigNumber,
-  convertNumberToString,
-  add,
-  greaterThan,
-} from '../../helpers/bignumber';
-import { capitalize, getEth } from '../../helpers/utilities';
+  capitalize,
+  getEth,
+  prepareTransaction,
+} from '../../helpers/utilities';
 
 import {
   StyledIcon,
@@ -112,6 +111,12 @@ class DonationModal extends Component {
   onSubmit = e => {
     e.preventDefault();
 
+    const accountState = prepareTransaction(
+      this.props.accountInfo.assets,
+      this.props.assetAmount,
+      this.props.assetAmount,
+    );
+
     if (!this.props.gasPrice.txFee) {
       this.props.notificationShow(
         lang.t('notification.error.generic_error'),
@@ -125,22 +130,15 @@ class DonationModal extends Component {
         return;
       }
 
-      // Make helper function
-      const ethereum = getEth(this.props.accountInfo.assets);
-      const balanceAmount = ethereum.balance.amount;
-      const balance = convertAmountFromBigNumber(balanceAmount);
-      const requestedAmount = convertNumberToString(this.props.assetAmount);
-      const txFeeAmount = this.props.gasPrice.txFee.value.amount;
-      const txFee = convertAmountFromBigNumber(txFeeAmount);
-      const includingFees = add(requestedAmount, txFee);
-
-      if (greaterThan(requestedAmount, balance)) {
+      if (greaterThan(accountState.requestedAmount, accountState.balance)) {
         this.props.notificationShow(
           lang.t('notification.error.insufficient_balance'),
           true,
         );
         return;
-      } else if (greaterThan(includingFees, balance)) {
+      } else if (
+        greaterThan(accountState.amountWithFees, accountState.balance)
+      ) {
         this.props.notificationShow(
           lang.t('notification.error.insufficient_for_fees'),
           true,

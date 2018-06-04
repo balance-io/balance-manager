@@ -1,3 +1,9 @@
+import {
+  convertAmountFromBigNumber,
+  convertNumberToString,
+  add,
+} from './bignumber';
+
 /**
  * @desc debounce api request
  * @param  {Function}  request
@@ -152,4 +158,21 @@ export const bootIntercom = () => {
  */
 export const getEth = assets => {
   return assets.filter(asset => asset.symbol === 'ETH')[0];
+};
+
+/**
+ * @desc returns an eth asset object
+ * @param  {Array} assets
+ * @return {Object}
+ */
+export const prepareTransaction = (accountInfo, assetAmount, gasPrice) => {
+  const ethereum = getEth(accountInfo.assets);
+  const balanceAmount = ethereum.balance.amount;
+  const balance = convertAmountFromBigNumber(balanceAmount);
+  const requestedAmount = convertNumberToString(assetAmount);
+  const txFeeAmount = gasPrice.txFee.value.amount;
+  const txFee = convertAmountFromBigNumber(txFeeAmount);
+  const amountWithFees = add(requestedAmount, txFee);
+
+  return { requestedAmount, balance, amountWithFees };
 };

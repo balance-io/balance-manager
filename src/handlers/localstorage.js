@@ -1,19 +1,33 @@
+const version = '0.1.0';
+
 /**
  * @desc save to local storage
  * @param  {String}  [key='']
  * @param  {Object}  [data={}]
  * @return {Object}
  */
-export const saveLocal = (key = '', data = {}) =>
-  localStorage.setItem(key, JSON.stringify(data));
+export const saveLocal = (key = '', data = {}) => {
+  data['localStorageVersion'] = version;
+  const jsonData = JSON.stringify(data);
+  localStorage.setItem(key, jsonData);
+};
 
 /**
  * @desc get from local storage
  * @param  {String}  [key='']
  * @return {Object}
  */
-export const getLocal = (key = '') =>
-  localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : null;
+export const getLocal = (key = '') => {
+  const data = localStorage.getItem(key)
+    ? JSON.parse(localStorage.getItem(key))
+    : null;
+  if (data && data['localStorageVersion'] === version) {
+    return data;
+  } else if (data) {
+    removeLocal(key);
+  }
+  return null;
+};
 
 /**
  * @desc get from local storage

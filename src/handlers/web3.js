@@ -14,6 +14,10 @@ import { ledgerEthSignTransaction } from './ledger-eth';
 import { walletConnectSignTransaction } from './walletconnect';
 import ethUnits from '../references/ethereum-units.json';
 import smartContractMethods from '../references/smartcontract-methods.json';
+import * as ENS from 'ethjs-ens';
+
+Web3.providers.HttpProvider.prototype.sendAsync =
+  Web3.providers.HttpProvider.prototype.send;
 
 /**
  * @desc web3 http instance
@@ -21,6 +25,20 @@ import smartContractMethods from '../references/smartcontract-methods.json';
 export const web3Instance = new Web3(
   new Web3.providers.HttpProvider(`https://mainnet.infura.io/`),
 );
+
+export let ens;
+if (typeof window.web3 !== 'undefined') {
+  console.log('web3 browser detected, using.');
+  window.web3.version.getNetwork(function(err, network) {
+    if (err) {
+      console.log(err);
+    }
+    ens = new ENS({
+      provider: web3Instance.currentProvider,
+      network: network,
+    });
+  });
+}
 
 /**
  * @desc set a different web3 provider

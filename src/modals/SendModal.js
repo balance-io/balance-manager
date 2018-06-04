@@ -39,6 +39,7 @@ import {
 } from '../helpers/bignumber';
 import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
+import { ens } from '../handlers/web3';
 
 const StyledSuccessMessage = styled.div`
   width: 100%;
@@ -283,6 +284,24 @@ class SendModal extends Component {
     this.props.sendModalInit();
   };
 
+  updateEns = target => {
+    if (target.value.includes('.')) {
+      ens
+        .lookup(target.value.trim())
+        .then(address => {
+          this.props.sendUpdateRecipient(address, this.props.selected.symbol);
+        })
+        .catch(reason => {
+          console.log('ENS failed');
+          // console.error(reason);
+        });
+    }
+    this.props.sendUpdateRecipient(
+      target.value.trim(),
+      this.props.selected.symbol,
+    );
+  };
+
   onSubmit = e => {
     e.preventDefault();
     const request = {
@@ -424,12 +443,11 @@ class SendModal extends Component {
                   spellCheck="false"
                   placeholder="0x..."
                   type="text"
-                  value={this.props.recipient}
                   onFocus={this.onAddressInputFocus}
                   onBlur={this.onAddressInputBlur}
-                  onChange={({ target }) =>
-                    this.props.sendUpdateRecipient(target.value)
-                  }
+                  onChange={({ target }) => {
+                    this.updateEns(target);
+                  }}
                 />
                 {this.props.recipient &&
                   !this.state.isValidAddress && (

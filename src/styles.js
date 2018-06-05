@@ -12,6 +12,7 @@ export const colors = {
   brightGreen: '18, 184, 120',
   brightGreenHover: '21, 193, 127',
   lightGrey: '247, 248, 252',
+  borderGrey: '227,227,227',
   blue: '101, 127, 230',
   blueHover: '108, 135, 245',
   blueActive: '90, 113, 204',

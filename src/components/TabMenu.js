@@ -7,7 +7,7 @@ import Button from './Button';
 import balancesTabIcon from '../assets/balances-tab.svg';
 import transactionsTabIcon from '../assets/transactions-tab.svg';
 import interactionsTabIcon from '../assets/interactions-tab.svg';
-import loansTabIcon from '../assets/interactions-tab.svg';
+import loansTabIcon from '../assets/loans-tab.svg';
 import tabBackground from '../assets/tab-background.png';
 import { colors, fonts, shadows, transitions } from '../styles';
 
@@ -30,8 +30,11 @@ const StyledTabsWrapper = styled.div`
   }
 
   & a:nth-child(3) button {
-    padding-left: 38px;
     margin-left: 8px;
+  }
+
+  & a:nth-child(4) button {
+    margin-left: 10px;
   }
 `;
 
@@ -58,7 +61,6 @@ const StyledTab = styled(Button)`
   -webkit-box-shadow: ${shadows.medium};
   box-shadow: ${shadows.medium};
   margin: 0;
-  margin-left: 10px;
   display: flex;
   opacity: 1 !important;
   padding-top: 12.5px;
@@ -120,13 +122,13 @@ class TabMenu extends Component {
         newState = { activeTab: 'BALANCES_TAB', tabPosition: offset - 87 };
         break;
       case '/transactions':
-        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: offset + 51 };
+        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: offset + 45 };
         break;
       case '/interactions':
-        newState = { activeTab: 'INTERACTIONS_TAB', tabPosition: 229 };
+        newState = { activeTab: 'INTERACTIONS_TAB', tabPosition: offset + 175 };
         break;
       case '/loans':
-        newState = { activeTab: 'LOANS_TAB', tabPosition: 350 };
+        newState = { activeTab: 'LOANS_TAB', tabPosition: offset + 300 };
         break;
       default:
         break;
@@ -195,6 +197,7 @@ class TabMenu extends Component {
       'account.tab_balances',
       'account.tab_transactions',
       'account.tab_interactions',
+      'account.tab_loans',
     ].map(resourceName => lang.t(resourceName).length);
 
     return tabCharSizes[0] * 5;

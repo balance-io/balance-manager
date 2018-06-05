@@ -22,6 +22,7 @@
       "tab_balances_tooltip": "Ethereum and Token Balances",
       "tab_transactions_tooltip": "Transactions and Token Transfers",
       "tab_interactions_tooltip": "Smart Contract Interactions",
+      "tab_loans_tooltip": "Collatoralized Loans",
       "label_asset": "Asset",
       "label_quantity": "Quantity",
       "label_price": "Price",

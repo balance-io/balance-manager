@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="29px" height="29px" viewBox="0 0 29 29" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>dai</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="loan-options" transform="translate(-95.000000, -306.000000)" fill-rule="nonzero">
+            <g id="dai" transform="translate(95.000000, 306.000000)">
+                <circle id="Oval" fill="#FEBE44" cx="14.4836026" cy="14.4836026" r="14.4765751"></circle>
+                <polygon id="Shape" fill="#FFFFFF" opacity="0.319999993" points="14.4836963 3.15331664 25.5732213 14.2427948 14.4836963 25.3323667 3.39417124 14.2427948"></polygon>
+                <polygon id="Shape" fill="#FFFFFF" points="14.4836026 17.8614701 3.38489499 14.2423263 14.4836026 3.15298869 25.5823102 14.2423263"></polygon>
+                <polygon id="Shape" fill="#FEBE44" points="7.24531502 13.5184976 12.3121163 13.5184976 14.4836026 11.1057351 16.8963651 13.5184976 21.9631664 13.5184976 14.4836026 5.43597738"></polygon>
+                <polygon id="Shape" fill="#FFFFFF" opacity="0.42" points="14.4836026 25.331664 14.4836026 3.15298869 25.5729402 14.2423263 14.4836026 25.331664"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

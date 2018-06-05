@@ -31,6 +31,11 @@ yarn start
 npm run start
 ```
 
+```
+npm run start:dev
+```
+To start the proxy for querying Binance for graph data
+
 For production
 
 ```

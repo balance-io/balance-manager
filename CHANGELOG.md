@@ -6,18 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
+## 06-05-2018
 
 ### Added
-
-*
+- Toggle graph for each currency
+- All open graphs are updated when native currency are updated
+- Graphs reducer
 
 ### Changed
-
-*
-
-### Removed
-
-*
+- Change native currency updates open graphs
 
 ## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 

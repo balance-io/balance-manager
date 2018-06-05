@@ -461,4 +461,7 @@ const reduxProps = ({ account }) => ({
   nativeCurrency: account.nativeCurrency,
 });
 
-export default connect(reduxProps, null)(AccountViewTransactions);
+export default connect(
+  reduxProps,
+  null,
+)(AccountViewTransactions);

@@ -240,7 +240,6 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
   });
   apiGetAccountBalances(accountAddress, network)
     .then(({ data }) => {
-      console.log(data);
       let accountInfo = { ...data, type: accountType };
       updateLocalBalances(accountAddress, accountInfo, network);
       dispatch({ type: ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS });

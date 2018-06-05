@@ -238,6 +238,8 @@ export const apiShapeshiftGetQuotedPrice = (amount = '', exchangePair = '') =>
  * @desc get candles for Ethereum graph
  * @return {Promise}
  */
-export const apiGetEthereumGraph = () => {
-  return axios.get('/candles');
+
+export const apiGetEthereumGraph = (symbol, nativeCurrency) => {
+  // Get user chosen currency (selected upper right)
+  return axios.get(`/candles/${symbol}${nativeCurrency}`);
 };

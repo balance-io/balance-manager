@@ -21,6 +21,7 @@ import {
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
 } from '../reducers/_account';
+import { graphGetCurrencyGraphs } from '../reducers/_graph';
 import { colors, responsive } from '../styles';
 import ReminderRibbon from '../components/ReminderRibbon';
 
@@ -131,6 +132,7 @@ const BaseLayout = ({
   web3Available,
   online,
   modalOpen,
+  graphGetCurrencyGraphs,
   ...props
 }) => {
   const addresses = {};
@@ -186,7 +188,10 @@ const BaseLayout = ({
               displayKey={`currency`}
               selected={nativeCurrency}
               options={nativeCurrencies}
-              onChange={accountChangeNativeCurrency}
+              onChange={newNativeCurrency => {
+                accountChangeNativeCurrency(newNativeCurrency);
+                graphGetCurrencyGraphs(newNativeCurrency);
+              }}
             />
           </StyledIndicators>
         </StyledHeader>
@@ -246,5 +251,6 @@ export default connect(
     accountChangeNativeCurrency,
     accountUpdateAccountAddress,
     modalOpen,
+    graphGetCurrencyGraphs,
   },
 )(BaseLayout);

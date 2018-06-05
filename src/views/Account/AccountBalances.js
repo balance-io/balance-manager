@@ -248,8 +248,8 @@ class AccountBalances extends Component {
             {ethereum.native ? ethereum.native.change.display : '———'}
           </StyledPercentage>
           <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
+          <Graph symbol={'ETH'} />
         </StyledEthereum>
-        <Graph symbol={ethereum.symbol} />
         {!!tokensAlwaysDisplay &&
           tokensAlwaysDisplay.map(token => (
             <StyledToken
@@ -271,6 +271,7 @@ class AccountBalances extends Component {
                 {token.native ? token.native.change.display : '———'}
               </StyledPercentage>
               <p>{token.native ? token.native.balance.display : '———'}</p>
+              <Graph symbol={token.symbol} />
             </StyledToken>
           ))}
         {!!tokensToggleDisplay.length &&
@@ -333,9 +334,6 @@ AccountBalances.propTypes = {
 const mapStateToProps = state => {
   return {
     accountInfo: state.account.accountInfo,
-    graphs: {
-      ethereum: state.graph.ethereum,
-    },
   };
 };
 

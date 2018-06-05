@@ -19,7 +19,7 @@ import {
   convertAmountToDisplay,
 } from '../helpers/bignumber';
 import { notificationShow } from './_notification';
-import { accountUpdateTransactions } from './_account';
+import { accountUpdateExchange } from './_account';
 import ethUnits from '../references/ethereum-units.json';
 
 // -- Constants ------------------------------------------------------------- //
@@ -474,13 +474,6 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
   web3SendTransactionMultiWallet(txDetails, accountType)
     .then(txHash => {
       txDetails.hash = txHash;
-      dispatch(accountUpdateTransactions(txDetails));
-      dispatch({
-        type: EXCHANGE_TRANSACTION_SUCCESS,
-        payload: txHash,
-      });
-    })
-    .then(() => {
       const incomingTx = {
         hash: `shapeshift_${recipient}`,
         asset: withdrawalSelected,
@@ -488,10 +481,16 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
         from: '',
         to: address,
         amount: withdrawalAmount,
+        value: withdrawalAmount,
         gasPrice: '',
         gasLimit: '',
       };
-      dispatch(accountUpdateTransactions(incomingTx));
+      console.log('about to exchange incoming', incomingTx);
+      dispatch(accountUpdateExchange([txDetails, incomingTx]));
+      dispatch({
+        type: EXCHANGE_TRANSACTION_SUCCESS,
+        payload: txHash,
+      });
     })
     .catch(error => {
       const message = parseError(error);

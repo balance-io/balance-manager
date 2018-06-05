@@ -166,6 +166,15 @@ export const apiGetTransactionData = (
 ) => api.get(`/get_transactions/${network}/${address}/${page}`);
 
 /**
+ * @desc get transaction
+ * @param  {String}   [txnHash = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetTransaction = (txnHash = '', network = 'mainnet') =>
+  api.get(`/get_transaction/${network}/${txnHash}`);
+
+/**
  * @desc get account transactions
  * @param  {String}   [address = '']
  * @param  {String}   [network = 'mainnet']

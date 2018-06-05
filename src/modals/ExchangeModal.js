@@ -782,16 +782,19 @@ const reduxProps = ({ modal, exchange, account }) => ({
   nativeCurrency: account.nativeCurrency,
 });
 
-export default connect(reduxProps, {
-  modalClose,
-  exchangeClearFields,
-  exchangeModalInit,
-  exchangeTransaction,
-  exchangeUpdateWithdrawalAmount,
-  exchangeUpdateDepositAmount,
-  exchangeUpdateDepositSelected,
-  exchangeUpdateWithdrawalSelected,
-  exchangeToggleConfirmationView,
-  exchangeMaxBalance,
-  notificationShow,
-})(ExchangeModal);
+export default connect(
+  reduxProps,
+  {
+    modalClose,
+    exchangeClearFields,
+    exchangeModalInit,
+    exchangeTransaction,
+    exchangeUpdateWithdrawalAmount,
+    exchangeUpdateDepositAmount,
+    exchangeUpdateDepositSelected,
+    exchangeUpdateWithdrawalSelected,
+    exchangeToggleConfirmationView,
+    exchangeMaxBalance,
+    notificationShow,
+  },
+)(ExchangeModal);

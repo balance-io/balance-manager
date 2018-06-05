@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../../languages';
 import AssetIcon from '../../components/AssetIcon';
+import Graph from '../../components/Graph';
 import ToggleIndicator from '../../components/ToggleIndicator';
 import { ellipseText } from '../../helpers/utilities';
 import {
@@ -247,6 +248,7 @@ class AccountBalances extends Component {
             {ethereum.native ? ethereum.native.change.display : '———'}
           </StyledPercentage>
           <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
+          <Graph symbol={'ETH'} />
         </StyledEthereum>
         {!!tokensAlwaysDisplay &&
           tokensAlwaysDisplay.map(token => (
@@ -269,6 +271,7 @@ class AccountBalances extends Component {
                 {token.native ? token.native.change.display : '———'}
               </StyledPercentage>
               <p>{token.native ? token.native.balance.display : '———'}</p>
+              <Graph symbol={token.symbol} />
             </StyledToken>
           ))}
         {!!tokensToggleDisplay.length &&
@@ -325,9 +328,13 @@ class AccountBalances extends Component {
 
 AccountBalances.propTypes = {
   accountInfo: PropTypes.object.isRequired,
+  // graphs: PropTypes.object.isRequired,
 };
-const reduxProps = ({ account }) => ({
-  accountInfo: account.accountInfo,
-});
 
-export default connect(reduxProps, null)(AccountBalances);
+const mapStateToProps = state => {
+  return {
+    accountInfo: state.account.accountInfo,
+  };
+};
+
+export default connect(mapStateToProps)(AccountBalances);

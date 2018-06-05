@@ -73,9 +73,12 @@ const reduxProps = ({ modal, walletconnect }) => ({
   webConnector: walletconnect.webConnector,
 });
 
-export default connect(reduxProps, {
-  modalClose,
-  walletConnectInit,
-  walletConnectGetSession,
-  walletConnectClearFields,
-})(WalletConnectInit);
+export default connect(
+  reduxProps,
+  {
+    modalClose,
+    walletConnectInit,
+    walletConnectGetSession,
+    walletConnectClearFields,
+  },
+)(WalletConnectInit);

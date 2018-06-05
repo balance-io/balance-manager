@@ -20,10 +20,11 @@ import { ledgerUpdateNetwork } from '../reducers/_ledger';
 import {
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
-  accountChangeLanguage
+  accountChangeLanguage,
 } from '../reducers/_account';
-import ReminderRibbon from '../components/ReminderRibbon';
+import { graphGetCurrencyGraphs } from '../reducers/_graph';
 import { colors, responsive } from '../styles';
+import ReminderRibbon from '../components/ReminderRibbon';
 import { resources } from '../languages';
 
 const StyledLayout = styled.div`
@@ -135,6 +136,7 @@ const BaseLayout = ({
   web3Available,
   online,
   modalOpen,
+  graphGetCurrencyGraphs,
   ...props
 }) => {
   const addresses = {};
@@ -145,11 +147,11 @@ const BaseLayout = ({
   }
   const languages = {};
   Object.keys(resources).forEach(resource => {
-      languages[resource] = {
-          code: resource,
-          description: resource.toUpperCase()
-      };
-  })
+    languages[resource] = {
+      code: resource,
+      description: resource.toUpperCase(),
+    };
+  });
   const showToolbar =
     window.location.pathname !== '/' &&
     (!metamaskFetching || !ledgerFetching) &&
@@ -185,11 +187,11 @@ const BaseLayout = ({
                   <StyledVerticalLine />
                 </Fragment>
               )}
-            <Dropdown 
-                displayKey={`description`}
-                selected={language}
-                options={languages}
-                onChange={accountChangeLanguage}
+            <Dropdown
+              displayKey={`description`}
+              selected={language}
+              options={languages}
+              onChange={accountChangeLanguage}
             />
             <StyledVerticalLine />
             <Dropdown
@@ -204,7 +206,10 @@ const BaseLayout = ({
               displayKey={`currency`}
               selected={nativeCurrency}
               options={nativeCurrencies}
-              onChange={accountChangeNativeCurrency}
+              onChange={newNativeCurrency => {
+                accountChangeNativeCurrency(newNativeCurrency);
+                graphGetCurrencyGraphs(newNativeCurrency);
+              }}
             />
           </StyledIndicators>
         </StyledHeader>
@@ -260,10 +265,14 @@ const reduxProps = ({ account, ledger, metamask, warning }) => ({
   online: warning.online,
 });
 
-export default connect(reduxProps, {
-  ledgerUpdateNetwork,
-  accountChangeNativeCurrency,
-  accountUpdateAccountAddress,
-  modalOpen,
-  accountChangeLanguage
-})(BaseLayout);
+export default connect(
+  reduxProps,
+  {
+    ledgerUpdateNetwork,
+    accountChangeNativeCurrency,
+    accountUpdateAccountAddress,
+    modalOpen,
+    accountChangeLanguage,
+    graphGetCurrencyGraphs,
+  },
+)(BaseLayout);

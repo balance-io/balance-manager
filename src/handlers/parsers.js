@@ -600,6 +600,12 @@ export const parseNewTransaction = async (
   nativeCurrency = '',
 ) => {
   console.log('txdetails', txDetails);
+  let ethFeeAsset = {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    address: null,
+    decimals: 18,
+  };
 
   let totalGas = multiply(txDetails.gasLimit, txDetails.gasPrice);
   let txFee = {
@@ -643,7 +649,11 @@ export const parseNewTransaction = async (
   const assetSymbol = tx.asset.symbol;
   tx.native = { selected: nativeCurrencies[nativeCurrency] };
 
-  const response = await apiGetHistoricalPrices(assetSymbol, timestamp);
+  const priceAssets = [assetSymbol, 'ETH'];
+  const promises = priceAssets.map(x => apiGetHistoricalPrices(x, timestamp));
+  const historicalPriceResponses = await Promise.all(promises);
+  const response = historicalPriceResponses[0];
+  const feeResponse = historicalPriceResponses[1];
 
   if (response.data.response !== 'Error' && response.data[assetSymbol]) {
     await Promise.all(
@@ -651,16 +661,24 @@ export const parseNewTransaction = async (
         const assetPriceAmount = convertAmountToBigNumber(
           response.data[assetSymbol][nativeCurrency],
         );
+        const feePriceAmount = convertAmountToBigNumber(
+          feeResponse.data['ETH'][nativeCurrency],
+        );
         let prices = { selected: nativeCurrencies[nativeCurrency] };
         prices[nativeCurrency] = {};
         prices[nativeCurrency][assetSymbol] = {
           price: { amount: assetPriceAmount, display: null },
         };
+        prices[nativeCurrency]['ETH'] = {
+          price: { amount: feePriceAmount, display: null },
+        };
         const assetPriceDisplay = convertAmountToDisplay(
           assetPriceAmount,
           prices,
         );
+        const feePriceDisplay = convertAmountToDisplay(feePriceAmount, prices);
         prices[nativeCurrency][assetSymbol].price.display = assetPriceDisplay;
+        prices[nativeCurrency]['ETH'].price.display = feePriceDisplay;
         const assetPrice = prices[nativeCurrency][assetSymbol].price;
         const valuePriceAmount = convertAssetAmountToNativeValue(
           tx.value.amount,
@@ -677,7 +695,7 @@ export const parseNewTransaction = async (
           : { amount: '', display: '' };
         const txFeePriceAmount = convertAssetAmountToNativeValue(
           tx.txFee.amount,
-          tx.asset,
+          ethFeeAsset,
           prices,
         );
         const txFeePriceDisplay = convertAmountToDisplay(

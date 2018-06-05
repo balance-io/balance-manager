@@ -272,6 +272,15 @@ const StyledMessage = styled.div`
   font-weight: ${fonts.weight.medium};
 `;
 
+const StyledBlockedMessage = StyledMessage.extend`
+  min-height: 400px;
+  padding-bottom: 12px;
+
+  & a {
+    color: #657fe6 !important;
+  }
+`;
+
 class ExchangeModal extends Component {
   state = {
     activeInput: '',
@@ -818,9 +827,14 @@ class ExchangeModal extends Component {
             </StyledSuccessMessage>
           )
         ) : (
-          <StyledMessage>
-            {lang.t('message.exchange_not_available')}
-          </StyledMessage>
+          <StyledBlockedMessage>
+            {lang.t('message.exchange_not_available')}.&nbsp;<a
+              href="http://pleaseprotectconsumers.org"
+              target="_blank"
+            >
+              {lang.t('message.learn_more')}
+            </a>.
+          </StyledBlockedMessage>
         )}
       </Card>
     );

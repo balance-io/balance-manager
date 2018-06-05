@@ -13,6 +13,7 @@
     "url": "https://github.com/balance-io/balance-manager/issues"
   },
   "dependencies": {
+    "@dharmaprotocol/dharma.js": "^0.0.61",
     "@ledgerhq/hw-app-eth": "^4.7.3",
     "@ledgerhq/hw-transport-u2f": "^4.7.3",
     "axios": "^0.18.0",

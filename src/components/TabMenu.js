@@ -7,6 +7,7 @@ import Button from './Button';
 import balancesTabIcon from '../assets/balances-tab.svg';
 import transactionsTabIcon from '../assets/transactions-tab.svg';
 import interactionsTabIcon from '../assets/interactions-tab.svg';
+import loansTabIcon from '../assets/interactions-tab.svg';
 import tabBackground from '../assets/tab-background.png';
 import { colors, fonts, shadows, transitions } from '../styles';
 
@@ -57,6 +58,7 @@ const StyledTab = styled(Button)`
   -webkit-box-shadow: ${shadows.medium};
   box-shadow: ${shadows.medium};
   margin: 0;
+  margin-left: 10px;
   display: flex;
   opacity: 1 !important;
   padding-top: 12.5px;
@@ -100,7 +102,7 @@ class TabMenu extends Component {
 
     this.state = {
       activeTab: 'BALANCES_TAB',
-      tabPosition: -87 + this._firstTabOffset()
+      tabPosition: -87 + this._firstTabOffset(),
     };
   }
 
@@ -122,6 +124,9 @@ class TabMenu extends Component {
         break;
       case '/interactions':
         newState = { activeTab: 'INTERACTIONS_TAB', tabPosition: 229 };
+        break;
+      case '/loans':
+        newState = { activeTab: 'LOANS_TAB', tabPosition: 350 };
         break;
       default:
         break;
@@ -169,14 +174,28 @@ class TabMenu extends Component {
               {lang.t('account.tab_interactions')}
             </StyledTab>
           </Link>
+          <Link to={`${this.props.match.url}/loans`}>
+            <StyledTab
+              data-toggle="tooltip"
+              title={lang.t('account.tab_loans_tooltip')}
+              active={this.state.activeTab === 'LOANS_TAB'}
+              icon={loansTabIcon}
+              left
+            >
+              {lang.t('account.tab_loans')}
+            </StyledTab>
+          </Link>
         </StyledTabsWrapper>
       </StyledTabMenu>
     );
   }
 
   _firstTabOffset() {
-    const tabCharSizes = ['account.tab_balances', 'account.tab_transactions', 'account.tab_interactions']
-        .map(resourceName => lang.t(resourceName).length);
+    const tabCharSizes = [
+      'account.tab_balances',
+      'account.tab_transactions',
+      'account.tab_interactions',
+    ].map(resourceName => lang.t(resourceName).length);
 
     return tabCharSizes[0] * 5;
   }

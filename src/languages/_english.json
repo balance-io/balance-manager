@@ -115,7 +115,8 @@
       "no_transactions": "No transactions found for this account",
       "no_interactions": "No interactions found for this account",
       "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum",
-      "exchange_not_available": "Exchange is not available in your area"
+      "exchange_not_available": "Exchange is not available in your area",
+      "learn_more": "Learn more"
     },
     "notification": {
       "error": {

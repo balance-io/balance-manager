@@ -12,7 +12,6 @@ import arrowReceived from '../../assets/circle-arrow.svg';
 import dharmaProtocol from '../../assets/powered-by-dharma.png';
 
 const StyledCard = styled(UnFlexedCard)`
-  display: block !important;
   border-radius: 0px;
   box-shadow: none;
 
@@ -32,11 +31,11 @@ const MenuDiv = styled.div`
   cursor: pointer;
   color: #2d2d31;
   font-size: 14.6px;
-  flex-basis: 23.4%;
   margin-top: 10px;
+  margin-right: 15px;
 
-  &:not(last-of-type) {
-    margin-right: 15px;
+  &:last-of-type {
+    margin-right: 0px;
   }
 
   @media screen and (${responsive.md.max}) {
@@ -74,7 +73,7 @@ const MenuFlex = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  justify-content: space-between;
 `;
 
 const StyledFlex = styled.div`

@@ -61,7 +61,7 @@ class Graph extends Component {
 
   render() {
     const { open } = this.state;
-    const { graph } = this.props;
+    const { graph, nativeCurrency, symbol } = this.props;
 
     function renderGraphContainer() {
       function renderContainerContent() {
@@ -75,9 +75,12 @@ class Graph extends Component {
 
         const myDataSource = {
           chart: {
-            caption: 'Ethereum',
-            subCaption: 'Worth in USD',
-            numberPrefix: '$',
+            caption: symbol,
+            subCaption: `worth in ${
+              nativeCurrency === 'GBP' || nativeCurrency === 'EUR'
+                ? 'USD'
+                : nativeCurrency
+            }`,
             showValues: '0',
           },
           data: graph.points.map(point => {

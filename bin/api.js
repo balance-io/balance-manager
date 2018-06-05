@@ -49,7 +49,7 @@ const initialize = async server => {
     method: 'get',
     path: '/candles/{symbol}',
     options: {
-      notes: 'Get candles for Ethereum in 15min intervals the last 24 hours',
+      notes: 'Get candles for currency in 1 month intervals the last year',
       handler: async (request, h) => {
         const symbol = filterNativeCurrencies(request.params.symbol);
         const time = await axios.get('https://api.binance.com/api/v1/time');

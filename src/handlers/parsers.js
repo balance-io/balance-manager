@@ -970,3 +970,21 @@ export const parseHistoricalPrices = async (transactions = null) => {
   );
   return _transactions;
 };
+
+/**
+ * @desc parse transaction historical prices
+ * @param  {Array} [data=null]
+ * @return {Array}
+ */
+
+const link = 'https://opensea.io/assets/';
+
+export const parseAccountUniqueTokens = async (data = null) => {
+  //TODO:
+  if (!data.data.assets.length) return data;
+  // let res = data.data.assets;
+  console.log(data);
+  await data.data.assets.map(el => {
+    console.log(`${link}${el.asset_contract.address}/${el.token_id}`);
+  });
+};

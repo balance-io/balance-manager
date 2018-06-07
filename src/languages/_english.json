@@ -112,6 +112,7 @@
       "failed_request": "Failed request, please refresh",
       "failed_ledger_connection": "Failed to connect to Ledger, please check your device",
       "no_transactions": "No transactions found for this account",
+      "no_unique_tokens": "No unique tokens found for this account",
       "no_interactions": "No interactions found for this account",
       "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum"
     },

@@ -431,7 +431,9 @@ const INITIAL_STATE = {
     total: '———',
   },
   transactions: [],
+  uniqueTokens: [],
   fetchingTransactions: false,
+  fetchingUniqueTokens: false,
   fetching: false,
 };
 

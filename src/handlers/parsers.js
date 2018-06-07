@@ -977,13 +977,14 @@ export const parseHistoricalPrices = async (transactions = null) => {
  * @return {Array}
  */
 export const parseAccountUniqueTokens = data => {
-  if (!data.data.assets.length) return data;
+  if (!data.data.assets.length) return [];
   const uniqueTokens = data.data.assets.map(el => ({
     background: `#${el.background_color}`,
     name: el.name,
     imageUrl: el.image_url,
     id: el.token_id,
-    lastPrice: el.last_sale && fromWei(el.last_sale.total_price),
+    lastPrice: el.last_sale && Number(fromWei(el.last_sale.total_price)),
+    contractAddress: el.asset_contract.address,
   }));
   return uniqueTokens;
 };

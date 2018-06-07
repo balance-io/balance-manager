@@ -3,64 +3,70 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../../languages';
-import AssetIcon from '../../components/AssetIcon';
-import ToggleIndicator from '../../components/ToggleIndicator';
+import Card from '../../components/Card';
 import Footer from '../../components/Footer';
+import UniqueToken from '../../components/UniqueToken';
+import { colors, fonts } from '../../styles';
 
-import { ellipseText } from '../../helpers/utilities';
-import { fetchUniqueTokens } from '../../handlers/opensea-api';
-import { colors, fonts, responsive } from '../../styles';
-
-const StyledGrid = styled.div`
-  width: 100%;
-  text-align: right;
-  position: relative;
-  z-index: 0;
-  box-shadow: 0 5px 10px 0 rgba(59, 59, 92, 0.08),
-    0 0 1px 0 rgba(50, 50, 93, 0.02), 0 3px 6px 0 rgba(0, 0, 0, 0.06);
+const UniqueTokensContainer = styled.div`
+  background: #ffffff;
 `;
 
-const Container = styled.div`
-  min-height: 79%;
-  position: relative;
+const StyledContainer = styled.div`
+  background: #f7f8fc;
+  border: 2px solid #e2e2e2;
+  border-radius: 15px;
+  padding: 20px 10px 0px;
+  margin: 15px;
 `;
 
-const OPEN_SEA_API = 'https://api.opensea.io/api/v1/assets?owner=';
+const StyledCard = styled(Card)`
+  box-shadow: none;
+`;
 
-class ShowAccountUniqueTokens extends Component {
-  state = {
-    disableToggle: false,
-    showMoreTokens: false,
-    kitties: [],
-  };
+const StyledMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(${colors.grey});
+  font-weight: ${fonts.weight.medium};
+`;
 
-  UNSAFE_componentWillMount = () => {
-    console.log(fetchUniqueTokens(this.props.accountAddress));
-  };
-
-  // onShowMoreTokens = () => {
-  //   this.setState({ showMoreTokens: !this.state.showMoreTokens });
-  // };
-
+class AccountUniqueTokens extends Component {
   render() {
-    if (!this.props.accountAddress) return null;
-    return (
-      <StyledGrid>
-        <Container />
-        <Footer />
-      </StyledGrid>
+    const { uniqueTokens } = this.props;
+    if (!uniqueTokens) return null;
+
+    return !!uniqueTokens.length ? (
+      !this.props.fetchingUniqueTokens ? (
+        <UniqueTokensContainer>
+          <StyledContainer>
+            {uniqueTokens.map(token => (
+              <UniqueToken {...token} key={token.id} />
+            ))}
+          </StyledContainer>
+          <Footer />
+        </UniqueTokensContainer>
+      ) : (
+        <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
+          <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
+        </StyledCard>
+      )
+    ) : (
+      <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
+        <StyledMessage>{lang.t('message.no_unique_tokens')}</StyledMessage>
+      </StyledCard>
     );
   }
 }
 
-ShowAccountUniqueTokens.propTypes = {
-  accountAddress: PropTypes.string.isRequired,
-  accountInfo: PropTypes.object.isRequired,
+AccountUniqueTokens.propTypes = {
+  uniqueTokens: PropTypes.array.isRequired,
+  fetchingUniqueTokens: PropTypes.bool.isRequired,
 };
-
 const reduxProps = ({ account }) => ({
-  accountAddress: account.accountAddress,
-  accountInfo: account.accountInfo,
+  uniqueTokens: account.uniqueTokens,
+  fetchingUniqueTokens: account.fetchingUniqueTokens,
 });
 
-export default connect(reduxProps, null)(ShowAccountUniqueTokens);
+export default connect(reduxProps, null)(AccountUniqueTokens);

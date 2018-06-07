@@ -1,14 +1,26 @@
 import axios from 'axios';
 import { parseAccountUniqueTokens } from './parsers';
-const OPEN_SEA_API = 'https://api.opensea.io/api/v1/assets?owner=';
 
+/**
+ * Configuration for opensea api
+ * @type axios instance
+ */
 const api = axios.create({
-  baseURL: 'https://some-domain.com/api/',
-  timeout: 30000,
+  baseURL: 'https://api.opensea.io/api/v1',
+  timeout: 30000, // 30 secs
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
 });
 
-export const fetchUniqueTokens = accountAddress => {
-  api.get(`${OPEN_SEA_API}${accountAddress}`).then(data => {
-    parseAccountUniqueTokens(data);
-  });
+/**
+ * @desc get opensea unique tokens
+ * @param  {String}   [address='']
+ * @return {Promise}
+ */
+export const apiGetAccountUniqueTokens = async (address = '') => {
+  const data = await api.get(`/assets?owner=${address}`);
+  const result = parseAccountUniqueTokens(data);
+  return result;
 };

@@ -13,7 +13,7 @@ import {
   convertAssetAmountToBigNumber,
 } from '../helpers/bignumber';
 import { debounceRequest } from '../helpers/utilities';
-import { getTransactionCount } from './web3';
+import { getTransactionCount, fromWei } from './web3';
 import { getTimeString } from '../helpers/time';
 import nativeCurrencies from '../references/native-currencies.json';
 import ethUnits from '../references/ethereum-units.json';
@@ -972,19 +972,18 @@ export const parseHistoricalPrices = async (transactions = null) => {
 };
 
 /**
- * @desc parse transaction historical prices
- * @param  {Array} [data=null]
+ * @desc parse unique tokens from opensea
+ * @param  {Object}
  * @return {Array}
  */
-
-const link = 'https://opensea.io/assets/';
-
-export const parseAccountUniqueTokens = async (data = null) => {
-  //TODO:
+export const parseAccountUniqueTokens = data => {
   if (!data.data.assets.length) return data;
-  // let res = data.data.assets;
-  console.log(data);
-  await data.data.assets.map(el => {
-    console.log(`${link}${el.asset_contract.address}/${el.token_id}`);
-  });
+  const uniqueTokens = data.data.assets.map(el => ({
+    background: `#${el.background_color}`,
+    name: el.name,
+    imageUrl: el.image_url,
+    id: el.token_id,
+    lastPrice: el.last_sale && fromWei(el.last_sale.total_price),
+  }));
+  return uniqueTokens;
 };

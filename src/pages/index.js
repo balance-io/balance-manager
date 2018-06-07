@@ -13,7 +13,7 @@ import ledgerLogoImage from '../assets/ledger-logo.svg';
 // import walletConnectLogoImage from '../assets/walletconnect-blue.svg';
 import trezorLogoImage from '../assets/trezor-logo.svg';
 import { accountUpdateAccountAddress } from '../reducers/_account';
-import { getLocal } from '../handlers/localstorage';
+import { getWalletConnectAccount } from '../handlers/localstorage';
 import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
 
@@ -159,7 +159,7 @@ const TrezorLogo = styled.div`
 
 class Home extends Component {
   onWalletConnectInit = () => {
-    const storedAddress = getLocal('walletconnect');
+    const storedAddress = getWalletConnectAccount();
     if (storedAddress) {
       this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
       this.props.history.push('/wallet');

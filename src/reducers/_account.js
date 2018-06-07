@@ -304,14 +304,14 @@ export const accountUpdateAccountAddress = (accountAddress, accountType) => (
 };
 
 export const accountChangeLanguage = language => dispatch => {
-    //TODO: needs to trigger render after change
-    updateLanguage(language);
-    saveLocal('language', language);
-    dispatch({
-        type: ACCOUNT_CHANGE_LANGUAGE,
-        payload: { language }
-    });
-}
+  //TODO: needs to trigger render after change
+  updateLanguage(language);
+  saveLocal('language', language);
+  dispatch({
+    type: ACCOUNT_CHANGE_LANGUAGE,
+    payload: { language },
+  });
+};
 
 export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
   const assetSymbols = accountInfo.assets.map(asset => asset.symbol);
@@ -456,8 +456,8 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_CHANGE_LANGUAGE:
       return {
         ...state,
-        language: action.payload.language
-      }
+        language: action.payload.language,
+      };
     case ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS:
     case ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE:
       return { ...state, fetching: false };

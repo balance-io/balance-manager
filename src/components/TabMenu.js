@@ -100,7 +100,7 @@ class TabMenu extends Component {
 
     this.state = {
       activeTab: 'BALANCES_TAB',
-      tabPosition: -87 + this._firstTabOffset()
+      tabPosition: -87 + this._firstTabOffset(),
     };
   }
 
@@ -175,8 +175,11 @@ class TabMenu extends Component {
   }
 
   _firstTabOffset() {
-    const tabCharSizes = ['account.tab_balances', 'account.tab_transactions', 'account.tab_interactions']
-        .map(resourceName => lang.t(resourceName).length);
+    const tabCharSizes = [
+      'account.tab_balances',
+      'account.tab_transactions',
+      'account.tab_interactions',
+    ].map(resourceName => lang.t(resourceName).length);
 
     return tabCharSizes[0] * 5;
   }

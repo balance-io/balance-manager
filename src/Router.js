@@ -36,12 +36,15 @@ Router.contextTypes = {
 };
 
 const reduxProps = ({ account }) => ({
-    language: account.language
+  language: account.language,
 });
 
 export default withRouter(
-  connect(reduxProps, {
-    warningOffline,
-    warningOnline,
-  })(Router),
+  connect(
+    reduxProps,
+    {
+      warningOffline,
+      warningOnline,
+    },
+  )(Router),
 );

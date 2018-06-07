@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import lang from '../languages';
 import OpenSeaLogo from '../assets/opensea-icon.png';
 
 const Container = styled.div`
@@ -60,17 +61,17 @@ const Logo = styled.div`
 const Footer = () => (
   <Container>
     <TextField>
-      <Header>How does this work under the hood?</Header>
+      <Header>{lang.t('message.opensea_header')}</Header>
       <Text>
         <Link href="https://opensea.io/">OpenSea</Link>
-        is a market place for unique (or "non-fungible") tokens. People trade on
-        the marketspace and that gives them valu. You can pawn your tokens to
-        get money. All of this runs on Ethereum.{' '}
-        <LinkFat href="https://opensea.io/about">Learn more</LinkFat>
+        {lang.t('message.opensea_footer')}
+        <LinkFat href="https://opensea.io/about">
+          {lang.t('button.learn_more')}
+        </LinkFat>
       </Text>
     </TextField>
     <ContainerLogo>
-      <PowerUp>Powered by</PowerUp>
+      <PowerUp>{lang.t('message.power_by')}</PowerUp>
       <Logo>
         <img src={OpenSeaLogo} alt="OpenSea logo" width={35} height={35} />
         <p>OpenSea</p>

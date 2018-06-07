@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import lang from '../languages';
 import { colors, fonts, shadows, transitions } from '../styles';
 
 const StyledViewLink = styled.a`
@@ -149,10 +150,12 @@ const UniqueToken = ({
           {name} • #{id}
         </StyledName>
         <StyledCurPrice>
-          {currentPrice ? `Now: ㆔ ${currentPrice}` : ' '}
+          {currentPrice ? `${lang.t('time.now')}: ㆔ ${currentPrice}` : ' '}
         </StyledCurPrice>
         <StyledPrevPrice>
-          {lastPrice ? ` Prev. ㆔ ${lastPrice}` : 'New!'}
+          {lastPrice
+            ? ` ${lang.t('modal.previous_short')} ㆔ ${lastPrice}`
+            : `${lang.t('modal.new')}!`}
         </StyledPrevPrice>
       </StyledInfo>
     </StyledCard>
@@ -164,7 +167,7 @@ const UniqueToken = ({
       left
       target="_blank"
     >
-      View
+      {lang.t('button.view')}
     </StyledViewLink>
   </StyledToken>
 );

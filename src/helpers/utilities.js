@@ -144,8 +144,19 @@ export const getUrlParameter = (
  * @return {Intercom}
  */
 export const bootIntercom = () => {
-  return;
-  let appID = process.env.NODE_ENV === 'production' ? 'j0fl7v0m' : 'k8c9ptl1';
+  let appID;
+  switch (process.env.NODE_ENV) {
+    case 'development':
+      break;
+    case 'test':
+      appID = 'k8c9ptl1';
+      break;
+    case 'production':
+      appID = 'j0fl7v0m';
+      break;
+    default:
+      return;
+  }
   const setup = () => window.Intercom('boot', { app_id: appID });
   if (typeof window.Intercom !== 'undefined') setup();
   else setTimeout(setup, 500);
@@ -161,11 +172,13 @@ export const getEth = assets => {
 };
 
 /**
- * @desc returns an eth asset object
- * @param  {Array} assets
- * @return {Object}
+ * @desc returns an object
+ * @param  {String} accountInfo
+ * @param  {String} assetAmount
+ * @param  {String} gasPrice
+ * @return { Object } ethereum, balanceAmount, balance, requestedAmount, txFeeAmount, txFee, amountWithFees
  */
-export const prepareTransaction = (accountInfo, assetAmount, gasPrice) => {
+export const transactionData = (accountInfo, assetAmount, gasPrice) => {
   const ethereum = getEth(accountInfo.assets);
   const balanceAmount = ethereum.balance.amount;
   const balance = convertAmountFromBigNumber(balanceAmount);
@@ -174,5 +187,13 @@ export const prepareTransaction = (accountInfo, assetAmount, gasPrice) => {
   const txFee = convertAmountFromBigNumber(txFeeAmount);
   const amountWithFees = add(requestedAmount, txFee);
 
-  return { requestedAmount, balance, amountWithFees };
+  return {
+    ethereum,
+    balanceAmount,
+    balance,
+    requestedAmount,
+    txFeeAmount,
+    txFee,
+    amountWithFees,
+  };
 };

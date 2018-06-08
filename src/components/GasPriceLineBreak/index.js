@@ -13,6 +13,7 @@ const GasPriceLineBreak = ({ gasPriceOption }) => (
     percentage={
       gasPriceOption === 'slow' ? 33 : gasPriceOption === 'average' ? 66 : 100
     }
+    noMargin={true}
   />
 );
 

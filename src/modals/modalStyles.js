@@ -1,8 +1,10 @@
 import styled from 'styled-components';
 
 import Button from '../components/Button';
+import CopyToClipboard from '../components/CopyToClipboard';
+import QRCodeDisplay from '../components/QRCodeDisplay';
 
-import { fonts, colors } from '../styles';
+import { fonts, colors, responsive } from '../styles';
 
 export const StyledSuccessMessage = styled.div`
   width: 100%;
@@ -19,6 +21,8 @@ export const StyledSuccessMessage = styled.div`
 export const StyledIcon = styled.div`
   width: 14px;
   height: 14px;
+  transform: ${({ rotation }) =>
+    rotation ? `rotate(${rotation}deg)` : 'rotate(0deg)'};
   mask: ${({ icon }) => (icon ? `url(${icon}) center no-repeat` : 'none')};
   mask-size: 90%;
   background-color: ${({ color }) =>
@@ -199,5 +203,45 @@ export const StyledActions = styled.div`
   justify-content: ${({ single }) => (single ? `center` : `space-between`)};
   & button {
     margin: 0 5px;
+  }
+`;
+
+export const StyledContainer = styled.div`
+  width: 100%;
+  padding: 22px;
+  @media screen and (${responsive.sm.max}) {
+    padding: 15px;
+    & h4 {
+      margin: 20px auto;
+    }
+  }
+`;
+
+export const StyledQRCodeDisplay = styled(QRCodeDisplay)`
+  margin: 35px auto;
+`;
+
+export const StyledJustifyContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const StyledCopyToClipboard = styled(CopyToClipboard)`
+  font-weight: ${fonts.weight.semibold};
+  text-align: center;
+  letter-spacing: 2px;
+  background: rgb(${colors.white});
+  border-radius: 8px;
+  margin: 15px auto;
+  padding: 12px 18px;
+  & input {
+    color: transparent;
+    text-shadow: 0 0 0 rgba(${colors.darkGrey});
+  }
+  @media screen and (${responsive.sm.max}) {
+    font-size: 3vw;
+    letter-spacing: 0;
+    padding: 12px;
   }
 `;

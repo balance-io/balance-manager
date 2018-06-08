@@ -7,8 +7,7 @@ import lang from '../../languages';
 import Card from '../../components/Card';
 import Input from '../../components/Input';
 import LineBreak from '../../components/LineBreak';
-import GasPriceLineBreak from '../../components/GasPriceLineBreak';
-import GasButton from '../../components/GasButton';
+import GasPanel from '../../components/GasPanel';
 import DropdownAsset from '../../components/DropdownAsset';
 import Button from '../../components/Button';
 import Form from '../../components/Form';
@@ -33,11 +32,7 @@ import {
 import { notificationShow } from '../../reducers/_notification';
 
 import { greaterThan } from '../../helpers/bignumber';
-import {
-  capitalize,
-  getEth,
-  prepareTransaction,
-} from '../../helpers/utilities';
+import { capitalize, getEth, transactionData } from '../../helpers/utilities';
 
 import {
   StyledIcon,
@@ -46,7 +41,6 @@ import {
   StyledParagraph,
   StyledAmountCurrency,
   StyledConversionIcon,
-  StyledGasOptions,
   StyledSubTitle,
   StyledActions,
 } from '../modalStyles';
@@ -111,10 +105,10 @@ class DonateModal extends Component {
   onSubmit = e => {
     e.preventDefault();
 
-    const accountState = prepareTransaction(
+    const data = transactionData(
       this.props.accountInfo.assets,
       this.props.assetAmount,
-      this.props.assetAmount,
+      this.props.gasPrice,
     );
 
     if (!this.props.gasPrice.txFee) {
@@ -130,19 +124,18 @@ class DonateModal extends Component {
         return;
       }
 
-      if (greaterThan(accountState.requestedAmount, accountState.balance)) {
+      if (greaterThan(data.requestedAmount, data.balance)) {
         this.props.notificationShow(
           lang.t('notification.error.insufficient_balance'),
           true,
         );
         return;
-      } else if (
-        greaterThan(accountState.amountWithFees, accountState.balance)
-      ) {
+      } else if (greaterThan(data.amountWithFees, data.balance)) {
         this.props.notificationShow(
           lang.t('notification.error.insufficient_for_fees'),
           true,
         );
+
         return;
       }
 
@@ -169,7 +162,7 @@ class DonateModal extends Component {
   };
 
   // still not a safe function
-  // TODO: Monitor
+  // TODO: Make util function
   calcGasFee = () => {
     let nativeFee = '$0.00';
     let txFee = '0.000 ETH';
@@ -278,24 +271,11 @@ class DonateModal extends Component {
                 </StyledFlex>
               </StyledFlex>
 
-              <GasPriceLineBreak gasPriceOption={gasPriceOption} />
-              <StyledGasOptions>
-                <GasButton
-                  gasPrice={gasPrices.slow}
-                  speed={`slow`}
-                  onClick={this.updateGasPrice}
-                />
-                <GasButton
-                  gasPrice={gasPrices.average}
-                  speed={`average`}
-                  onClick={this.updateGasPrice}
-                />
-                <GasButton
-                  gasPrice={gasPrices.fast}
-                  speed={`fast`}
-                  onClick={this.updateGasPrice}
-                />
-              </StyledGasOptions>
+              <GasPanel
+                gasPriceOption={gasPriceOption}
+                gasPrices={gasPrices}
+                updateGasPrice={this.updateGasPrice}
+              />
 
               <LineBreak noMargin />
 

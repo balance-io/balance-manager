@@ -173,11 +173,11 @@ class Home extends Component {
         <CardContainer>
           <MetamaskLogo />
           <MetamaskLogoText>
-            {lang.t('homepage.connect_metamask')}
+            {lang.t('homepage.connect_metamask.description')}
           </MetamaskLogoText>
           <Link to="/metamask">
             <MetamaskButton left color="orange">
-              {lang.t('button.connect_metamask')}
+              {lang.t('homepage.connect_metamask.button')}
             </MetamaskButton>
           </Link>
         </CardContainer>
@@ -188,20 +188,20 @@ class Home extends Component {
           <LogoSection>
             <LedgerLogo />
             <LogoText>
-              {lang.t('homepage.connect_ledger')}
+              {lang.t('homepage.connect_ledger.description')}
               <LedgerAffiliateLink
                 href="https://www.ledgerwallet.com/r/7931"
                 target="_blank"
-                title="Buy a Ledger hardware wallet"
+                title={lang.t('homepage.connect_ledger.link_title')}
               >
-                {lang.t('homepage.connect_ledger_link')}
+                {lang.t('homepage.connect_ledger.link_text')}
               </LedgerAffiliateLink>
               .
             </LogoText>
           </LogoSection>
           <Link to="/ledger">
             <LedgerButton left color="ledger">
-              {lang.t('button.connect_ledger')}
+              {lang.t('homepage.connect_ledger.button')}
             </LedgerButton>
           </Link>
         </CardContainer>

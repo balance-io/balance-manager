@@ -1,12 +1,29 @@
 {
   "translation": {
+    "homepage": {
+      "connect_metamask": {
+        "description": "Conéctate a la extensión de Chrome de Metamask.",
+        "button": "Conectar MetaMask"
+      },
+      "connect_ledger": {
+        "description": "Conéctate y firma tus transacciones con tu ",
+        "link_text": "Ledger Wallet",
+        "link_title": "Compra un Ledger hardware wallet",
+        "button": "Conectar Ledger"
+      },
+      "connect_walletconnect": {
+        "description": "Conéctate y firmat con tu wallet móvil de WalletConnect.",
+        "button": "Conectar Wallet Connect"
+      },
+      "coming_soon": "Próximamente."
+    },
     "account": {
       "tab_balances": "Saldos",
       "tab_transactions": "Transacciones",
       "tab_interactions": "Interacciones",
       "tab_balances_tooltip": "Saldos de Ethereum y Tokens",
       "tab_transactions_tooltip": "Transacciones y Transferencias de Tokens",
-      "tab_interactions_tooltip": "Interacciones de Smart Contract",
+      "tab_interactions_tooltip": "Interacciones de Smart Contracts",
       "label_asset": "Activo",
       "label_quantity": "Cantidad",
       "label_price": "Precio",
@@ -19,11 +36,11 @@
       "tokens": "tokens",
       "no_market_value": "sin valor de mercado",
       "low_market_value": "con bajo valor de mercado",
-      "tx_hash": "Transaccione Hash",
-      "tx_timestamp": "Hora",
+      "tx_hash": "Hash de Transacción",
+      "tx_timestamp": "Fecha/Hora",
       "tx_fee": "Tarifa",
-      "tx_to": "Para",
-      "tx_from": "De",
+      "tx_to": "Hacia",
+      "tx_from": "Desde",
       "tx_self": "Yo",
       "tx_sent": "Enviado",
       "tx_received": "Recibido",
@@ -35,8 +52,6 @@
     },
     "button": {
       "connect_walletconnect": "Utilizar WalletConnect",
-      "connect_metamask": "Conectar a MetaMask",
-      "connect_ledger": "Conectar a Ledger",
       "donate": "Donar ETH",
       "exchange": "Cambiar",
       "send": "Enviar",
@@ -58,17 +73,17 @@
       "input_text": "Input",
       "email_placeholder": "tu@email.com",
       "password_placeholder": "••••••••••",
-      "input_placeholder": "Escriba aquí"
+      "input_placeholder": "Escribe aquí"
     },
     "modal": {
       "receive_title": "Recibir a {{walletName}}",
-      "exchange_title": "Cambiar de {{walletName}}",
+      "exchange_title": "Intercambiar de {{walletName}}",
       "send_title": "Enviar de {{walletName}}",
       "approve_tx": "Aprobar transacción en {{walletType}}",
       "confirm_tx": "Confirmar transacción de {{walletName}}",
       "invalid_address": "Dirección inválida",
       "send_max": "Enviar máximo",
-      "exchange_max": "Cambiar máximo",
+      "exchange_max": "Intercambiar máximo",
       "default_wallet": " Cartera",
       "gas_slow": "Lento",
       "gas_average": "Medio",
@@ -79,9 +94,9 @@
       "tx_confirm_recipient": "Recipiente",
       "tx_confirm_amount": "Cantidad",
       "tx_confirm_fee": "Tarifa de transacción",
-      "tx_hash": "Transaction Hash",
+      "tx_hash": "Hash de Transacción",
       "tx_verify": "Verifique su transacción aquí",
-      "deposit_dropdown_label": "Cambiar mi",
+      "deposit_dropdown_label": "Intercambiar mi",
       "withdrawal_dropdown_label": "por",
       "deposit_input_label": "Pagar",
       "withdrawal_input_label": "Obtener",
@@ -89,13 +104,13 @@
       "exchange_fee": "Tarifa de cambio"
     },
     "message": {
-      "web3_not_available": "Instala la Chrome extension de MetaMask",
+      "web3_not_available": "Instala la extension de Chrome de MetaMask",
       "web3_not_unlocked": "Por favor desbloquear su cartera MetaMask",
       "web3_unknown_network": "Red desconocida, por favor cambie a otro",
       "page_not_found": "404 Página no encontrada",
-      "coming_soon": "En breve...",
-      "click_to_copy_to_clipboard": "Haga clic para copiar para clipboard",
-      "failed_request": "Demanda fallida, por favor actualice",
+      "coming_soon": "Próximamente...",
+      "click_to_copy_to_clipboard": "Haz clic para copiar al clipboard",
+      "failed_request": "Solicitud fallida, por favor refrescar",
       "failed_ledger_connection": "Error al conectar a Ledger, por favor verifica tu dispositivo",
       "no_transactions": "No se encontraron transacciones para esta cuenta",
       "no_interactions": "No se encontraron interacciones para esta cuenta",
@@ -106,31 +121,31 @@
     "notification": {
       "error": {
         "no_accounts_found": "No se encontraron cuentas de Ethereum",
-        "invalid_address": "Dirección inválida, verifique de nuevo",
+        "invalid_address": "Dirección inválida, verifica nuevamente",
         "insufficient_balance": "Saldo insuficiente en esta cuenta",
         "insufficient_for_fees": "Saldo insuficiente para cubrir las tarifas de transacción",
-        "invalid_address_scanned": "Dirección inválida escaneado, inténtalo de nuevo",
-        "invalid_private_key_scanned": "Llave privada inválida escaneado, inténtalo de nuevo",
-        "failed_scanning_qr_code": "Error al escanear el código QR, inténtalo de nuevo",
+        "invalid_address_scanned": "Dirección inválida escaneada, intenta nuevamente",
+        "invalid_private_key_scanned": "Llave privada inválida, intenta nuevamente",
+        "failed_scanning_qr_code": "Error al escanear el código QR, intenta nuevamente",
         "failed_get_gas_prices": "Error al obtener los precios de Gas Ethereum",
         "failed_get_tx_fee": "Error al estimar la tarifa de transacción",
         "failed_get_account_tx": "Error al obtener transacciones de cuenta",
-        "generic_error": "Algo salió mal, inténtalo de nuevo"
+        "generic_error": "Algo salió mal, intenta nuevamente"
       },
       "info": {
         "address_copied_to_clipboard": "Dirección copiada al clipboard"
       }
     },
     "warning": {
-      "user_is_offline": "Conexión offline, por favor verifica su conexión a Internet",
+      "user_is_offline": "Conexión offline, por favor verifica tu conexión a Internet",
       "user_is_online": "¡Conectado! Estás de vuelta online"
     },
     "subscribe_form": {
-      "email_already_subscribed": "Lo sentimos, ya has registrado con este correo electrónico",
+      "email_already_subscribed": "Lo sentimos, ya te has registrado con este correo electrónico",
       "too_many_signup_request": "Demasiadas solicitudes de registro, inténtalo de nuevo más tarde",
       "successful": "Verifica tu email",
       "sending": "Enviando...",
-      "generic_error": "Huy! Algo salió mal"
+      "generic_error": "Uy! Algo salió mal"
     },
     "time": {
       "ms": "ms",

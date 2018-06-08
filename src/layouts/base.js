@@ -20,9 +20,11 @@ import { ledgerUpdateNetwork } from '../reducers/_ledger';
 import {
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
+  accountChangeLanguage,
 } from '../reducers/_account';
-import { colors, responsive } from '../styles';
 import ReminderRibbon from '../components/ReminderRibbon';
+import { colors, responsive } from '../styles';
+import { resources } from '../languages';
 
 const StyledLayout = styled.div`
   position: relative;
@@ -126,7 +128,9 @@ const BaseLayout = ({
   ledgerUpdateNetwork,
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
+  accountChangeLanguage,
   nativeCurrency,
+  language,
   network,
   web3Available,
   online,
@@ -139,6 +143,13 @@ const BaseLayout = ({
       addresses[account.address] = account;
     });
   }
+  const languages = {};
+  Object.keys(resources).forEach(resource => {
+    languages[resource] = {
+      code: resource,
+      description: resource.toUpperCase(),
+    };
+  });
   const showToolbar =
     window.location.pathname !== '/' &&
     (!metamaskFetching || !ledgerFetching) &&
@@ -174,6 +185,13 @@ const BaseLayout = ({
                   <StyledVerticalLine />
                 </Fragment>
               )}
+            <Dropdown
+              displayKey={`description`}
+              selected={language}
+              options={languages}
+              onChange={accountChangeLanguage}
+            />
+            <StyledVerticalLine />
             <Dropdown
               displayKey={`value`}
               selected={network}
@@ -218,9 +236,11 @@ BaseLayout.propTypes = {
   ledgerUpdateNetwork: PropTypes.func.isRequired,
   accountChangeNativeCurrency: PropTypes.func.isRequired,
   accountUpdateAccountAddress: PropTypes.func.isRequired,
+  accountChangeLanguage: PropTypes.func.isRequired,
   accountType: PropTypes.string.isRequired,
   accountAddress: PropTypes.string.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
+  language: PropTypes.string.isRequired,
   network: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
   online: PropTypes.bool.isRequired,
@@ -232,6 +252,7 @@ const reduxProps = ({ account, ledger, metamask, warning }) => ({
   accountAddress: account.accountAddress,
   nativeCurrency: account.nativeCurrency,
   metamaskFetching: metamask.fetching,
+  language: account.language,
   ledgerFetching: ledger.fetching,
   network: account.network,
   ledgerAccounts: ledger.accounts,
@@ -244,4 +265,5 @@ export default connect(reduxProps, {
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
   modalOpen,
+  accountChangeLanguage,
 })(BaseLayout);

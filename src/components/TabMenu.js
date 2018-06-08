@@ -94,10 +94,15 @@ const StyledTab = styled(Button)`
 `;
 
 class TabMenu extends Component {
-  state = {
-    activeTab: 'BALANCES_TAB',
-    tabPosition: -47,
-  };
+  constructor() {
+    super();
+
+    this.state = {
+      activeTab: 'BALANCES_TAB',
+      tabPosition: -87 + this._firstTabOffset(),
+    };
+  }
+
   componentDidUpdate() {
     const tabRoute =
       window.browserHistory.location.pathname.replace(
@@ -105,12 +110,14 @@ class TabMenu extends Component {
         '',
       ) || '/';
     let newState = this.state;
+
+    const offset = this._firstTabOffset();
     switch (tabRoute) {
       case '/':
-        newState = { activeTab: 'BALANCES_TAB', tabPosition: -47 };
+        newState = { activeTab: 'BALANCES_TAB', tabPosition: offset - 87 };
         break;
       case '/transactions':
-        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: 91 };
+        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: offset + 51 };
         break;
       default:
         break;
@@ -119,6 +126,7 @@ class TabMenu extends Component {
       this.setState(newState);
     }
   }
+
   render() {
     return (
       <StyledTabMenu>
@@ -149,6 +157,16 @@ class TabMenu extends Component {
         </StyledTabsWrapper>
       </StyledTabMenu>
     );
+  }
+
+  _firstTabOffset() {
+    const tabCharSizes = [
+      'account.tab_balances',
+      'account.tab_transactions',
+      'account.tab_interactions',
+    ].map(resourceName => lang.t(resourceName).length);
+
+    return tabCharSizes[0] * 5;
   }
 }
 

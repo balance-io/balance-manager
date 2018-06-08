@@ -166,3 +166,20 @@ export const getWalletConnectAccount = () => {
 export const saveWalletConnectAccount = account => {
   saveLocal('walletconnect', { data: account }, walletConnectVersion);
 };
+
+/**
+ * @desc get language
+ * @return {Object}
+ */
+export const getLanguage = () => {
+  const language = getLocal('language', globalSettingsVersion);
+  return language ? language.data : null;
+};
+
+/**
+ * @desc save language
+ * @param  {String}   [language]
+ */
+export const saveLanguage = language => {
+  saveLocal('language', { data: language }, globalSettingsVersion);
+};

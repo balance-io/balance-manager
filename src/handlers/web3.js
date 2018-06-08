@@ -329,9 +329,8 @@ export const web3LedgerSendTransaction = transaction =>
  */
 export const web3SendTransactionMultiWallet = (transaction, accountType) => {
   let method = null;
-  if (transaction.asset.symbol === 'ETH') {
-    transaction.value = transaction.amount;
-  } else {
+  transaction.value = transaction.amount;
+  if (transaction.asset.symbol !== 'ETH') {
     transaction = getTransferTokenTransaction(transaction);
   }
   switch (accountType) {

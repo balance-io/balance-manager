@@ -310,7 +310,6 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
       });
     })
     .catch(error => {
-      console.log('error getting account txns', error);
       dispatch(
         notificationShow(
           lang.t('notification.error.failed_get_account_tx'),

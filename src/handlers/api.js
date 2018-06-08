@@ -4,8 +4,7 @@ import {
   parseAccountAssets,
   parseAccountTransactions,
 } from './parsers';
-import { getTransactionByHash, getBlockByHash } from '../handlers/web3';
-import { convertHexToString, formatInputDecimals } from '../helpers/bignumber';
+import { formatInputDecimals } from '../helpers/bignumber';
 import networkList from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
 

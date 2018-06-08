@@ -310,6 +310,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
       });
     })
     .catch(error => {
+      console.log('error getting account txns', error);
       dispatch(
         notificationShow(
           lang.t('notification.error.failed_get_account_tx'),
@@ -524,7 +525,7 @@ export const accountClearState = () => dispatch => {
 const INITIAL_STATE = {
   nativePriceRequest: getNativeCurrency() || 'USD',
   nativeCurrency: getNativeCurrency() || 'USD',
-  language: getLanguage || 'en',
+  language: getLanguage() || 'en',
   prices: getNativePrices() || {},
   network: 'mainnet',
   accountType: '',

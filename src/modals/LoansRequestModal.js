@@ -9,10 +9,9 @@ import Card from '../components/UnFlexedCard';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { modalClose } from '../reducers/_modal';
-import { capitalize } from '../helpers/utilities';
 import { fonts, colors, responsive, shadows } from '../styles';
 
-import { Slider } from 'reactrangeslider';
+import ReactSlider from 'react-slider';
 
 import dharmaProtocol from '../assets/powered-by-dharma.png';
 import arrowReceived from '../assets/circle-arrow.svg';
@@ -24,7 +23,6 @@ const StyledDropdown = styled(Dropdown)`
     border-radius: 7.6px;
     width: 125px;
     padding: 0px;
-    margin-top: 20px;
     font-family: 'SFMono', 'Roboto Mono', Courier New, Courier, monospace;
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.06),
       0 0 1px 0 rgba(50, 50, 93, 0.02), 0 5px 10px 0 rgba(59, 59, 92, 0.08);
@@ -61,9 +59,12 @@ const StyledContainer = styled.div`
     }
   }
 
+  label {
+    color: rgb(${colors.grey});
+  }
+
   .tiny-input {
     width: 50px;
-    margin-top: 20px;
     margin-right: 5px;
     padding: 10px;
   }
@@ -105,6 +106,54 @@ const StyledContainer = styled.div`
   a {
     color: rgb(${colors.blue});
   }
+
+  .horizontal-slider {
+    width: 100%;
+    max-width: 600px;
+    height: 7px;
+    margin-left: 5px;
+    margin-right: 5px;
+
+    .bar-0,
+    .bar-1 {
+      height: 7px;
+    }
+
+    .bar-0 {
+      background: #e4e4e4;
+    }
+
+    ,
+    .bar-1 {
+      background: #e4e4e4;
+    }
+
+    .handle {
+      border-radius: 50%;
+      background: #f3754a;
+      box-shadow: ${shadows.medium};
+      width: 20px;
+      height: 20px;
+      top: -7px;
+    }
+  }
+
+  .slider-section {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 30px 0px;
+    border-top: 1px solid rgb(${colors.lightGrey});
+    border-bottom: 1px solid rgb(${colors.lightGrey});
+  }
+
+  .data-section {
+    padding: 15px 0px;
+
+    p {
+      color: rgb(${colors.darkGrey});
+      min-width: 125px;
+    }
+  }
 `;
 
 const StyledCard = styled(Card)`
@@ -126,7 +175,22 @@ const StyledFlex = styled.div`
 
   span {
     color: rgb(${colors.darkGrey});
-    margin-top: 30px;
+  }
+
+  input {
+    margin: 0px;
+  }
+`;
+
+const VerticalFlex = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  transform: none;
+
+  span {
+    color: rgb(${colors.darkGrey});
   }
 
   input {
@@ -177,7 +241,7 @@ class LoansRequestModal extends Component {
     return (
       <StyledCard>
         <StyledContainer>
-          <StyledFlex>
+          <VerticalFlex>
             <span>I want to borrow</span>
             <StyledFlex className="medium-input">
               <Input monospace placeholder="1" type="text" />
@@ -208,58 +272,49 @@ class LoansRequestModal extends Component {
                 dark
               />
             </StyledFlex>
-          </StyledFlex>
+          </VerticalFlex>
         </StyledContainer>
 
         <StyledContainer>
-          <StyledFlex className="align-items">
+          <VerticalFlex className="slider-section">
             <span> I want to pay </span>
-            <Slider
-              wrapperStyle={{
-                width: '65%',
-                marginTop: '23px',
-              }}
-              handleStyle={{
-                backgroundColor: '#F3764A',
-                border: '1px solid #F3764A',
-                boxShadow: shadows.medium,
-              }}
-              focusedHandleStyle={{
-                backgroundColor: '#F3764A',
-                border: '1px solid #F3764A',
-                boxShadow: shadows.medium,
-              }}
-              activeHandleStyle={{
-                backgroundColor: '#F3764A',
-                border: '1px solid #F3764A',
-                boxShadow: shadows.medium,
-              }}
-              hoveredHandleStyle={{
-                backgroundColor: '#F3764A',
-                border: '1px solid #F3764A',
-                boxShadow: shadows.medium,
-              }}
-              trackStyle={{
-                backgroundColor: '#E4E4E4',
-                borderColor: 'transparent',
-                height: '7px',
-              }}
+            <ReactSlider
+              withBars
+              className="horizontal-slider"
               defaultValue={this.state.interestRate}
-              step={5}
               onChange={this.updateInterestRate}
             />
             <span> interest </span>
-          </StyledFlex>
+          </VerticalFlex>
         </StyledContainer>
 
         <StyledContainer>
-          <label>PERCENTAGE</label>
-          <p>{this.state.interestRate}% for full term</p>
+          <VerticalFlex className="data-section">
+            <div>
+              <label>PERCENTAGE</label>
+              <p>{this.state.interestRate}% for full term</p>
+            </div>
+
+            <div>
+              <label>AMOUNT</label>
+              <p>10.04 DAI</p>
+            </div>
+
+            <div>
+              <label>NATIVE</label>
+              <p>10.00 USD</p>
+            </div>
+
+            <div>
+              <label>INSTALLMENT</label>
+              <p>1.00 USD</p>
+            </div>
+          </VerticalFlex>
         </StyledContainer>
 
         <StyledContainer className="loans-modal-footer">
           <div className="footer-content">
-            <img src={dharmaProtocol} />
+            <img src={dharmaProtocol} alt="Powered by Dharma Protocol" />
 
             <p>
               Your loan request will be processed by{' '}

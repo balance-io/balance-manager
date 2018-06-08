@@ -242,3 +242,12 @@ export const apiGetEthereumGraph = (symbol, nativeCurrency) => {
   // Get user chosen currency (selected upper right)
   return axios.get(`/candles/${symbol}${nativeCurrency}`);
 };
+
+/**
+ * @desc get info about a token address
+ * @return {Promise}
+ */
+export const apiGetTokenInfo = address => {
+  // Get user chosen currency (selected upper right)
+  return axios.get(`/api/tokenInfo?address=${address}`);
+};

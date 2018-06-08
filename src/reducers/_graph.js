@@ -155,9 +155,6 @@ export default (state = INITIAL_STATE, action) => {
           symbol => symbol !== action.payload.symbol,
         ),
       };
-    case 'yolo': {
-      return state;
-    }
     default:
       return state;
   }

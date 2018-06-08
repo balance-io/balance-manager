@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../../languages';
 import AssetIcon from '../../components/AssetIcon';
-import Graph from '../../components/Graph';
+import EthereumInfo from '../../components/EthereumInfo';
+import TokenInfo from '../../components/TokenInfo';
 import ToggleIndicator from '../../components/ToggleIndicator';
 import { ellipseText } from '../../helpers/utilities';
 import {
@@ -248,7 +249,7 @@ class AccountBalances extends Component {
             {ethereum.native ? ethereum.native.change.display : '———'}
           </StyledPercentage>
           <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
-          <Graph symbol={'ETH'} />
+          <EthereumInfo symbol={ethereum.symbol} />
         </StyledEthereum>
         {!!tokensAlwaysDisplay &&
           tokensAlwaysDisplay.map(token => (
@@ -271,7 +272,7 @@ class AccountBalances extends Component {
                 {token.native ? token.native.change.display : '———'}
               </StyledPercentage>
               <p>{token.native ? token.native.balance.display : '———'}</p>
-              <Graph symbol={token.symbol} />
+              <TokenInfo token={token} />
             </StyledToken>
           ))}
         {!!tokensToggleDisplay.length &&

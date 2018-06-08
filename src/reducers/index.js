@@ -9,6 +9,7 @@ import walletconnect from './_walletconnect';
 import notification from './_notification';
 import warning from './_warning';
 import graph from './_graph';
+import token from './_token';
 
 export default combineReducers({
   exchange,
@@ -21,4 +22,5 @@ export default combineReducers({
   warning,
   walletconnect,
   graph,
+  token,
 });

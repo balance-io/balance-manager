@@ -355,4 +355,6 @@ export const globalStyles = `
     display: inline-block;
     margin-top: 56px !important;
   }
+
+  @import url('https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css');
 `;

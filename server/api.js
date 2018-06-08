@@ -39,7 +39,6 @@ const initialize = async server => {
       symbol.indexOf('EUR') !== -1 ||
       symbol.indexOf('USD') !== -1
     ) {
-
       return symbol.substr(0, 3) + 'USDT';
     }
     return symbol;
@@ -69,6 +68,34 @@ const initialize = async server => {
           // Other: probably no connection to Binance
           .catch(err => {
             // return [];
+            return h.response().code(404);
+          });
+        return response;
+      },
+    },
+  });
+
+  server.route({
+    method: 'get',
+    path: '/api/tokenInfo',
+    options: {
+      notes: 'Get candles for currency in 1 month intervals the last year',
+      handler: async (request, h) => {
+        console.log(
+          `https://trivial.co/api/tokeninformation?token_address=${
+            request.query.address
+          }`,
+        );
+        const response = await axios
+          .get(
+            `https://trivial.co/api/tokeninformation?token_address=${
+              request.query.address
+            }`,
+          )
+          .then(res => {
+            return res.data;
+          })
+          .catch(err => {
             return h.response().code(404);
           });
         return response;

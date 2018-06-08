@@ -55,7 +55,8 @@
     "eject": "react-scripts eject",
     "precommit": "lint-staged",
     "format": "prettier --write \"src/**/*.{js,json}\"",
-    "lint": "eslint src --ext .js"
+    "lint": "eslint src --ext .js",
+    "watch": "npm-watch"
   },
   "proxy": "http://localhost:5000",
   "lint-staged": {
@@ -79,5 +80,11 @@
     "lint-staged": "^7.1.0",
     "npm-watch": "^0.3.0",
     "prettier": "^1.12.1"
+  },
+  "watch": {
+    "start:dev": {
+      "patterns": "server",
+      "extensions": "js"
+    }
   }
 }

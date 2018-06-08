@@ -316,7 +316,13 @@ class AccountViewTransactions extends Component {
                                 : lang.t('account.tx_from').toUpperCase()}
                           </strong>
                         </p>
-                        <p>{tx.from === accountAddress ? tx.to : tx.from}</p>
+                        <p>
+                          {tx.from === accountAddress
+                            ? tx.to
+                            : tx.from
+                              ? tx.from
+                              : lang.t('account.tx_pending')}
+                        </p>
                       </div>
                     </div>
                     <div>
@@ -326,7 +332,11 @@ class AccountViewTransactions extends Component {
                             {lang.t('account.tx_fee').toUpperCase()}
                           </strong>
                         </p>
-                        <p>{`${tx.txFee.display} ≈ ${
+                        <p>{`${
+                          tx.txFee && tx.txFee.display
+                            ? tx.txFee.display
+                            : '———'
+                        } ≈ ${
                           tx.native &&
                           tx.native[nativeCurrency] &&
                           tx.native[nativeCurrency].txFee
@@ -360,7 +370,11 @@ class AccountViewTransactions extends Component {
                             {lang.t('account.tx_hash').toUpperCase()}
                           </strong>
                         </p>
-                        <p>{tx.hash.replace(/-.*/g, '')}</p>
+                        <p>
+                          {tx.hash.startsWith('shapeshift')
+                            ? lang.t('account.tx_pending')
+                            : tx.hash.replace(/-.*/g, '')}
+                        </p>
                       </div>
                     </div>
 

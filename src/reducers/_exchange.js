@@ -485,7 +485,6 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
         gasPrice: '',
         gasLimit: '',
       };
-      console.log('about to exchange incoming', incomingTx);
       dispatch(accountUpdateExchange([txDetails, incomingTx]));
       dispatch({
         type: EXCHANGE_TRANSACTION_SUCCESS,

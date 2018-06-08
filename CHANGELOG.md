@@ -5,11 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
-## [Unreleased]
+## [Unreleased] - 06.06.2018
 
 ### Added
+* Proxy server to communicate with external APIs
+* Add graphs from Binance
+* Add token info from Trivial
 
-*
 
 ### Changed
 

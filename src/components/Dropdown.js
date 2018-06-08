@@ -137,10 +137,12 @@ class Dropdown extends Component {
     } = this.props;
     const _selected = selected || options[Object.keys(options)[0]][displayKey];
     if (!options[_selected]) return null;
+
     return (
       <ClickOutside onClickOutside={this.onClickOutside}>
         <StyledWrapper {...props}>
           <StyledSelectedWrapper
+            className="dropdown-selected"
             monospace={monospace}
             dark={dark}
             show={this.state.showDropdown}
@@ -154,15 +156,16 @@ class Dropdown extends Component {
             <StyledCaret dark={dark} />
           </StyledSelectedWrapper>
           <StyledDropdownWrapper
+            className="dropdown-menu"
             monospace={monospace}
             show={this.state.showDropdown}
             noOptions={!onChange || Object.keys(options).length < 2}
           >
             {onChange &&
-              Object.keys(options).map(key => (
+              Object.keys(options).map((key, index) => (
                 <StyledRow
                   selected={key === _selected}
-                  key={options[key][displayKey]}
+                  key={index}
                   onClick={() => this.onChangeSelected(key)}
                 >
                   <p>{options[key][displayKey]}</p>

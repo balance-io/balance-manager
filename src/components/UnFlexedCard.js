@@ -8,7 +8,6 @@ const StyledCard = styled.div`
   transition: ${transitions.base};
   position: relative;
   width: 100%;
-  max-width: ${({ maxWidth }) => (maxWidth ? `${maxWidth}px` : 'none')};
   border: none;
   border-style: none;
   color: rgb(${colors.dark});

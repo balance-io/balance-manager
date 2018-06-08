@@ -162,9 +162,9 @@ abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
 
-"abi-decoder@git+https://github.com/dharmaprotocol/abi-decoder.git":
+"abi-decoder@https://github.com/dharmaprotocol/abi-decoder":
   version "1.1.0"
-  resolved "git+https://github.com/dharmaprotocol/abi-decoder.git#9448e51a134633673ccbb07a3df0ed2b0c47ab62"
+  resolved "https://github.com/dharmaprotocol/abi-decoder#9448e51a134633673ccbb07a3df0ed2b0c47ab62"
   dependencies:
     babel-core "^6.23.1"
     babel-loader "^6.3.2"
@@ -7259,6 +7259,10 @@ react@^16.2.0:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.0"
+
+reactrangeslider@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/reactrangeslider/-/reactrangeslider-3.0.6.tgz#5f3e1cef24fd3065322d4c01a0010199910f3737"
 
 read-pkg-up@^1.0.1:
   version "1.0.1"

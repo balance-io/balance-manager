@@ -57,6 +57,7 @@
       "receive": "Receive",
       "close": "Close",
       "cancel": "Cancel",
+      "request": "Request",
       "go_back": "Go Back",
       "send_another": "Send Another",
       "notify_me": "Get notified",

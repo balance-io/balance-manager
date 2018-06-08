@@ -669,7 +669,10 @@ export const parseHistoricalNativePrice = async transaction => {
         amount: txFeePriceAmount,
         display: txFeePriceDisplay,
       };
-      tx.native[nativeCurrency]['txFee'] = txFeePrice;
+      tx.native[nativeCurrency] = {
+        ...tx.native[nativeCurrency],
+        txFee: txFeePrice,
+      };
     }
   });
 

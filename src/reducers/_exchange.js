@@ -6,7 +6,10 @@ import {
   apiGetSinglePrice,
 } from '../handlers/api';
 import { parseError, parseGasPrices } from '../handlers/parsers';
-import { web3SendTransactionMultiWallet } from '../handlers/web3';
+import {
+  web3SendTransactionMultiWallet,
+  estimateGasLimit,
+} from '../handlers/web3';
 import {
   divide,
   multiply,
@@ -30,6 +33,13 @@ const EXCHANGE_GET_AVAILABLE_SUCCESS =
   'exchange/EXCHANGE_GET_AVAILABLE_SUCCESS';
 const EXCHANGE_GET_AVAILABLE_FAILURE =
   'exchange/EXCHANGE_GET_AVAILABLE_FAILURE';
+
+const EXCHANGE_UPDATE_GAS_LIMIT_REQUEST =
+  'exchange/EXCHANGE_UPDATE_GAS_LIMIT_REQUEST';
+const EXCHANGE_UPDATE_GAS_LIMIT_SUCCESS =
+  'exchange/EXCHANGE_UPDATE_GAS_LIMIT_SUCCESS';
+const EXCHANGE_UPDATE_GAS_LIMIT_FAILURE =
+  'exchange/EXCHANGE_UPDATE_GAS_LIMIT_FAILURE';
 
 const EXCHANGE_GET_GAS_PRICE_REQUEST =
   'exchange/EXCHANGE_GET_GAS_PRICE_REQUEST';
@@ -135,6 +145,34 @@ export const exchangeGetWithdrawalPrice = () => (dispatch, getState) => {
     });
 };
 
+export const exchangeUpdateGasLimit = newGasPriceOption => (
+  dispatch,
+  getState,
+) => {
+  const {
+    depositSelected,
+    address,
+    recipient,
+    depositAmount,
+  } = getState().exchange;
+  dispatch({ type: EXCHANGE_UPDATE_GAS_LIMIT_REQUEST });
+  estimateGasLimit({
+    asset: depositSelected,
+    address,
+    recipient,
+    amount: depositAmount,
+  })
+    .then(gasLimit => {
+      dispatch({
+        type: EXCHANGE_UPDATE_GAS_LIMIT_SUCCESS,
+        payload: gasLimit,
+      });
+    })
+    .catch(error => {
+      dispatch({ type: EXCHANGE_UPDATE_GAS_LIMIT_FAILURE });
+    });
+};
+
 export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
   const {
     withdrawalAssets,
@@ -162,6 +200,7 @@ export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
     type: EXCHANGE_UPDATE_DEPOSIT_SELECTED,
     payload: { depositSelected, withdrawalSelected },
   });
+  dispatch(exchangeUpdateGasLimit());
   if (priorityInput === 'DEPOSIT') {
     dispatch(exchangeUpdateDepositAmount(depositAmount, false));
   } else {
@@ -757,6 +796,11 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         depositSelected: action.payload.depositSelected,
         withdrawalSelected: action.payload.withdrawalSelected,
+      };
+    case EXCHANGE_UPDATE_GAS_LIMIT_SUCCESS:
+      return {
+        ...state,
+        gasLimit: action.payload,
       };
     case EXCHANGE_UPDATE_WITHDRAWAL_SELECTED:
       return {

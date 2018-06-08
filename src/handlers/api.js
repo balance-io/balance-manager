@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {
-  parseHistoricalPrices,
+  parseHistoricalTransactions,
   parseAccountAssets,
   parseAccountTransactions,
 } from './parsers';
@@ -88,38 +88,6 @@ export const apiGetMetamaskNetwork = () =>
   });
 
 /**
- * @desc get transaction status
- * @param  {String}   [hash = '']
- * @param  {String}   [network = 'mainnet']
- * @return {Promise}
- */
-export const apiGetTransactionStatus = async (
-  hash = '',
-  network = 'mainnet',
-) => {
-  try {
-    let result = { data: null };
-    let tx = await getTransactionByHash(hash);
-    if (!tx || !tx.blockNumber || !tx.blockHash) return result;
-    if (tx) {
-      const blockData = await getBlockByHash(tx.blockHash);
-      tx.timestamp = null;
-      if (blockData) {
-        const blockTimestamp = convertHexToString(blockData.timestamp);
-        tx.timestamp = {
-          secs: blockTimestamp,
-          ms: `${blockTimestamp}000`,
-        };
-      }
-    }
-    result = { data: tx };
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
  * Configuration for balance api
  * @type axios instance
  */
@@ -166,6 +134,15 @@ export const apiGetTransactionData = (
 ) => api.get(`/get_transactions/${network}/${address}/${page}`);
 
 /**
+ * @desc get transaction
+ * @param  {String}   [txnHash = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetTransaction = (txnHash = '', network = 'mainnet') =>
+  api.get(`/get_transaction/${network}/${txnHash}`);
+
+/**
  * @desc get account transactions
  * @param  {String}   [address = '']
  * @param  {String}   [network = 'mainnet']
@@ -192,7 +169,7 @@ export const apiGetAccountTransactions = async (
         }
       });
     }
-    transactions = await parseHistoricalPrices(transactions);
+    transactions = await parseHistoricalTransactions(transactions);
     const result = { data: transactions };
     return result;
   } catch (error) {
@@ -232,6 +209,14 @@ const shapeshift = axios.create({
  */
 export const apiShapeshiftGetMarketInfo = (pair = '') =>
   shapeshift.get(`/marketinfo/${pair}`);
+
+/**
+ * @desc shapeshift get txn status of deposit address
+ * @param  {String}   [depositAddress = '']
+ * @return {Promise}
+ */
+export const apiShapeshiftGetDepositStatus = (depositAddress = '') =>
+  shapeshift.get(`/txStat/${depositAddress}`);
 
 /**
  * @desc shapeshift get fixed or quoted price

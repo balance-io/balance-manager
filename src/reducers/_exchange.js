@@ -19,7 +19,7 @@ import {
   convertAmountToDisplay,
 } from '../helpers/bignumber';
 import { notificationShow } from './_notification';
-import { accountUpdateTransactions } from './_account';
+import { accountUpdateExchange } from './_account';
 import ethUnits from '../references/ethereum-units.json';
 
 // -- Constants ------------------------------------------------------------- //
@@ -217,26 +217,22 @@ export const exchangeUpdateDepositAmount = (
 ) => (dispatch, getState) => {
   let {
     withdrawalAmount,
+    withdrawalNative,
     depositSelected,
     withdrawalSelected,
     withdrawalPrice,
   } = getState().exchange;
-  depositAmount = `${depositAmount}`.replace(/[^0-9.]/g, '');
-  if (!depositAmount) {
+  const parsedDepositAmount = parseFloat(depositAmount);
+  if (!parsedDepositAmount || parsedDepositAmount <= 0) {
     withdrawalAmount = '';
   }
-  const withdrawalNative = withdrawalAmount
-    ? multiply(
-        withdrawalAmount,
-        convertAmountFromBigNumber(withdrawalPrice.amount),
-      )
-    : '';
+  withdrawalNative = withdrawalAmount ? withdrawalNative : '';
   dispatch({
     type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_REQUEST,
     payload: { depositAmount, withdrawalAmount, withdrawalNative },
   });
   const getExchangeDetailsPromise = timeoutEnabled => {
-    if (depositAmount || !timeoutEnabled) {
+    if (parsedDepositAmount && parsedDepositAmount > 0 && !timeoutEnabled) {
       apiShapeshiftGetExchangeDetails({
         request: {
           depositSymbol: depositSelected.symbol,
@@ -301,8 +297,8 @@ export const exchangeUpdateWithdrawalAmount = (
     withdrawalPrice,
     withdrawalNative,
   } = getState().exchange;
-  withdrawalAmount = `${withdrawalAmount}`.replace(/[^0-9.]/g, '');
-  if (!withdrawalAmount) {
+  const parsedWithdrawalAmount = parseFloat(withdrawalAmount);
+  if (!parsedWithdrawalAmount || parsedWithdrawalAmount <= 0) {
     depositAmount = '';
   }
   withdrawalNative = disableNative
@@ -323,7 +319,11 @@ export const exchangeUpdateWithdrawalAmount = (
     },
   });
   const getExchangeDetailsPromise = timeoutEnabled => {
-    if (withdrawalAmount || !timeoutEnabled) {
+    if (
+      parsedWithdrawalAmount &&
+      parsedWithdrawalAmount > 0 &&
+      !timeoutEnabled
+    ) {
       apiShapeshiftGetExchangeDetails({
         request: {
           depositSymbol: depositSelected.symbol,
@@ -459,7 +459,6 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
     withdrawalSelected,
     gasPrice,
     gasLimit,
-    exchangeDetails,
   } = getState().exchange;
   dispatch({ type: EXCHANGE_TRANSACTION_REQUEST });
   const { accountType } = getState().account;
@@ -475,21 +474,22 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
   web3SendTransactionMultiWallet(txDetails, accountType)
     .then(txHash => {
       txDetails.hash = txHash;
-      dispatch(accountUpdateTransactions(txDetails));
+      const incomingTx = {
+        hash: `shapeshift_${recipient}`,
+        asset: withdrawalSelected,
+        nonce: null,
+        from: '',
+        to: address,
+        amount: withdrawalAmount,
+        value: withdrawalAmount,
+        gasPrice: '',
+        gasLimit: '',
+      };
+      dispatch(accountUpdateExchange([txDetails, incomingTx]));
       dispatch({
         type: EXCHANGE_TRANSACTION_SUCCESS,
         payload: txHash,
       });
-      const incomingTx = {
-        hash: `shapeshift_${exchangeDetails.orderId}`,
-        asset: withdrawalSelected,
-        from: '',
-        to: address,
-        amount: withdrawalAmount,
-        gasPrice: '',
-        gasLimit: '',
-      };
-      dispatch(accountUpdateTransactions(incomingTx));
     })
     .catch(error => {
       const message = parseError(error);

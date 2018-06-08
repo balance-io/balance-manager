@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
+* Incoming and outgoing pending transactions for Shapeshift
 * Versioning for local storage
 * Bookmark Reminder (anti-phishing) Ribbon
 * Exchange button and modal

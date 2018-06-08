@@ -2,21 +2,27 @@ import _ from 'lodash';
 import lang from '../languages';
 import {
   apiShapeshiftSendAmount,
+  apiShapeshiftGetDepositStatus,
   apiGetAccountBalances,
   apiGetAccountTransactions,
   apiGetPrices,
-  apiGetTransactionStatus,
+  apiGetTransaction,
 } from '../handlers/api';
 import {
   parseError,
   parseNewTransaction,
+  parseConfirmedDeposit,
+  parseFailedDeposit,
   parseAccountBalancesPrices,
   parsePricesObject,
-  parseConfirmedTransaction,
+  parseConfirmedTransactions,
 } from '../handlers/parsers';
 import {
-  saveLocal,
-  getLocal,
+  getAccountLocal,
+  getNativePrices,
+  getNativeCurrency,
+  saveNativePrices,
+  saveNativeCurrency,
   updateLocalTransactions,
   updateLocalBalances,
 } from '../handlers/localstorage';
@@ -89,26 +95,107 @@ const ACCOUNT_CLEAR_STATE = 'account/ACCOUNT_CLEAR_STATE';
 let getPricesInterval = null;
 
 export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
-  const network = getState().account.network;
   dispatch({ type: ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST });
-  apiGetTransactionStatus(txHash, network)
-    .then(({ data }) => {
-      if (data) {
+  if (txHash.startsWith('shapeshift')) {
+    const depositAddress = txHash.split('_')[1];
+    dispatch(accountGetShiftStatus(txHash, depositAddress));
+  } else {
+    const network = getState().account.network;
+    dispatch(accountGetTransactionStatus(txHash, network));
+  }
+};
+
+export const accountGetTransactionStatus = (txHash, network) => (
+  dispatch,
+  getState,
+) => {
+  apiGetTransaction(txHash, network)
+    .then(response => {
+      const data = response.data;
+      if (
+        data &&
+        !data.error &&
+        (data.input === '0x' ||
+          (data.input !== '0x' && data.operations && data.operations.length))
+      ) {
         const address = getState().account.accountInfo.address;
         const transactions = getState().account.transactions;
-        const _transactions = parseConfirmedTransaction(
-          transactions,
-          txHash,
-          data.timestamp,
-        );
-        updateLocalTransactions(address, _transactions, network);
-        dispatch({
-          type: ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS,
-          payload: _transactions,
+        let promises = transactions.map(async tx => {
+          if (tx.hash.toLowerCase() === txHash.toLowerCase()) {
+            return await parseConfirmedTransactions(data);
+          } else {
+            return tx;
+          }
         });
-        dispatch(accountUpdateBalances());
+        Promise.all(promises).then(parsedTransactions => {
+          let _transactions = [].concat(...parsedTransactions);
+          updateLocalTransactions(address, _transactions, network);
+          dispatch({
+            type: ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS,
+            payload: _transactions,
+          });
+          dispatch(accountUpdateBalances());
+        });
       } else {
-        setTimeout(() => dispatch(accountCheckTransactionStatus(txHash)), 1000);
+        setTimeout(
+          () => dispatch(accountGetTransactionStatus(txHash, network)),
+          1000,
+        );
+      }
+    })
+    .catch(error => {
+      setTimeout(
+        () => dispatch(accountGetTransactionStatus(txHash, network)),
+        1000,
+      );
+      //dispatch({ type: ACCOUNT_CHECK_TRANSACTION_STATUS_FAILURE });
+      //const message = parseError(error);
+      //dispatch(notificationShow(message, true));
+    });
+};
+
+export const accountGetShiftStatus = (txHash, depositAddress) => (
+  dispatch,
+  getState,
+) => {
+  dispatch({ type: ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST });
+  apiShapeshiftGetDepositStatus(depositAddress)
+    .then(({ data }) => {
+      if (data) {
+        const transactions = getState().account.transactions;
+        const address = getState().account.accountInfo.address;
+        const network = getState().account.network;
+        if (data['status'] === 'complete') {
+          const updatedTxHash = data['transaction'].toLowerCase();
+          const _transactions = parseConfirmedDeposit(
+            transactions,
+            txHash,
+            updatedTxHash,
+          );
+          updateLocalTransactions(address, _transactions, network);
+          dispatch({
+            type: ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS,
+            payload: _transactions,
+          });
+          dispatch(accountGetTransactionStatus(updatedTxHash));
+        } else if (data['status'] === 'failed') {
+          const _transactions = parseFailedDeposit(transactions, txHash);
+          dispatch({
+            type: ACCOUNT_CHECK_TRANSACTION_STATUS_SUCCESS,
+            payload: _transactions,
+          });
+          updateLocalTransactions(address, _transactions, network);
+        } else {
+          setTimeout(
+            () => dispatch(accountGetShiftStatus(txHash, depositAddress)),
+            1000,
+          );
+        }
+      } else {
+        setTimeout(
+          () => dispatch(accountGetShiftStatus(txHash, depositAddress)),
+          1000,
+        );
       }
     })
     .catch(error => {
@@ -124,20 +211,46 @@ export const accountUpdateTransactions = txDetails => (dispatch, getState) => {
   const network = getState().account.network;
   const address = getState().account.accountInfo.address;
   const nativeCurrency = getState().account.nativeCurrency;
-  parseNewTransaction(
-    txDetails,
-    currentTransactions,
-    nativeCurrency,
-    address,
-    network,
-  )
-    .then(transactions => {
-      updateLocalTransactions(address, transactions, network);
+  parseNewTransaction(txDetails, nativeCurrency)
+    .then(parsedTransaction => {
+      let _transactions = [...currentTransactions];
+      _transactions = [parsedTransaction, ..._transactions];
+      updateLocalTransactions(address, _transactions, network);
       dispatch({
         type: ACCOUNT_UPDATE_TRANSACTIONS_SUCCESS,
-        payload: transactions,
+        payload: _transactions,
       });
       dispatch(accountCheckTransactionStatus(txDetails.hash));
+    })
+    .catch(error => {
+      dispatch({ type: ACCOUNT_UPDATE_TRANSACTIONS_FAILURE });
+      const message = parseError(error);
+      dispatch(notificationShow(message, true));
+    });
+};
+
+export const accountUpdateExchange = txns => (dispatch, getState) => {
+  dispatch({ type: ACCOUNT_UPDATE_TRANSACTIONS_REQUEST });
+  const currentTransactions = getState().account.transactions;
+  const network = getState().account.network;
+  const address = getState().account.accountInfo.address;
+  const nativeCurrency = getState().account.nativeCurrency;
+  Promise.all(
+    txns.map(txDetails =>
+      parseNewTransaction(txDetails, nativeCurrency, address, network),
+    ),
+  )
+    .then(parsedTransactions => {
+      let _transactions = [
+        ...parsedTransactions.reverse(),
+        ...currentTransactions,
+      ];
+      updateLocalTransactions(address, _transactions, network);
+      dispatch({
+        type: ACCOUNT_UPDATE_TRANSACTIONS_SUCCESS,
+        payload: _transactions,
+      });
+      txns.forEach(txn => dispatch(accountCheckTransactionStatus(txn.hash)));
     })
     .catch(error => {
       dispatch({ type: ACCOUNT_UPDATE_TRANSACTIONS_FAILURE });
@@ -150,7 +263,7 @@ export const accountGetAccountTransactions = () => (dispatch, getState) => {
   const { accountAddress, network } = getState().account;
   let cachedTransactions = [];
   let confirmedTransactions = [];
-  const accountLocal = getLocal(accountAddress) || null;
+  const accountLocal = getAccountLocal(accountAddress) || null;
   if (accountLocal && accountLocal[network]) {
     if (accountLocal[network].pending) {
       cachedTransactions = [...accountLocal[network].pending];
@@ -214,7 +327,7 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
   } = getState().account;
   let cachedAccount = { ...accountInfo };
   let cachedTransactions = [];
-  const accountLocal = getLocal(accountAddress) || null;
+  const accountLocal = getAccountLocal(accountAddress) || null;
   if (accountLocal && accountLocal[network]) {
     if (accountLocal[network].balances) {
       cachedAccount = {
@@ -353,7 +466,7 @@ export const accountGetNativePrices = accountInfo => (dispatch, getState) => {
             parsedAccountInfo,
             network,
           );
-          saveLocal('native_prices', prices);
+          saveNativePrices(prices);
           dispatch({
             type: ACCOUNT_GET_NATIVE_PRICES_SUCCESS,
             payload: { accountInfo: parsedAccountInfo, prices },
@@ -375,8 +488,8 @@ export const accountChangeNativeCurrency = nativeCurrency => (
   dispatch,
   getState,
 ) => {
-  saveLocal('native_currency', nativeCurrency);
-  let prices = getState().account.prices || getLocal('native_prices');
+  saveNativeCurrency(nativeCurrency);
+  let prices = getState().account.prices || getNativePrices();
   const network = getState().account.network;
   const selected = nativeCurrencies[nativeCurrency];
   let newPrices = { ...prices, selected };
@@ -397,9 +510,9 @@ export const accountClearState = () => dispatch => {
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
-  nativePriceRequest: getLocal('native_currency') || 'USD',
-  nativeCurrency: getLocal('native_currency') || 'USD',
-  prices: getLocal('native_prices') || {},
+  nativePriceRequest: getNativeCurrency() || 'USD',
+  nativeCurrency: getNativeCurrency() || 'USD',
+  prices: getNativePrices() || {},
   network: 'mainnet',
   accountType: '',
   accountAddress: '',

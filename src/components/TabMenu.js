@@ -163,7 +163,6 @@ class TabMenu extends Component {
     const tabCharSizes = [
       'account.tab_balances',
       'account.tab_transactions',
-      'account.tab_interactions',
     ].map(resourceName => lang.t(resourceName).length);
 
     return tabCharSizes[0] * 5;

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-*
+* Added English language fallback to i18n initialisation
 
 ### Changed
 

@@ -225,12 +225,24 @@ class Home extends Component {
       <StyledCard minHeight={102}>
         <CardContainer>
           <LogoSection>
-            <TrezorLogo />
-            <LogoText disabled isAlwaysVisible>
-              {lang.t('homepage.coming_soon')}
+            <TrezorLogo/>
+            <LogoText>
+              {lang.t('homepage.connect_trezor.description')}
+              <LedgerAffiliateLink
+                href="https://shop.trezor.io/?a=balance.io"
+                target="_blank"
+                title={lang.t('homepage.connect_trezor.link_title')}
+              >
+                {lang.t('homepage.connect_trezor.link_text')}
+              </LedgerAffiliateLink>
+              .
             </LogoText>
           </LogoSection>
-          <StyledSubscribeForm />
+          <Link to="/trezor">
+            <LedgerButton left color="ledger">
+              {lang.t('homepage.connect_trezor.button')}
+            </LedgerButton>
+          </Link>
         </CardContainer>
       </StyledCard>
 

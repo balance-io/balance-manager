@@ -11,6 +11,7 @@ import {
   convertAmountToAssetAmount,
 } from '../helpers/bignumber';
 import { ledgerEthSignTransaction } from './ledger-eth';
+import { trezorEthSignTransaction } from './trezor-eth';
 import { walletConnectSignTransaction } from './walletconnect';
 import ethUnits from '../references/ethereum-units.json';
 import smartContractMethods from '../references/smartcontract-methods.json';
@@ -360,6 +361,38 @@ export const web3LedgerSendTransaction = transaction =>
       .catch(error => reject(error));
   });
 
+  export const web3TrezorSendTransaction = transaction =>
+  new Promise((resolve, reject) => {
+    const from =
+      transaction.from.substr(0, 2) === '0x'
+        ? transaction.from
+        : `0x${transaction.from}`;
+    const to =
+      transaction.to.substr(0, 2) === '0x'
+        ? transaction.to
+        : `0x${transaction.to}`;
+    const value = transaction.value ? toWei(transaction.value) : '0x00';
+    const data = transaction.data ? transaction.data : '0x';
+    getTxDetails({
+      from,
+      to,
+      data,
+      value,
+      gasPrice: transaction.gasPrice,
+      gasLimit: transaction.gasLimit,
+    })
+      .then(txDetails => {
+        trezorEthSignTransaction(txDetails)
+          .then(signedTx =>
+            web3SendSignedTransaction(signedTx)
+              .then(txHash => resolve(txHash))
+              .catch(error => reject(error)),
+          )
+          .catch(error => reject(error));
+      })
+      .catch(error => reject(error));
+  });
+
 /**
  * @desc ledger transfer token
  * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
@@ -379,6 +412,19 @@ export const web3LedgerTransferToken = transaction =>
       .catch(error => reject(error));
   });
 
+export const web3TrezorTransferToken = transaction =>
+new Promise((resolve, reject) => {
+  transaction = getTransferTokenTransaction(transaction);
+  web3TrezorSendTransaction({
+    from: transaction.from,
+    to: transaction.to,
+    data: transaction.data,
+    gasPrice: transaction.gasPrice,
+    gasLimit: transaction.gasLimit,
+  })
+    .then(txHash => resolve(txHash))
+    .catch(error => reject(error));
+});
 /**
  * @desc send transaction controller given asset transfered and account type
  * @param {Object} transaction { asset, from, to, amount, gasPrice }
@@ -395,6 +441,9 @@ export const web3SendTransactionMultiWallet = (transaction, accountType) => {
       case 'LEDGER':
         method = web3LedgerSendTransaction;
         break;
+      case 'TREZOR':
+        method = web3TrezorSendTransaction;
+        break;
       case 'WALLETCONNECT':
         method = web3WalletConnectSendTransaction;
         break;
@@ -409,7 +458,10 @@ export const web3SendTransactionMultiWallet = (transaction, accountType) => {
         break;
       case 'LEDGER':
         method = web3LedgerTransferToken;
-        break;
+        break;      
+      case 'TREZOR':
+      method = web3TrezorTransferToken;
+      break;
       case 'WALLETCONNECT':
         method = web3WalletConnectTransferToken;
         break;

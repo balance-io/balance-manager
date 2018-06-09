@@ -1,17 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import loanLengths from '../references/loan-lengths.json';
-import Dropdown from '../components/Dropdown';
 import styled from 'styled-components';
+import ReactSlider from 'react-slider';
+import { dharma } from '../handlers/dharma';
+
 import lang from '../languages';
+import loanLengths from '../references/loan-lengths.json';
+
+import Dropdown from '../components/Dropdown';
 import Card from '../components/UnFlexedCard';
 import Button from '../components/Button';
 import Input from '../components/Input';
+
 import { modalClose } from '../reducers/_modal';
 import { fonts, colors, responsive, shadows } from '../styles';
-
-import ReactSlider from 'react-slider';
 
 import dharmaProtocol from '../assets/powered-by-dharma.png';
 import arrowReceived from '../assets/circle-arrow.svg';
@@ -219,13 +222,15 @@ class LoansRequestModal extends Component {
     };
   }
 
+  componentDidMount() {
+    console.log('dharma', dharma);
+  }
+
   onClose = () => {
     this.props.modalClose();
   };
 
   updateLoanLength = res => {
-    console.log('updating', res);
-
     this.setState({
       loanLength: res,
     });

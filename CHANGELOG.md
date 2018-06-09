@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-*
+* Added language selector to wallet connection page
 
 ### Changed
 

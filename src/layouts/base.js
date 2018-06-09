@@ -80,9 +80,6 @@ const StyledBeta = styled.div`
 `;
 
 const StyledIndicators = styled.div`
-  opacity: ${({ show }) => (show ? 1 : 0)};
-  visibility: ${({ show }) => (show ? 'visible' : 'hidden')};
-  pointer-events: ${({ show }) => (show ? 'auto' : 'none')};
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -169,8 +166,9 @@ const BaseLayout = ({
               <StyledBeta>{'BETA'}</StyledBeta>
             </StyledBranding>
           </Link>
-          <StyledIndicators show={showToolbar}>
-            {accountType === 'LEDGER' &&
+          <StyledIndicators>
+            {showToolbar &&
+              accountType === 'LEDGER' &&
               !!Object.keys(addresses).length && (
                 <Fragment>
                   <Dropdown
@@ -185,26 +183,32 @@ const BaseLayout = ({
                   <StyledVerticalLine />
                 </Fragment>
               )}
+            {showToolbar && (
+              <Fragment>
+                <Dropdown
+                  displayKey={`value`}
+                  selected={network}
+                  iconColor={online ? 'green' : 'red'}
+                  options={ethereumNetworks}
+                  onChange={
+                    accountType === 'LEDGER' ? ledgerUpdateNetwork : null
+                  }
+                />
+                <StyledVerticalLine />
+                <Dropdown
+                  displayKey={`currency`}
+                  selected={nativeCurrency}
+                  options={nativeCurrencies}
+                  onChange={accountChangeNativeCurrency}
+                />
+                <StyledVerticalLine />
+              </Fragment>
+            )}
             <Dropdown
               displayKey={`description`}
               selected={language}
               options={languages}
               onChange={accountChangeLanguage}
-            />
-            <StyledVerticalLine />
-            <Dropdown
-              displayKey={`value`}
-              selected={network}
-              iconColor={online ? 'green' : 'red'}
-              options={ethereumNetworks}
-              onChange={accountType === 'LEDGER' ? ledgerUpdateNetwork : null}
-            />
-            <StyledVerticalLine />
-            <Dropdown
-              displayKey={`currency`}
-              selected={nativeCurrency}
-              options={nativeCurrencies}
-              onChange={accountChangeNativeCurrency}
             />
           </StyledIndicators>
         </StyledHeader>

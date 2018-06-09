@@ -1,4 +1,5 @@
 import {
+  apiShapeshiftGetMarketInfo,
   apiShapeshiftGetCurrencies,
   apiShapeshiftSendAmount,
   apiShapeshiftGetExchangeDetails,
@@ -80,11 +81,6 @@ const EXCHANGE_GET_WITHDRAWAL_PRICE_SUCCESS =
 const EXCHANGE_GET_WITHDRAWAL_PRICE_FAILURE =
   'exchange/EXCHANGE_GET_WITHDRAWAL_PRICE_FAILURE';
 
-const EXCHANGE_UPDATE_DEPOSIT_SELECTED =
-  'exchange/EXCHANGE_UPDATE_DEPOSIT_SELECTED';
-const EXCHANGE_UPDATE_WITHDRAWAL_SELECTED =
-  'exchange/EXCHANGE_UPDATE_WITHDRAWAL_SELECTED';
-
 const EXCHANGE_UPDATE_WITHDRAWAL_NATIVE =
   'exchange/EXCHANGE_UPDATE_WITHDRAWAL_NATIVE';
 
@@ -98,6 +94,9 @@ const EXCHANGE_TOGGLE_WITHDRAWAL_NATIVE =
 
 const EXCHANGE_UPDATE_EXCHANGE_DETAILS =
   'exchange/EXCHANGE_UPDATE_EXCHANGE_DETAILS';
+
+const EXCHANGE_UPDATE_MIN_MAX_LIMITS =
+  'exchange/EXCHANGE_UPDATE_MIN_MAX_LIMITS';
 
 const EXCHANGE_CLEAR_FIELDS = 'exchange/EXCHANGE_CLEAR_FIELDS';
 
@@ -173,6 +172,32 @@ export const exchangeUpdateGasLimit = newGasPriceOption => (
     });
 };
 
+export const exchangeUpdateMinMaxLimits = (
+  depositSelected,
+  withdrawalSelected,
+) => (dispatch, getState) => {
+  let { exchangeDetails } = getState().exchange;
+  const pair = `${depositSelected.symbol.toLowerCase()}_${withdrawalSelected.symbol.toLowerCase()}`;
+  apiShapeshiftGetMarketInfo(pair)
+    .then(marketInfo => {
+      exchangeDetails.min = marketInfo.data.minimum;
+      exchangeDetails.maxLimit = marketInfo.data.maxLimit;
+      exchangeDetails.pair = marketInfo.data.pair.toLowerCase();
+      exchangeDetails.quotedRate = marketInfo.data.rate;
+      exchangeDetails.minerFee = marketInfo.data.minerFee;
+      dispatch({
+        type: EXCHANGE_UPDATE_MIN_MAX_LIMITS,
+        payload: { depositSelected, withdrawalSelected, exchangeDetails },
+      });
+    })
+    .catch(error => {
+      dispatch({
+        type: EXCHANGE_UPDATE_MIN_MAX_LIMITS,
+        payload: { depositSelected, withdrawalSelected, exchangeDetails },
+      });
+    });
+};
+
 export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
   const {
     withdrawalAssets,
@@ -196,10 +221,7 @@ export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
   if (value !== 'ETH') {
     depositSelected = depositAssets.filter(asset => asset.symbol === value)[0];
   }
-  dispatch({
-    type: EXCHANGE_UPDATE_DEPOSIT_SELECTED,
-    payload: { depositSelected, withdrawalSelected },
-  });
+  dispatch(exchangeUpdateMinMaxLimits(depositSelected, withdrawalSelected));
   dispatch(exchangeUpdateGasLimit());
   if (priorityInput === 'DEPOSIT') {
     dispatch(exchangeUpdateDepositAmount(depositAmount, false));
@@ -218,6 +240,7 @@ export const exchangeUpdateWithdrawalSelected = value => (
     depositAmount,
     withdrawalAmount,
     priorityInput,
+    exchangeDetails,
   } = getState().exchange;
   let { withdrawalSelected, depositSelected } = getState().exchange;
   if (value === depositSelected.symbol) {
@@ -238,10 +261,7 @@ export const exchangeUpdateWithdrawalSelected = value => (
       asset => asset.symbol === value,
     )[0];
   }
-  dispatch({
-    type: EXCHANGE_UPDATE_WITHDRAWAL_SELECTED,
-    payload: { depositSelected, withdrawalSelected },
-  });
+  dispatch(exchangeUpdateMinMaxLimits(depositSelected, withdrawalSelected));
   dispatch(exchangeGetWithdrawalPrice());
   if (priorityInput === 'DEPOSIT') {
     dispatch(exchangeUpdateDepositAmount(depositAmount, false));
@@ -797,22 +817,17 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, fetchingRate: false };
     case EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_FAILURE:
       return { ...state, fetchingRate: false };
-    case EXCHANGE_UPDATE_DEPOSIT_SELECTED:
-      return {
-        ...state,
-        depositSelected: action.payload.depositSelected,
-        withdrawalSelected: action.payload.withdrawalSelected,
-      };
     case EXCHANGE_UPDATE_GAS_LIMIT_SUCCESS:
       return {
         ...state,
         gasLimit: action.payload,
       };
-    case EXCHANGE_UPDATE_WITHDRAWAL_SELECTED:
+    case EXCHANGE_UPDATE_MIN_MAX_LIMITS:
       return {
         ...state,
         depositSelected: action.payload.depositSelected,
         withdrawalSelected: action.payload.withdrawalSelected,
+        exchangeDetails: action.payload.exchangeDetails,
       };
     case EXCHANGE_UPDATE_EXCHANGE_DETAILS:
       return {

@@ -388,6 +388,7 @@ class AccountViewTransactions extends Component {
                       >
                         <ButtonCustom
                           left
+                          disabled={tx.hash.startsWith('shapeshift')}
                           txtColor="etherscan"
                           img={etherscanLogo}
                         >
@@ -404,7 +405,10 @@ class AccountViewTransactions extends Component {
                       >
                         <ButtonCustom
                           left
-                          disabled={network !== 'mainnet'}
+                          disabled={
+                            network !== 'mainnet' ||
+                            tx.hash.startsWith('shapeshift')
+                          }
                           txtColor="ethplorer"
                           img={ethplorerLogo}
                         >

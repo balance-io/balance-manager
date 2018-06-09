@@ -8,6 +8,8 @@ import { formatInputDecimals } from '../helpers/bignumber';
 import networkList from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
 
+const cryptocompareApiKey = process.env.REACT_APP_CRYPTOCOMPARE_API_KEY || '';
+
 /**
  * Configuration for cryptocompare api
  * @type axios instance
@@ -27,8 +29,11 @@ const cryptocompare = axios.create({
  * @param  {String}   [native='USD']
  * @return {Promise}
  */
-export const apiGetSinglePrice = (asset = '', native = 'USD') =>
-  cryptocompare.get(`/price?fsym=${asset}&tsyms=${native}`);
+export const apiGetSinglePrice = (asset = '', native = 'USD') => {
+  return cryptocompare.get(
+    `/price?fsym=${asset}&tsyms=${native}&apiKey=${cryptocompareApiKey}`,
+  );
+};
 
 /**
  * @desc get all assets prices
@@ -42,7 +47,7 @@ export const apiGetPrices = (assets = []) => {
     '',
   );
   return cryptocompare.get(
-    `/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}`,
+    `/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}&apiKey=${cryptocompareApiKey}`,
   );
 };
 
@@ -61,7 +66,7 @@ export const apiGetHistoricalPrices = (
     '',
   );
   return cryptocompare.get(
-    `/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`,
+    `/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}&apiKey=${cryptocompareApiKey}`,
   );
 };
 

@@ -957,7 +957,7 @@ export const parseHistoricalTransactions = async (transactions = null) => {
         const parsedTxn = await debounceRequest(
           parseHistoricalNativePrice,
           [tx],
-          200 * idx,
+          50 * idx,
         );
         return parsedTxn;
       }

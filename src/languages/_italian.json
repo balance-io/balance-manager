@@ -11,7 +11,7 @@
         "link_title": "Acquista un hardware wallet Ledger",
         "button": "Connetti a Ledger"
       },
-      "connect_walletconnect": "Collegati ed accedi al tuo portafoglio WalletConnect.",
+      "connect_walletconnect": "Collegati ed accedi al tuo wallet WalletConnect.",
       "coming_soon": "In arrivo."
     },
     "account": {
@@ -82,11 +82,11 @@
       "invalid_address": "Indirizzo Non Valido",
       "send_max": "Invia max",
       "exchange_max": "Scambia max",
-      "default_wallet": " Portafoglio",
+      "default_wallet": " Wallet",
       "gas_slow": "Lento",
-      "gas_average": "Media",
+      "gas_average": "Medio",
       "gas_fast": "Veloce",
-      "gas_fee": "Commissione",
+      "gas_fee": "Costi di commissione",
       "tx_confirm_sender": "Mittente",
       "tx_confirm_recipient": "Destinatario",
       "tx_confirm_amount": "Quantità",
@@ -102,7 +102,7 @@
     },
     "message": {
       "web3_not_available": "Installa l'estensione di Chrome MetaMask",
-      "web3_not_unlocked": "Per favore sblocca il tuo portafoglio MetaMask",
+      "web3_not_unlocked": "Per favore sblocca il tuo wallet MetaMask",
       "web3_unknown_network": "Network sconosciuto, per favore passa ad un altro",
       "page_not_found": "404 Pagina Non Trovata",
       "coming_soon": "In arrivo...",

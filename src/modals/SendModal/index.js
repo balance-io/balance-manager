@@ -38,7 +38,11 @@ import { notificationShow } from '../../reducers/_notification';
 import { isValidAddress } from '../../helpers/validators';
 import { greaterThan } from '../../helpers/bignumber';
 
-import { capitalize, transactionData } from '../../helpers/utilities';
+import {
+  capitalize,
+  transactionData,
+  calcTxFee,
+} from '../../helpers/utilities';
 
 import {
   StyledIcon,
@@ -62,7 +66,6 @@ const reduxProps = ({ modal, send, account }) => ({
   txHash: send.txHash,
   address: send.address,
   selected: send.selected,
-  fetchingGasPrices: send.fetchingGasPrices,
   gasPrices: send.gasPrices,
   gasPrice: send.gasPrice,
   gasLimit: send.gasLimit,
@@ -94,9 +97,8 @@ class SendModal extends Component {
     nativeAmount: PropTypes.string.isRequired,
     assetAmount: PropTypes.string.isRequired,
     txHash: PropTypes.string.isRequired,
-    address: PropTypes.string.isRequired,
+    // address: PropTypes.string.isRequired,
     selected: PropTypes.object.isRequired,
-    fetchingGasPrices: PropTypes.bool.isRequired,
     gasPrice: PropTypes.object.isRequired,
     gasPrices: PropTypes.object.isRequired,
     gasLimit: PropTypes.number.isRequired,
@@ -167,7 +169,7 @@ class SendModal extends Component {
         return;
       } else if (this.props.selected.symbol === 'ETH') {
         const { requestedAmount, balance, amountWithFees } = transactionData(
-          this.props.accountInfo.assets,
+          this.props.accountInfo,
           this.props.assetAmount,
           this.props.gasPrice,
         );
@@ -189,7 +191,7 @@ class SendModal extends Component {
         }
       } else {
         const { requestedAmount, balance, amountWithFees } = transactionData(
-          this.props.accountInfo.assets,
+          this.props.accountInfo,
           this.props.assetAmount,
           this.props.gasPrice,
         );
@@ -235,23 +237,6 @@ class SendModal extends Component {
 
   updateGasPrice = gasPrice => {
     this.props.sendUpdateGasPrice(gasPrice);
-  };
-
-  // still not a safe function
-  // TODO: Make util function
-  calcGasFee = () => {
-    let nativeFee = '$0.00';
-    let txFee = '0.000 ETH';
-
-    const gasPriceOption = this.props.gasPrices[this.props.gasPriceOption];
-    const gasPriceOptionAvailable = gasPriceOption && gasPriceOption.txFee;
-
-    if (gasPriceOptionAvailable) {
-      nativeFee = gasPriceOption.txFee.native.value.display;
-      txFee = gasPriceOption.txFee.value.display;
-    }
-
-    return `${nativeFee}(${txFee})`;
   };
 
   // QR Code Reader Handlers
@@ -411,9 +396,10 @@ class SendModal extends Component {
                   </Button>
 
                   <StyledParagraph>
-                    <span>{`${lang.t(
-                      'modal.gas_fee',
-                    )}: ${this.calcGasFee()}`}</span>
+                    <span>{`${lang.t('modal.gas_fee')}: ${calcTxFee(
+                      this.props.gasPrices,
+                      this.props.gasPriceOption,
+                    )}`}</span>
                   </StyledParagraph>
 
                   <Button

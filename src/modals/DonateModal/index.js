@@ -32,7 +32,12 @@ import {
 import { notificationShow } from '../../reducers/_notification';
 
 import { greaterThan } from '../../helpers/bignumber';
-import { capitalize, getEth, transactionData } from '../../helpers/utilities';
+import {
+  capitalize,
+  getEth,
+  transactionData,
+  calcTxFee,
+} from '../../helpers/utilities';
 
 import {
   StyledIcon,
@@ -161,23 +166,6 @@ class DonateModal extends Component {
     this.props.sendUpdateGasPrice(gasPrice);
   };
 
-  // still not a safe function
-  // TODO: Make util function
-  calcGasFee = () => {
-    let nativeFee = '$0.00';
-    let txFee = '0.000 ETH';
-
-    const gasPriceOption = this.props.gasPrices[this.props.gasPriceOption];
-    const gasPriceOptionAvailable = gasPriceOption && gasPriceOption.txFee;
-
-    if (gasPriceOptionAvailable) {
-      nativeFee = gasPriceOption.txFee.native.value.display;
-      txFee = gasPriceOption.txFee.value.display;
-    }
-
-    return `${nativeFee}(${txFee})`;
-  };
-
   render = () => {
     const {
       accountInfo,
@@ -286,9 +274,10 @@ class DonateModal extends Component {
                   </Button>
 
                   <StyledParagraph>
-                    <span>{`${lang.t(
-                      'modal.gas_fee',
-                    )}: ${this.calcGasFee()}`}</span>
+                    <span>{`${lang.t('modal.gas_fee')}: ${calcTxFee(
+                      this.props.gasPrices,
+                      this.props.gasPriceOption,
+                    )}`}</span>
                   </StyledParagraph>
 
                   <Button

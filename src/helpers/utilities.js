@@ -176,7 +176,7 @@ export const getEth = assets => {
  * @param  {String} accountInfo
  * @param  {String} assetAmount
  * @param  {String} gasPrice
- * @return { Object } ethereum, balanceAmount, balance, requestedAmount, txFeeAmount, txFee, amountWithFees
+ * @return {Object} ethereum, balanceAmount, balance, requestedAmount, txFeeAmount, txFee, amountWithFees
  */
 export const transactionData = (accountInfo, assetAmount, gasPrice) => {
   const ethereum = getEth(accountInfo.assets);
@@ -196,4 +196,25 @@ export const transactionData = (accountInfo, assetAmount, gasPrice) => {
     txFee,
     amountWithFees,
   };
+};
+
+/**
+ * @desc calculates the native and tx fee for a transaction
+ * @param  {Array} gasPrices
+ * @param  {Object} gasPriceOption
+ * @return {String} native and txFee
+ */
+export const calcTxFee = (gasPrices, gasPriceOption) => {
+  let nativeFee = '$0.00';
+  let txFee = '0.000 ETH';
+
+  const option = gasPrices[gasPriceOption];
+  const isAvailable = option && option.txFee;
+
+  if (isAvailable) {
+    nativeFee = gasPrices[gasPriceOption].txFee.native.value.display;
+    txFee = gasPrices[gasPriceOption].txFee.value.display;
+  }
+
+  return `${nativeFee} - (${txFee})`;
 };

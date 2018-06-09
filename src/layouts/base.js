@@ -20,7 +20,7 @@ import { ledgerUpdateNetwork } from '../reducers/_ledger';
 import {
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
-  accountChangeLanguage
+  accountChangeLanguage,
 } from '../reducers/_account';
 import ReminderRibbon from '../components/ReminderRibbon';
 import { colors, responsive } from '../styles';
@@ -145,11 +145,11 @@ const BaseLayout = ({
   }
   const languages = {};
   Object.keys(resources).forEach(resource => {
-      languages[resource] = {
-          code: resource,
-          description: resource.toUpperCase()
-      };
-  })
+    languages[resource] = {
+      code: resource,
+      description: resource.toUpperCase(),
+    };
+  });
   const showToolbar =
     window.location.pathname !== '/' &&
     (!metamaskFetching || !ledgerFetching) &&
@@ -185,11 +185,11 @@ const BaseLayout = ({
                   <StyledVerticalLine />
                 </Fragment>
               )}
-            <Dropdown 
-                displayKey={`description`}
-                selected={language}
-                options={languages}
-                onChange={accountChangeLanguage}
+            <Dropdown
+              displayKey={`description`}
+              selected={language}
+              options={languages}
+              onChange={accountChangeLanguage}
             />
             <StyledVerticalLine />
             <Dropdown
@@ -265,5 +265,5 @@ export default connect(reduxProps, {
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
   modalOpen,
-  accountChangeLanguage
+  accountChangeLanguage,
 })(BaseLayout);

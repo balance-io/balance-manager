@@ -17,6 +17,7 @@ bootIntercom();
 // Languages (i18n)
 lang.init({
   lng: getLocal('language') || 'en',
+  fallbackLng: 'en',
   debug: process.env.NODE_ENV === 'development',
   resources,
 });

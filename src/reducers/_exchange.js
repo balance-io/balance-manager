@@ -260,6 +260,7 @@ export const exchangeUpdateDepositAmount = (
     depositSelected,
     withdrawalSelected,
     withdrawalPrice,
+    exchangeDetails,
   } = getState().exchange;
   const parsedDepositAmount = parseFloat(depositAmount);
   if (!parsedDepositAmount || parsedDepositAmount <= 0) {
@@ -271,7 +272,12 @@ export const exchangeUpdateDepositAmount = (
     payload: { depositAmount, withdrawalAmount, withdrawalNative },
   });
   const getExchangeDetailsPromise = timeoutEnabled => {
-    if (parsedDepositAmount && parsedDepositAmount > 0 && !timeoutEnabled) {
+    if (
+      parsedDepositAmount &&
+      parsedDepositAmount >= exchangeDetails.min &&
+      parsedDepositAmount <= exchangeDetails.maxLimit &&
+      !timeoutEnabled
+    ) {
       apiShapeshiftGetExchangeDetails({
         request: {
           depositSymbol: depositSelected.symbol,

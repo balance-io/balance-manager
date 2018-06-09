@@ -45,11 +45,10 @@ export const trezorEthAccounts = () => {
   return Promise.resolve(accounts)
 }
 
-export const trezorEthSignTransaction = async (tx, transaction) => {
+export const trezorEthSignTransaction = async (tx) => {
   const account = trezorEthInstance.accounts.filter(
-    account => account.address.toLowerCase() === '0x' + transaction.from.toLowerCase(),
+    account => account.address.toLowerCase() === tx.from,
   )[0];
-  tx.from = '0x' + transaction.from.toLowerCase()
   const { r, s, v } = await new Promise((resolve) => TC.TrezorConnect.ethereumSignTx(
     account.path,
     ...[

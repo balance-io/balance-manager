@@ -382,13 +382,7 @@ export const web3LedgerSendTransaction = transaction =>
       gasLimit: transaction.gasLimit,
     })
       .then(txDetails => {
-        let unPrefixed = {};
-        Object.keys(txDetails).forEach(el => {
-          unPrefixed[el] = txDetails[el].substr(0,2) === '0x'
-          ? txDetails[el].substr(2)
-          : txDetails[el]
-        })
-        trezorEthSignTransaction(txDetails, unPrefixed)
+        trezorEthSignTransaction(txDetails)
           .then(signedTx =>
             web3SendSignedTransaction(signedTx)
               .then(txHash => resolve(txHash))

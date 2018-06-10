@@ -133,38 +133,46 @@ class AccountBalances extends Component {
           ) : (
             <div />
           )}
-          <p>{`${this.props.accountInfo.total.display || emptyBalanceDisplay}`}</p>
+          {!this.state.showMoreTokens &&
+            <p>{`${this.props.accountInfo.total.display || emptyBalanceDisplay}`}</p>
+          }
         </StyledLastRow>
         
         {this.state.showMoreTokens && 
           assets.hidden && assets.hidden.length > 0 &&
-          assets.hidden.map(token => (
-            <StyledToken
-              key={`${this.props.accountInfo.address}-${token.symbol}`}
-            >
-              <StyledAsset 
-                onMouseEnter={() => this.onAssetHover(token.address)}
-                onMouseLeave={() => this.onAssetHover(null)}
-              >
-                <AssetIcon asset={token.address} />
-                <p>{token.name}</p>
-                {this.state.hoveredAsset === token.address && 
-                  <StyledShowIcon onClick={() => this.onShowAsset(token.address)}/>}
-              </StyledAsset>
-              <p>{token.balance.display}</p>
-              <p>{token.native ? token.native.price.display : emptyBalanceDisplay}</p>
-              <StyledPercentage
-                percentage={
-                  token.native
-                    ? convertStringToNumber(token.native.change.amount)
-                    : 0
-                }
-              >
-                {token.native ? token.native.change.display : emptyBalanceDisplay}
-              </StyledPercentage>
-              <p>{token.native ? token.native.balance.display : emptyBalanceDisplay}</p>
-            </StyledToken>
-          ))
+          <React.Fragment>
+            {assets.hidden.map(token => (
+                <StyledToken
+                key={`${this.props.accountInfo.address}-${token.symbol}`}
+                >
+                <StyledAsset 
+                    onMouseEnter={() => this.onAssetHover(token.address)}
+                    onMouseLeave={() => this.onAssetHover(null)}
+                >
+                    <AssetIcon asset={token.address} />
+                    <p>{token.name}</p>
+                    {this.state.hoveredAsset === token.address && 
+                    <StyledShowIcon onClick={() => this.onShowAsset(token.address)}/>}
+                </StyledAsset>
+                <p>{token.balance.display}</p>
+                <p>{token.native ? token.native.price.display : emptyBalanceDisplay}</p>
+                <StyledPercentage
+                    percentage={
+                    token.native
+                        ? convertStringToNumber(token.native.change.amount)
+                        : 0
+                    }
+                >
+                    {token.native ? token.native.change.display : emptyBalanceDisplay}
+                </StyledPercentage>
+                <p>{token.native ? token.native.balance.display : emptyBalanceDisplay}</p>
+                </StyledToken>
+            ))}
+            <StyledLastRow>
+                <p></p>
+                <p>{`${this.props.accountInfo.total.display || emptyBalanceDisplay}`}</p>
+            </StyledLastRow>
+          </React.Fragment>
         }
       </StyledGrid>
     );
@@ -183,8 +191,7 @@ class AccountBalances extends Component {
       ...tokensWithNoMarketValue,
     ];
 
-    //const hiddenTokens = [...dustTokens.map(t => t.address), ...this.props.hiddenAssets];
-    const hiddenTokens = [...this.props.hiddenAssets];
+    const hiddenTokens = [...dustTokens.map(t => t.address), ...this.props.hiddenAssets];
 
     return {
         hidden: tokens.filter(asset => _.includes(hiddenTokens, asset.address)),

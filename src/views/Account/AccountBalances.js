@@ -133,17 +133,19 @@ class AccountBalances extends Component {
           ) : (
             <div />
           )}
-          {!this.state.showMoreTokens &&
+          {(!this.state.showMoreTokens || !assets.hidden || assets.hidden.length === 0) &&
             <p>{`${this.props.accountInfo.total.display || emptyBalanceDisplay}`}</p>
           }
         </StyledLastRow>
         
+        {/* Hidden Tokens */}
         {this.state.showMoreTokens && 
           assets.hidden && assets.hidden.length > 0 &&
           <React.Fragment>
             {assets.hidden.map(token => (
                 <StyledToken
-                key={`${this.props.accountInfo.address}-${token.symbol}`}
+                  key={`${this.props.accountInfo.address}-${token.symbol}`}
+                  isSeparator={token.isSeparator}
                 >
                 <StyledAsset 
                     onMouseEnter={() => this.onAssetHover(token.address)}
@@ -177,6 +179,7 @@ class AccountBalances extends Component {
       </StyledGrid>
     );
   }
+
   _getAssets() {
     const tokens = this.props.accountInfo.assets.filter(
       asset => asset.symbol !== 'ETH' && typeof asset === 'object' && !!asset,
@@ -186,17 +189,27 @@ class AccountBalances extends Component {
     const tokensWithLowMarketValue = tokens.filter(
         asset => asset.symbol !== 'ETH' && (hasLowMarketValue(asset))
     );
-    const dustTokens = [
-      ...tokensWithLowMarketValue,
-      ...tokensWithNoMarketValue,
-    ];
+    
+    const dustTokens = _([...tokensWithLowMarketValue, ...tokensWithNoMarketValue])
+      .map(t => t.address)
+      .without(...this.props.visibleAssets)
+      .value();
 
-    const hiddenTokens = [...dustTokens.map(t => t.address), ...this.props.hiddenAssets];
+    const hiddenTokenAddresses = [...dustTokens, ...this.props.hiddenAssets];
+    const hidden = tokens.filter(asset => _.includes(hiddenTokenAddresses, asset.address))
+    const visible = tokens.filter(asset => !_.includes(hiddenTokenAddresses, asset.address))
 
-    return {
-        hidden: tokens.filter(asset => _.includes(hiddenTokens, asset.address)),
-        visible: tokens.filter(asset => !_.includes(hiddenTokens, asset.address))
+    hidden.sort((b, a) =>
+      (a.native ? a.native.balance.amount : 0) - (b.native ? b.native.balance.amount : 0));
+
+    for (let token of hidden) {
+      if (!token.native) {
+        token.isSeparator = true;
+        break;
+      }
     }
+
+    return { hidden, visible }
   }
 }
 
@@ -205,6 +218,7 @@ AccountBalances.propTypes = {
 };
 const reduxProps = ({ account }) => ({
   accountInfo: account.accountInfo,
+  visibleAssets: account.visibleAssets,
   hiddenAssets: account.hiddenAssets
 });
 

@@ -90,7 +90,11 @@ export const StyledToken = styled(StyledRow)`
     font-family: ${fonts.family.SFMono};
   }
   &:nth-child(n + 3) {
-    border-top: 1px solid rgba(${colors.rowDivider});
+    border-top: ${({ isSeparator }) => 
+      isSeparator
+        ? `2px solid rgba(${colors.lightBlue});`
+        : `1px solid rgba(${colors.rowDivider});`
+    }
   }
 `;
 

@@ -28,6 +28,8 @@ import {
   saveNativeCurrency,
   updateLocalTransactions,
   updateLocalBalances,
+  getAssetList,
+  updateAssetList
 } from '../handlers/localstorage';
 import { web3SetHttpProvider } from '../handlers/web3';
 import { notificationShow } from './_notification';
@@ -442,16 +444,23 @@ export const accountUpdateBalances = () => (dispatch, getState) => {
     });
 };
 
-export const accountHideAsset = address => dispatch => {
-    const hidden = getLocal('hidden_assets') || [];
-    saveLocal('hidden_assets', [...hidden, address]);
+export const accountHideAsset = address => dispatch => {  
+  const assetList = getAssetList() || {};
+    updateAssetList({
+      visible: _.pull(assetList.visible || [], address),
+      hidden: [...(assetList.hidden || []), address]
+    });
+
     dispatch({ type: ACCOUNT_HIDE_ASSET, payload: { address } });
 };
 
 export const accountShowAsset = address => dispatch => {
-    const hidden = getLocal('hidden_assets') || [];
-    _.pull(hidden, address);
-    saveLocal('hidden_assets', hidden);
+    const assetList = getAssetList();
+      updateAssetList({
+        visible: [...(assetList.visible || []), address],
+        hidden: _.pull(assetList.hidden || [], address)
+    });
+
     dispatch({ type: ACCOUNT_SHOW_ASSET, payload: { address } });
 };
 
@@ -576,6 +585,8 @@ export const accountClearState = () => dispatch => {
 };
 
 // -- Reducer --------------------------------------------------------------- //
+const assetList = getAssetList();
+
 const INITIAL_STATE = {
   nativePriceRequest: getNativeCurrency() || 'USD',
   nativeCurrency: getNativeCurrency() || 'USD',
@@ -602,7 +613,8 @@ const INITIAL_STATE = {
     ],
     total: '———',
   },
-  hiddenAssets: getLocal('hidden_assets') || [],
+  hiddenAssets: assetList.hidden || [],
+  visibleAssets: assetList.visible || [],
   transactions: [],
   uniqueTokens: [],
   shapeshiftAvailable: true,
@@ -729,12 +741,14 @@ export default (state = INITIAL_STATE, action) => {
     case ACCOUNT_HIDE_ASSET: 
       return {
         ...state,
-        hiddenAssets: [...state.hiddenAssets, action.payload.address]
+        hiddenAssets: [...state.hiddenAssets, action.payload.address],
+        visibleAssets: _.without(state.visibleAssets, action.payload.address)
       };
     case ACCOUNT_SHOW_ASSET:
       return {
         ...state,
-        hiddenAssets: _.without(state.hiddenAssets, action.payload.address)
+        hiddenAssets: _.without(state.hiddenAssets, action.payload.address),
+        visibleAssets: [...state.visibleAssets, action.payload.address]
       };
     case ACCOUNT_UPDATE_NETWORK:
       return {

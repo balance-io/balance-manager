@@ -23,7 +23,10 @@ import {
   convertAmountToDisplay,
 } from '../helpers/bignumber';
 import { notificationShow } from './_notification';
-import { accountUpdateExchange } from './_account';
+import {
+  accountUpdateExchange,
+  accountUpdateHasPendingTransaction,
+} from './_account';
 import ethUnits from '../references/ethereum-units.json';
 
 // -- Constants ------------------------------------------------------------- //
@@ -100,17 +103,11 @@ const EXCHANGE_UPDATE_MIN_MAX_LIMITS =
 
 const EXCHANGE_UPDATE_SELECTED = 'exchange/EXCHANGE_UPDATE_SELECTED';
 
-const EXCHANGE_UPDATE_HAS_PENDING_TRANSACTION =
-  'exchange/EXCHANGE_UPDATE_HAS_PENDING_TRANSACTION';
-
 const EXCHANGE_CLEAR_FIELDS = 'exchange/EXCHANGE_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
 let getExchangeDetailsTimeout = null;
-
-export const exchangeResetHasPendingTransaction = () => dispatch =>
-  dispatch({ type: EXCHANGE_UPDATE_HAS_PENDING_TRANSACTION, payload: false });
 
 export const exchangeGetGasPrices = () => (dispatch, getState) => {
   const { prices } = getState().account;
@@ -621,10 +618,7 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
   web3SendTransactionMultiWallet(txDetails, accountType)
     .then(txHash => {
       // has pending transactions set to true for redirect to Transactions route
-      dispatch({
-        type: EXCHANGE_UPDATE_HAS_PENDING_TRANSACTION,
-        payload: true,
-      });
+      dispatch(accountUpdateHasPendingTransaction());
       txDetails.hash = txHash;
       const incomingTx = {
         hash: `shapeshift_${recipient}`,
@@ -927,8 +921,6 @@ export default (state = INITIAL_STATE, action) => {
       };
     case EXCHANGE_UPDATE_COUNTDOWN:
       return { ...state, countdown: action.payload };
-    case EXCHANGE_UPDATE_HAS_PENDING_TRANSACTION:
-      return { ...state, hasPendingTransaction: action.payload };
     case EXCHANGE_TOGGLE_CONFIRMATION_VIEW:
       return { ...state, countdown: '', confirm: !state.confirm };
     case EXCHANGE_UPDATE_WITHDRAWAL_NATIVE:

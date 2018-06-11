@@ -184,8 +184,8 @@ Account.defaultProps = {
   fetchingMessage: '',
 };
 
-const reduxProps = ({ account, exchange }) => ({
-  hasPendingTransaction: exchange.hasPendingTransaction,
+const reduxProps = ({ account }) => ({
+  hasPendingTransaction: account.hasPendingTransaction,
   network: account.network,
   fetching: account.fetching,
   accountInfo: account.accountInfo,

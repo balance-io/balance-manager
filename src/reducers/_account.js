@@ -84,6 +84,9 @@ const ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS =
 const ACCOUNT_SHAPESHIFT_VERIFY_FAILURE =
   'account/ACCOUNT_SHAPESHIFT_VERIFY_FAILURE';
 
+const ACCOUNT_UPDATE_HAS_PENDING_TRANSACTION =
+  'account/ACCOUNT_UPDATE_HAS_PENDING_TRANSACTION';
+
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 
 const ACCOUNT_UPDATE_ACCOUNT_ADDRESS = 'account/ACCOUNT_UPDATE_ACCOUNT_ADDRESS';
@@ -95,6 +98,14 @@ const ACCOUNT_CHANGE_LANGUAGE = 'account/ACCOUNT_CHANGE_LANGUAGE';
 
 // -- Actions --------------------------------------------------------------- //
 let getPricesInterval = null;
+
+export const accountUpdateHasPendingTransaction = (
+  hasPending = true,
+) => dispatch =>
+  dispatch({
+    type: ACCOUNT_UPDATE_HAS_PENDING_TRANSACTION,
+    payload: hasPending,
+  });
 
 export const accountCheckTransactionStatus = txHash => (dispatch, getState) => {
   dispatch({ type: ACCOUNT_CHECK_TRANSACTION_STATUS_REQUEST });
@@ -552,6 +563,7 @@ const INITIAL_STATE = {
   fetchingShapeshift: false,
   fetchingTransactions: false,
   fetching: false,
+  hasPendingTransaction: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -645,6 +657,8 @@ export default (state = INITIAL_STATE, action) => {
         fetchingShapeshift: false,
         shapeshiftAvailable: false,
       };
+    case ACCOUNT_UPDATE_HAS_PENDING_TRANSACTION:
+      return { ...state, hasPendingTransaction: action.payload };
     case ACCOUNT_CHANGE_NATIVE_CURRENCY:
       return {
         ...state,

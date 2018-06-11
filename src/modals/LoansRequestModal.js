@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import ReactSlider from 'react-slider';
+
 import { dharma } from '../handlers/dharma';
+// import { setPendingDebtEntity, updateDebtEntity } from "../reducers/_dharma";
 
 import lang from '../languages';
 import loanLengths from '../references/loan-lengths.json';
@@ -359,8 +361,7 @@ LoansRequestModal.propTypes = {
 };
 
 const reduxProps = ({ account }) => ({
-  accountAddress: account.accountAddress,
-  accountType: account.accountType,
+  account: account,
 });
 
 export default connect(reduxProps, {

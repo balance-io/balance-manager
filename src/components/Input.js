@@ -80,7 +80,9 @@ const Input = ({
   }
   return (
     <StyledInputWrapper disabled={disabled}>
-      <StyledLabel hide={_label === 'Input'}>{_label}</StyledLabel>
+      {_label !== 'Input' && (
+        <StyledLabel hide={_label === 'Input'}>{_label}</StyledLabel>
+      )}
       <StyledInput
         disabled={disabled}
         type={type}

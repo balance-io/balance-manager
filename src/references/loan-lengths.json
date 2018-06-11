@@ -1,0 +1,22 @@
+{
+  "Hours": {
+    "id": 0,
+    "length": "Hours"
+  },
+  "Days": {
+    "id": 1,
+    "length": "Days"
+  },
+  "Weeks": {
+    "id": 2,
+    "length": "Weeks"
+  },
+  "Months": {
+    "id": 3,
+    "length": "Months"
+  },
+  "Years": {
+    "id": 4,
+    "length": "Years"
+  }
+}

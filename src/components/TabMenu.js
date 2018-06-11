@@ -7,6 +7,7 @@ import Button from './Button';
 import balancesTabIcon from '../assets/balances-tab.svg';
 import transactionsTabIcon from '../assets/transactions-tab.svg';
 import interactionsTabIcon from '../assets/interactions-tab.svg';
+import loansTabIcon from '../assets/loans-tab.svg';
 import tabBackground from '../assets/tab-background.png';
 import { colors, fonts, shadows, transitions } from '../styles';
 
@@ -29,8 +30,11 @@ const StyledTabsWrapper = styled.div`
   }
 
   & a:nth-child(3) button {
-    padding-left: 38px;
     margin-left: 8px;
+  }
+
+  & a:nth-child(4) button {
+    margin-left: 10px;
   }
 `;
 
@@ -100,7 +104,7 @@ class TabMenu extends Component {
 
     this.state = {
       activeTab: 'BALANCES_TAB',
-      tabPosition: -87 + this._firstTabOffset()
+      tabPosition: -87 + this._firstTabOffset(),
     };
   }
 
@@ -118,10 +122,13 @@ class TabMenu extends Component {
         newState = { activeTab: 'BALANCES_TAB', tabPosition: offset - 87 };
         break;
       case '/transactions':
-        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: offset + 51 };
+        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: offset + 45 };
         break;
       case '/interactions':
-        newState = { activeTab: 'INTERACTIONS_TAB', tabPosition: 229 };
+        newState = { activeTab: 'INTERACTIONS_TAB', tabPosition: offset + 175 };
+        break;
+      case '/loans':
+        newState = { activeTab: 'LOANS_TAB', tabPosition: offset + 300 };
         break;
       default:
         break;
@@ -169,14 +176,29 @@ class TabMenu extends Component {
               {lang.t('account.tab_interactions')}
             </StyledTab>
           </Link>
+          <Link to={`${this.props.match.url}/loans`}>
+            <StyledTab
+              data-toggle="tooltip"
+              title={lang.t('account.tab_loans_tooltip')}
+              active={this.state.activeTab === 'LOANS_TAB'}
+              icon={loansTabIcon}
+              left
+            >
+              {lang.t('account.tab_loans')}
+            </StyledTab>
+          </Link>
         </StyledTabsWrapper>
       </StyledTabMenu>
     );
   }
 
   _firstTabOffset() {
-    const tabCharSizes = ['account.tab_balances', 'account.tab_transactions', 'account.tab_interactions']
-        .map(resourceName => lang.t(resourceName).length);
+    const tabCharSizes = [
+      'account.tab_balances',
+      'account.tab_transactions',
+      'account.tab_interactions',
+      'account.tab_loans',
+    ].map(resourceName => lang.t(resourceName).length);
 
     return tabCharSizes[0] * 5;
   }

@@ -7,6 +7,7 @@ import ExchangeModal from './ExchangeModal';
 import SendModal from './SendModal';
 import ReceiveModal from './ReceiveModal';
 import DonationModal from './DonationModal';
+import LoansRequestModal from './LoansRequestModal';
 import WalletConnectInit from './WalletConnectInit';
 import { modalClose } from '../reducers/_modal';
 import { sendClearFields } from '../reducers/_send';
@@ -58,6 +59,8 @@ class Modal extends Component {
         return <ReceiveModal />;
       case 'WALLET_CONNECT_INIT':
         return <WalletConnectInit />;
+      case 'LOANS_REQUEST_MODAL':
+        return <LoansRequestModal />;
       default:
         return <div />;
     }
@@ -78,7 +81,12 @@ class Modal extends Component {
       <StyledLightbox modal={this.props.modal}>
         <StyledContainer>
           <StyledHitbox onClick={this.onClose} />
-          <Column center>{this.modalController()}</Column>
+          <Column
+            center
+            maxWidth={this.props.modal === 'LOANS_REQUEST_MODAL' ? 800 : 600}
+          >
+            {this.modalController()}
+          </Column>
         </StyledContainer>
       </StyledLightbox>
     );

@@ -11,6 +11,7 @@ import CopyToClipboard from '../../components/CopyToClipboard';
 import AccountBalances from './AccountBalances';
 import AccountTransactions from './AccountTransactions';
 import AccountInteractions from './AccountInteractions';
+import AccountLoans from './AccountLoans';
 import arrowUp from '../../assets/arrow-up.svg';
 // import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
@@ -154,6 +155,11 @@ class Account extends Component {
                   exact
                   path={`${this.props.match.url}/interactions`}
                   component={AccountInteractions}
+                />
+                <Route
+                  exact
+                  path={`${this.props.match.url}/loans`}
+                  component={AccountLoans}
                 />
                 <Route render={() => <Redirect to={this.props.match.url} />} />
               </Switch>

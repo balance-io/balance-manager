@@ -247,25 +247,6 @@ export const web3MetamaskSendTransaction = transaction =>
   });
 
 /**
- * @desc metamask transfer token
- * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
- * @return {Promise}
- */
-export const web3MetamaskTransferToken = transaction =>
-  new Promise((resolve, reject) => {
-    transaction = getTransferTokenTransaction(transaction);
-    web3MetamaskSendTransaction({
-      from: transaction.from,
-      to: transaction.to,
-      data: transaction.data,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-    })
-      .then(txHash => resolve(txHash))
-      .catch(error => reject(error));
-  });
-
-/**
  * @desc walletconnect send transaction
  * @param  {Object}  transaction { from, to, value, data, gasPrice}
  * @return {Promise}
@@ -301,25 +282,6 @@ export const web3WalletConnectSendTransaction = transaction =>
           })
           .catch(error => reject(error));
       })
-      .catch(error => reject(error));
-  });
-
-/**
- * @desc walletconnect transfer token
- * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
- * @return {Promise}
- */
-export const web3WalletConnectTransferToken = transaction =>
-  new Promise((resolve, reject) => {
-    transaction = getTransferTokenTransaction(transaction);
-    web3WalletConnectSendTransaction({
-      from: transaction.from,
-      to: transaction.to,
-      data: transaction.data,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-    })
-      .then(txHash => resolve(txHash))
       .catch(error => reject(error));
   });
 
@@ -361,62 +323,29 @@ export const web3LedgerSendTransaction = transaction =>
   });
 
 /**
- * @desc ledger transfer token
- * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
- * @return {Promise}
- */
-export const web3LedgerTransferToken = transaction =>
-  new Promise((resolve, reject) => {
-    transaction = getTransferTokenTransaction(transaction);
-    web3LedgerSendTransaction({
-      from: transaction.from,
-      to: transaction.to,
-      data: transaction.data,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-    })
-      .then(txHash => resolve(txHash))
-      .catch(error => reject(error));
-  });
-
-/**
  * @desc send transaction controller given asset transfered and account type
  * @param {Object} transaction { asset, from, to, amount, gasPrice }
  * @return {Promise}
  */
 export const web3SendTransactionMultiWallet = (transaction, accountType) => {
   let method = null;
-  if (transaction.asset.symbol === 'ETH') {
-    transaction.value = transaction.amount;
-    switch (accountType) {
-      case 'METAMASK':
-        method = web3MetamaskSendTransaction;
-        break;
-      case 'LEDGER':
-        method = web3LedgerSendTransaction;
-        break;
-      case 'WALLETCONNECT':
-        method = web3WalletConnectSendTransaction;
-        break;
-      default:
-        method = web3MetamaskSendTransaction;
-        break;
-    }
-  } else {
-    switch (accountType) {
-      case 'METAMASK':
-        method = web3MetamaskTransferToken;
-        break;
-      case 'LEDGER':
-        method = web3LedgerTransferToken;
-        break;
-      case 'WALLETCONNECT':
-        method = web3WalletConnectTransferToken;
-        break;
-      default:
-        method = web3MetamaskTransferToken;
-        break;
-    }
+  transaction.value = transaction.amount;
+  if (transaction.asset.symbol !== 'ETH') {
+    transaction = getTransferTokenTransaction(transaction);
+  }
+  switch (accountType) {
+    case 'METAMASK':
+      method = web3MetamaskSendTransaction;
+      break;
+    case 'LEDGER':
+      method = web3LedgerSendTransaction;
+      break;
+    case 'WALLETCONNECT':
+      method = web3WalletConnectSendTransaction;
+      break;
+    default:
+      method = web3MetamaskSendTransaction;
+      break;
   }
   return method(transaction);
 };

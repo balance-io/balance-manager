@@ -210,6 +210,13 @@ const BaseLayout = ({
               options={languages}
               onChange={accountChangeLanguage}
             />
+            <StyledVerticalLine />
+            <Dropdown
+              displayKey={`description`}
+              selected={language}
+              options={languages}
+              onChange={accountChangeLanguage}
+            />
           </StyledIndicators>
         </StyledHeader>
         <StyledContent>{children}</StyledContent>

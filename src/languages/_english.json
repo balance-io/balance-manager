@@ -54,9 +54,11 @@
       "donate": "Donate ETH",
       "receive": "Receive",
       "close": "Close",
+      "confirm": "Confirm",
       "cancel": "Cancel",
       "go_back": "Go Back",
       "send_another": "Send Another",
+      "exchange_again": "Exchange Again",
       "notify_me": "Get notified",
       "try_again": "Try again"
     },
@@ -94,11 +96,17 @@
       "tx_hash": "Transaction Hash",
       "tx_verify": "Verify your transaction here",
       "deposit_dropdown_label": "Exchange my",
-      "withdrawal_dropdown_label": "for",
+      "withdrawal_dropdown_label": "For",
       "deposit_input_label": "Pay",
       "withdrawal_input_label": "Get",
       "tx_fee": "Transaction Fee",
-      "exchange_fee": "Exchange Fee"
+      "exchange_fee": "Exchange Fee",
+      "helper_balance": "Balance",
+      "helper_value": "Value",
+      "helper_rate": "Rate",
+      "helper_price": "Price",
+      "helper_min": "Min",
+      "helper_max": "Max"
     },
     "message": {
       "web3_not_available": "Please install the MetaMask Chrome extension",
@@ -111,7 +119,9 @@
       "failed_ledger_connection": "Failed to connect to Ledger, please check your device",
       "no_transactions": "No transactions found for this account",
       "no_interactions": "No interactions found for this account",
-      "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum"
+      "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum",
+      "exchange_not_available": "Exchange is not available in your area",
+      "learn_more": "Learn more"
     },
     "notification": {
       "error": {

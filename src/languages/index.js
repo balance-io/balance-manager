@@ -1,11 +1,13 @@
 import i18next from 'i18next';
 import english from './_english.json';
 import spanish from './_spanish.json';
+import italian from './_italian.json';
 import german from './_german.json';
 
 export const resources = {
   en: english,
   es: spanish,
+  it: italian,
   de: german,
 };
 

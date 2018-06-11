@@ -107,8 +107,6 @@ const EXCHANGE_CLEAR_FIELDS = 'exchange/EXCHANGE_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
-let getExchangeDetailsTimeout = null;
-
 export const exchangeGetGasPrices = () => (dispatch, getState) => {
   const { prices } = getState().account;
   const { gasLimit } = getState().exchange;
@@ -246,7 +244,6 @@ export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
           depositSelected,
           withdrawalSelected,
           exchangeDetails,
-          false,
         ),
       );
     } else {
@@ -256,7 +253,6 @@ export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
           depositSelected,
           withdrawalSelected,
           withdrawalPrice,
-          false,
         ),
       );
     }
@@ -308,7 +304,6 @@ export const exchangeUpdateWithdrawalSelected = value => (
             depositSelected,
             withdrawalSelected,
             exchangeDetails,
-            false,
           ),
         );
       } else {
@@ -318,7 +313,6 @@ export const exchangeUpdateWithdrawalSelected = value => (
             depositSelected,
             withdrawalSelected,
             withdrawalPrice,
-            false,
           ),
         );
       }
@@ -331,7 +325,6 @@ export const exchangeUpdateDepositAmount = (
   depositSelected = null,
   withdrawalSelected = null,
   exchangeDetails = null,
-  timeout = false,
 ) => (dispatch, getState) => {
   let {
     withdrawalAmount,
@@ -355,62 +348,50 @@ export const exchangeUpdateDepositAmount = (
     type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_REQUEST,
     payload: { depositAmount, withdrawalAmount, withdrawalNative },
   });
-  const getExchangeDetailsPromise = timeoutEnabled => {
-    if (
-      parsedDepositAmount &&
-      parsedDepositAmount >= exchangeDetails.min &&
-      parsedDepositAmount <= exchangeDetails.maxLimit &&
-      !timeoutEnabled
-    ) {
-      apiShapeshiftGetExchangeDetails({
-        request: {
-          depositSymbol: depositSelected.symbol,
-          withdrawalSymbol: withdrawalSelected.symbol,
-          depositAmount,
-        },
-        inputOne: depositAmount,
-        inputTwo: withdrawalAmount,
-        withdrawal: false,
-      })
-        .then(result => {
-          if (!result.exchangeDetails) {
-            result.exchangeDetails = getState().exchange.exchangeDetails;
-          }
-          const withdrawalNative = result.withdrawalAmount
-            ? multiply(
-                result.withdrawalAmount,
-                convertAmountFromBigNumber(withdrawalPrice.amount),
-              )
-            : '';
-          result.withdrawalNative = withdrawalNative;
-          dispatch({
-            type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_SUCCESS,
-            payload: result,
-          });
-        })
-        .catch(error => {
-          const message = parseError(error);
-          dispatch(notificationShow(message, true));
-          dispatch({ type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_FAILURE });
+  if (
+    parsedDepositAmount &&
+    parsedDepositAmount >= exchangeDetails.min &&
+    parsedDepositAmount <= exchangeDetails.maxLimit
+  ) {
+    apiShapeshiftGetExchangeDetails({
+      request: {
+        depositSymbol: depositSelected.symbol,
+        withdrawalSymbol: withdrawalSelected.symbol,
+        depositAmount,
+      },
+      inputOne: depositAmount,
+      inputTwo: withdrawalAmount,
+      withdrawal: false,
+    })
+      .then(result => {
+        if (!result.exchangeDetails) {
+          result.exchangeDetails = getState().exchange.exchangeDetails;
+        }
+        const withdrawalNative = result.withdrawalAmount
+          ? multiply(
+              result.withdrawalAmount,
+              convertAmountFromBigNumber(withdrawalPrice.amount),
+            )
+          : '';
+        result.withdrawalNative = withdrawalNative;
+        dispatch({
+          type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_SUCCESS,
+          payload: result,
         });
-    } else {
-      dispatch({
-        type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_SUCCESS,
-        payload: {
-          exchangeDetails: getState().exchange.exchangeDetails,
-          withdrawalAmount: '',
-        },
+      })
+      .catch(error => {
+        const message = parseError(error);
+        dispatch(notificationShow(message, true));
+        dispatch({ type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_FAILURE });
       });
-    }
-  };
-  clearInterval(getExchangeDetailsTimeout);
-  if (timeout) {
-    getExchangeDetailsTimeout = setTimeout(
-      () => getExchangeDetailsPromise(timeout),
-      300,
-    );
   } else {
-    getExchangeDetailsPromise(timeout);
+    dispatch({
+      type: EXCHANGE_UPDATE_DEPOSIT_AMOUNT_SUCCESS,
+      payload: {
+        exchangeDetails: getState().exchange.exchangeDetails,
+        withdrawalAmount: '',
+      },
+    });
   }
 };
 
@@ -419,7 +400,6 @@ export const exchangeUpdateWithdrawalAmount = (
   depositSelected = null,
   withdrawalSelected = null,
   withdrawalPrice = null,
-  timeout = false,
   disableNative = false,
 ) => (dispatch, getState) => {
   let { depositAmount, withdrawalNative } = getState().exchange;
@@ -449,54 +429,39 @@ export const exchangeUpdateWithdrawalAmount = (
       depositAmount,
     },
   });
-  const getExchangeDetailsPromise = timeoutEnabled => {
-    if (
-      parsedWithdrawalAmount &&
-      parsedWithdrawalAmount > 0 &&
-      !timeoutEnabled
-    ) {
-      apiShapeshiftGetExchangeDetails({
-        request: {
-          depositSymbol: depositSelected.symbol,
-          withdrawalSymbol: withdrawalSelected.symbol,
-          withdrawalAmount,
-        },
-        inputOne: withdrawalAmount,
-        inputTwo: depositAmount,
-        withdrawal: true,
-      })
-        .then(result => {
-          if (!result.exchangeDetails) {
-            result.exchangeDetails = getState().exchange.exchangeDetails;
-          }
-          dispatch({
-            type: EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_SUCCESS,
-            payload: result,
-          });
-        })
-        .catch(error => {
-          const message = parseError(error);
-          dispatch(notificationShow(message, true));
-          dispatch({ type: EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_FAILURE });
+  if (parsedWithdrawalAmount && parsedWithdrawalAmount > 0) {
+    apiShapeshiftGetExchangeDetails({
+      request: {
+        depositSymbol: depositSelected.symbol,
+        withdrawalSymbol: withdrawalSelected.symbol,
+        withdrawalAmount,
+      },
+      inputOne: withdrawalAmount,
+      inputTwo: depositAmount,
+      withdrawal: true,
+    })
+      .then(result => {
+        if (!result.exchangeDetails) {
+          result.exchangeDetails = getState().exchange.exchangeDetails;
+        }
+        dispatch({
+          type: EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_SUCCESS,
+          payload: result,
         });
-    } else {
-      dispatch({
-        type: EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_SUCCESS,
-        payload: {
-          exchangeDetails: getState().exchange.exchangeDetails,
-          depositAmount: '',
-        },
+      })
+      .catch(error => {
+        const message = parseError(error);
+        dispatch(notificationShow(message, true));
+        dispatch({ type: EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_FAILURE });
       });
-    }
-  };
-  clearInterval(getExchangeDetailsTimeout);
-  if (timeout) {
-    getExchangeDetailsTimeout = setTimeout(
-      () => getExchangeDetailsPromise(timeout),
-      300,
-    );
   } else {
-    getExchangeDetailsPromise(timeout);
+    dispatch({
+      type: EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_SUCCESS,
+      payload: {
+        exchangeDetails: getState().exchange.exchangeDetails,
+        depositAmount: '',
+      },
+    });
   }
 };
 
@@ -523,7 +488,6 @@ export const exchangeUpdateWithdrawalNative = withdrawalNative => (
       depositSelected,
       withdrawalSelected,
       withdrawalPrice,
-      false,
       true,
     ),
   );

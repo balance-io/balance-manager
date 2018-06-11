@@ -250,9 +250,9 @@ export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
     } else {
       dispatch(
         exchangeUpdateWithdrawalAmount(
+          withdrawalAmount,
           depositSelected,
           withdrawalSelected,
-          withdrawalAmount,
           withdrawalPrice,
           false,
         ),
@@ -312,9 +312,9 @@ export const exchangeUpdateWithdrawalSelected = value => (
       } else {
         dispatch(
           exchangeUpdateWithdrawalAmount(
+            withdrawalAmount,
             depositSelected,
             withdrawalSelected,
-            withdrawalAmount,
             withdrawalPrice,
             false,
           ),
@@ -326,8 +326,8 @@ export const exchangeUpdateWithdrawalSelected = value => (
 
 export const exchangeUpdateDepositAmount = (
   depositAmount = '',
-  depositSelected = '',
-  withdrawalSelected = '',
+  depositSelected = null,
+  withdrawalSelected = null,
   exchangeDetails = null,
   timeout = false,
 ) => (dispatch, getState) => {
@@ -413,14 +413,19 @@ export const exchangeUpdateDepositAmount = (
 };
 
 export const exchangeUpdateWithdrawalAmount = (
-  depositSelected,
-  withdrawalSelected,
   withdrawalAmount = '',
-  withdrawalPrice,
+  depositSelected = null,
+  withdrawalSelected = null,
+  withdrawalPrice = null,
   timeout = false,
   disableNative = false,
 ) => (dispatch, getState) => {
   let { depositAmount, withdrawalNative } = getState().exchange;
+  depositSelected = depositSelected || getState().exchange.depositSelected;
+  withdrawalSelected =
+    withdrawalSelected || getState().exchange.withdrawalSelected;
+  withdrawalPrice = withdrawalPrice || getState().exchange.withdrawalPrice;
+
   const parsedWithdrawalAmount = parseFloat(withdrawalAmount);
   if (!parsedWithdrawalAmount || parsedWithdrawalAmount <= 0) {
     depositAmount = '';
@@ -512,9 +517,9 @@ export const exchangeUpdateWithdrawalNative = withdrawalNative => (
   });
   dispatch(
     exchangeUpdateWithdrawalAmount(
+      withdrawalAmount,
       depositSelected,
       withdrawalSelected,
-      withdrawalAmount,
       withdrawalPrice,
       false,
       true,
@@ -610,6 +615,7 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
   };
   web3SendTransactionMultiWallet(txDetails, accountType)
     .then(txHash => {
+      // TODO: move to Transactions tab
       txDetails.hash = txHash;
       const incomingTx = {
         hash: `shapeshift_${recipient}`,

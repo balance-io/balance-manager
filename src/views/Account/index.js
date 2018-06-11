@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -80,6 +81,11 @@ class Account extends Component {
   openExchangeModal = () => this.props.modalOpen('EXCHANGE_MODAL');
   openSendModal = () => this.props.modalOpen('SEND_MODAL');
   openReceiveModal = () => this.props.modalOpen('RECEIVE_MODAL');
+  componentDidUpdate() {
+    if (this.props.hasPendingTransaction) {
+      this.props.history.push(`${this.props.match.url}/transactions`);
+    }
+  }
   render() {
     return (
       <StyledAccount>
@@ -162,6 +168,7 @@ class Account extends Component {
 }
 
 Account.propTypes = {
+  history: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
@@ -177,7 +184,8 @@ Account.defaultProps = {
   fetchingMessage: '',
 };
 
-const reduxProps = ({ account }) => ({
+const reduxProps = ({ account, exchange }) => ({
+  hasPendingTransaction: exchange.hasPendingTransaction,
   network: account.network,
   fetching: account.fetching,
   accountInfo: account.accountInfo,
@@ -185,6 +193,8 @@ const reduxProps = ({ account }) => ({
   accountType: account.accountType,
 });
 
-export default connect(reduxProps, {
-  modalOpen,
-})(Account);
+export default withRouter(
+  connect(reduxProps, {
+    modalOpen,
+  })(Account),
+);

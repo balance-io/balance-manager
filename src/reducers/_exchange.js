@@ -100,11 +100,17 @@ const EXCHANGE_UPDATE_MIN_MAX_LIMITS =
 
 const EXCHANGE_UPDATE_SELECTED = 'exchange/EXCHANGE_UPDATE_SELECTED';
 
+const EXCHANGE_UPDATE_HAS_PENDING_TRANSACTION =
+  'exchange/EXCHANGE_UPDATE_HAS_PENDING_TRANSACTION';
+
 const EXCHANGE_CLEAR_FIELDS = 'exchange/EXCHANGE_CLEAR_FIELDS';
 
 // -- Actions --------------------------------------------------------------- //
 
 let getExchangeDetailsTimeout = null;
+
+export const exchangeResetHasPendingTransaction = () => dispatch =>
+  dispatch({ type: EXCHANGE_UPDATE_HAS_PENDING_TRANSACTION, payload: false });
 
 export const exchangeGetGasPrices = () => (dispatch, getState) => {
   const { prices } = getState().account;
@@ -232,7 +238,6 @@ export const exchangeUpdateDepositSelected = value => (dispatch, getState) => {
     payload: { depositSelected, withdrawalSelected },
   });
 
-  // TODO Dispatch withdrawal and deposit selected
   dispatch(exchangeUpdateGasLimit(depositSelected));
   dispatch(
     exchangeUpdateMinMaxLimits(depositSelected, withdrawalSelected),
@@ -615,7 +620,11 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
   };
   web3SendTransactionMultiWallet(txDetails, accountType)
     .then(txHash => {
-      // TODO: move to Transactions tab
+      // has pending transactions set to true for redirect to Transactions route
+      dispatch({
+        type: EXCHANGE_UPDATE_HAS_PENDING_TRANSACTION,
+        payload: true,
+      });
       txDetails.hash = txHash;
       const incomingTx = {
         hash: `shapeshift_${recipient}`,
@@ -918,6 +927,8 @@ export default (state = INITIAL_STATE, action) => {
       };
     case EXCHANGE_UPDATE_COUNTDOWN:
       return { ...state, countdown: action.payload };
+    case EXCHANGE_UPDATE_HAS_PENDING_TRANSACTION:
+      return { ...state, hasPendingTransaction: action.payload };
     case EXCHANGE_TOGGLE_CONFIRMATION_VIEW:
       return { ...state, countdown: '', confirm: !state.confirm };
     case EXCHANGE_UPDATE_WITHDRAWAL_NATIVE:

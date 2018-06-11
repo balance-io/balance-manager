@@ -13,6 +13,7 @@ import ToggleIndicator from '../../components/ToggleIndicator';
 import TransactionStatus from '../../components/TransactionStatus';
 import etherscanLogo from '../../assets/etherscan-logo.svg';
 import ethplorerLogo from '../../assets/ethplorer-logo.svg';
+import { exchangeResetHasPendingTransaction } from '../../reducers/_exchange';
 import { getLocalTimeDate } from '../../helpers/time';
 import { colors, fonts, shadows, responsive } from '../../styles';
 
@@ -231,6 +232,11 @@ class AccountViewTransactions extends Component {
   };
   onShowAllTransactions = () =>
     this.setState({ showAllTransactions: !this.state.showAllTransactions });
+
+  componentDidMount() {
+    console.log('mounting account transactions');
+    this.props.exchangeResetHasPendingTransaction();
+  }
 
   render = () => {
     const {
@@ -455,6 +461,7 @@ class AccountViewTransactions extends Component {
 }
 
 AccountViewTransactions.propTypes = {
+  exchangeResetHasPendingTransaction: PropTypes.func.isRequired,
   transactions: PropTypes.array.isRequired,
   fetchingTransactions: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
@@ -471,4 +478,6 @@ const reduxProps = ({ account }) => ({
   nativeCurrency: account.nativeCurrency,
 });
 
-export default connect(reduxProps, null)(AccountViewTransactions);
+export default connect(reduxProps, {
+  exchangeResetHasPendingTransaction,
+})(AccountViewTransactions);

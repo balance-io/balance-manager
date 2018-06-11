@@ -5,19 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
-## [Unreleased]
+## [Unreleased](https://github.com/balance-io/balance-manager/releases/tag/0.5.5)
 
 ### Added
 
-*
+* Added copy button animation to show copied text.
+* Added english translation for "copy", "copied".
 
 ### Changed
 
-*
+* Removed on hover of copy icon to show "click to copy to clipboard" text.
 
 ### Removed
 
-*
 
 ## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 

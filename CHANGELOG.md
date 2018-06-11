@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
+* Added English language fallback to i18n initialisation
 * Incoming and outgoing pending transactions for Shapeshift
 * Versioning for local storage
 * Exchange button and modal

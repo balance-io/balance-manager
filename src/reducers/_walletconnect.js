@@ -4,8 +4,8 @@ import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
 import { accountUpdateAccountAddress } from './_account';
 import {
-  walletConnectEthInit,
-  walletConnectEthAccounts,
+  walletConnectInit,
+  walletConnectGetAccounts,
 } from '../handlers/walletconnect';
 
 // -- Constants ------------------------------------------------------------- //
@@ -31,9 +31,9 @@ const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
 let getSessionInterval = null;
 let getTransactionStatusInterval = null;
 
-export const walletConnectInit = () => async (dispatch, getState) => {
+export const walletConnectModalInit = () => async (dispatch, getState) => {
   dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST });
-  walletConnectEthInit()
+  walletConnectInit()
     .then(walletConnectInstance => {
       dispatch({
         type: WALLET_CONNECT_NEW_SESSION_SUCCESS,
@@ -51,7 +51,7 @@ export const walletConnectInit = () => async (dispatch, getState) => {
 
 export const walletConnectGetSession = () => (dispatch, getState) => {
   dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
-  walletConnectEthAccounts((error, data) => {
+  walletConnectGetAccounts((error, data) => {
     if (error) {
       const message = parseError(error);
       dispatch(notificationShow(message), true);

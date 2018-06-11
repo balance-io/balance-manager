@@ -10,9 +10,7 @@ import LineBreak from '../components/LineBreak';
 import DropdownAsset from '../components/DropdownAsset';
 import Button from '../components/Button';
 import Form from '../components/Form';
-import MetamaskLogo from '../components/MetamaskLogo';
-import LedgerLogo from '../components/LedgerLogo';
-import TrezorLogo from '../components/TrezorLogo';
+import AccountType from '../components/AccountType';
 import convertIcon from '../assets/convert-icon.svg';
 import arrowUp from '../assets/arrow-up.svg';
 import qrIcon from '../assets/qr-code-bnw.png';
@@ -80,6 +78,22 @@ const StyledParagraph = styled.p`
   margin: 10px 0;
   color: rgb(${colors.grey});
   font-weight: ${fonts.weight.medium};
+`;
+
+const StyledFees = styled.div`
+  margin: 10px 0;
+  text-align: center;
+  & p {
+    color: rgb(${colors.grey});
+    font-size: 13px;
+    font-weight: ${fonts.weight.normal};
+  }
+  & strong {
+    color: rgb(${colors.grey});
+    font-size: 13px;
+    font-weight: ${fonts.weight.semibold};
+    margin-bottom: 8px;
+  }
 `;
 
 const StyledHash = styled.p`
@@ -285,14 +299,6 @@ class SendModal extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    const request = {
-      address: this.props.accountInfo.address,
-      recipient: this.props.recipient,
-      amount: this.props.assetAmount,
-      asset: this.props.selected,
-      gasPrice: this.props.gasPrice,
-      gasLimit: this.props.gasLimit,
-    };
     if (!this.props.gasPrice.txFee) {
       this.props.notificationShow(
         lang.t('notification.error.generic_error'),
@@ -356,7 +362,7 @@ class SendModal extends Component {
           return;
         }
       }
-      this.props.sendTransaction(request);
+      this.props.sendTransaction();
     }
     this.props.sendToggleConfirmationView(true);
   };
@@ -518,7 +524,11 @@ class SendModal extends Component {
                     this.props.gasPrices.slow &&
                     this.props.gasPrices.slow.txFee.native
                       ? this.props.gasPrices.slow.txFee.native.value.display
-                      : '$0.00'
+                      : `${
+                          this.props.prices && this.props.prices.selected
+                            ? this.props.prices.selected.symbol
+                            : '$'
+                        }0.00`
                   }`}</p>
                   <p>{`~ ${
                     this.props.gasPrices.slow
@@ -535,7 +545,11 @@ class SendModal extends Component {
                     this.props.gasPrices.average &&
                     this.props.gasPrices.average.txFee.native
                       ? this.props.gasPrices.average.txFee.native.value.display
-                      : '$0.00'
+                      : `${
+                          this.props.prices && this.props.prices.selected
+                            ? this.props.prices.selected.symbol
+                            : '$'
+                        }0.00`
                   }`}</p>
                   <p>{`~ ${
                     this.props.gasPrices.average
@@ -552,7 +566,11 @@ class SendModal extends Component {
                     this.props.gasPrices.fast &&
                     this.props.gasPrices.fast.txFee.native
                       ? this.props.gasPrices.fast.txFee.native.value.display
-                      : '$0.00'
+                      : `${
+                          this.props.prices && this.props.prices.selected
+                            ? this.props.prices.selected.symbol
+                            : '$'
+                        }0.00`
                   }`}</p>
                   <p>{`~ ${
                     this.props.gasPrices.fast
@@ -567,26 +585,30 @@ class SendModal extends Component {
                   <Button onClick={this.onClose}>
                     {lang.t('button.cancel')}
                   </Button>
-                  <StyledParagraph>
-                    <span>{`${lang.t('modal.gas_fee')}: `}</span>
-                    <span>{`${
+                  <StyledFees>
+                    <strong>{lang.t('modal.tx_fee')}</strong>
+                    <p>{`${
+                      this.props.nativeCurrency !== 'ETH'
+                        ? `${
+                            this.props.gasPrices[this.props.gasPriceOption]
+                              ? this.props.gasPrices[this.props.gasPriceOption]
+                                  .txFee.value.display
+                              : '0.000 ETH'
+                          } ≈ `
+                        : ''
+                    }${
                       this.props.gasPrices[this.props.gasPriceOption] &&
                       this.props.gasPrices[this.props.gasPriceOption].txFee
                         .native
                         ? this.props.gasPrices[this.props.gasPriceOption].txFee
                             .native.value.display
-                        : '$0.00'
-                    }${
-                      this.props.nativeCurrency !== 'ETH'
-                        ? ` (${
-                            this.props.gasPrices[this.props.gasPriceOption]
-                              ? this.props.gasPrices[this.props.gasPriceOption]
-                                  .txFee.value.display
-                              : '0.000 ETH'
-                          })`
-                        : ''
-                    }`}</span>
-                  </StyledParagraph>
+                        : `${
+                            this.props.prices
+                              ? this.props.prices.selected.symbol
+                              : '$'
+                          }0.00`
+                    }`}</p>
+                  </StyledFees>
                   <Button
                     left
                     color="blue"
@@ -613,18 +635,7 @@ class SendModal extends Component {
             </Form>
           ) : (
             <StyledApproveTransaction>
-              {(() => {
-                switch (this.props.accountType) {
-                  case 'METAMASK':
-                    return <MetamaskLogo />;
-                  case 'LEDGER':
-                    return <LedgerLogo />;
-                  case 'TREZOR':
-                    return <TrezorLogo />;
-                  default:
-                    return <div />;
-                }
-              })()}
+              <AccountType accountType={this.props.accountType} />
               <StyledParagraph>
                 {lang.t('modal.approve_tx', {
                   walletType: capitalize(this.props.accountType),

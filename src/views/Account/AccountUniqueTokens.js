@@ -48,12 +48,12 @@ class AccountUniqueTokens extends Component {
           <Footer />
         </UniqueTokensContainer>
       ) : (
-        <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
+        <StyledCard minHeight={280} fetching={this.props.fetchingUniqueTokens}>
           <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
         </StyledCard>
       )
     ) : (
-      <StyledCard minHeight={280} fetching={this.props.fetchingTransactions}>
+      <StyledCard minHeight={280} fetching={this.props.fetchingUniqueTokens}>
         <StyledMessage>{lang.t('message.no_unique_tokens')}</StyledMessage>
       </StyledCard>
     );

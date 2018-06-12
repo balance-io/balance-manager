@@ -119,7 +119,7 @@
       "no_transactions": "No transactions found for this account",
       "no_interactions": "No interactions found for this account",
       "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum",
-      "please_connect_trezor": "Please connect your Tezor and follow the instructions"
+      "please_connect_trezor": "Please connect your Trezor and follow the instructions"
     },
     "notification": {
       "error": {

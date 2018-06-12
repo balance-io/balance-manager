@@ -5,6 +5,7 @@ const moment = require('moment');
 const StyledNewsLink = styled.a`
   padding: 10px;
   display: block;
+  width: 100%;
 
   &:hover,
   &:focus {

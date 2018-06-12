@@ -249,5 +249,8 @@ export const apiGetEthereumGraph = (symbol, nativeCurrency) => {
  */
 export const apiGetTokenInfo = address => {
   // Get user chosen currency (selected upper right)
-  return axios.get(`/api/tokenInfo?address=${address}`);
+  // return axios.get(`/api/tokenInfo?address=${address}`);
+  return axios.get(
+    `https://trivial.co/api/tokeninformation?token_address=${address}`,
+  );
 };

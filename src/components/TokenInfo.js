@@ -137,7 +137,6 @@ class TokenInfo extends Component {
         return (
           <div>
             <StyledText>Could not find info for {token.symbol}</StyledText>
-            <Graph symbol={token.symbol} />
           </div>
         );
       }
@@ -155,7 +154,8 @@ class TokenInfo extends Component {
             <StyledText>{tokenInfo.info.num_holders_approx}</StyledText>
           </StyledTokenInfoLeft>
           <StyledGraphInfo>
-            <Graph symbol={token.symbol} />
+            <StyledHeading>Price chart</StyledHeading>
+            <StyledText>TBA</StyledText>
           </StyledGraphInfo>
           <StyledTokenInfoRow>
             <StyledLinksList>

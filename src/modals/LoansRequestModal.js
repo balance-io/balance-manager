@@ -4,11 +4,10 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import ReactSlider from 'react-slider';
 
-import { dharma } from '../handlers/dharma';
 // import { setPendingDebtEntity, updateDebtEntity } from "../reducers/_dharma";
 
 import lang from '../languages';
-import loanLengths from '../references/loan-lengths.json';
+import amortizationUnits from '../references/term-lengths.json';
 
 import Dropdown from '../components/Dropdown';
 import Card from '../components/UnFlexedCard';
@@ -16,6 +15,7 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 
 import { modalClose } from '../reducers/_modal';
+import { apiGetPrice } from '../handlers/api';
 import { fonts, colors, responsive, shadows } from '../styles';
 
 import dharmaProtocol from '../assets/powered-by-dharma.png';
@@ -212,6 +212,7 @@ const StyledAmountCurrency = styled.div`
   background: rgb(${colors.brightGreen});
   font-size: ${fonts.size.medium};
   color: rgb(${colors.white});
+  text-transform: uppercase;
 `;
 
 class LoansRequestModal extends Component {
@@ -219,47 +220,149 @@ class LoansRequestModal extends Component {
     super(props);
 
     this.state = {
-      loanLength: 'Months',
-      interestRate: 1,
+      debtRequest: {
+        amortizationUnit: 'months',
+        collateralAmount: 0,
+        collateralTokenSymbol:
+          this.props.modal.params === 'eth' ? 'DAI' : 'ETH',
+        description: '',
+        gracePeriodInDays: '',
+        interestRate: 1,
+        principalAmount: 0,
+        principalTokenSymbol: this.props.modal.params.toUpperCase(),
+        termLength: 1,
+      },
     };
   }
 
   componentDidMount() {
-    console.log('dharma', dharma);
+    let { modal, account } = this.props;
+
+    apiGetPrice(
+      modal.params === 'eth' ? 'ETH' : 'DAI',
+      account.nativeCurrency,
+    ).then(res => {
+      this.setState({
+        principalTokenNativePrice: res.data[account.nativeCurrency],
+      });
+    });
   }
+
+  calculateAmount = () => {
+    let debtRequest = { ...this.state.debtRequest };
+    let principalAmount = debtRequest.principalAmount;
+    let interestRate = debtRequest.interestRate / 100;
+    let totalAmount = interestRate * principalAmount + principalAmount;
+
+    return totalAmount || 0;
+  };
+
+  calculateInstallments = () => {
+    let debtRequest = { ...this.state.debtRequest };
+
+    let principalAmount = debtRequest.principalAmount;
+    let interestRate = debtRequest.interestRate / 100;
+    let totalAmount = interestRate * principalAmount + principalAmount;
+    let installment = totalAmount / debtRequest.termLength;
+
+    return installment || 0;
+  };
+
+  calculateNative = () => {
+    let debtRequest = { ...this.state.debtRequest };
+
+    let principalAmount = debtRequest.principalAmount;
+    let interestRate = debtRequest.interestRate / 100;
+    let totalTokenAmount = interestRate * principalAmount + principalAmount;
+    let totalNativeAmount =
+      totalTokenAmount * this.state.principalTokenNativePrice;
+
+    return totalNativeAmount || 0;
+  };
 
   onClose = () => {
     this.props.modalClose();
   };
 
-  updateLoanLength = res => {
-    this.setState({
-      loanLength: res,
-    });
+  updateAmortizationUnit = value => {
+    let debtRequest = { ...this.state.debtRequest };
+
+    debtRequest.amortizationUnit = value;
+
+    this.setState({ debtRequest });
   };
 
-  updateInterestRate = res => {
-    this.setState({
-      interestRate: res,
-    });
+  updateCollateralAmount = value => {
+    let debtRequest = { ...this.state.debtRequest };
+
+    debtRequest.collateralAmount = parseFloat(value === '' ? 0 : value, 10);
+
+    this.setState({ debtRequest });
+  };
+
+  updateInterestRate = value => {
+    let debtRequest = { ...this.state.debtRequest };
+
+    debtRequest.interestRate = value;
+
+    this.setState({ debtRequest });
+  };
+
+  updatePrincipalAmount = value => {
+    let debtRequest = { ...this.state.debtRequest };
+
+    debtRequest.principalAmount = parseFloat(value === '' ? 0 : value, 10);
+
+    this.setState({ debtRequest });
+  };
+
+  updateTermLength = value => {
+    let debtRequest = { ...this.state.debtRequest };
+
+    debtRequest.termLength = parseInt(value === '' ? 1 : value, 10);
+
+    this.setState({ debtRequest });
   };
 
   render = () => {
+    const { debtRequest } = this.state;
+    const { account } = this.props;
+
     return (
       <StyledCard>
         <StyledContainer>
           <VerticalFlex>
             <span>I want to borrow</span>
             <StyledFlex className="medium-input">
-              <Input monospace placeholder="1" type="text" />
-              <StyledAmountCurrency>ETH</StyledAmountCurrency>
+              <Input
+                monospace
+                placeholder="1"
+                type="text"
+                value={debtRequest.principalAmount}
+                onChange={({ target }) =>
+                  this.updatePrincipalAmount(target.value)
+                }
+              />
+              <StyledAmountCurrency>
+                {debtRequest.principalTokenSymbol}
+              </StyledAmountCurrency>
             </StyledFlex>
 
             <span>by locking up</span>
 
             <StyledFlex className="medium-input">
-              <Input monospace placeholder="450" type="text" />
-              <StyledAmountCurrency>DAI</StyledAmountCurrency>
+              <Input
+                monospace
+                placeholder="450"
+                type="text"
+                value={debtRequest.collateralAmount}
+                onChange={({ target }) =>
+                  this.updateCollateralAmount(target.value)
+                }
+              />
+              <StyledAmountCurrency>
+                {debtRequest.collateralTokenSymbol}
+              </StyledAmountCurrency>
             </StyledFlex>
 
             <span>for</span>
@@ -270,12 +373,14 @@ class LoansRequestModal extends Component {
                 monospace
                 placeholder="1"
                 type="text"
+                value={debtRequest.termLength}
+                onChange={({ target }) => this.updateTermLength(target.value)}
               />
               <StyledDropdown
-                displayKey={`length`}
-                selected={this.state.loanLength}
-                onChange={this.updateLoanLength}
-                options={loanLengths}
+                displayKey={`amortizationUnit`}
+                selected={debtRequest.amortizationUnit}
+                onChange={this.updateAmortizationUnit}
+                options={amortizationUnits}
                 dark
               />
             </StyledFlex>
@@ -288,7 +393,7 @@ class LoansRequestModal extends Component {
             <ReactSlider
               withBars
               className="horizontal-slider"
-              defaultValue={this.state.interestRate}
+              value={debtRequest.interestRate}
               onChange={this.updateInterestRate}
             />
             <span> interest </span>
@@ -299,22 +404,29 @@ class LoansRequestModal extends Component {
           <VerticalFlex className="data-section">
             <div>
               <label>PERCENTAGE</label>
-              <p>{this.state.interestRate}% for full term</p>
+              <p>{debtRequest.interestRate}% for full term</p>
             </div>
 
             <div>
               <label>AMOUNT</label>
-              <p>10.04 DAI</p>
+              <p>
+                {this.calculateAmount()} {debtRequest.principalTokenSymbol}
+              </p>
             </div>
 
             <div>
               <label>NATIVE</label>
-              <p>10.00 USD</p>
+              <p>
+                {this.calculateNative()} {account.nativeCurrency}
+              </p>
             </div>
 
             <div>
               <label>INSTALLMENT</label>
-              <p>1.00 USD</p>
+              <p>
+                {this.calculateInstallments()}{' '}
+                {debtRequest.principalTokenSymbol}
+              </p>
             </div>
           </VerticalFlex>
         </StyledContainer>
@@ -360,8 +472,10 @@ LoansRequestModal.propTypes = {
   modalClose: PropTypes.func.isRequired,
 };
 
-const reduxProps = ({ account }) => ({
+const reduxProps = ({ account, dharma, modal }) => ({
   account: account,
+  dharma: dharma,
+  modal: modal,
 });
 
 export default connect(reduxProps, {

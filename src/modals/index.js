@@ -60,7 +60,7 @@ class Modal extends Component {
       case 'WALLET_CONNECT_INIT':
         return <WalletConnectInit />;
       case 'LOANS_REQUEST_MODAL':
-        return <LoansRequestModal />;
+        return <LoansRequestModal {...this.props} />;
       default:
         return <div />;
     }

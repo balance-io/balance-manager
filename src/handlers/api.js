@@ -26,6 +26,16 @@ export const apiGetPrices = (assets = []) => {
 };
 
 /**
+ * @desc get price of token in native currency
+ * @return {Promise}
+ */
+export const apiGetPrice = (token, nativeCurrency) => {
+  return axios.get(
+    `https://min-api.cryptocompare.com/data/price?fsym=${token}&tsyms=${nativeCurrency}`,
+  );
+};
+
+/**
  * @desc get historical prices
  * @param  {String}  [assetSymbol='']
  * @param  {Number}  [timestamp=Date.now()]

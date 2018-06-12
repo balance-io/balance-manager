@@ -130,8 +130,8 @@ class AccountLoans extends Component {
     });
   };
 
-  openModal = currencyToBorrow => {
-    this.props.modalOpen('LOANS_REQUEST_MODAL');
+  modalOpen = params => {
+    this.props.modalOpen('LOANS_REQUEST_MODAL', params);
   };
 
   render() {
@@ -164,7 +164,7 @@ class AccountLoans extends Component {
                 color="brightGreen"
                 activeColor="brightGreenHover"
                 hoverColor="brightGreenHover"
-                onClick={() => this.openModal('dai')}
+                onClick={() => this.modalOpen('dai')}
               >
                 <img src={arrowReceived} alt="borrow dai" />
                 Borrow DAI{' '}
@@ -192,7 +192,7 @@ class AccountLoans extends Component {
                 activeColor="brightGreenHover"
                 color="brightGreen"
                 hoverColor="brightGreenHover"
-                onClick={() => this.openModal('eth')}
+                onClick={() => this.modalOpen('eth')}
               >
                 <img src={arrowReceived} alt="borrow eth" />
                 Borrow ETH{' '}

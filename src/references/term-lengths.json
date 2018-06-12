@@ -1,0 +1,22 @@
+{
+  "hours": {
+    "id": 0,
+    "amortizationUnit": "Hours"
+  },
+  "days": {
+    "id": 1,
+    "amortizationUnit": "Days"
+  },
+  "weeks": {
+    "id": 2,
+    "amortizationUnit": "Weeks"
+  },
+  "months": {
+    "id": 3,
+    "amortizationUnit": "Months"
+  },
+  "years": {
+    "id": 4,
+    "amortizationUnit": "Years"
+  }
+}

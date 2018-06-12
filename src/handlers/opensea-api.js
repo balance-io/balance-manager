@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { parseAccountUniqueTokens } from './parsers';
 
+const openseaApiKey = process.env.REACT_APP_OPENSEA_API_KEY || '';
+
 /**
  * Configuration for opensea api
  * @type axios instance
@@ -11,6 +13,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
+    'X_API_KEY': openseaApiKey,
   },
 });
 

@@ -166,6 +166,7 @@ const UniqueToken = ({
       activeColor="blueActive"
       left
       target="_blank"
+      rel="noopener noreferrer"
     >
       {lang.t('button.view')}
     </StyledViewLink>

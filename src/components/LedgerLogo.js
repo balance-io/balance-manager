@@ -13,7 +13,7 @@ const StyledLedgerLogo = styled.div`
 
 const LedgerLogo = ({ size, ...props }) => (
   <StyledLedgerLogo size={size} {...props}>
-    <img src={ledgerLogo} alt="metamask" />
+    <img src={ledgerLogo} alt="ledger" />
   </StyledLedgerLogo>
 );
 

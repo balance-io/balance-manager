@@ -152,7 +152,7 @@ class TabMenu extends Component {
         newState = { activeTab: 'TRANSACTIONS_TAB', activeLang: i18next.language, tabWidth: ReactDOM.findDOMNode(this.refs.transactionsTab).getBoundingClientRect().width - 40, tabPosition: ReactDOM.findDOMNode(this.refs.transactionsTab).offsetLeft + 24};
         break;
       case '/uniquetokens':
-        newState = { activeTab: 'UNIQUETOKENS_TAB', tabPosition: 367 };
+        newState = { activeTab: 'UNIQUETOKENS_TAB', activeLang: i18next.language, tabWidth: ReactDOM.findDOMNode(this.refs.uniqueTokensTab).getBoundingClientRect().width - 40, tabPosition: ReactDOM.findDOMNode(this.refs.uniqueTokensTab).offsetLeft + 24};
         break;
       default:
         break;
@@ -198,6 +198,7 @@ class TabMenu extends Component {
               title={lang.t('account.tab_uniquetokens_tooltip')}
               active={this.state.activeTab === 'UNIQUETOKENS_TAB'}
               icon={uniquetokensTabIcon}
+              ref="uniqueTokensTab"
               left
             >
               {lang.t('account.tab_uniquetokens')}

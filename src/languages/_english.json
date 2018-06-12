@@ -106,7 +106,7 @@
       "tx_fee": "Transaction Fee",
       "exchange_fee": "Exchange Fee",
       "previous_short": "Prev.",
-      "new": "New"
+      "new": "New",
       "helper_balance": "Balance",
       "helper_value": "Value",
       "helper_rate": "Rate",

@@ -9,15 +9,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-*
+* Added language selector to wallet connection page
+* Added English language fallback to i18n initialisation
+* Incoming and outgoing pending transactions for Shapeshift
+* Versioning for local storage
+* Exchange button and modal
+* Shapeshift endpoints
+* Account Type component for displaying active wallet logo
 
 ### Changed
 
-*
+* Fix txn fee conversion
+* DrodpownAsset improved logic
+* Refactor Send and Exchange modals/reducers for consistency
+* Fix unit time references
+* Moved missing language strings
 
 ### Removed
 
-*
+* Account interactions tab
 
 ## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 
@@ -28,6 +38,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Link to Ledger support page on Ledger connection page
 * Ledger affiliate link to wallet selection screen
 * Donate ETH button and modal
+* Input fetching animation
 
 
 ### Changed
@@ -39,7 +50,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Fix overflow padding for dropdowns
 
 ### Removed
-
 
 ## [0.5.3](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 

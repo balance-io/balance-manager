@@ -1,16 +1,42 @@
 import axios from 'axios';
 import {
-  parseHistoricalPrices,
+  parseHistoricalTransactions,
   parseAccountAssets,
   parseAccountTransactions,
 } from './parsers';
-import { getTransactionByHash, getBlockByHash } from '../handlers/web3';
-import { convertHexToString } from '../helpers/bignumber';
+import { formatInputDecimals } from '../helpers/bignumber';
 import networkList from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
 
+const cryptocompareApiKey = process.env.REACT_APP_CRYPTOCOMPARE_API_KEY || '';
+
 /**
- * @desc get prices
+ * Configuration for cryptocompare api
+ * @type axios instance
+ */
+const cryptocompare = axios.create({
+  baseURL: 'https://min-api.cryptocompare.com/data/',
+  timeout: 30000, // 30 secs
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+});
+
+/**
+ * @desc get single asset price
+ * @param  {String}   [asset='']
+ * @param  {String}   [native='USD']
+ * @return {Promise}
+ */
+export const apiGetSinglePrice = (asset = '', native = 'USD') => {
+  return cryptocompare.get(
+    `/price?fsym=${asset}&tsyms=${native}&apiKey=${cryptocompareApiKey}`,
+  );
+};
+
+/**
+ * @desc get all assets prices
  * @param  {Array}   [asset=[]]
  * @return {Promise}
  */
@@ -20,8 +46,8 @@ export const apiGetPrices = (assets = []) => {
     /[[\]"]/gi,
     '',
   );
-  return axios.get(
-    `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}`,
+  return cryptocompare.get(
+    `/pricemultifull?fsyms=${assetsQuery}&tsyms=${nativeQuery}&apiKey=${cryptocompareApiKey}`,
   );
 };
 
@@ -39,8 +65,9 @@ export const apiGetHistoricalPrices = (
     /[[\]"]/gi,
     '',
   );
-  const url = `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}`;
-  return axios.get(url);
+  return cryptocompare.get(
+    `/pricehistorical?fsym=${assetSymbol}&tsyms=${nativeQuery}&ts=${timestamp}&apiKey=${cryptocompareApiKey}`,
+  );
 };
 
 /**
@@ -63,38 +90,6 @@ export const apiGetMetamaskNetwork = () =>
       });
     }
   });
-
-/**
- * @desc get transaction status
- * @param  {String}   [hash = '']
- * @param  {String}   [network = 'mainnet']
- * @return {Promise}
- */
-export const apiGetTransactionStatus = async (
-  hash = '',
-  network = 'mainnet',
-) => {
-  try {
-    let result = { data: null };
-    let tx = await getTransactionByHash(hash);
-    if (!tx || !tx.blockNumber || !tx.blockHash) return result;
-    if (tx) {
-      const blockData = await getBlockByHash(tx.blockHash);
-      tx.timestamp = null;
-      if (blockData) {
-        const blockTimestamp = convertHexToString(blockData.timestamp);
-        tx.timestamp = {
-          secs: blockTimestamp,
-          ms: `${blockTimestamp}000`,
-        };
-      }
-    }
-    result = { data: tx };
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
 
 /**
  * Configuration for balance api
@@ -143,6 +138,15 @@ export const apiGetTransactionData = (
 ) => api.get(`/get_transactions/${network}/${address}/${page}`);
 
 /**
+ * @desc get transaction
+ * @param  {String}   [txnHash = '']
+ * @param  {String}   [network = 'mainnet']
+ * @return {Promise}
+ */
+export const apiGetTransaction = (txnHash = '', network = 'mainnet') =>
+  api.get(`/get_transaction/${network}/${txnHash}`);
+
+/**
  * @desc get account transactions
  * @param  {String}   [address = '']
  * @param  {String}   [network = 'mainnet']
@@ -169,7 +173,7 @@ export const apiGetAccountTransactions = async (
         }
       });
     }
-    transactions = await parseHistoricalPrices(transactions);
+    transactions = await parseHistoricalTransactions(transactions);
     const result = { data: transactions };
     return result;
   } catch (error) {
@@ -190,46 +194,129 @@ export const apiGetGasPrices = () => api.get(`/get_eth_gas_prices`);
 export const apiShapeshiftGetCurrencies = () => api.get(`/get_currencies`);
 
 /**
+ * Configuration for shapeshift api
+ * @type axios instance
+ */
+const shapeshift = axios.create({
+  baseURL: 'https://shapeshift.io',
+  timeout: 30000, // 30 secs
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+});
+
+/**
  * @desc shapeshift get market info
- * @param  {String}   [depositSelected = '']
- * @param  {String}   [withdrawalSelected = '']
+ * @param  {String}   [pair = '']
  * @return {Promise}
  */
-export const apiShapeshiftGetMarketInfo = (
-  depositSelected = '',
-  withdrawalSelected = '',
-) =>
-  api.get(
-    `/get_market_info?deposit=${depositSelected}&withdrawal=${withdrawalSelected}`,
-  );
+export const apiShapeshiftGetMarketInfo = (pair = '') =>
+  shapeshift.get(`/marketinfo/${pair}`);
 
 /**
- * @desc shapeshift get fixed price
- * @param  {String}   [amount = '']
- * @param  {String}   [exchangePair = '']
- * @param  {String}   [address = '']
+ * @desc shapeshift get txn status of deposit address
+ * @param  {String}   [depositAddress = '']
  * @return {Promise}
  */
-export const apiShapeshiftGetFixedPrice = (
-  amount = '',
-  exchangePair = '',
+export const apiShapeshiftGetDepositStatus = (depositAddress = '') =>
+  shapeshift.get(`/txStat/${depositAddress}`);
+
+/**
+ * @desc shapeshift get fixed or quoted price
+ * @param  {String}   [depositSymbol = '']
+ * @param  {String}   [withdrawalSymbol = '']
+ * @param  {String}   [depositAmount = '']
+ * @param  {String}   [withdrawalAmount = '']
+ * @return {Promise}
+ */
+export const apiShapeshiftSendAmount = async ({
   address = '',
-) =>
-  api.post(`/shapeshift_send_amount`, {
-    amount,
-    withdrawal: address,
-    pair: exchangePair,
-    returnAddress: address,
-  });
+  depositSymbol = '',
+  withdrawalSymbol = '',
+  depositAmount = '',
+  withdrawalAmount = '',
+}) => {
+  try {
+    const pair = `${depositSymbol.toLowerCase()}_${withdrawalSymbol.toLowerCase()}`;
+    const marketInfo = await apiShapeshiftGetMarketInfo(pair);
+    const min = marketInfo.data.minimum;
+    const body = address
+      ? {
+          pair,
+          withdrawal: address,
+          returnAddress: address,
+        }
+      : { pair };
+    if (withdrawalAmount) {
+      body.amount = withdrawalAmount;
+    } else if (depositAmount) {
+      body.depositAmount = depositAmount;
+    } else {
+      body.depositAmount = min;
+    }
+    const shapeshiftApiKey = process.env.REACT_APP_SHAPESHIFT_API_KEY || '';
+    if (shapeshiftApiKey) {
+      body.apiKey = shapeshiftApiKey;
+    }
+    const response = await shapeshift.post(`/sendamount`, body);
+    if (response.data.success) {
+      response.data.success.min = min;
+      return response;
+    } else {
+      /* Error Fallback */
+      return {
+        data: {
+          success: {
+            pair,
+            depositAmount: '',
+            withdrawalAmount: '',
+            quotedRate: marketInfo.data.rate,
+            maxLimit: marketInfo.data.maxLimit,
+            min: marketInfo.data.minimum,
+            minerFee: marketInfo.data.minerFee,
+            error: response.data.error,
+          },
+        },
+      };
+    }
+  } catch (error) {
+    throw error;
+  }
+};
 
 /**
- * @desc shapeshift get quoted price
- * @param  {String}   [amount = '']
- * @param  {String}   [exchangePair = '']
+ * @desc shapeshift get exchange details
+ * @param  {Object}     [request = [object Object]]
+ * @param  {String}     [inputOne = '']
+ * @param  {String}     [inputTwo = '']
+ * @param  {Boolean}    [withdrawal = false]
  * @return {Promise}
  */
-export const apiShapeshiftGetQuotedPrice = (amount = '', exchangePair = '') =>
-  api.post(`/shapeshift_quoted_price_request`, {
-    amount,
-    pair: exchangePair,
+export const apiShapeshiftGetExchangeDetails = ({
+  request = {
+    depositSymbol: 'ETH',
+    withdrawalSymbol: 'BNT',
+    withdrawalAmount: '0.5',
+  },
+  inputOne = '',
+  inputTwo = '',
+  withdrawal = false,
+}) =>
+  apiShapeshiftSendAmount(request).then(({ data }) => {
+    const inputTwoName = withdrawal ? 'depositAmount' : 'withdrawalAmount';
+    let result = {};
+    let exchangeDetails = null;
+    exchangeDetails = data.success;
+    result = { exchangeDetails };
+    if (exchangeDetails.error) {
+      inputTwo = '';
+    } else if (!inputOne) {
+      inputTwo = '';
+    } else {
+      inputTwo = exchangeDetails[inputTwoName] || '';
+      inputTwo = formatInputDecimals(inputTwo, inputOne);
+    }
+    result[inputTwoName] = inputTwo;
+    return result;
   });

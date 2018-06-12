@@ -20,7 +20,7 @@ import { ledgerUpdateNetwork } from '../reducers/_ledger';
 import {
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
-  accountChangeLanguage
+  accountChangeLanguage,
 } from '../reducers/_account';
 import ReminderRibbon from '../components/ReminderRibbon';
 import { colors, responsive } from '../styles';
@@ -80,9 +80,6 @@ const StyledBeta = styled.div`
 `;
 
 const StyledIndicators = styled.div`
-  opacity: ${({ show }) => (show ? 1 : 0)};
-  visibility: ${({ show }) => (show ? 'visible' : 'hidden')};
-  pointer-events: ${({ show }) => (show ? 'auto' : 'none')};
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -145,11 +142,11 @@ const BaseLayout = ({
   }
   const languages = {};
   Object.keys(resources).forEach(resource => {
-      languages[resource] = {
-          code: resource,
-          description: resource.toUpperCase()
-      };
-  })
+    languages[resource] = {
+      code: resource,
+      description: resource.toUpperCase(),
+    };
+  });
   const showToolbar =
     window.location.pathname !== '/' &&
     (!metamaskFetching || !ledgerFetching) &&
@@ -169,8 +166,9 @@ const BaseLayout = ({
               <StyledBeta>{'BETA'}</StyledBeta>
             </StyledBranding>
           </Link>
-          <StyledIndicators show={showToolbar}>
-            {accountType === 'LEDGER' &&
+          <StyledIndicators>
+            {showToolbar &&
+              accountType === 'LEDGER' &&
               !!Object.keys(addresses).length && (
                 <Fragment>
                   <Dropdown
@@ -185,26 +183,32 @@ const BaseLayout = ({
                   <StyledVerticalLine />
                 </Fragment>
               )}
-            <Dropdown 
-                displayKey={`description`}
-                selected={language}
-                options={languages}
-                onChange={accountChangeLanguage}
-            />
-            <StyledVerticalLine />
+            {showToolbar && (
+              <Fragment>
+                <Dropdown
+                  displayKey={`value`}
+                  selected={network}
+                  iconColor={online ? 'green' : 'red'}
+                  options={ethereumNetworks}
+                  onChange={
+                    accountType === 'LEDGER' ? ledgerUpdateNetwork : null
+                  }
+                />
+                <StyledVerticalLine />
+                <Dropdown
+                  displayKey={`currency`}
+                  selected={nativeCurrency}
+                  options={nativeCurrencies}
+                  onChange={accountChangeNativeCurrency}
+                />
+                <StyledVerticalLine />
+              </Fragment>
+            )}
             <Dropdown
-              displayKey={`value`}
-              selected={network}
-              iconColor={online ? 'green' : 'red'}
-              options={ethereumNetworks}
-              onChange={accountType === 'LEDGER' ? ledgerUpdateNetwork : null}
-            />
-            <StyledVerticalLine />
-            <Dropdown
-              displayKey={`currency`}
-              selected={nativeCurrency}
-              options={nativeCurrencies}
-              onChange={accountChangeNativeCurrency}
+              displayKey={`description`}
+              selected={language}
+              options={languages}
+              onChange={accountChangeLanguage}
             />
           </StyledIndicators>
         </StyledHeader>
@@ -265,5 +269,5 @@ export default connect(reduxProps, {
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
   modalOpen,
-  accountChangeLanguage
+  accountChangeLanguage,
 })(BaseLayout);

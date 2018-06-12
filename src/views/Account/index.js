@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -10,11 +11,9 @@ import Button from '../../components/Button';
 import CopyToClipboard from '../../components/CopyToClipboard';
 import AccountBalances from './AccountBalances';
 import AccountTransactions from './AccountTransactions';
-import AccountInteractions from './AccountInteractions';
 import AccountUniqueTokens from './AccountUniqueTokens';
-
 import arrowUp from '../../assets/arrow-up.svg';
-// import exchangeIcon from '../../assets/exchange-icon.svg';
+import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { modalOpen } from '../../reducers/_modal';
 import { capitalize } from '../../helpers/utilities';
@@ -83,6 +82,11 @@ class Account extends Component {
   openExchangeModal = () => this.props.modalOpen('EXCHANGE_MODAL');
   openSendModal = () => this.props.modalOpen('SEND_MODAL');
   openReceiveModal = () => this.props.modalOpen('RECEIVE_MODAL');
+  componentDidUpdate() {
+    if (this.props.hasPendingTransaction) {
+      this.props.history.push(`${this.props.match.url}/transactions`);
+    }
+  }
   render() {
     return (
       <StyledAccount>
@@ -104,7 +108,7 @@ class Account extends Component {
                 </StyledAddressWrapper>
 
                 <StyledActions>
-                  {/* {this.props.network === 'mainnet' && (
+                  {this.props.network === 'mainnet' && (
                     <Button
                       left
                       color="brightGreen"
@@ -115,7 +119,7 @@ class Account extends Component {
                     >
                       {lang.t('button.exchange')}
                     </Button>
-                  )} */}
+                  )}
                   <Button
                     left
                     color="blue"
@@ -154,11 +158,6 @@ class Account extends Component {
                 />
                 <Route
                   exact
-                  path={`${this.props.match.url}/interactions`}
-                  component={AccountInteractions}
-                />
-                <Route
-                  exact
                   path={`${this.props.match.url}/uniquetokens`}
                   component={AccountUniqueTokens}
                 />
@@ -175,6 +174,7 @@ class Account extends Component {
 }
 
 Account.propTypes = {
+  history: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
@@ -191,6 +191,7 @@ Account.defaultProps = {
 };
 
 const reduxProps = ({ account }) => ({
+  hasPendingTransaction: account.hasPendingTransaction,
   network: account.network,
   fetching: account.fetching,
   accountInfo: account.accountInfo,
@@ -198,6 +199,8 @@ const reduxProps = ({ account }) => ({
   accountType: account.accountType,
 });
 
-export default connect(reduxProps, {
-  modalOpen,
-})(Account);
+export default withRouter(
+  connect(reduxProps, {
+    modalOpen,
+  })(Account),
+);

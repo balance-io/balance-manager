@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../languages';
+import i18next from 'i18next';
 import Link from './Link';
 import Button from './Button';
 import balancesTabIcon from '../assets/balances-tab.svg';
 import transactionsTabIcon from '../assets/transactions-tab.svg';
-import interactionsTabIcon from '../assets/interactions-tab.svg';
 import uniquetokensTabIcon from '../assets/star-tab.svg';
-
 import tabBackground from '../assets/tab-background.png';
+import tabBackgroundSprite from '../assets/tab-background-sprite.png';
 import { colors, fonts, shadows, transitions } from '../styles';
 
 const StyledTabMenu = styled.div`
@@ -37,15 +38,35 @@ const StyledTabsWrapper = styled.div`
 `;
 
 const StyledTabBackground = styled.div`
-  width: 181px;
+  width: ${({ width }) => `${width}`}px;
   height: 46px;
   position: absolute;
   top: -1px;
   left: 0;
-  transform: ${({ position }) => `translate3d(${position}px, 0, 0)`};
-  background: url(${tabBackground}) no-repeat;
-  background-size: 100%;
+  transform: ${({ position }) => `translate(${position}px, 0)`};
+  background-size: 50% 100%;
+  background-image: url(${tabBackground});
   transition: ease 0.2s;
+
+  &:before,
+  &:after {
+    content: '\00a0';
+    position: absolute;
+    top: 0;
+    width: 46px;
+    height: 46px;
+    background-size: 100%;
+    background-image: url(${tabBackgroundSprite});
+  }
+
+  &:before {
+    left: -46px;
+  }
+
+  &:after {
+    right: -46px;
+    background-position: 0 46px;
+  }
 `;
 
 const StyledTab = styled(Button)`
@@ -102,8 +123,17 @@ class TabMenu extends Component {
 
     this.state = {
       activeTab: 'BALANCES_TAB',
-      tabPosition: -87 + this._firstTabOffset(),
+      activeLang: 'en',
+      tabPosition: 0,
+      tabWidth: 0
     };
+  }
+
+  componentDidMount() {
+    this.setState({
+      tabWidth: ReactDOM.findDOMNode(this.refs.balancesTab).getBoundingClientRect().width - 40,
+      tabPosition: 24
+    });
   }
 
   componentDidUpdate() {
@@ -114,16 +144,12 @@ class TabMenu extends Component {
       ) || '/';
     let newState = this.state;
 
-    const offset = this._firstTabOffset();
     switch (tabRoute) {
       case '/':
-        newState = { activeTab: 'BALANCES_TAB', tabPosition: offset - 87 };
+        newState = { activeTab: 'BALANCES_TAB', activeLang: i18next.language, tabWidth: ReactDOM.findDOMNode(this.refs.balancesTab).getBoundingClientRect().width - 40, tabPosition: 24};
         break;
       case '/transactions':
-        newState = { activeTab: 'TRANSACTIONS_TAB', tabPosition: offset + 51 };
-        break;
-      case '/interactions':
-        newState = { activeTab: 'INTERACTIONS_TAB', tabPosition: 229 };
+        newState = { activeTab: 'TRANSACTIONS_TAB', activeLang: i18next.language, tabWidth: ReactDOM.findDOMNode(this.refs.transactionsTab).getBoundingClientRect().width - 40, tabPosition: ReactDOM.findDOMNode(this.refs.transactionsTab).offsetLeft + 24};
         break;
       case '/uniquetokens':
         newState = { activeTab: 'UNIQUETOKENS_TAB', tabPosition: 367 };
@@ -131,7 +157,8 @@ class TabMenu extends Component {
       default:
         break;
     }
-    if (this.state.activeTab !== newState.activeTab) {
+
+    if (this.state.activeTab !== newState.activeTab || this.state.activeLang !== i18next.language) {
       this.setState(newState);
     }
   }
@@ -139,7 +166,7 @@ class TabMenu extends Component {
   render() {
     return (
       <StyledTabMenu>
-        <StyledTabBackground position={this.state.tabPosition} />
+        <StyledTabBackground position={this.state.tabPosition} width={this.state.tabWidth}/>
         <StyledTabsWrapper>
           <Link to={this.props.match.url}>
             <StyledTab
@@ -147,6 +174,7 @@ class TabMenu extends Component {
               title={lang.t('account.tab_balances_tooltip')}
               active={this.state.activeTab === 'BALANCES_TAB'}
               icon={balancesTabIcon}
+              ref="balancesTab"
               left
             >
               {lang.t('account.tab_balances')}
@@ -158,20 +186,10 @@ class TabMenu extends Component {
               title={lang.t('account.tab_transactions_tooltip')}
               active={this.state.activeTab === 'TRANSACTIONS_TAB'}
               icon={transactionsTabIcon}
+              ref="transactionsTab"
               left
             >
               {lang.t('account.tab_transactions')}
-            </StyledTab>
-          </Link>
-          <Link to={`${this.props.match.url}/interactions`}>
-            <StyledTab
-              data-toggle="tooltip"
-              title={lang.t('account.tab_interactions_tooltip')}
-              active={this.state.activeTab === 'INTERACTIONS_TAB'}
-              icon={interactionsTabIcon}
-              left
-            >
-              {lang.t('account.tab_interactions')}
             </StyledTab>
           </Link>
           <Link to={`${this.props.match.url}/uniquetokens`}>
@@ -194,7 +212,7 @@ class TabMenu extends Component {
     const tabCharSizes = [
       'account.tab_balances',
       'account.tab_transactions',
-      'account.tab_interactions',
+      'account.tab_uniquetokens',
     ].map(resourceName => lang.t(resourceName).length);
 
     return tabCharSizes[0] * 5;

@@ -56,9 +56,11 @@
       "donate": "Donate ETH",
       "receive": "Receive",
       "close": "Close",
+      "confirm": "Confirm",
       "cancel": "Cancel",
       "go_back": "Go Back",
       "send_another": "Send Another",
+      "exchange_again": "Exchange Again",
       "notify_me": "Get notified",
       "try_again": "Try again",
       "learn_more": "Learn more",
@@ -98,13 +100,19 @@
       "tx_hash": "Transaction Hash",
       "tx_verify": "Verify your transaction here",
       "deposit_dropdown_label": "Exchange my",
-      "withdrawal_dropdown_label": "for",
+      "withdrawal_dropdown_label": "For",
       "deposit_input_label": "Pay",
       "withdrawal_input_label": "Get",
       "tx_fee": "Transaction Fee",
       "exchange_fee": "Exchange Fee",
       "previous_short": "Prev.",
       "new": "New"
+      "helper_balance": "Balance",
+      "helper_value": "Value",
+      "helper_rate": "Rate",
+      "helper_price": "Price",
+      "helper_min": "Min",
+      "helper_max": "Max"
     },
     "message": {
       "web3_not_available": "Please install the MetaMask Chrome extension",
@@ -122,6 +130,8 @@
       "opensea_footer": " is a market place for unique (or 'non-fungible') tokens. People trade on the marketspace and that gives them value. You can pawn your tokens to get money. All of this runs on Ethereum. ",
       "opensea_header": "How does this work under the hood?",
       "power_by": "Powered by"
+      "exchange_not_available": "Exchange is not available in your area",
+      "learn_more": "Learn more"
     },
     "notification": {
       "error": {

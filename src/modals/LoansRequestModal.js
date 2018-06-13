@@ -222,13 +222,13 @@ class LoansRequestModal extends Component {
     this.state = {
       debtRequest: {
         amortizationUnit: 'months',
-        collateralAmount: 0,
+        collateralAmount: '',
         collateralTokenSymbol:
           this.props.modal.params === 'eth' ? 'DAI' : 'ETH',
         description: '',
         gracePeriodInDays: '',
         interestRate: 1,
-        principalAmount: 0,
+        principalAmount: '',
         principalTokenSymbol: this.props.modal.params.toUpperCase(),
         termLength: 1,
       },
@@ -295,7 +295,7 @@ class LoansRequestModal extends Component {
   updateCollateralAmount = value => {
     let debtRequest = { ...this.state.debtRequest };
 
-    debtRequest.collateralAmount = parseFloat(value === '' ? 0 : value, 10);
+    debtRequest.collateralAmount = parseFloat(value);
 
     this.setState({ debtRequest });
   };
@@ -311,7 +311,7 @@ class LoansRequestModal extends Component {
   updatePrincipalAmount = value => {
     let debtRequest = { ...this.state.debtRequest };
 
-    debtRequest.principalAmount = parseFloat(value === '' ? 0 : value, 10);
+    debtRequest.principalAmount = parseFloat(value);
 
     this.setState({ debtRequest });
   };
@@ -319,7 +319,7 @@ class LoansRequestModal extends Component {
   updateTermLength = value => {
     let debtRequest = { ...this.state.debtRequest };
 
-    debtRequest.termLength = parseInt(value === '' ? 1 : value, 10);
+    debtRequest.termLength = parseInt(value, 10);
 
     this.setState({ debtRequest });
   };
@@ -338,7 +338,6 @@ class LoansRequestModal extends Component {
                 monospace
                 placeholder="1"
                 type="text"
-                value={debtRequest.principalAmount}
                 onChange={({ target }) =>
                   this.updatePrincipalAmount(target.value)
                 }
@@ -355,7 +354,6 @@ class LoansRequestModal extends Component {
                 monospace
                 placeholder="450"
                 type="text"
-                value={debtRequest.collateralAmount}
                 onChange={({ target }) =>
                   this.updateCollateralAmount(target.value)
                 }
@@ -373,7 +371,7 @@ class LoansRequestModal extends Component {
                 monospace
                 placeholder="1"
                 type="text"
-                value={debtRequest.termLength}
+                defaultValue={debtRequest.termLength}
                 onChange={({ target }) => this.updateTermLength(target.value)}
               />
               <StyledDropdown

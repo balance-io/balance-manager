@@ -842,8 +842,12 @@ this.TrezorConnect = (function () {
         };
 
         var receive = function (event) {
+            console.log('event origin', event.origin);
+            console.log('popup origin', popup.origin);
             var org1 = event.origin.match(/^.+\:\/\/[^\‌​/]+/)[0];
             var org2 = popup.origin.match(/^.+\:\/\/[^\‌​/]+/)[0];
+            console.log('org1', org1);
+            console.log('org2', org2);
             //if (event.source === popup.window && event.origin === popup.origin) {
             if (event.source === popup.window && org1 === org2) {
                 respond(event.data);

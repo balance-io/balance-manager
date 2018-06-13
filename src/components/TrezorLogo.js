@@ -13,7 +13,7 @@ const StyledTrezorLogo = styled.div`
 
 const TrezorLogo = ({ size, ...props }) => (
   <StyledTrezorLogo size={size} {...props}>
-    <img src={trezorLogo} alt="metamask" />
+    <img src={trezorLogo} alt="trezor" />
   </StyledTrezorLogo>
 );
 

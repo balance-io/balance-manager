@@ -122,7 +122,9 @@
       "no_transactions": "No se encontraron transacciones para esta cuenta",
       "no_interactions": "No se encontraron interacciones para esta cuenta",
       "please_connect_ledger": "Por favor conecta y desbloquea Ledger y luego selecciona Ethereum",
-      "please_connect_trezor": "Por favor conecta y desbloquea Trezor y luego selecciona Ethereum"
+      "please_connect_trezor": "Por favor conecta y desbloquea Trezor y luego selecciona Ethereum",
+      "exchange_not_available": "Intercambio no está disponible en su área",
+      "learn_more": "Aprende más"
     },
     "notification": {
       "error": {

@@ -44,7 +44,7 @@ const StyledTabBackground = styled.div`
   top: -1px;
   left: 0;
   transform: ${({ position }) => `translate(${position}px, 0)`};
-  background-size: 50% 100%;
+  background-position-y: 86px;
   background-image: url(${tabBackground});
   transition: ease 0.2s;
 

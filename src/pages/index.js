@@ -210,7 +210,7 @@ class Home extends Component {
       <StyledCard minHeight={102}>
         <CardContainer>
           <LogoSection>
-            <TrezorLogo/>
+            <TrezorLogo />
             <LogoText>
               {lang.t('homepage.connect_trezor.description')}
               <LedgerAffiliateLink

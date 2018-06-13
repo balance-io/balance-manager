@@ -216,7 +216,11 @@ const BaseLayout = ({
                   iconColor={online ? 'green' : 'red'}
                   options={ethereumNetworks}
                   onChange={
-                    accountType === 'LEDGER' ? ledgerUpdateNetwork : accountType === 'TREZOR' ? trezorUpdateNetwork : null
+                    accountType === 'LEDGER'
+                      ? ledgerUpdateNetwork
+                      : accountType === 'TREZOR'
+                        ? trezorUpdateNetwork
+                        : null
                   }
                 />
                 <StyledVerticalLine />

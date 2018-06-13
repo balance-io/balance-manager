@@ -13,7 +13,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
-    'X_API_KEY': openseaApiKey,
+    X_API_KEY: openseaApiKey,
   },
 });
 

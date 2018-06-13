@@ -323,7 +323,7 @@ export const web3LedgerSendTransaction = transaction =>
       .catch(error => reject(error));
   });
 
-  export const web3TrezorSendTransaction = transaction =>
+export const web3TrezorSendTransaction = transaction =>
   new Promise((resolve, reject) => {
     const from =
       transaction.from.substr(0, 2) === '0x'

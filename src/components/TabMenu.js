@@ -8,6 +8,7 @@ import Link from './Link';
 import Button from './Button';
 import balancesTabIcon from '../assets/balances-tab.svg';
 import transactionsTabIcon from '../assets/transactions-tab.svg';
+import uniquetokensTabIcon from '../assets/star-tab.svg';
 import tabBackground from '../assets/tab-background.png';
 import tabBackgroundSprite from '../assets/tab-background-sprite.png';
 import { colors, fonts, shadows, transitions } from '../styles';
@@ -150,6 +151,9 @@ class TabMenu extends Component {
       case '/transactions':
         newState = { activeTab: 'TRANSACTIONS_TAB', activeLang: i18next.language, tabWidth: ReactDOM.findDOMNode(this.refs.transactionsTab).getBoundingClientRect().width - 40, tabPosition: ReactDOM.findDOMNode(this.refs.transactionsTab).offsetLeft + 24};
         break;
+      case '/uniquetokens':
+        newState = { activeTab: 'UNIQUETOKENS_TAB', activeLang: i18next.language, tabWidth: ReactDOM.findDOMNode(this.refs.uniqueTokensTab).getBoundingClientRect().width - 40, tabPosition: ReactDOM.findDOMNode(this.refs.uniqueTokensTab).offsetLeft + 24};
+        break;
       default:
         break;
     }
@@ -188,6 +192,18 @@ class TabMenu extends Component {
               {lang.t('account.tab_transactions')}
             </StyledTab>
           </Link>
+          <Link to={`${this.props.match.url}/uniquetokens`}>
+            <StyledTab
+              data-toggle="tooltip"
+              title={lang.t('account.tab_uniquetokens_tooltip')}
+              active={this.state.activeTab === 'UNIQUETOKENS_TAB'}
+              icon={uniquetokensTabIcon}
+              ref="uniqueTokensTab"
+              left
+            >
+              {lang.t('account.tab_uniquetokens')}
+            </StyledTab>
+          </Link>
         </StyledTabsWrapper>
       </StyledTabMenu>
     );
@@ -197,6 +213,7 @@ class TabMenu extends Component {
     const tabCharSizes = [
       'account.tab_balances',
       'account.tab_transactions',
+      'account.tab_uniquetokens',
     ].map(resourceName => lang.t(resourceName).length);
 
     return tabCharSizes[0] * 5;

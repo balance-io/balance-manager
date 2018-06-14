@@ -69,8 +69,8 @@ const StyledBeta = styled.div`
   margin: 0;
   position: absolute;
   top: 5.5px;
-  right: -36px;
-  width: 28px;
+  right: -40px;
+  display: inline-block;
   letter-spacing: 0.4px;
   font-size: 8px;
   font-weight: 500;

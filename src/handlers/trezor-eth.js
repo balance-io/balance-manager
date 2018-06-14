@@ -1,8 +1,10 @@
 import EthereumTx from 'ethereumjs-tx';
 import ethereumNetworks from '../references/ethereum-networks.json';
 import { web3Instance } from './web3';
-const HDKey = require('ethereumjs-wallet/hdkey');
+import lang from '../languages';
+import { notificationShow } from './_notification';
 
+const HDKey = require('ethereumjs-wallet/hdkey');
 export let trezorEthInstance = {
   length: 10,
   accounts: [],
@@ -61,13 +63,20 @@ export const trezorEthSignTransaction = async tx => {
     ),
   );
 
-  const str = `0x${new EthereumTx({
-    ...tx,
-    r: `0x${r}`,
-    s: `0x${s}`,
-    v: `0x${v.toString(16)}`,
-  })
-    .serialize()
-    .toString('hex')}`;
-  return str;
+  try {
+    const str = `0x${new EthereumTx({
+      ...tx,
+      r: `0x${r}`,
+      s: `0x${s}`,
+      v: `0x${v.toString(16)}`,
+    })
+      .serialize()
+      .toString('hex')}`;
+    return str;
+  } catch (error) {
+    /*dispatch(
+      notificationShow(lang.t('message.failed_trezor_popup_blocked'), true),
+    );
+  */
+  }
 };

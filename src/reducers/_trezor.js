@@ -35,12 +35,12 @@ export const trezorConnectInit = () => (dispatch, getState) => {
           }
         })
         .catch(error => {
-          console.log(error)
+          console.log(error);
           dispatch({ type: TREZOR_CONNECT_FAILURE });
         });
     })
     .catch(error => {
-      console.log(error)
+      console.log(error);
       dispatch({ type: TREZOR_CONNECT_FAILURE });
     });
 };
@@ -50,7 +50,7 @@ export const trezorUpdateNetwork = network => (dispatch, getState) => {
   dispatch({ type: TREZOR_UPDATE_NETWORK, payload: network });
   dispatch(accountUpdateNetwork(network));
   dispatch(accountUpdateAccountAddress(accountAddress, 'TREZOR'));
-  dispatch(trezorConnectInit())
+  dispatch(trezorConnectInit());
 };
 
 // -- Reducer --------------------------------------------------------------- //
@@ -79,10 +79,10 @@ export default (state = INITIAL_STATE, action) => {
         fetching: false,
       };
     case TREZOR_UPDATE_NETWORK:
-    return {
-      ...state,
-      fetching: false,
-    };
+      return {
+        ...state,
+        fetching: false,
+      };
     default:
       return state;
   }

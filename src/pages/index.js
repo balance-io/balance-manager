@@ -210,7 +210,7 @@ class Home extends Component {
       <StyledCard minHeight={102}>
         <CardContainer>
           <LogoSection>
-            <TrezorLogo/>
+            <TrezorLogo />
             <LogoText>
               {lang.t('homepage.connect_trezor.description')}
               <LedgerAffiliateLink
@@ -255,7 +255,10 @@ Home.propTypes = {
   accountUpdateAccountAddress: PropTypes.func.isRequired,
 };
 
-export default connect(null, {
-  modalOpen,
-  accountUpdateAccountAddress,
-})(Home);
+export default connect(
+  null,
+  {
+    modalOpen,
+    accountUpdateAccountAddress,
+  },
+)(Home);

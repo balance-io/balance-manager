@@ -14,7 +14,7 @@ import Card from '../components/UnFlexedCard';
 import Button from '../components/Button';
 import Input from '../components/Input';
 
-import { modalClose } from '../reducers/_modal';
+import { modalClose, modalOpen } from '../reducers/_modal';
 import { apiGetPrice } from '../handlers/api';
 import { BigNumber } from 'bignumber.js';
 
@@ -241,12 +241,14 @@ class LoansRequestModal extends Component {
         collateralTokenSymbol:
           this.props.modal.params === 'WETH' ? 'DAI' : 'WETH',
         description: '',
-        gracePeriodInDays: 10,
+        gracePeriodInDays: 0,
         interestRate: 1,
         principalAmount: '',
         principalTokenSymbol: this.props.modal.params,
         termLength: 1,
       },
+      debtOrderInstance: {},
+      issuanceHash: '',
     };
   }
 
@@ -254,7 +256,7 @@ class LoansRequestModal extends Component {
     let { modal, account } = this.props;
 
     apiGetPrice(
-      modal.params === 'eth' ? 'ETH' : 'DAI',
+      modal.params === 'WETH' ? 'ETH' : 'DAI',
       account.nativeCurrency,
     ).then(res => {
       this.setState({
@@ -307,7 +309,7 @@ class LoansRequestModal extends Component {
       collateralAmount: new BigNumber(debtRequest.collateralAmount),
       collateralTokenSymbol: debtRequest.collateralTokenSymbol,
       description: '',
-      gracePeriodInDays: new BigNumber(0),
+      gracePeriodInDays: new BigNumber(debtRequest.gracePeriodInDays),
       interestRate: new BigNumber(debtRequest.interestRate),
       principalAmount: new BigNumber(debtRequest.principalAmount),
       principalTokenSymbol: debtRequest.principalTokenSymbol,
@@ -339,6 +341,21 @@ class LoansRequestModal extends Component {
       'issuanceHash',
       issuanceHash,
     );
+
+    // this.setState({
+    //   debtOrderInstance: debtOrderInstance,
+    //   issuanceHash: issuanceHash,
+    // });
+
+    this.props.modalOpen('LOANS_REQUEST_CONFIRMATION_MODAL', {
+      debtRequest: debtRequest,
+      debtEntity: payload,
+      debtOrderInstance: debtOrderInstance,
+      issuanceHash: issuanceHash,
+      amount: this.calculateAmount(),
+      nativeAmount: this.calculateNative(),
+      installments: this.calculateInstallments(),
+    });
   }
 
   updateAmortizationUnit(value) {
@@ -526,6 +543,7 @@ class LoansRequestModal extends Component {
 
 LoansRequestModal.propTypes = {
   modalClose: PropTypes.func.isRequired,
+  modalOpen: PropTypes.func.isRequired,
 };
 
 const reduxProps = ({ account, dharma, modal }) => ({
@@ -536,4 +554,5 @@ const reduxProps = ({ account, dharma, modal }) => ({
 
 export default connect(reduxProps, {
   modalClose,
+  modalOpen,
 })(LoansRequestModal);

@@ -4,4 +4,5 @@ import { Dharma } from '@dharmaprotocol/dharma.js';
 web3.providers.HttpProvider.prototype.sendAsync =
   web3.providers.HttpProvider.prototype.send;
 
-export const dharma = new Dharma(web3.currentProvider);
+export const dharma = new Dharma(window.web3.currentProvider);
+console.log('dharma', dharma);

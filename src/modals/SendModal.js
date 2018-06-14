@@ -65,6 +65,10 @@ const StyledFlex = styled.div`
   display: flex;
   position: relative;
   transform: none;
+
+  .native-currency-input {
+    margin-top: 30px;
+  }
 `;
 
 const StyledBottomModal = styled(StyledFlex)`
@@ -470,6 +474,7 @@ class SendModal extends Component {
                   <Input
                     monospace
                     placeholder="0.0"
+                    className="native-currency-input"
                     type="text"
                     value={this.props.nativeAmount}
                     disabled={

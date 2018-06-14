@@ -8,6 +8,7 @@ import SendModal from './SendModal';
 import ReceiveModal from './ReceiveModal';
 import DonationModal from './DonationModal';
 import LoansRequestModal from './LoansRequestModal';
+import LoanRequestConfirmationModal from './LoanRequestConfirmationModal';
 import WalletConnectInit from './WalletConnectInit';
 import { modalClose } from '../reducers/_modal';
 import { sendClearFields } from '../reducers/_send';
@@ -61,6 +62,8 @@ class Modal extends Component {
         return <WalletConnectInit />;
       case 'LOANS_REQUEST_MODAL':
         return <LoansRequestModal {...this.props} />;
+      case 'LOANS_REQUEST_CONFIRMATION_MODAL':
+        return <LoanRequestConfirmationModal {...this.props} />;
       default:
         return <div />;
     }

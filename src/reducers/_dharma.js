@@ -24,7 +24,7 @@ export const updatePendingDebtEntity = debtEntity => {
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
-  debtEntities: [],
+  debtEntities: new Map([]),
   filledDebtEntityIssuanceHashes: [],
   pendingDebtEntityIssuanceHashes: [],
 };
@@ -79,6 +79,7 @@ const handleSetFilledDebtEntities = (state, filledDebtEntities = []) => {
 };
 
 const handleUpdateDebtEntity = (state, debtEntity) => {
+  console.log(state);
   const debtEntities = state.debtEntities;
   debtEntities.set(debtEntity.issuanceHash, debtEntity);
 

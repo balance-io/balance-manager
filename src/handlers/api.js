@@ -132,8 +132,7 @@ export const apiGetAccountBalances = async (
  */
 export const apiGetAccountUniqueTokens = async (address = '') => {
   const data = await api.get(`/get_unique_tokens/${address}`);
-  const result = parseAccountUniqueTokens(data);
-  return result;
+  return parseAccountUniqueTokens(data);
 };
 
 /**

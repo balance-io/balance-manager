@@ -1,6 +1,5 @@
 import EthereumTx from 'ethereumjs-tx';
 import ethereumNetworks from '../references/ethereum-networks.json';
-import TC from '../helpers/connect';
 import { web3Instance } from './web3';
 const HDKey = require('ethereumjs-wallet/hdkey');
 
@@ -16,7 +15,7 @@ export const trezorEthInit = (network = 'mainnet') => {
   const networkId = ethereumNetworks[network].id;
   const basePath = `m/44'/${networkId === 1 ? '60' : '1'}'/0'/0`;
   return new Promise((resolve, reject) => {
-    TC.TrezorConnect.getXPubKey(basePath, response => {
+    window.TrezorConnect.getXPubKey(basePath, response => {
       if (response.success) {
         trezorEthInstance.networkId = networkId;
         trezorEthInstance.hdkey = HDKey.fromExtendedKey(response.xpubkey);
@@ -49,7 +48,7 @@ export const trezorEthSignTransaction = async tx => {
     account => account.address.toLowerCase() === tx.from,
   )[0];
   const { r, s, v } = await new Promise(resolve =>
-    TC.TrezorConnect.ethereumSignTx(
+    window.TrezorConnect.ethereumSignTx(
       account.path,
       ...[tx.nonce, tx.gasPrice, tx.gasLimit, tx.to, tx.value, tx.data].map(
         hex => {

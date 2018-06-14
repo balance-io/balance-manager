@@ -1,8 +1,6 @@
 import EthereumTx from 'ethereumjs-tx';
 import ethereumNetworks from '../references/ethereum-networks.json';
-import { web3Instance } from './web3';
 import lang from '../languages';
-import { notificationShow } from './_notification';
 
 const HDKey = require('ethereumjs-wallet/hdkey');
 export let trezorEthInstance = {

@@ -166,6 +166,7 @@ class LoanRequestConfirmationModal extends Component {
 
     this.props.updatePendingDebtEntity(debtEntity);
     this.props.setPendingDebtEntity(debtEntity.issuanceHash);
+    this.props.modalClose();
   }
 
   render = () => {

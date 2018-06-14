@@ -99,6 +99,7 @@ class CopyToClipboard extends Component {
       <StyledCopyToClipboard {...props}>
         <StyledContainer iconOnHover={iconOnHover}>
           <StyledInvisible
+            target="_blank"
             title={lang.t('message.view_on_etherscan')}
             href={`https://etherscan.io/address/${text}`}
           >

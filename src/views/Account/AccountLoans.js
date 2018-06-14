@@ -164,7 +164,7 @@ class AccountLoans extends Component {
                 color="brightGreen"
                 activeColor="brightGreenHover"
                 hoverColor="brightGreenHover"
-                onClick={() => this.modalOpen('dai')}
+                onClick={() => this.modalOpen('DAI')}
               >
                 <img src={arrowReceived} alt="borrow dai" />
                 Borrow DAI{' '}
@@ -192,7 +192,7 @@ class AccountLoans extends Component {
                 activeColor="brightGreenHover"
                 color="brightGreen"
                 hoverColor="brightGreenHover"
-                onClick={() => this.modalOpen('eth')}
+                onClick={() => this.modalOpen('WETH')}
               >
                 <img src={arrowReceived} alt="borrow eth" />
                 Borrow ETH{' '}

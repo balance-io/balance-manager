@@ -1356,10 +1356,6 @@ bignumber.js@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-5.0.0.tgz#fbce63f09776b3000a83185badcde525daf34833"
 
-bignumber.js@^7.0.1:
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-7.0.2.tgz#2d9ce9428249896d6ef528b2abadf69a405cf365"
-
 "bignumber.js@git+https://github.com/debris/bignumber.js.git#94d7146671b9719e00a09c29b01a691bc85048c2":
   version "2.0.7"
   resolved "git+https://github.com/debris/bignumber.js.git#94d7146671b9719e00a09c29b01a691bc85048c2"

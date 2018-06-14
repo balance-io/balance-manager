@@ -16,10 +16,14 @@ import Input from '../components/Input';
 
 import { modalClose } from '../reducers/_modal';
 import { apiGetPrice } from '../handlers/api';
+import { BigNumber } from 'bignumber.js';
+
 import { fonts, colors, responsive, shadows } from '../styles';
 
 import dharmaProtocol from '../assets/powered-by-dharma.png';
 import arrowReceived from '../assets/circle-arrow.svg';
+
+import { dharma } from '../handlers/dharma';
 
 const StyledDropdown = styled(Dropdown)`
   .dropdown-selected {
@@ -219,17 +223,28 @@ class LoansRequestModal extends Component {
   constructor(props) {
     super(props);
 
+    this.calculateAmount = this.calculateAmount.bind(this);
+    this.calculateInstallments = this.calculateInstallments.bind(this);
+    this.calculateNative = this.calculateNative.bind(this);
+    this.onClose = this.onClose.bind(this);
+    this.updateAmortizationUnit = this.updateAmortizationUnit.bind(this);
+    this.updateTermLength = this.updateTermLength.bind(this);
+    this.updateInterestRate = this.updateInterestRate.bind(this);
+    this.updatePrincipalAmount = this.updatePrincipalAmount.bind(this);
+    this.updateCollateralAmount = this.updateCollateralAmount.bind(this);
+    this.submitLoanRequest = this.submitLoanRequest.bind(this);
+
     this.state = {
       debtRequest: {
         amortizationUnit: 'months',
         collateralAmount: '',
         collateralTokenSymbol:
-          this.props.modal.params === 'eth' ? 'DAI' : 'ETH',
+          this.props.modal.params === 'WETH' ? 'DAI' : 'WETH',
         description: '',
-        gracePeriodInDays: '',
+        gracePeriodInDays: 10,
         interestRate: 1,
         principalAmount: '',
-        principalTokenSymbol: this.props.modal.params.toUpperCase(),
+        principalTokenSymbol: this.props.modal.params,
         termLength: 1,
       },
     };
@@ -248,16 +263,16 @@ class LoansRequestModal extends Component {
     });
   }
 
-  calculateAmount = () => {
+  calculateAmount() {
     let debtRequest = { ...this.state.debtRequest };
     let principalAmount = debtRequest.principalAmount;
     let interestRate = debtRequest.interestRate / 100;
     let totalAmount = interestRate * principalAmount + principalAmount;
 
     return totalAmount || 0;
-  };
+  }
 
-  calculateInstallments = () => {
+  calculateInstallments() {
     let debtRequest = { ...this.state.debtRequest };
 
     let principalAmount = debtRequest.principalAmount;
@@ -266,9 +281,9 @@ class LoansRequestModal extends Component {
     let installment = totalAmount / debtRequest.termLength;
 
     return installment || 0;
-  };
+  }
 
-  calculateNative = () => {
+  calculateNative() {
     let debtRequest = { ...this.state.debtRequest };
 
     let principalAmount = debtRequest.principalAmount;
@@ -278,51 +293,93 @@ class LoansRequestModal extends Component {
       totalTokenAmount * this.state.principalTokenNativePrice;
 
     return totalNativeAmount || 0;
-  };
+  }
 
-  onClose = () => {
+  onClose() {
     this.props.modalClose();
-  };
+  }
 
-  updateAmortizationUnit = value => {
+  async submitLoanRequest() {
+    let debtRequest = this.state.debtRequest;
+
+    let payload = {
+      amortizationUnit: debtRequest.amortizationUnit,
+      collateralAmount: new BigNumber(debtRequest.collateralAmount),
+      collateralTokenSymbol: debtRequest.collateralTokenSymbol,
+      description: '',
+      gracePeriodInDays: new BigNumber(0),
+      interestRate: new BigNumber(debtRequest.interestRate),
+      principalAmount: new BigNumber(debtRequest.principalAmount),
+      principalTokenSymbol: debtRequest.principalTokenSymbol,
+      termLength: new BigNumber(debtRequest.termLength),
+    };
+
+    console.log(
+      'dharma',
+      dharma,
+      'debtRequest',
+      debtRequest,
+      'payLoad',
+      payload,
+      'account',
+      this.props.account,
+    );
+
+    let debtOrderInstance = await dharma.adapters.collateralizedSimpleInterestLoan.toDebtOrder(
+      payload,
+    );
+
+    debtOrderInstance.debtor = this.props.account.accountAddress;
+
+    let issuanceHash = await dharma.order.getIssuanceHash(debtOrderInstance);
+
+    console.log(
+      'debtOrderInstance',
+      debtOrderInstance,
+      'issuanceHash',
+      issuanceHash,
+    );
+  }
+
+  updateAmortizationUnit(value) {
     let debtRequest = { ...this.state.debtRequest };
 
     debtRequest.amortizationUnit = value;
 
     this.setState({ debtRequest });
-  };
+  }
 
-  updateCollateralAmount = value => {
+  updateCollateralAmount(value) {
     let debtRequest = { ...this.state.debtRequest };
 
     debtRequest.collateralAmount = parseFloat(value);
 
     this.setState({ debtRequest });
-  };
+  }
 
-  updateInterestRate = value => {
+  updateInterestRate(value) {
     let debtRequest = { ...this.state.debtRequest };
 
     debtRequest.interestRate = value;
 
     this.setState({ debtRequest });
-  };
+  }
 
-  updatePrincipalAmount = value => {
+  updatePrincipalAmount(value) {
     let debtRequest = { ...this.state.debtRequest };
 
     debtRequest.principalAmount = parseFloat(value);
 
     this.setState({ debtRequest });
-  };
+  }
 
-  updateTermLength = value => {
+  updateTermLength(value) {
     let debtRequest = { ...this.state.debtRequest };
 
     debtRequest.termLength = parseInt(value, 10);
 
     this.setState({ debtRequest });
-  };
+  }
 
   render = () => {
     const { debtRequest } = this.state;
@@ -454,6 +511,7 @@ class LoansRequestModal extends Component {
                 color="brightGreen"
                 hoverColor="brightGreen"
                 activeColor="green"
+                onClick={this.submitLoanRequest}
               >
                 <img src={arrowReceived} alt="borrow dai" />
                 {lang.t('button.request')}

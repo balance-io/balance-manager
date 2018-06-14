@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Fix unit time references
 * Moved missing language strings
 * Automatically route users to '/transactions' when pending transaction is initiated
+* Address links to Etherscan in new tab
 
 ### Removed
 

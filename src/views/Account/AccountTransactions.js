@@ -477,6 +477,9 @@ const reduxProps = ({ account }) => ({
   nativeCurrency: account.nativeCurrency,
 });
 
-export default connect(reduxProps, {
-  accountUpdateHasPendingTransaction,
-})(AccountViewTransactions);
+export default connect(
+  reduxProps,
+  {
+    accountUpdateHasPendingTransaction,
+  },
+)(AccountViewTransactions);

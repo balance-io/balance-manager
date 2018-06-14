@@ -211,11 +211,23 @@ class Home extends Component {
         <CardContainer>
           <LogoSection>
             <TrezorLogo />
-            <LogoText disabled isAlwaysVisible>
-              {lang.t('homepage.coming_soon')}
+            <LogoText>
+              {lang.t('homepage.connect_trezor.description')}
+              <LedgerAffiliateLink
+                href="https://shop.trezor.io/?a=balance.io"
+                target="_blank"
+                title={lang.t('homepage.connect_trezor.link_title')}
+              >
+                {lang.t('homepage.connect_trezor.link_text')}
+              </LedgerAffiliateLink>
+              .
             </LogoText>
           </LogoSection>
-          <StyledSubscribeForm />
+          <Link to="/trezor">
+            <LedgerButton left color="ledger">
+              {lang.t('homepage.connect_trezor.button')}
+            </LedgerButton>
+          </Link>
         </CardContainer>
       </StyledCard>
 
@@ -243,7 +255,10 @@ Home.propTypes = {
   accountUpdateAccountAddress: PropTypes.func.isRequired,
 };
 
-export default connect(null, {
-  modalOpen,
-  accountUpdateAccountAddress,
-})(Home);
+export default connect(
+  null,
+  {
+    modalOpen,
+    accountUpdateAccountAddress,
+  },
+)(Home);

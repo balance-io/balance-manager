@@ -11,6 +11,12 @@
         "link_title": "Buy a Ledger hardware wallet",
         "button": "Connect to Ledger"
       },
+      "connect_trezor": {
+        "description": "Connect and sign with your ",
+        "link_text": "Trezor hardware wallet",
+        "link_title": "Buy a Trezor hardware wallet",
+        "button": "Connect to Trezor"
+      },
       "connect_walletconnect": "Connect and sign with your WalletConnect-enabled mobile wallet.",
       "coming_soon": "Coming soon."
     },
@@ -123,10 +129,12 @@
       "click_to_copy_to_clipboard": "Click to copy to clipboard",
       "failed_request": "Failed request, please refresh",
       "failed_ledger_connection": "Failed to connect to Ledger, please check your device",
+      "failed_trezor_connection": "Failed to connect to Trezor, please check your device",
       "no_transactions": "No transactions found for this account",
       "no_unique_tokens": "No unique tokens found for this account",
       "no_interactions": "No interactions found for this account",
       "please_connect_ledger": "Please connect and unlock Ledger then select Ethereum",
+      "please_connect_trezor": "Please connect your Trezor and follow the instructions",
       "opensea_footer": " is a market place for unique (or 'non-fungible') tokens. People trade on the marketspace and that gives them value. You can pawn your tokens to get money. All of this runs on Ethereum. ",
       "opensea_header": "How does this work under the hood?",
       "power_by": "Powered by",

@@ -17,6 +17,7 @@ import balanceManagerLogo from '../assets/balance-manager-logo.svg';
 import ethereumNetworks from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
 import { ledgerUpdateNetwork } from '../reducers/_ledger';
+import { trezorUpdateNetwork } from '../reducers/_trezor';
 import {
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
@@ -119,10 +120,13 @@ const BaseLayout = ({
   children,
   metamaskFetching,
   ledgerFetching,
+  trezorFetching,
   accountType,
   accountAddress,
   ledgerAccounts,
   ledgerUpdateNetwork,
+  trezorAccounts,
+  trezorUpdateNetwork,
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
   accountChangeLanguage,
@@ -140,6 +144,11 @@ const BaseLayout = ({
       addresses[account.address] = account;
     });
   }
+  if (accountType === 'TREZOR') {
+    trezorAccounts.forEach(account => {
+      addresses[account.address] = account;
+    });
+  }
   const languages = {};
   Object.keys(resources).forEach(resource => {
     languages[resource] = {
@@ -149,7 +158,7 @@ const BaseLayout = ({
   });
   const showToolbar =
     window.location.pathname !== '/' &&
-    (!metamaskFetching || !ledgerFetching) &&
+    (!metamaskFetching || !ledgerFetching || !trezorFetching) &&
     ((accountType === 'METAMASK' && web3Available) ||
       accountType !== 'METAMASK') &&
     accountAddress;
@@ -183,6 +192,22 @@ const BaseLayout = ({
                   <StyledVerticalLine />
                 </Fragment>
               )}
+            {showToolbar &&
+              accountType === 'TREZOR' &&
+              !!Object.keys(addresses).length && (
+                <Fragment>
+                  <Dropdown
+                    monospace
+                    displayKey={`address`}
+                    selected={accountAddress}
+                    options={addresses}
+                    onChange={address =>
+                      accountUpdateAccountAddress(address, 'TREZOR')
+                    }
+                  />
+                  <StyledVerticalLine />
+                </Fragment>
+              )}
             {showToolbar && (
               <Fragment>
                 <Dropdown
@@ -191,7 +216,11 @@ const BaseLayout = ({
                   iconColor={online ? 'green' : 'red'}
                   options={ethereumNetworks}
                   onChange={
-                    accountType === 'LEDGER' ? ledgerUpdateNetwork : null
+                    accountType === 'LEDGER'
+                      ? ledgerUpdateNetwork
+                      : accountType === 'TREZOR'
+                        ? trezorUpdateNetwork
+                        : null
                   }
                 />
                 <StyledVerticalLine />
@@ -238,6 +267,8 @@ BaseLayout.propTypes = {
   metamaskFetching: PropTypes.bool.isRequired,
   ledgerFetching: PropTypes.bool.isRequired,
   ledgerUpdateNetwork: PropTypes.func.isRequired,
+  trezorFetching: PropTypes.bool.isRequired,
+  trezorUpdateNetwork: PropTypes.func.isRequired,
   accountChangeNativeCurrency: PropTypes.func.isRequired,
   accountUpdateAccountAddress: PropTypes.func.isRequired,
   accountChangeLanguage: PropTypes.func.isRequired,
@@ -251,23 +282,29 @@ BaseLayout.propTypes = {
   modalOpen: PropTypes.func.isRequired,
 };
 
-const reduxProps = ({ account, ledger, metamask, warning }) => ({
+const reduxProps = ({ account, ledger, trezor, metamask, warning }) => ({
   accountType: account.accountType,
   accountAddress: account.accountAddress,
   nativeCurrency: account.nativeCurrency,
   metamaskFetching: metamask.fetching,
   language: account.language,
   ledgerFetching: ledger.fetching,
+  trezorFetching: trezor.fetching,
   network: account.network,
   ledgerAccounts: ledger.accounts,
+  trezorAccounts: trezor.accounts,
   web3Available: metamask.web3Available,
   online: warning.online,
 });
 
-export default connect(reduxProps, {
-  ledgerUpdateNetwork,
-  accountChangeNativeCurrency,
-  accountUpdateAccountAddress,
-  modalOpen,
-  accountChangeLanguage,
-})(BaseLayout);
+export default connect(
+  reduxProps,
+  {
+    ledgerUpdateNetwork,
+    trezorUpdateNetwork,
+    accountChangeNativeCurrency,
+    accountUpdateAccountAddress,
+    modalOpen,
+    accountChangeLanguage,
+  },
+)(BaseLayout);

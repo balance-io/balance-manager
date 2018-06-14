@@ -54,7 +54,7 @@ const StyledInput = styled.input`
   display: none;
 `;
 
-const StyledInvisible = styled.a`
+const StyledAddressLink = styled.a`
   background-color: transparent;
   color: transparent;
   text-shadow: 0 0 0 rgb(${colors.mediumGrey});
@@ -98,13 +98,13 @@ class CopyToClipboard extends Component {
     return (
       <StyledCopyToClipboard {...props}>
         <StyledContainer iconOnHover={iconOnHover}>
-          <StyledInvisible
+          <StyledAddressLink
             target="_blank"
             title={lang.t('message.view_on_etherscan')}
             href={`https://etherscan.io/address/${text}`}
           >
             {text}
-          </StyledInvisible>
+          </StyledAddressLink>
           <StyledInput
             value={text}
             spellCheck={false}

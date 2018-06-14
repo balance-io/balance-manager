@@ -9,34 +9,55 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-*
-
 ### Changed
-
-*
 
 ### Removed
 
-*
+## [0.6.0](https://github.com/balance-io/balance-manager/releases/tag/0.6.0)
+
+### Added
+* Support for Shapeshift
+* Support for Trezor
+* Support for Unique (non fungible) tokens
+* Added language selector to wallet connection page
+* Added English language fallback to i18n initialisation
+* Incoming and outgoing pending transactions for Shapeshift
+* Versioning for local storage
+* Exchange button and modal
+* Account Type component for displaying active wallet logo
+
+### Changed
+* Fix txn fee conversion
+* DrodpownAsset improved logic
+* Refactor Send and Exchange modals/reducers for consistency
+* Fix unit time references
+* Moved missing language strings
+* Automatically route users to '/transactions' when pending transaction is initiated
+
+### Removed
+* Account interactions tab
 
 ## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 
 ### Added
 
 * Bookmark Reminder (anti-phishing) Ribbon
+* Dropdown on account view for choosing language
 * Link to Ledger support page on Ledger connection page
 * Ledger affiliate link to wallet selection screen
 * Donate ETH button and modal
+* Input fetching animation
+
 
 ### Changed
 
 * Layout padding definition locations
 * Fix mobile layout on the wallet selection screen (#232)
+* Update spanish translation with consistent voice (tu vs usted)
+* Changed a few strings that weren't handled by i18n
 * Fix overflow padding for dropdowns
 
 ### Removed
-
-*
 
 ## [0.5.3](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 
@@ -77,9 +98,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Collapse Dropdown component onClick outside of Dropdown (Issue #172)
 * Fix flickering AssetIcon due to unnecessary setState calls (Issue ##107)
 
-### Removed
-
-\*
 
 ## [0.5.1](https://github.com/balance-io/balance-manager/releases/tag/0.5.1)
 

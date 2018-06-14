@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { saveLocal, getLocal } from '../handlers/localstorage';
+import {
+  getSupressReminderRibbon,
+  saveSupressReminderRibbon,
+} from '../handlers/localstorage';
 import cross from '../assets/cross.svg';
 import { colors } from '../styles';
 
@@ -39,13 +42,12 @@ const StyledReminderRibbonMessage = styled.div`
 
 class ReminderRibbon extends Component {
   state = {
-    show: !getLocal('supressreminderribbon'),
+    show: !getSupressReminderRibbon(),
   };
 
   onClose = () => {
     this.setState({ show: false });
-
-    saveLocal('supressreminderribbon', true);
+    saveSupressReminderRibbon(true);
   };
 
   bookmarkReminder = () => {

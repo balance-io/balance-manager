@@ -13,7 +13,7 @@ export let walletConnectInstance = {
  * @desc init WalletConnect webConnector instance
  * @return {Object}
  */
-export const walletConnectEthInit = async () => {
+export const walletConnectInit = async () => {
   const webConnector = new WebConnector(walletConnectInstance.bridgeDomain, {
     dappName: walletConnectInstance.dappName,
   });
@@ -26,7 +26,7 @@ export const walletConnectEthInit = async () => {
  * @desc WalletConnect get accounts
  * @return {Array}
  */
-export const walletConnectEthAccounts = cb => {
+export const walletConnectGetAccounts = cb => {
   walletConnectInstance.webConnector.listenSessionStatus(cb);
 };
 
@@ -43,7 +43,7 @@ const walletConnectListenTransactionStatus = transactionId =>
 
 /**
  * @desc WalletConnect sign transaction
- * @param  {Object}  transaction { tokenObject, from, to, amount, gasPrice }
+ * @param  {Object}  transaction { from, to, data, value, gasPrice, gasLimit }
  * @return {String}
  */
 export const walletConnectSignTransaction = async transaction => {

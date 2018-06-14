@@ -96,11 +96,8 @@ const reduxProps = ({ modal }) => ({
   modal: modal.modal,
 });
 
-export default connect(
-  reduxProps,
-  {
-    modalClose,
-    sendClearFields,
-    exchangeClearFields,
-  },
-)(Modal);
+export default connect(reduxProps, {
+  modalClose,
+  sendClearFields,
+  exchangeClearFields,
+})(Modal);

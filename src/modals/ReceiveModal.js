@@ -113,9 +113,6 @@ const reduxProps = ({ account }) => ({
   accountType: account.accountType,
 });
 
-export default connect(
-  reduxProps,
-  {
-    modalClose,
-  },
-)(ReceiveModal);
+export default connect(reduxProps, {
+  modalClose,
+})(ReceiveModal);

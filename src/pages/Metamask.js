@@ -81,11 +81,8 @@ const reduxProps = ({ account, metamask }) => ({
   fetching: metamask.fetching,
 });
 
-export default connect(
-  reduxProps,
-  {
-    metamaskUpdateMetamaskAccount,
-    metamaskConnectInit,
-    metamaskClearIntervals,
-  },
-)(Metamask);
+export default connect(reduxProps, {
+  metamaskUpdateMetamaskAccount,
+  metamaskConnectInit,
+  metamaskClearIntervals,
+})(Metamask);

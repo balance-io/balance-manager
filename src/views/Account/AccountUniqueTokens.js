@@ -69,7 +69,4 @@ const reduxProps = ({ account }) => ({
   fetchingUniqueTokens: account.fetchingUniqueTokens,
 });
 
-export default connect(
-  reduxProps,
-  null,
-)(AccountUniqueTokens);
+export default connect(reduxProps, null)(AccountUniqueTokens);

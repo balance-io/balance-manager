@@ -914,22 +914,19 @@ const reduxProps = ({ modal, exchange, account }) => ({
   fetchingShapeshift: account.fetchingShapeshift,
 });
 
-export default connect(
-  reduxProps,
-  {
-    modalClose,
-    exchangeClearFields,
-    exchangeModalInit,
-    exchangeSendTransaction,
-    exchangeUpdateWithdrawalAmount,
-    exchangeUpdateWithdrawalNative,
-    exchangeUpdateDepositAmount,
-    exchangeUpdateDepositSelected,
-    exchangeUpdateWithdrawalSelected,
-    exchangeToggleConfirmationView,
-    exchangeConfirmTransaction,
-    exchangeToggleWithdrawalNative,
-    exchangeMaxBalance,
-    notificationShow,
-  },
-)(ExchangeModal);
+export default connect(reduxProps, {
+  modalClose,
+  exchangeClearFields,
+  exchangeModalInit,
+  exchangeSendTransaction,
+  exchangeUpdateWithdrawalAmount,
+  exchangeUpdateWithdrawalNative,
+  exchangeUpdateDepositAmount,
+  exchangeUpdateDepositSelected,
+  exchangeUpdateWithdrawalSelected,
+  exchangeToggleConfirmationView,
+  exchangeConfirmTransaction,
+  exchangeToggleWithdrawalNative,
+  exchangeMaxBalance,
+  notificationShow,
+})(ExchangeModal);

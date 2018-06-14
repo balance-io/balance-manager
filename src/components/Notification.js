@@ -49,7 +49,4 @@ const reduxProps = ({ notification }) => ({
   message: notification.message,
 });
 
-export default connect(
-  reduxProps,
-  null,
-)(Notification);
+export default connect(reduxProps, null)(Notification);

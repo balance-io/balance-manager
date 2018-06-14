@@ -121,9 +121,6 @@ const reduxProps = ({ account, trezor }) => ({
   fetching: trezor.fetching,
 });
 
-export default connect(
-  reduxProps,
-  {
-    trezorConnectInit,
-  },
-)(Trezor);
+export default connect(reduxProps, {
+  trezorConnectInit,
+})(Trezor);

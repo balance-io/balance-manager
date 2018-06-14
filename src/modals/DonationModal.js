@@ -537,18 +537,15 @@ const reduxProps = ({ modal, send, account }) => ({
   prices: account.prices,
 });
 
-export default connect(
-  reduxProps,
-  {
-    modalClose,
-    sendModalInit,
-    sendUpdateGasPrice,
-    sendTransaction,
-    sendClearFields,
-    sendUpdateRecipient,
-    sendUpdateNativeAmount,
-    sendUpdateAssetAmount,
-    sendToggleConfirmationView,
-    notificationShow,
-  },
-)(DonationModal);
+export default connect(reduxProps, {
+  modalClose,
+  sendModalInit,
+  sendUpdateGasPrice,
+  sendTransaction,
+  sendClearFields,
+  sendUpdateRecipient,
+  sendUpdateNativeAmount,
+  sendUpdateAssetAmount,
+  sendToggleConfirmationView,
+  notificationShow,
+})(DonationModal);

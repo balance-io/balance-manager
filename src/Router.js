@@ -40,11 +40,8 @@ const reduxProps = ({ account }) => ({
 });
 
 export default withRouter(
-  connect(
-    reduxProps,
-    {
-      warningOffline,
-      warningOnline,
-    },
-  )(Router),
+  connect(reduxProps, {
+    warningOffline,
+    warningOnline,
+  })(Router),
 );

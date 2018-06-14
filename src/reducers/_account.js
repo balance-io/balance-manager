@@ -6,9 +6,9 @@ import {
   apiGetAccountBalances,
   apiGetAccountTransactions,
   apiGetPrices,
+  apiGetAccountUniqueTokens,
   apiGetTransaction,
 } from '../handlers/api';
-import { apiGetAccountUniqueTokens } from '../handlers/opensea-api.js';
 import {
   parseError,
   parseNewTransaction,

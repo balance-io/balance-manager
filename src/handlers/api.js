@@ -2,6 +2,7 @@ import axios from 'axios';
 import {
   parseHistoricalTransactions,
   parseAccountAssets,
+  parseAccountUniqueTokens,
   parseAccountTransactions,
 } from './parsers';
 import { formatInputDecimals } from '../helpers/bignumber';
@@ -122,6 +123,17 @@ export const apiGetAccountBalances = async (
   } catch (error) {
     throw error;
   }
+};
+
+/**
+ * @desc get unique tokens
+ * @param  {String}   [address = '']
+ * @return {Promise}
+ */
+export const apiGetAccountUniqueTokens = async (address = '') => {
+  const data = await api.get(`/get_unique_tokens/${address}`);
+  const result = parseAccountUniqueTokens(data);
+  return result;
 };
 
 /**

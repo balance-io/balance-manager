@@ -10,7 +10,9 @@ export const debounceRequest = (request, params, timeout) =>
     setTimeout(
       () =>
         request(...params)
-          .then(res => resolve(res))
+          .then(res => {
+            resolve(res);
+          })
           .catch(err => reject(err)),
       timeout,
     ),

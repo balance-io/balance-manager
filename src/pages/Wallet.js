@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
-import { getLocal } from '../handlers/localstorage';
+import { getWalletConnectAccount } from '../handlers/localstorage';
 import { accountUpdateAccountAddress } from '../reducers/_account';
 
 const StyledWrapper = styled.div`
@@ -14,7 +14,7 @@ const StyledWrapper = styled.div`
 
 class Wallet extends Component {
   componentDidMount() {
-    const storedAddress = getLocal('walletconnect');
+    const storedAddress = getWalletConnectAccount();
     if (storedAddress) {
       this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
     } else {
@@ -52,6 +52,9 @@ const reduxProps = ({ account }) => ({
   accountAddress: account.accountAddress,
 });
 
-export default connect(reduxProps, {
-  accountUpdateAccountAddress,
-})(Wallet);
+export default connect(
+  reduxProps,
+  {
+    accountUpdateAccountAddress,
+  },
+)(Wallet);

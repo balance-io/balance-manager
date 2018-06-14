@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
+### Changed
+
+### Removed
+
+## [0.5.5](https://github.com/balance-io/balance-manager/releases/tag/0.5.5)
+
+### Added
 * Support for Trezor
 * Added language selector to wallet connection page
 * Added English language fallback to i18n initialisation
@@ -19,7 +26,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Account Type component for displaying active wallet logo
 
 ### Changed
-
 * Fix txn fee conversion
 * DrodpownAsset improved logic
 * Refactor Send and Exchange modals/reducers for consistency
@@ -28,7 +34,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Automatically route users to '/transactions' when pending transaction is initiated
 
 ### Removed
-
 * Account interactions tab
 
 ## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)

@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
-## [0.5.5](https://github.com/balance-io/balance-manager/releases/tag/0.5.5)
+## [0.6.0](https://github.com/balance-io/balance-manager/releases/tag/0.6.0)
 
 ### Added
 * Support for Shapeshift

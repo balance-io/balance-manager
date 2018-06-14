@@ -74,9 +74,6 @@ export const trezorEthSignTransaction = async tx => {
       .toString('hex')}`;
     return str;
   } catch (error) {
-    /*dispatch(
-      notificationShow(lang.t('message.failed_trezor_popup_blocked'), true),
-    );
-  */
+    throw new Error(lang.t('message.failed_trezor_popup_blocked'));
   }
 };

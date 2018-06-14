@@ -15,7 +15,7 @@ export const trezorEthInit = (network = 'mainnet') => {
   const networkId = ethereumNetworks[network].id;
   const basePath = `m/44'/${networkId === 1 ? '60' : '1'}'/0'/0`;
   return new Promise((resolve, reject) => {
-    TrezorConnect.getXPubKey(basePath, response => {
+    window.TrezorConnect.getXPubKey(basePath, response => {
       if (response.success) {
         trezorEthInstance.networkId = networkId;
         trezorEthInstance.hdkey = HDKey.fromExtendedKey(response.xpubkey);
@@ -48,7 +48,7 @@ export const trezorEthSignTransaction = async tx => {
     account => account.address.toLowerCase() === tx.from,
   )[0];
   const { r, s, v } = await new Promise(resolve =>
-    TrezorConnect.ethereumSignTx(
+    window.TrezorConnect.ethereumSignTx(
       account.path,
       ...[tx.nonce, tx.gasPrice, tx.gasLimit, tx.to, tx.value, tx.data].map(
         hex => {

@@ -16,13 +16,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [0.5.5](https://github.com/balance-io/balance-manager/releases/tag/0.5.5)
 
 ### Added
+* Support for Shapeshift
 * Support for Trezor
+* Support for Unique (non fungible) tokens
 * Added language selector to wallet connection page
 * Added English language fallback to i18n initialisation
 * Incoming and outgoing pending transactions for Shapeshift
 * Versioning for local storage
 * Exchange button and modal
-* Shapeshift endpoints
 * Account Type component for displaying active wallet logo
 
 ### Changed

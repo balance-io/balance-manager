@@ -118,7 +118,9 @@
       "helper_rate": "Rate",
       "helper_price": "Price",
       "helper_min": "Min",
-      "helper_max": "Max"
+      "helper_max": "Max",
+      "send_all_tokens_from_wallet": "Send all tokens",
+      "send_specific_token": "Send single token"
     },
     "message": {
       "web3_not_available": "Please install the MetaMask Chrome extension",

@@ -98,7 +98,9 @@
       "deposit_input_label": "Bezahlen",
       "withdrawal_input_label": "Erhalten",
       "tx_fee": "Transaktionsgebühr",
-      "exchange_fee": "Umtauschgebühr"
+      "exchange_fee": "Umtauschgebühr",
+      "send_all_tokens_from_wallet": "Alle Tokens senden",
+      "send_specific_token": "Einzelne Tokens senden"
     },
     "message": {
       "web3_not_available": "Bitte die MetaMask Chrome Erweiterung installieren",

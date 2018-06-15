@@ -154,6 +154,41 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     });
 };
 
+export const sendAllTransactions = () => (dispatch, getState) => {
+  dispatch({ type: SEND_TRANSACTION_REQUEST });
+  const { address, recipient, gasPrice, gasLimit } = getState().send;
+  const { accountType, accountInfo } = getState().account;
+
+  accountInfo.assets.forEach(asset => {
+    const txDetails = {
+      asset: asset,
+      from: address,
+      to: recipient,
+      nonce: null,
+      amount: convertAmountFromBigNumber(asset.balance.amount),
+      gasPrice: gasPrice.value.amount,
+      gasLimit: gasLimit,
+    };
+
+    web3SendTransactionMultiWallet(txDetails, accountType)
+      .then(txHash => {
+        // has pending transactions set to true for redirect to Transactions route
+        dispatch(accountUpdateHasPendingTransaction());
+        txDetails.hash = txHash;
+        dispatch(accountUpdateTransactions(txDetails));
+        dispatch({
+          type: SEND_TRANSACTION_SUCCESS,
+          payload: txHash,
+        });
+      })
+      .catch(error => {
+        const message = parseError(error);
+        dispatch(notificationShow(message, true));
+        dispatch({ type: SEND_TRANSACTION_FAILURE });
+      });
+  });
+};
+
 export const sendTransaction = () => (dispatch, getState) => {
   dispatch({ type: SEND_TRANSACTION_REQUEST });
   const {

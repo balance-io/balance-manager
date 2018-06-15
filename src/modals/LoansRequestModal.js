@@ -397,18 +397,7 @@ class LoansRequestModal extends Component {
 
   validForm() {
     const { debtRequest } = this.state;
-    // debtRequest: {
-    //   amortizationUnit: 'months',
-    //   collateralAmount: '',
-    //   collateralTokenSymbol:
-    //     this.props.modal.params === 'WETH' ? 'DAI' : 'WETH',
-    //   description: '',
-    //   gracePeriodInDays: 0,
-    //   interestRate: 1,
-    //   principalAmount: '',
-    //   principalTokenSymbol: this.props.modal.params,
-    //   termLength: 1,
-    // },
+
     if (
       _.isNumber(debtRequest.termLength) &&
       _.isNumber(debtRequest.collateralAmount) &&

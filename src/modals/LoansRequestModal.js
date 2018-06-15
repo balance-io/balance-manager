@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import ReactSlider from 'react-slider';
+import _ from 'lodash';
 
 // import { setPendingDebtEntity, updateDebtEntity } from "../reducers/_dharma";
 
@@ -233,6 +234,7 @@ class LoansRequestModal extends Component {
     this.updatePrincipalAmount = this.updatePrincipalAmount.bind(this);
     this.updateCollateralAmount = this.updateCollateralAmount.bind(this);
     this.submitLoanRequest = this.submitLoanRequest.bind(this);
+    this.validForm = this.validForm.bind(this);
 
     this.state = {
       debtRequest: {
@@ -342,11 +344,6 @@ class LoansRequestModal extends Component {
       issuanceHash,
     );
 
-    // this.setState({
-    //   debtOrderInstance: debtOrderInstance,
-    //   issuanceHash: issuanceHash,
-    // });
-
     this.props.modalOpen('LOANS_REQUEST_CONFIRMATION_MODAL', {
       debtRequest: debtRequest,
       debtEntity: payload,
@@ -398,6 +395,33 @@ class LoansRequestModal extends Component {
     this.setState({ debtRequest });
   }
 
+  validForm() {
+    const { debtRequest } = this.state;
+    // debtRequest: {
+    //   amortizationUnit: 'months',
+    //   collateralAmount: '',
+    //   collateralTokenSymbol:
+    //     this.props.modal.params === 'WETH' ? 'DAI' : 'WETH',
+    //   description: '',
+    //   gracePeriodInDays: 0,
+    //   interestRate: 1,
+    //   principalAmount: '',
+    //   principalTokenSymbol: this.props.modal.params,
+    //   termLength: 1,
+    // },
+    if (
+      _.isNumber(debtRequest.termLength) &&
+      _.isNumber(debtRequest.collateralAmount) &&
+      _.isNumber(debtRequest.principalAmount) &&
+      debtRequest.collateralAmount >= 1 &&
+      debtRequest.termLength >= 1
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   render = () => {
     const { debtRequest } = this.state;
     const { account } = this.props;
@@ -445,7 +469,7 @@ class LoansRequestModal extends Component {
                 monospace
                 placeholder="1"
                 type="text"
-                defaultValue={debtRequest.termLength}
+                defaultValue={debtRequest.termLength || ''}
                 onChange={({ target }) => this.updateTermLength(target.value)}
               />
               <StyledDropdown
@@ -529,6 +553,7 @@ class LoansRequestModal extends Component {
                 hoverColor="brightGreen"
                 activeColor="green"
                 onClick={this.submitLoanRequest}
+                disabled={this.validForm()}
               >
                 <img src={arrowReceived} alt="borrow dai" />
                 {lang.t('button.request')}

@@ -3,23 +3,20 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-import lang from '../languages';
-
-import Card from '../components/UnFlexedCard';
-import Button from '../components/Button';
-
 import { modalClose } from '../reducers/_modal';
 import {
   updatePendingDebtEntity,
   setPendingDebtEntity,
 } from '../reducers/_dharma';
 
-import { colors, responsive } from '../styles';
-
 import dharmaProtocol from '../assets/powered-by-dharma.png';
 import arrowReceived from '../assets/circle-arrow.svg';
 
 import { dharma } from '../handlers/dharma';
+import { colors, responsive } from '../styles';
+import lang from '../languages';
+import Card from '../components/UnFlexedCard';
+import Button from '../components/Button';
 
 const VerticalFlex = styled.div`
   display: flex;

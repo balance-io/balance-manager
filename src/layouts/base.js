@@ -17,12 +17,15 @@ import balanceManagerLogo from '../assets/balance-manager-logo.svg';
 import ethereumNetworks from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
 import { ledgerUpdateNetwork } from '../reducers/_ledger';
+import { trezorUpdateNetwork } from '../reducers/_trezor';
 import {
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
+  accountChangeLanguage,
 } from '../reducers/_account';
-import { colors, responsive } from '../styles';
 import ReminderRibbon from '../components/ReminderRibbon';
+import { colors, responsive } from '../styles';
+import { resources } from '../languages';
 
 const StyledLayout = styled.div`
   position: relative;
@@ -66,8 +69,8 @@ const StyledBeta = styled.div`
   margin: 0;
   position: absolute;
   top: 5.5px;
-  right: -36px;
-  width: 28px;
+  right: -40px;
+  display: inline-block;
   letter-spacing: 0.4px;
   font-size: 8px;
   font-weight: 500;
@@ -78,9 +81,6 @@ const StyledBeta = styled.div`
 `;
 
 const StyledIndicators = styled.div`
-  opacity: ${({ show }) => (show ? 1 : 0)};
-  visibility: ${({ show }) => (show ? 'visible' : 'hidden')};
-  pointer-events: ${({ show }) => (show ? 'auto' : 'none')};
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -120,13 +120,18 @@ const BaseLayout = ({
   children,
   metamaskFetching,
   ledgerFetching,
+  trezorFetching,
   accountType,
   accountAddress,
   ledgerAccounts,
   ledgerUpdateNetwork,
+  trezorAccounts,
+  trezorUpdateNetwork,
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
+  accountChangeLanguage,
   nativeCurrency,
+  language,
   network,
   web3Available,
   online,
@@ -139,9 +144,21 @@ const BaseLayout = ({
       addresses[account.address] = account;
     });
   }
+  if (accountType === 'TREZOR') {
+    trezorAccounts.forEach(account => {
+      addresses[account.address] = account;
+    });
+  }
+  const languages = {};
+  Object.keys(resources).forEach(resource => {
+    languages[resource] = {
+      code: resource,
+      description: resource.toUpperCase(),
+    };
+  });
   const showToolbar =
     window.location.pathname !== '/' &&
-    (!metamaskFetching || !ledgerFetching) &&
+    (!metamaskFetching || !ledgerFetching || !trezorFetching) &&
     ((accountType === 'METAMASK' && web3Available) ||
       accountType !== 'METAMASK') &&
     accountAddress;
@@ -158,8 +175,9 @@ const BaseLayout = ({
               <StyledBeta>{'BETA'}</StyledBeta>
             </StyledBranding>
           </Link>
-          <StyledIndicators show={showToolbar}>
-            {accountType === 'LEDGER' &&
+          <StyledIndicators>
+            {showToolbar &&
+              accountType === 'LEDGER' &&
               !!Object.keys(addresses).length && (
                 <Fragment>
                   <Dropdown
@@ -174,19 +192,52 @@ const BaseLayout = ({
                   <StyledVerticalLine />
                 </Fragment>
               )}
+            {showToolbar &&
+              accountType === 'TREZOR' &&
+              !!Object.keys(addresses).length && (
+                <Fragment>
+                  <Dropdown
+                    monospace
+                    displayKey={`address`}
+                    selected={accountAddress}
+                    options={addresses}
+                    onChange={address =>
+                      accountUpdateAccountAddress(address, 'TREZOR')
+                    }
+                  />
+                  <StyledVerticalLine />
+                </Fragment>
+              )}
+            {showToolbar && (
+              <Fragment>
+                <Dropdown
+                  displayKey={`value`}
+                  selected={network}
+                  iconColor={online ? 'green' : 'red'}
+                  options={ethereumNetworks}
+                  onChange={
+                    accountType === 'LEDGER'
+                      ? ledgerUpdateNetwork
+                      : accountType === 'TREZOR'
+                        ? trezorUpdateNetwork
+                        : null
+                  }
+                />
+                <StyledVerticalLine />
+                <Dropdown
+                  displayKey={`currency`}
+                  selected={nativeCurrency}
+                  options={nativeCurrencies}
+                  onChange={accountChangeNativeCurrency}
+                />
+                <StyledVerticalLine />
+              </Fragment>
+            )}
             <Dropdown
-              displayKey={`value`}
-              selected={network}
-              iconColor={online ? 'green' : 'red'}
-              options={ethereumNetworks}
-              onChange={accountType === 'LEDGER' ? ledgerUpdateNetwork : null}
-            />
-            <StyledVerticalLine />
-            <Dropdown
-              displayKey={`currency`}
-              selected={nativeCurrency}
-              options={nativeCurrencies}
-              onChange={accountChangeNativeCurrency}
+              displayKey={`description`}
+              selected={language}
+              options={languages}
+              onChange={accountChangeLanguage}
             />
           </StyledIndicators>
         </StyledHeader>
@@ -216,32 +267,41 @@ BaseLayout.propTypes = {
   metamaskFetching: PropTypes.bool.isRequired,
   ledgerFetching: PropTypes.bool.isRequired,
   ledgerUpdateNetwork: PropTypes.func.isRequired,
+  trezorFetching: PropTypes.bool.isRequired,
+  trezorUpdateNetwork: PropTypes.func.isRequired,
   accountChangeNativeCurrency: PropTypes.func.isRequired,
   accountUpdateAccountAddress: PropTypes.func.isRequired,
+  accountChangeLanguage: PropTypes.func.isRequired,
   accountType: PropTypes.string.isRequired,
   accountAddress: PropTypes.string.isRequired,
   nativeCurrency: PropTypes.string.isRequired,
+  language: PropTypes.string.isRequired,
   network: PropTypes.string.isRequired,
   web3Available: PropTypes.bool.isRequired,
   online: PropTypes.bool.isRequired,
   modalOpen: PropTypes.func.isRequired,
 };
 
-const reduxProps = ({ account, ledger, metamask, warning }) => ({
+const reduxProps = ({ account, ledger, trezor, metamask, warning }) => ({
   accountType: account.accountType,
   accountAddress: account.accountAddress,
   nativeCurrency: account.nativeCurrency,
   metamaskFetching: metamask.fetching,
+  language: account.language,
   ledgerFetching: ledger.fetching,
+  trezorFetching: trezor.fetching,
   network: account.network,
   ledgerAccounts: ledger.accounts,
+  trezorAccounts: trezor.accounts,
   web3Available: metamask.web3Available,
   online: warning.online,
 });
 
 export default connect(reduxProps, {
   ledgerUpdateNetwork,
+  trezorUpdateNetwork,
   accountChangeNativeCurrency,
   accountUpdateAccountAddress,
   modalOpen,
+  accountChangeLanguage,
 })(BaseLayout);

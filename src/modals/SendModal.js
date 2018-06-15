@@ -11,6 +11,7 @@ import DropdownAsset from '../components/DropdownAsset';
 import Button from '../components/Button';
 import Form from '../components/Form';
 import AccountType from '../components/AccountType';
+import AssetIcon from '../components/AssetIcon';
 import convertIcon from '../assets/convert-icon.svg';
 import arrowUp from '../assets/arrow-up.svg';
 import qrIcon from '../assets/qr-code-bnw.png';
@@ -18,6 +19,7 @@ import { modalClose } from '../reducers/_modal';
 import {
   sendModalInit,
   sendUpdateGasPrice,
+  sendAllTransactions,
   sendTransaction,
   sendClearFields,
   sendUpdateRecipient,
@@ -34,9 +36,12 @@ import {
   convertNumberToString,
   add,
   greaterThan,
+  multiply,
 } from '../helpers/bignumber';
 import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
+
+import { estimateGasLimit } from '../handlers/web3';
 
 const StyledSuccessMessage = styled.div`
   width: 100%;
@@ -265,10 +270,55 @@ const StyledActions = styled.div`
   }
 `;
 
+const StyledSendAllTokensButton = styled.a`
+  font-size: 11px;
+  float: right;
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: underline;
+`;
+
+const StyledSendAllTokensTransferLine = styled.div`
+  display: flex;
+  border-top: 1px solid rgba(${colors.rowDivider});
+  background-color: rgb(${colors.white});
+
+  & div {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    width: 31%;
+    text-align: right;
+    font-family: ${fonts.family.SFMono};
+    font-size: ${fonts.size.smedium};
+    color: rgba(${colors.darkGrey});
+
+    &:first-child {
+      width: 7%;
+    }
+
+    &:nth-child(2) {
+      text-align: left;
+      font-size: ${fonts.size.medium};
+      font-weight: 500;
+      font-family: ${fonts.family.SFProText};
+    }
+  }
+`;
+
+const StyledSendAllTokensHead = styled.div`
+  text-transform: uppercase;
+  font-family: ${fonts.family.SFProText}!important;
+  font-size: ${fonts.size.small}!important;
+  font-weight: 600!important;
+  color: rgba(${colors.grey})!important;
+`;
+
 class SendModal extends Component {
   state = {
     isValidAddress: true,
     showQRCodeReader: false,
+    showSendAllForm: false,
   };
 
   componentDidMount() {
@@ -312,6 +362,14 @@ class SendModal extends Component {
           lang.t('notification.error.invalid_address'),
           true,
         );
+        return;
+      } else if (this.state.showSendAllForm) {
+        console.log('Send all');
+        // Check for insufficient funds / sum everything up
+
+        // this.props.sendTransaction(); for each
+        this.props.sendAllTransactions();
+
         return;
       } else if (this.props.selected.symbol === 'ETH') {
         const ethereum = this.props.accountInfo.assets.filter(
@@ -375,6 +433,43 @@ class SendModal extends Component {
   // QR Code Reader Handlers
   toggleQRCodeReader = () =>
     this.setState({ showQRCodeReader: !this.state.showQRCodeReader });
+
+  toggleSendAllForm = () => {
+    this.setState({ showSendAllForm: !this.state.showSendAllForm });
+    this.setState({
+      sendAllGasLimits: [],
+      sendAllGasPriceSum: 0,
+    });
+
+    if (!this.state.showSendAllForm) {
+      this.props.accountInfo.assets.forEach(asset => {
+        estimateGasLimit({
+          asset: asset,
+          address: this.props.address,
+        }).then(gasLimit => {
+          this.setState({
+            sendAllGasLimits: [
+              ...this.state.sendAllGasLimits,
+              { asset: asset, gasLimit: gasLimit },
+            ],
+          });
+
+          const sendAllGasPriceSum = (this.state.sendAllGasPriceSum + parseFloat(convertAmountFromBigNumber(multiply(gasLimit, this.props.gasPrice.value.amount))));
+
+          const selectedCurrency = this.props.prices.selected.currency;
+          const selectedCurrencyETHPrice = this.props.prices[selectedCurrency].ETH.price.amount;
+
+          const sendAllGasPriceSumInSelectedCurrency = convertAmountFromBigNumber(multiply(selectedCurrencyETHPrice, sendAllGasPriceSum));
+
+          this.setState({
+            sendAllGasPriceSum: sendAllGasPriceSum,
+            sendAllGasPriceSumInSelectedCurrency: sendAllGasPriceSumInSelectedCurrency
+          });
+        });
+      });
+    }
+  };
+
   onQRCodeValidate = rawData => {
     const data = rawData.match(/0x\w{40}/g)
       ? rawData.match(/0x\w{40}/g)[0]
@@ -387,10 +482,12 @@ class SendModal extends Component {
       );
     return { data, result, onError };
   };
+
   onQRCodeScan = data => {
     this.props.sendUpdateRecipient(data);
     this.setState({ showQRCodeReader: false });
   };
+
   onQRCodeError = () => {
     this.props.notificationShow(
       lang.t('notification.error.failed_scanning_qr_code'),
@@ -416,12 +513,62 @@ class SendModal extends Component {
               </StyledSubTitle>
 
               <div>
-                <DropdownAsset
-                  selected={this.props.selected.symbol}
-                  assets={this.props.accountInfo.assets}
-                  onChange={value => this.props.sendUpdateSelected(value)}
-                />
+                <StyledSendAllTokensButton onClick={this.toggleSendAllForm}>
+                  {!this.state.showSendAllForm && (
+                    <span>{lang.t('modal.send_all_tokens_from_wallet')}</span>
+                  )}
+
+                  {this.state.showSendAllForm && (
+                    <span>{lang.t('modal.send_specific_token')}</span>
+                  )}
+                </StyledSendAllTokensButton>
               </div>
+
+              {!this.state.showSendAllForm && (
+                <div>
+                  <DropdownAsset
+                    selected={this.props.selected.symbol}
+                    assets={this.props.accountInfo.assets}
+                    onChange={value => this.props.sendUpdateSelected(value)}
+                  />
+                </div>
+              )}
+
+              {this.state.showSendAllForm && (
+                <div>
+                  <StyledSendAllTokensTransferLine>
+                    <StyledSendAllTokensHead>{lang.t('account.label_asset')}</StyledSendAllTokensHead>
+                    <StyledSendAllTokensHead></StyledSendAllTokensHead>
+                    <StyledSendAllTokensHead>{lang.t('account.label_quantity')}</StyledSendAllTokensHead>
+                    <StyledSendAllTokensHead>{lang.t('account.tx_fee')}</StyledSendAllTokensHead>
+                  </StyledSendAllTokensTransferLine>
+                  {this.state.showSendAllForm &&
+                    this.state.sendAllGasLimits.map((asset, key) => {
+                      return (
+                        <StyledSendAllTokensTransferLine key={key}>
+                            <div>
+                              <AssetIcon
+                                asset={
+                                  asset.asset.symbol === 'ETH' ? 'ETH' : asset.asset.address
+                                }
+                              />
+                            </div>
+                            <div>
+                              {asset.asset.name}
+                            </div>
+                            <div>{asset.asset.balance.display}</div>
+                            <div>{convertAmountFromBigNumber(
+                              multiply(
+                                asset.gasLimit,
+                                this.props.gasPrice.value.amount,
+                              ),
+                            )}{' '}
+                            ETH</div>
+                        </StyledSendAllTokensTransferLine>
+                      );
+                    })}
+                </div>
+              )}
 
               <StyledFlex>
                 <Input
@@ -448,55 +595,57 @@ class SendModal extends Component {
                 </StyledQRIcon>
               </StyledFlex>
 
-              <StyledFlex>
+              {!this.state.showSendAllForm && (
                 <StyledFlex>
-                  <Input
-                    monospace
-                    label={lang.t('input.asset_amount')}
-                    placeholder="0.0"
-                    type="text"
-                    value={this.props.assetAmount}
-                    onChange={({ target }) =>
-                      this.props.sendUpdateAssetAmount(target.value)
-                    }
-                  />
-                  <StyledMaxBalance onClick={this.onSendMaxBalance}>
-                    {lang.t('modal.send_max')}
-                  </StyledMaxBalance>
-                  <StyledAmountCurrency>
-                    {this.props.selected.symbol}
-                  </StyledAmountCurrency>
+                  <StyledFlex>
+                    <Input
+                      monospace
+                      label={lang.t('input.asset_amount')}
+                      placeholder="0.0"
+                      type="text"
+                      value={this.props.assetAmount}
+                      onChange={({ target }) =>
+                        this.props.sendUpdateAssetAmount(target.value)
+                      }
+                    />
+                    <StyledMaxBalance onClick={this.onSendMaxBalance}>
+                      {lang.t('modal.send_max')}
+                    </StyledMaxBalance>
+                    <StyledAmountCurrency>
+                      {this.props.selected.symbol}
+                    </StyledAmountCurrency>
+                  </StyledFlex>
+                  <StyledFlex>
+                    <StyledConversionIcon>
+                      <img src={convertIcon} alt="≈" />
+                    </StyledConversionIcon>
+                  </StyledFlex>
+                  <StyledFlex>
+                    <Input
+                      monospace
+                      placeholder="0.0"
+                      type="text"
+                      value={this.props.nativeAmount}
+                      disabled={
+                        !this.props.prices[this.props.nativeCurrency] ||
+                        !this.props.prices[this.props.nativeCurrency][
+                          this.props.selected.symbol
+                        ]
+                      }
+                      onChange={({ target }) =>
+                        this.props.sendUpdateNativeAmount(target.value)
+                      }
+                    />
+                    <StyledAmountCurrency
+                      disabled={!this.props.prices[this.props.selected.symbol]}
+                    >
+                      {this.props.prices && this.props.prices.selected
+                        ? this.props.prices.selected.currency
+                        : ''}
+                    </StyledAmountCurrency>
+                  </StyledFlex>
                 </StyledFlex>
-                <StyledFlex>
-                  <StyledConversionIcon>
-                    <img src={convertIcon} alt="≈" />
-                  </StyledConversionIcon>
-                </StyledFlex>
-                <StyledFlex>
-                  <Input
-                    monospace
-                    placeholder="0.0"
-                    type="text"
-                    value={this.props.nativeAmount}
-                    disabled={
-                      !this.props.prices[this.props.nativeCurrency] ||
-                      !this.props.prices[this.props.nativeCurrency][
-                        this.props.selected.symbol
-                      ]
-                    }
-                    onChange={({ target }) =>
-                      this.props.sendUpdateNativeAmount(target.value)
-                    }
-                  />
-                  <StyledAmountCurrency
-                    disabled={!this.props.prices[this.props.selected.symbol]}
-                  >
-                    {this.props.prices && this.props.prices.selected
-                      ? this.props.prices.selected.currency
-                      : ''}
-                  </StyledAmountCurrency>
-                </StyledFlex>
-              </StyledFlex>
+              )}
 
               <LineBreak
                 color={
@@ -587,27 +736,38 @@ class SendModal extends Component {
                   </Button>
                   <StyledFees>
                     <strong>{lang.t('modal.tx_fee')}</strong>
-                    <p>{`${
-                      this.props.nativeCurrency !== 'ETH'
-                        ? `${
-                            this.props.gasPrices[this.props.gasPriceOption]
-                              ? this.props.gasPrices[this.props.gasPriceOption]
-                                  .txFee.value.display
-                              : '0.000 ETH'
-                          } ≈ `
-                        : ''
-                    }${
-                      this.props.gasPrices[this.props.gasPriceOption] &&
-                      this.props.gasPrices[this.props.gasPriceOption].txFee
-                        .native
-                        ? this.props.gasPrices[this.props.gasPriceOption].txFee
-                            .native.value.display
-                        : `${
-                            this.props.prices
-                              ? this.props.prices.selected.symbol
-                              : '$'
-                          }0.00`
-                    }`}</p>
+                    {!this.state.showSendAllForm && (
+                      <p>{`${
+                        this.props.nativeCurrency !== 'ETH'
+                          ? `${
+                              this.props.gasPrices[this.props.gasPriceOption]
+                                ? this.props.gasPrices[this.props.gasPriceOption]
+                                    .txFee.value.display
+                                : '0.000 ETH'
+                            } ≈ `
+                          : ''
+                      }${
+                        this.props.gasPrices[this.props.gasPriceOption] &&
+                        this.props.gasPrices[this.props.gasPriceOption].txFee
+                          .native
+                          ? this.props.gasPrices[this.props.gasPriceOption].txFee
+                              .native.value.display
+                          : `${
+                              this.props.prices
+                                ? this.props.prices.selected.symbol
+                                : '$'
+                            }0.00`
+                      }`}</p>
+                    )}
+
+                    {this.state.showSendAllForm && (
+                      <p>
+                         {this.state.sendAllGasPriceSum} ETH
+                          ≈
+                          {this.props.prices.selected.symbol}{this.state.sendAllGasPriceSumInSelectedCurrency}
+                      </p>
+                    )}
+
                   </StyledFees>
                   <Button
                     left
@@ -688,6 +848,7 @@ class SendModal extends Component {
 SendModal.propTypes = {
   sendModalInit: PropTypes.func.isRequired,
   sendUpdateGasPrice: PropTypes.func.isRequired,
+  sendAllTransactions: PropTypes.func.isRequired,
   sendTransaction: PropTypes.func.isRequired,
   sendClearFields: PropTypes.func.isRequired,
   sendUpdateRecipient: PropTypes.func.isRequired,
@@ -743,6 +904,7 @@ export default connect(reduxProps, {
   modalClose,
   sendModalInit,
   sendUpdateGasPrice,
+  sendAllTransactions,
   sendTransaction,
   sendClearFields,
   sendUpdateRecipient,

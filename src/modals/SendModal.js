@@ -334,6 +334,10 @@ class SendModal extends Component {
         this.props.sendUpdateGasPrice();
       }
     }
+
+    if (this.props.gasPriceOption !== prevProps.gasPriceOption && this.state.showSendAllForm) {
+      this.updateSendAllGasPriceSum();
+    }
   }
 
   onAddressInputFocus = () => this.setState({ isValidAddress: true });
@@ -436,39 +440,68 @@ class SendModal extends Component {
 
   toggleSendAllForm = () => {
     this.setState({ showSendAllForm: !this.state.showSendAllForm });
+
+
+    if (!this.state.showSendAllForm) {
+      this.updateSendAllGasPriceSum();
+    }
+  };
+
+  updateSendAllGasPriceSum = () => {
     this.setState({
       sendAllGasLimits: [],
       sendAllGasPriceSum: 0,
+      sendAllGasPriceSumSlow: 0,
+      sendAllGasPriceSumAverage: 0,
+      sendAllGasPriceSumFast: 0,
+      sendAllGasPriceSumSlowInSelectedCurrency: 0,
+      sendAllGasPriceSumAverageInSelectedCurrency: 0,
+      sendAllGasPriceSumFastInSelectedCurrency: 0
     });
 
-    if (!this.state.showSendAllForm) {
-      this.props.accountInfo.assets.forEach(asset => {
-        estimateGasLimit({
-          asset: asset,
-          address: this.props.address,
-        }).then(gasLimit => {
-          this.setState({
-            sendAllGasLimits: [
-              ...this.state.sendAllGasLimits,
-              { asset: asset, gasLimit: gasLimit },
-            ],
-          });
+    this.props.accountInfo.assets.forEach(asset => {
+      estimateGasLimit({
+        asset: asset,
+        address: this.props.address,
+      }).then(gasLimit => {
+        console.log(gasLimit)
+        this.setState({
+          sendAllGasLimits: [
+            ...this.state.sendAllGasLimits,
+            { asset: asset, gasLimit: gasLimit },
+          ],
+        });
 
-          const sendAllGasPriceSum = (this.state.sendAllGasPriceSum + parseFloat(convertAmountFromBigNumber(multiply(gasLimit, this.props.gasPrice.value.amount))));
+        const sendAllGasPriceSum = (this.state.sendAllGasPriceSum + parseFloat(convertAmountFromBigNumber(multiply(gasLimit, this.props.gasPrice.value.amount))));
 
-          const selectedCurrency = this.props.prices.selected.currency;
-          const selectedCurrencyETHPrice = this.props.prices[selectedCurrency].ETH.price.amount;
+        const sendAllGasPriceSumSlow = (this.state.sendAllGasPriceSumSlow + parseFloat(convertAmountFromBigNumber(multiply(gasLimit, this.props.gasPrices.slow.value.amount))));
 
-          const sendAllGasPriceSumInSelectedCurrency = convertAmountFromBigNumber(multiply(selectedCurrencyETHPrice, sendAllGasPriceSum));
+        const sendAllGasPriceSumAverage = (this.state.sendAllGasPriceSumAverage + parseFloat(convertAmountFromBigNumber(multiply(gasLimit, this.props.gasPrices.average.value.amount))));
 
-          this.setState({
-            sendAllGasPriceSum: sendAllGasPriceSum,
-            sendAllGasPriceSumInSelectedCurrency: sendAllGasPriceSumInSelectedCurrency
-          });
+        const sendAllGasPriceSumFast = (this.state.sendAllGasPriceSumFast + parseFloat(convertAmountFromBigNumber(multiply(gasLimit, this.props.gasPrices.fast.value.amount))));
+
+        const selectedCurrency = this.props.prices.selected.currency;
+        const selectedCurrencyETHPrice = this.props.prices[selectedCurrency].ETH.price.amount;
+
+        const sendAllGasPriceSumInSelectedCurrency = convertAmountFromBigNumber(multiply(selectedCurrencyETHPrice, sendAllGasPriceSum));
+
+        const sendAllGasPriceSumSlowInSelectedCurrency = convertAmountFromBigNumber(multiply(selectedCurrencyETHPrice, sendAllGasPriceSumSlow));
+        const sendAllGasPriceSumAverageInSelectedCurrency = convertAmountFromBigNumber(multiply(selectedCurrencyETHPrice, sendAllGasPriceSumAverage));
+        const sendAllGasPriceSumFastInSelectedCurrency = convertAmountFromBigNumber(multiply(selectedCurrencyETHPrice, sendAllGasPriceSumFast));
+
+        this.setState({
+          sendAllGasPriceSum: sendAllGasPriceSum,
+          sendAllGasPriceSumInSelectedCurrency: sendAllGasPriceSumInSelectedCurrency,
+          sendAllGasPriceSumSlow: sendAllGasPriceSumSlow,
+          sendAllGasPriceSumAverage: sendAllGasPriceSumAverage,
+          sendAllGasPriceSumFast: sendAllGasPriceSumFast,
+          sendAllGasPriceSumSlowInSelectedCurrency: sendAllGasPriceSumSlowInSelectedCurrency,
+          sendAllGasPriceSumAverageInSelectedCurrency: sendAllGasPriceSumAverageInSelectedCurrency,
+          sendAllGasPriceSumFastInSelectedCurrency: sendAllGasPriceSumFastInSelectedCurrency
         });
       });
-    }
-  };
+    });
+  }
 
   onQRCodeValidate = rawData => {
     const data = rawData.match(/0x\w{40}/g)
@@ -669,16 +702,24 @@ class SendModal extends Component {
                   disabled={!this.props.gasPrices.slow}
                   onClick={() => this.props.sendUpdateGasPrice('slow')}
                 >
-                  <p>{`${lang.t('modal.gas_slow')}: ${
-                    this.props.gasPrices.slow &&
-                    this.props.gasPrices.slow.txFee.native
-                      ? this.props.gasPrices.slow.txFee.native.value.display
-                      : `${
-                          this.props.prices && this.props.prices.selected
-                            ? this.props.prices.selected.symbol
-                            : '$'
-                        }0.00`
-                  }`}</p>
+                  <p>
+                    {`${lang.t('modal.gas_slow')}`}:
+                    {this.state.showSendAllForm && (
+                      <span>{` `}{this.props.prices.selected.symbol}{parseFloat(this.state.sendAllGasPriceSumSlowInSelectedCurrency).toFixed(3)}</span>
+                    )}
+                    { !this.state.showSendAllForm && (
+                      <span>{`${
+                      this.props.gasPrices.slow &&
+                      this.props.gasPrices.slow.txFee.native
+                        ? this.props.gasPrices.slow.txFee.native.value.display
+                        : `${
+                            this.props.prices && this.props.prices.selected
+                              ? this.props.prices.selected.symbol
+                              : '$'
+                          }0.00`
+                      }`}</span>
+                    )}
+                  </p>
                   <p>{`~ ${
                     this.props.gasPrices.slow
                       ? this.props.gasPrices.slow.estimatedTime.display
@@ -690,16 +731,24 @@ class SendModal extends Component {
                   disabled={!this.props.gasPrices.average}
                   onClick={() => this.props.sendUpdateGasPrice('average')}
                 >
-                  <p>{`${lang.t('modal.gas_average')}: ${
-                    this.props.gasPrices.average &&
-                    this.props.gasPrices.average.txFee.native
-                      ? this.props.gasPrices.average.txFee.native.value.display
-                      : `${
-                          this.props.prices && this.props.prices.selected
-                            ? this.props.prices.selected.symbol
-                            : '$'
-                        }0.00`
-                  }`}</p>
+                  <p>
+                    {`${lang.t('modal.gas_average')}:`}
+                    {this.state.showSendAllForm && (
+                      <span>{` `}{this.props.prices.selected.symbol}{parseFloat(this.state.sendAllGasPriceSumAverageInSelectedCurrency).toFixed(3)}</span>
+                    )}
+                    { !this.state.showSendAllForm && (
+                    <span>{`${
+                      this.props.gasPrices.average &&
+                      this.props.gasPrices.average.txFee.native
+                        ? this.props.gasPrices.average.txFee.native.value.display
+                        : `${
+                            this.props.prices && this.props.prices.selected
+                              ? this.props.prices.selected.symbol
+                              : '$'
+                          }0.00`
+                    }`}</span>
+                    )}
+                  </p>
                   <p>{`~ ${
                     this.props.gasPrices.average
                       ? this.props.gasPrices.average.estimatedTime.display
@@ -711,16 +760,24 @@ class SendModal extends Component {
                   disabled={!this.props.gasPrices.fast}
                   onClick={() => this.props.sendUpdateGasPrice('fast')}
                 >
-                  <p>{`${lang.t('modal.gas_fast')}: ${
-                    this.props.gasPrices.fast &&
-                    this.props.gasPrices.fast.txFee.native
-                      ? this.props.gasPrices.fast.txFee.native.value.display
-                      : `${
-                          this.props.prices && this.props.prices.selected
-                            ? this.props.prices.selected.symbol
-                            : '$'
-                        }0.00`
-                  }`}</p>
+                  <p>
+                    {`${lang.t('modal.gas_fast')}:`}
+                    {this.state.showSendAllForm && (
+                      <span>{` `}{this.props.prices.selected.symbol}{parseFloat(this.state.sendAllGasPriceSumFastInSelectedCurrency).toFixed(3)}</span>
+                    )}
+                    { !this.state.showSendAllForm && (
+                      <span>{`${
+                        this.props.gasPrices.fast &&
+                        this.props.gasPrices.fast.txFee.native
+                          ? this.props.gasPrices.fast.txFee.native.value.display
+                          : `${
+                              this.props.prices && this.props.prices.selected
+                                ? this.props.prices.selected.symbol
+                                : '$'
+                            }0.00`
+                      }`}</span>
+                    )}
+                  </p>
                   <p>{`~ ${
                     this.props.gasPrices.fast
                       ? this.props.gasPrices.fast.estimatedTime.display
@@ -762,9 +819,8 @@ class SendModal extends Component {
 
                     {this.state.showSendAllForm && (
                       <p>
-                         {this.state.sendAllGasPriceSum} ETH
-                          ≈
-                          {this.props.prices.selected.symbol}{this.state.sendAllGasPriceSumInSelectedCurrency}
+                         {this.state.sendAllGasPriceSum.toFixed(6)} ETH
+                          ≈ {this.props.prices.selected.symbol}{parseFloat(this.state.sendAllGasPriceSumInSelectedCurrency).toFixed(3)}
                       </p>
                     )}
 

@@ -34,13 +34,6 @@ const StyledHeaderContainer = styled.div`
   margin-bottom: 10px;
 `;
 
-const StyledDate = styled.p`
-  justify-content: flex-start !important;
-  font-size: 0.7rem !important;
-  opacity: 0.9;
-  margin-bottom: 10px;
-`;
-
 class NewsLink extends Component {
   render() {
     const { post } = this.props;

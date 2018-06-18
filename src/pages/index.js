@@ -255,7 +255,10 @@ Home.propTypes = {
   accountUpdateAccountAddress: PropTypes.func.isRequired,
 };
 
-export default connect(null, {
-  modalOpen,
-  accountUpdateAccountAddress,
-})(Home);
+export default connect(
+  null,
+  {
+    modalOpen,
+    accountUpdateAccountAddress,
+  },
+)(Home);

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './helpers/intercom';
 import { injectGlobal } from 'styled-components';
 import { globalStyles } from './styles';
-import { bootIntercom } from './helpers/utilities';
+// import { bootIntercom } from './helpers/utilities';
 import { getLanguage } from './handlers/localstorage';
 import lang, { resources } from './languages';
 import Root from './Root';
@@ -12,7 +12,7 @@ import Root from './Root';
 injectGlobal`${globalStyles}`;
 
 // Intercom
-bootIntercom();
+// bootIntercom();
 
 // Languages (i18n)
 lang.init({

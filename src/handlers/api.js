@@ -320,3 +320,15 @@ export const apiShapeshiftGetExchangeDetails = ({
     result[inputTwoName] = inputTwo;
     return result;
   });
+
+/**
+ * @desc get info about a token address
+ * @return {Promise}
+ */
+export const apiGetTokenDetails = address => {
+  // Get user chosen currency (selected upper right)
+  // return axios.get(`/api/tokenInfo?address=${address}`);
+  return axios.get(
+    `https://trivial.co/api/tokeninformation?token_address=${address}`,
+  );
+};

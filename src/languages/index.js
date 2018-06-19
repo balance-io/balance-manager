@@ -4,6 +4,7 @@ import spanish from './_spanish.json';
 import russian from './_russian.json';
 import italian from './_italian.json';
 import german from './_german.json';
+import french from './_french.json';
 
 export const resources = {
   en: english,
@@ -11,6 +12,7 @@ export const resources = {
   ru: russian,
   it: italian,
   de: german,
+  fr: french,
 };
 
 export const updateLanguage = code => i18next.changeLanguage(code);

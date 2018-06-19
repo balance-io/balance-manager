@@ -7,6 +7,7 @@ import {
 import { formatInputDecimals } from '../helpers/bignumber';
 import networkList from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
+const moment = require('moment');
 
 const cryptocompareApiKey = process.env.REACT_APP_CRYPTOCOMPARE_API_KEY || '';
 
@@ -328,7 +329,43 @@ export const apiShapeshiftGetExchangeDetails = ({
 export const apiGetTokenDetails = address => {
   // Get user chosen currency (selected upper right)
   // return axios.get(`/api/tokenInfo?address=${address}`);
-  return axios.get(
-    `https://trivial.co/api/tokeninformation?token_address=${address}`,
-  );
+  return axios
+    .all([
+      axios.get(
+        `https://trivial.co/api/tokeninformation?token_address=${address}`,
+      ),
+      axios.get(
+        `https://trivial.co/api/token-price-chart?token_address=${address}`,
+      ),
+      axios.get(
+        `https://trivial.co/api/daily-active-chart?token_address=${address}`,
+      ),
+    ])
+    .then(response => {
+      let price_by_day = response[1].data.price_by_day;
+      if (price_by_day) {
+        price_by_day = price_by_day.map(price => {
+          return {
+            name: moment(`${price.ymd}`).format('MM/DD'),
+            price: parseFloat(price.value),
+          };
+        });
+      }
+
+      let daily_active = response[2].data.daily_active_by_day;
+      if (daily_active) {
+        daily_active = daily_active.map(active => {
+          return {
+            name: moment(`${active.ymd}`).format('MM/DD'),
+            active: active.value,
+          };
+        });
+      }
+
+      return {
+        info: response[0].data,
+        price_by_day,
+        daily_active,
+      };
+    });
 };

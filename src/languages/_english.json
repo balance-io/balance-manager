@@ -60,7 +60,8 @@
         "number_of_holders": "Number of holders",
         "news": "News",
         "smart_contract": "Token smart contract",
-        "unknown": "Nothing to show yet..."
+        "daily_active": "Daily active users (Last 30 days)",
+        "price_chart": "Price chart"
       }
     },
     "button": {

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import NewsLink from './NewsLink';
 import { colors, responsive, fonts } from '../styles';
 import lang from '../languages';
+import { BarChart, Bar, XAxis, ResponsiveContainer } from 'recharts';
 
 const StyledTokenDetailsGrid = styled.div`
   display: flex;
@@ -25,6 +26,8 @@ const StyledTokenDetailsLeft = styled(StyledTokenDetails)`
 `;
 
 const StyledTokenDetailsRight = styled(StyledTokenDetails)`
+  display: flex;
+  flex-wrap: wrap;
   @media screen and (${responsive.sm.min}) {
     padding-left: 5px;
   }
@@ -45,11 +48,6 @@ const StyledText = styled.p`
   padding-bottom: 10px;
 `;
 
-const StyledUnknown = styled(StyledText)`
-  color: ${colors.lightGrey};
-  opacity: 0.3;
-`;
-
 const StyledLinksList = styled.ul`
   padding-bottom: 10px;
   & li {
@@ -60,6 +58,18 @@ const StyledLinksList = styled.ul`
       color: rgb(${colors.darkGrey});
     }
   }
+`;
+
+const StyledPriceChartContainer = styled.div`
+  height: 150px;
+  width: 100%;
+  margin-bottom: 20px;
+`;
+
+const StyledDailyActiveChartContainer = styled.div`
+  height: 200px;
+  width: 100%;
+  margin-bottom: 20px;
 `;
 
 const StyledNewsList = styled.ul`
@@ -82,54 +92,53 @@ class TokenDetails extends Component {
     return (
       <StyledTokenDetailsGrid>
         <StyledTokenDetailsLeft>
-          {tokenDetails.description ? (
+          {tokenDetails.info.description ? (
             <div>
               <StyledHeading>
                 {lang.t('account.details.general_info')}
               </StyledHeading>
-              <StyledText>{tokenDetails.description}</StyledText>
+              <StyledText>{tokenDetails.info.description}</StyledText>
             </div>
           ) : (
             ''
           )}
 
-          {tokenDetails.token_count ? (
+          {tokenDetails.info.token_count ? (
             <div>
               <StyledHeading>
                 {lang.t('account.details.number_of_tokens')}
               </StyledHeading>
-              <StyledText>{tokenDetails.token_count}</StyledText>
+              <StyledText>{tokenDetails.info.token_count}</StyledText>
             </div>
           ) : (
             ''
           )}
 
-          {tokenDetails.num_holders_approx ? (
+          {tokenDetails.info.num_holders_approx ? (
             <div>
               <StyledHeading>
                 {lang.t('account.details.number_of_holders')}
               </StyledHeading>
-              <StyledText>{tokenDetails.num_holders_approx}</StyledText>
-            </div>
-          ) : (
-            ''
-          )}
-        </StyledTokenDetailsLeft>
-        <StyledTokenDetailsRight>
-          {tokenDetails.address ? (
-            <div>
-              <StyledHeading>
-                {lang.t('account.details.smart_contract')}
-              </StyledHeading>
-              <StyledText>{tokenDetails.address}</StyledText>
+              <StyledText>{tokenDetails.info.num_holders_approx}</StyledText>
             </div>
           ) : (
             ''
           )}
 
-          {tokenDetails.links ? (
+          {tokenDetails.info.address ? (
+            <div>
+              <StyledHeading>
+                {lang.t('account.details.smart_contract')}
+              </StyledHeading>
+              <StyledText>{tokenDetails.info.address}</StyledText>
+            </div>
+          ) : (
+            ''
+          )}
+
+          {tokenDetails.info.links ? (
             <StyledLinksList>
-              {tokenDetails.links.map(link => {
+              {tokenDetails.info.links.map(link => {
                 return (
                   <li key={link.title}>
                     <a
@@ -147,13 +156,61 @@ class TokenDetails extends Component {
           ) : (
             ''
           )}
+        </StyledTokenDetailsLeft>
+        <StyledTokenDetailsRight>
+          {tokenDetails.price_by_day ? (
+            <StyledPriceChartContainer>
+              <StyledHeading>
+                {lang.t('account.details.price_chart')}
+              </StyledHeading>
+              <ResponsiveContainer>
+                <BarChart data={tokenDetails.price_by_day}>
+                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                  <Bar
+                    dataKey="price"
+                    fill={`rgb(${colors.grey})`}
+                    label={{ position: 'top', fontSize: 10 }}
+                    isAnimationActive={false}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </StyledPriceChartContainer>
+          ) : (
+            ''
+          )}
+
+          {tokenDetails.daily_active ? (
+            <StyledDailyActiveChartContainer>
+              <StyledHeading>
+                {lang.t('account.details.daily_active')}
+              </StyledHeading>
+              <ResponsiveContainer>
+                <BarChart data={tokenDetails.daily_active}>
+                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                  <Bar
+                    dataKey="active"
+                    fill={`rgb(${colors.grey})`}
+                    label={{
+                      position: 'top',
+                      fontSize: 10,
+                      angle: -90,
+                      offset: 20,
+                    }}
+                    isAnimationActive={false}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </StyledDailyActiveChartContainer>
+          ) : (
+            ''
+          )}
         </StyledTokenDetailsRight>
         <StyledTokenDetailsRow>
-          {tokenDetails.last_posts.length > 0 ? (
+          {tokenDetails.info.last_posts.length > 0 ? (
             <div>
               <StyledHeading>{lang.t('account.details.news')}</StyledHeading>
               <StyledNewsList>
-                {tokenDetails.last_posts.map(post => {
+                {tokenDetails.info.last_posts.map(post => {
                   return (
                     <li key={post.title}>
                       <NewsLink post={post} />

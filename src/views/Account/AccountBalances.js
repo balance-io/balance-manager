@@ -226,7 +226,7 @@ class AccountBalances extends Component {
     } else {
       apiGetTokenDetails(address).then(tokenDetails => {
         this.setState({
-          tokenDetails: tokenDetails.data,
+          tokenDetails: tokenDetails,
           showTokenDetails: address,
         });
       });

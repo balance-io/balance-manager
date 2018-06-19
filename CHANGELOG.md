@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
-*
+* New util function for transaction prep
+* General componetisation of the modals
+* General improvement to readability/maintainability of the modals
 
 ### Changed
 
@@ -17,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
-*
+* Duplicative code
 
 ## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 

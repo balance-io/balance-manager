@@ -213,7 +213,10 @@ const reduxProps = ({ account }) => ({
 });
 
 export default withRouter(
-  connect(reduxProps, {
-    modalOpen,
-  })(Account),
+  connect(
+    reduxProps,
+    {
+      modalOpen,
+    },
+  )(Account),
 );

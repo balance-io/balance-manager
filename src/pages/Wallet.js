@@ -52,6 +52,9 @@ const reduxProps = ({ account }) => ({
   accountAddress: account.accountAddress,
 });
 
-export default connect(reduxProps, {
-  accountUpdateAccountAddress,
-})(Wallet);
+export default connect(
+  reduxProps,
+  {
+    accountUpdateAccountAddress,
+  },
+)(Wallet);

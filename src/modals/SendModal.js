@@ -665,6 +665,7 @@ class SendModal extends Component {
                     ? `${this.props.network}.`
                     : ''
                 }etherscan.io/tx/${this.props.txHash}`}
+                rel="noopener noreferrer"
                 target="_blank"
               >
                 {lang.t('modal.tx_verify')}
@@ -739,17 +740,20 @@ const reduxProps = ({ modal, send, account }) => ({
   prices: account.prices,
 });
 
-export default connect(reduxProps, {
-  modalClose,
-  sendModalInit,
-  sendUpdateGasPrice,
-  sendTransaction,
-  sendClearFields,
-  sendUpdateRecipient,
-  sendUpdateNativeAmount,
-  sendUpdateAssetAmount,
-  sendUpdateSelected,
-  sendMaxBalance,
-  sendToggleConfirmationView,
-  notificationShow,
-})(SendModal);
+export default connect(
+  reduxProps,
+  {
+    modalClose,
+    sendModalInit,
+    sendUpdateGasPrice,
+    sendTransaction,
+    sendClearFields,
+    sendUpdateRecipient,
+    sendUpdateNativeAmount,
+    sendUpdateAssetAmount,
+    sendUpdateSelected,
+    sendMaxBalance,
+    sendToggleConfirmationView,
+    notificationShow,
+  },
+)(SendModal);

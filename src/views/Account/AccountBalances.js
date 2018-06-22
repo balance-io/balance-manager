@@ -35,6 +35,7 @@ const StyledRow = styled.div`
   grid-template-columns: 5fr repeat(4, 4fr);
   min-height: 0;
   min-width: 0;
+  cursor: pointer;
   & p {
     display: flex;
     align-items: center;
@@ -92,7 +93,6 @@ const StyledEthereum = styled(StyledRow)`
 
 const StyledTokenWrapper = styled.div`
   border-top: 1px solid rgba(${colors.rowDivider});
-  cursor: pointer;
   width: 100%;
   display: flex;
   flex-direction: column;

@@ -84,61 +84,69 @@ const StyledNewsList = styled.ul`
   }
 `;
 
+const StyledTrivialLink = styled.a`
+  display: block;
+  margin-top: 40px;
+`;
+
+const StyledTrivialLinkImage = styled.img`
+  width: 150px;
+`;
+
 class TokenDetails extends Component {
   render() {
     const { tokenDetails, showTokenDetails } = this.props;
-
     if (!showTokenDetails) return '';
     return (
       <StyledTokenDetailsGrid>
         <StyledTokenDetailsLeft>
-          {tokenDetails.info.description ? (
+          {tokenDetails.description ? (
             <div>
               <StyledHeading>
                 {lang.t('account.details.general_info')}
               </StyledHeading>
-              <StyledText>{tokenDetails.info.description}</StyledText>
+              <StyledText>{tokenDetails.description}</StyledText>
             </div>
           ) : (
             ''
           )}
 
-          {tokenDetails.info.token_count ? (
+          {tokenDetails.token_count ? (
             <div>
               <StyledHeading>
                 {lang.t('account.details.number_of_tokens')}
               </StyledHeading>
-              <StyledText>{tokenDetails.info.token_count}</StyledText>
+              <StyledText>{tokenDetails.token_count}</StyledText>
             </div>
           ) : (
             ''
           )}
 
-          {tokenDetails.info.num_holders_approx ? (
+          {tokenDetails.num_holders_approx ? (
             <div>
               <StyledHeading>
                 {lang.t('account.details.number_of_holders')}
               </StyledHeading>
-              <StyledText>{tokenDetails.info.num_holders_approx}</StyledText>
+              <StyledText>{tokenDetails.num_holders_approx}</StyledText>
             </div>
           ) : (
             ''
           )}
 
-          {tokenDetails.info.address ? (
+          {tokenDetails.address ? (
             <div>
               <StyledHeading>
                 {lang.t('account.details.smart_contract')}
               </StyledHeading>
-              <StyledText>{tokenDetails.info.address}</StyledText>
+              <StyledText>{tokenDetails.address}</StyledText>
             </div>
           ) : (
             ''
           )}
 
-          {tokenDetails.info.links ? (
+          {tokenDetails.links ? (
             <StyledLinksList>
-              {tokenDetails.info.links.map(link => {
+              {tokenDetails.links.map(link => {
                 return (
                   <li key={link.title}>
                     <a
@@ -156,6 +164,10 @@ class TokenDetails extends Component {
           ) : (
             ''
           )}
+
+          <StyledTrivialLink href={tokenDetails.token_page} target="_blank">
+            <StyledTrivialLinkImage src="https://trivial.co/static/for_more_info.png" />
+          </StyledTrivialLink>
         </StyledTokenDetailsLeft>
         <StyledTokenDetailsRight>
           {tokenDetails.price_by_day ? (
@@ -179,13 +191,13 @@ class TokenDetails extends Component {
             ''
           )}
 
-          {tokenDetails.daily_active ? (
+          {tokenDetails.daily_active_by_day ? (
             <StyledDailyActiveChartContainer>
               <StyledHeading>
                 {lang.t('account.details.daily_active')}
               </StyledHeading>
               <ResponsiveContainer>
-                <BarChart data={tokenDetails.daily_active}>
+                <BarChart data={tokenDetails.daily_active_by_day}>
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                   <Bar
                     dataKey="active"
@@ -206,11 +218,11 @@ class TokenDetails extends Component {
           )}
         </StyledTokenDetailsRight>
         <StyledTokenDetailsRow>
-          {tokenDetails.info.last_posts.length > 0 ? (
+          {tokenDetails.last_posts.length > 0 ? (
             <div>
               <StyledHeading>{lang.t('account.details.news')}</StyledHeading>
               <StyledNewsList>
-                {tokenDetails.info.last_posts.map(post => {
+                {tokenDetails.last_posts.map(post => {
                   return (
                     <li key={post.title}>
                       <NewsLink post={post} />

@@ -1,18 +1,20 @@
 import i18next from 'i18next';
 import english from './_english.json';
-import spanish from './_spanish.json';
-import russian from './_russian.json';
-import italian from './_italian.json';
-import german from './_german.json';
 import french from './_french.json';
+import german from './_german.json';
+import italian from './_italian.json';
+import portuguese from './_portuguese.json';
+import russian from './_russian.json';
+import spanish from './_spanish.json';
 
 export const resources = {
   en: english,
-  es: spanish,
-  ru: russian,
-  it: italian,
   de: german,
+  es: spanish,
   fr: french,
+  it: italian,
+  pt: portuguese,
+  ru: russian,
 };
 
 export const updateLanguage = code => i18next.changeLanguage(code);

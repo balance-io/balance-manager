@@ -7,6 +7,7 @@ import {
 import { formatInputDecimals } from '../helpers/bignumber';
 import networkList from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
+const moment = require('moment');
 
 const cryptocompareApiKey = process.env.REACT_APP_CRYPTOCOMPARE_API_KEY || '';
 
@@ -320,3 +321,37 @@ export const apiShapeshiftGetExchangeDetails = ({
     result[inputTwoName] = inputTwo;
     return result;
   });
+
+/**
+ * @desc get info about a token address
+ * @return {Promise}
+ */
+export const apiGetTokenDetails = address => {
+  return axios
+    .get(
+      `https://trivial.co/api/token-information?token_address=${address}&price_chart_data=1&dau_chart_data=1`,
+    )
+    .then(response => {
+      if (response.data.price_by_day) {
+        response.data.price_by_day = response.data.price_by_day.map(price => {
+          return {
+            name: moment(`${price.ymd}`).format('MM/DD'),
+            price: parseFloat(price.value),
+          };
+        });
+      }
+
+      if (response.data.daily_active_by_day) {
+        response.data.daily_active_by_day = response.data.daily_active_by_day.map(
+          active => {
+            return {
+              name: moment(`${active.ymd}`).format('MM/DD'),
+              active: active.value,
+            };
+          },
+        );
+      }
+
+      return response.data;
+    });
+};

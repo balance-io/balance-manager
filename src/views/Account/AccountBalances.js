@@ -5,13 +5,16 @@ import styled from 'styled-components';
 import lang from '../../languages';
 import AssetIcon from '../../components/AssetIcon';
 import ToggleIndicator from '../../components/ToggleIndicator';
+import HoverWrapper from '../../components/HoverWrapper';
+import TokenDetails from '../../components/TokenDetails';
 import { ellipseText } from '../../helpers/utilities';
 import {
   convertStringToNumber,
   hasHighMarketValue,
   hasLowMarketValue,
 } from '../../helpers/bignumber';
-import { colors, fonts, responsive } from '../../styles';
+import { apiGetTokenDetails } from '../../handlers/api';
+import { colors, fonts, shadows, responsive } from '../../styles';
 
 const StyledGrid = styled.div`
   width: 100%;
@@ -32,6 +35,7 @@ const StyledRow = styled.div`
   grid-template-columns: 5fr repeat(4, 4fr);
   min-height: 0;
   min-width: 0;
+  cursor: pointer;
   & p {
     display: flex;
     align-items: center;
@@ -87,6 +91,26 @@ const StyledEthereum = styled(StyledRow)`
   }
 `;
 
+const StyledTokenWrapper = styled.div`
+  border-top: 1px solid rgba(${colors.rowDivider});
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+  z-index: 0;
+  & > div {
+    transition: box-shadow 0.1s ease;
+    border-radius: 0;
+    @media (hover: hover) {
+      &:hover {
+        z-index: 10;
+        box-shadow: ${({ showTokenDetails }) =>
+          showTokenDetails ? `${shadows.big}` : `${shadows.soft}`};
+      }
+    }
+  }
+`;
+
 const StyledToken = styled(StyledRow)`
   width: 100%;
   & > * {
@@ -124,6 +148,11 @@ const StyledAsset = styled.div`
       display: none;
     }
   }
+`;
+
+const StyledTokenDetails = styled.div`
+  height: ${({ showTokenDetails }) => (showTokenDetails ? 'auto' : '0')};
+  background-color: rgb(${colors.white});
 `;
 
 const StyledPercentage = styled.p`
@@ -185,9 +214,25 @@ const StyledShowMoreTokens = styled(StyledToken)`
 
 class AccountBalances extends Component {
   state = {
+    showTokenDetails: null,
+    tokenDetails: {},
     disableToggle: false,
     showMoreTokens: false,
   };
+
+  onShowTokenDetails = address => {
+    if (this.state.showTokenDetails === address) {
+      this.setState({ showTokenDetails: null });
+    } else {
+      apiGetTokenDetails(address).then(tokenDetails => {
+        this.setState({
+          tokenDetails: tokenDetails,
+          showTokenDetails: address,
+        });
+      });
+    }
+  };
+
   onShowMoreTokens = () => {
     this.setState({ showMoreTokens: !this.state.showMoreTokens });
   };
@@ -231,44 +276,76 @@ class AccountBalances extends Component {
           <StyledLabels>{lang.t('account.label_total')}</StyledLabels>
         </StyledLabelsRow>
 
-        <StyledEthereum>
-          <StyledAsset>
-            <AssetIcon asset={ethereum.symbol} />
-            <p>{ethereum.name}</p>
-          </StyledAsset>
-          <p>{ethereum.balance.display}</p>
-          <p>{ethereum.native ? ethereum.native.price.display : '———'}</p>
-          <StyledPercentage
-            percentage={
-              ethereum.native
-                ? convertStringToNumber(ethereum.native.change.amount)
-                : 0
-            }
-          >
-            {ethereum.native ? ethereum.native.change.display : '———'}
-          </StyledPercentage>
-          <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
-        </StyledEthereum>
-        {!!tokensAlwaysDisplay &&
-          tokensAlwaysDisplay.map(token => (
-            <StyledToken key={`${accountInfo.address}-${token.symbol}`}>
+        <StyledTokenWrapper key={`${accountInfo.symbol}-${ethereum.symbol}`}>
+          <HoverWrapper hover={this.state.showTokenDetails === ethereum.symbol}>
+            <StyledEthereum
+              onClick={() => this.onShowTokenDetails(ethereum.symbol)}
+            >
               <StyledAsset>
-                <AssetIcon asset={token.address} />
-                <p>{token.name}</p>
+                <AssetIcon asset={ethereum.symbol} />
+                <p>{ethereum.name}</p>
               </StyledAsset>
-              <p>{token.balance.display}</p>
-              <p>{token.native ? token.native.price.display : '———'}</p>
+              <p>{ethereum.balance.display}</p>
+              <p>{ethereum.native ? ethereum.native.price.display : '———'}</p>
               <StyledPercentage
                 percentage={
-                  token.native
-                    ? convertStringToNumber(token.native.change.amount)
+                  ethereum.native
+                    ? convertStringToNumber(ethereum.native.change.amount)
                     : 0
                 }
               >
-                {token.native ? token.native.change.display : '———'}
+                {ethereum.native ? ethereum.native.change.display : '———'}
               </StyledPercentage>
-              <p>{token.native ? token.native.balance.display : '———'}</p>
-            </StyledToken>
+              <p>{ethereum.native ? ethereum.native.balance.display : '———'}</p>
+            </StyledEthereum>
+          </HoverWrapper>
+          <StyledTokenDetails
+            showTokenDetails={this.state.showTokenDetails === ethereum.symbol}
+          >
+            <TokenDetails
+              showTokenDetails={this.state.showTokenDetails === ethereum.symbol}
+              tokenDetails={this.state.tokenDetails}
+            />
+          </StyledTokenDetails>
+        </StyledTokenWrapper>
+        {!!tokensAlwaysDisplay &&
+          tokensAlwaysDisplay.map(token => (
+            <StyledTokenWrapper key={`${accountInfo.address}-${token.symbol}`}>
+              <HoverWrapper
+                hover={this.state.showTokenDetails === token.address}
+              >
+                <StyledToken
+                  onClick={() => this.onShowTokenDetails(token.address)}
+                >
+                  <StyledAsset>
+                    <AssetIcon asset={token.address} />
+                    <p>{token.name}</p>
+                  </StyledAsset>
+                  <p>{token.balance.display}</p>
+                  <p>{token.native ? token.native.price.display : '———'}</p>
+                  <StyledPercentage
+                    percentage={
+                      token.native
+                        ? convertStringToNumber(token.native.change.amount)
+                        : 0
+                    }
+                  >
+                    {token.native ? token.native.change.display : '———'}
+                  </StyledPercentage>
+                  <p>{token.native ? token.native.balance.display : '———'}</p>
+                </StyledToken>
+              </HoverWrapper>
+              <StyledTokenDetails
+                showTokenDetails={this.state.showTokenDetails === token.address}
+              >
+                <TokenDetails
+                  showTokenDetails={
+                    this.state.showTokenDetails === token.address
+                  }
+                  tokenDetails={this.state.tokenDetails}
+                />
+              </StyledTokenDetails>
+            </StyledTokenWrapper>
           ))}
         {!!tokensToggleDisplay.length &&
           this.state.showMoreTokens &&

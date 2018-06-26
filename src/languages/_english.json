@@ -53,7 +53,16 @@
       "tx_pending": "Pending",
       "show_all": "Show all",
       "show_less": "Show less",
-      "unknown_token": "Unknown Token"
+      "unknown_token": "Unknown Token",
+      "details": {
+        "general_info": "General info",
+        "number_of_tokens": "Number of tokens",
+        "number_of_holders": "Number of holders",
+        "news": "News",
+        "smart_contract": "Token smart contract",
+        "daily_active": "Daily active users (Last 30 days)",
+        "price_chart": "Price chart"
+      }
     },
     "button": {
       "connect_walletconnect": "Use WalletConnect",

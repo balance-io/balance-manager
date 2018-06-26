@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
+* Added Brazilian language translation #276
+* Added portuguese translation
+
 ### Changed
 
 ### Removed

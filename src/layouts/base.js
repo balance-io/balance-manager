@@ -297,11 +297,14 @@ const reduxProps = ({ account, ledger, trezor, metamask, warning }) => ({
   online: warning.online,
 });
 
-export default connect(reduxProps, {
-  ledgerUpdateNetwork,
-  trezorUpdateNetwork,
-  accountChangeNativeCurrency,
-  accountUpdateAccountAddress,
-  modalOpen,
-  accountChangeLanguage,
-})(BaseLayout);
+export default connect(
+  reduxProps,
+  {
+    ledgerUpdateNetwork,
+    trezorUpdateNetwork,
+    accountChangeNativeCurrency,
+    accountUpdateAccountAddress,
+    modalOpen,
+    accountChangeLanguage,
+  },
+)(BaseLayout);

@@ -811,6 +811,7 @@ class ExchangeModal extends Component {
                       ? `${this.props.network}.`
                       : ''
                   }etherscan.io/tx/${this.props.txHash}`}
+                  rel="noopener noreferrer"
                   target="_blank"
                 >
                   {lang.t('modal.tx_verify')}
@@ -914,19 +915,22 @@ const reduxProps = ({ modal, exchange, account }) => ({
   fetchingShapeshift: account.fetchingShapeshift,
 });
 
-export default connect(reduxProps, {
-  modalClose,
-  exchangeClearFields,
-  exchangeModalInit,
-  exchangeSendTransaction,
-  exchangeUpdateWithdrawalAmount,
-  exchangeUpdateWithdrawalNative,
-  exchangeUpdateDepositAmount,
-  exchangeUpdateDepositSelected,
-  exchangeUpdateWithdrawalSelected,
-  exchangeToggleConfirmationView,
-  exchangeConfirmTransaction,
-  exchangeToggleWithdrawalNative,
-  exchangeMaxBalance,
-  notificationShow,
-})(ExchangeModal);
+export default connect(
+  reduxProps,
+  {
+    modalClose,
+    exchangeClearFields,
+    exchangeModalInit,
+    exchangeSendTransaction,
+    exchangeUpdateWithdrawalAmount,
+    exchangeUpdateWithdrawalNative,
+    exchangeUpdateDepositAmount,
+    exchangeUpdateDepositSelected,
+    exchangeUpdateWithdrawalSelected,
+    exchangeToggleConfirmationView,
+    exchangeConfirmTransaction,
+    exchangeToggleWithdrawalNative,
+    exchangeMaxBalance,
+    notificationShow,
+  },
+)(ExchangeModal);

@@ -28,6 +28,8 @@ const StyledLightbox = styled.div`
   visibility: ${({ modal }) => (modal ? 'visible' : 'hidden')};
   pointer-events: ${({ modal }) => (modal ? 'auto' : 'none')};
   background: rgba(${colors.dark}, 0.2);
+  overflow-x: hidden;
+  overflow-y: ${({ modal }) => (modal ? 'auto' : 'hidden')};
 `;
 
 const StyledHitbox = styled.div`
@@ -40,9 +42,7 @@ const StyledHitbox = styled.div`
 
 const StyledContainer = styled.div`
   position: relative;
-  width: 100%;
-  height: 100%;
-  padding: 15px;
+  margin: 15px auto;
   display: flex;
   align-items: center;
   justify-content: center;

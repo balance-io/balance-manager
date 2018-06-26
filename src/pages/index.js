@@ -126,12 +126,6 @@ const MetamaskLogoText = styled(LogoText)`
   margin: 0 20px 0 196px;
 `;
 
-const StyledSubscribeForm = styled(SubscribeForm)`
-  @media screen and (${responsive.sm.max}) {
-    margin-top: 28px;
-  }
-`;
-
 const TrezorLogo = styled.div`
   background-image: url(${trezorLogoImage});
   background-repeat: no-repeat;

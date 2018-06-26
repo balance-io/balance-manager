@@ -131,6 +131,7 @@
       "failed_request": "Failed request, please refresh",
       "failed_ledger_connection": "Failed to connect to Ledger, please check your device",
       "failed_trezor_connection": "Failed to connect to Trezor, please check your device",
+      "failed_trezor_popup_blocked": "Please allow popups on Balance to use your Trezor",
       "no_transactions": "No transactions found for this account",
       "no_unique_tokens": "No unique tokens found for this account",
       "no_interactions": "No interactions found for this account",

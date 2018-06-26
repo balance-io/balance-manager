@@ -3,6 +3,7 @@ import brazilian from './_brazilian.json';
 import english from './_english.json';
 import french from './_french.json';
 import german from './_german.json';
+import czech from './_czech.json';
 import italian from './_italian.json';
 import portuguese from './_portuguese.json';
 import russian from './_russian.json';
@@ -16,6 +17,7 @@ export const resources = {
   es: spanish,
   fr: french,
   it: italian,
+  cz: czech,
   pt: portuguese,
   ru: russian,
   pl: polish,

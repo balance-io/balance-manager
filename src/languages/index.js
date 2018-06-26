@@ -1,6 +1,7 @@
 import i18next from 'i18next';
 import brazilian from './_brazilian.json';
 import english from './_english.json';
+import french from './_french.json';
 import german from './_german.json';
 import italian from './_italian.json';
 import portuguese from './_portuguese.json';
@@ -13,6 +14,7 @@ export const resources = {
   br: brazilian,
   de: german,
   es: spanish,
+  fr: french,
   it: italian,
   pt: portuguese,
   ru: russian,

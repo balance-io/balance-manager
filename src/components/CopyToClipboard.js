@@ -181,4 +181,7 @@ CopyToClipboard.propTypes = {
   text: PropTypes.string.isRequired,
 };
 
-export default connect(null, { notificationShow })(CopyToClipboard);
+export default connect(
+  null,
+  { notificationShow },
+)(CopyToClipboard);

@@ -8,7 +8,7 @@ let timeoutHide;
 export const notificationShow = (message, error = false) => dispatch => {
   clearTimeout(timeoutHide);
   dispatch({ type: NOTIFICATION_SHOW, payload: { message, error } });
-  timeoutHide = setTimeout(() => dispatch({ type: NOTIFICATION_HIDE }), 3000);
+  timeoutHide = setTimeout(() => dispatch({ type: NOTIFICATION_HIDE }), 15000);
 };
 
 // -- Reducer --------------------------------------------------------------- //

@@ -176,7 +176,7 @@ class SubscribeForm extends Component {
           onChange={this.onChange}
         />
         <StyledSubmit
-          disabled={!this.state.input}
+          disabled={!isValidEmail(this.state.input)}
           color="blue"
           hoverColor="blueHover"
           activeColor="blueActive"

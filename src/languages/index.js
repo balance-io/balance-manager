@@ -17,7 +17,6 @@ export const resources = {
   es: spanish,
   fr: french,
   it: italian,
-  de: german,
   cz: czech,
   pt: portuguese,
   ru: russian,

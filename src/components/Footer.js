@@ -63,9 +63,19 @@ const Footer = () => (
     <TextField>
       <Header>{lang.t('message.opensea_header')}</Header>
       <Text>
-        <Link href="https://opensea.io/" target="_blank" rel="noopener noreferrer">OpenSea</Link>
+        <Link
+          href="https://opensea.io/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          OpenSea
+        </Link>
         {lang.t('message.opensea_footer')}
-        <LinkFat href="https://opensea.io/about" target="_blank" rel="noopener noreferrer">
+        <LinkFat
+          href="https://opensea.io/about"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {lang.t('button.learn_more')}
         </LinkFat>
       </Text>

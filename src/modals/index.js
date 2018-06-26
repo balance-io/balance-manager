@@ -2,15 +2,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+
 import Column from '../components/Column';
+
 import ExchangeModal from './ExchangeModal';
 import SendModal from './SendModal';
 import ReceiveModal from './ReceiveModal';
-import DonationModal from './DonationModal';
+import DonateModal from './DonateModal';
 import WalletConnectModal from './WalletConnectModal';
 import { modalClose } from '../reducers/_modal';
 import { sendClearFields } from '../reducers/_send';
 import { exchangeClearFields } from '../reducers/_exchange';
+
 import { colors, transitions } from '../styles';
 
 const StyledLightbox = styled.div`
@@ -45,7 +48,18 @@ const StyledContainer = styled.div`
   justify-content: center;
 `;
 
+const reduxProps = ({ modal }) => ({
+  modal: modal.modal,
+});
+
 class Modal extends Component {
+  propTypes = {
+    modalClose: PropTypes.func.isRequired,
+    sendClearFields: PropTypes.func.isRequired,
+    exchangeClearFields: PropTypes.func.isRequired,
+    modal: PropTypes.string.isRequired,
+  };
+
   modalController = () => {
     switch (this.props.modal) {
       case 'EXCHANGE_MODAL':
@@ -53,7 +67,7 @@ class Modal extends Component {
       case 'SEND_MODAL':
         return <SendModal />;
       case 'DONATION_MODAL':
-        return <DonationModal />;
+        return <DonateModal />;
       case 'RECEIVE_MODAL':
         return <ReceiveModal />;
       case 'WALLET_CONNECT':
@@ -62,18 +76,22 @@ class Modal extends Component {
         return <div />;
     }
   };
+
   onClose = () => {
     this.props.sendClearFields();
     this.props.exchangeClearFields();
     this.props.modalClose();
   };
+
   render = () => {
     const body = document.body || document.getElementsByTagName('body')[0];
+
     if (this.props.modal) {
       body.style.overflow = 'hidden';
     } else {
       body.style.overflow = 'auto';
     }
+
     return (
       <StyledLightbox modal={this.props.modal}>
         <StyledContainer>
@@ -85,19 +103,11 @@ class Modal extends Component {
   };
 }
 
-Modal.propTypes = {
-  modalClose: PropTypes.func.isRequired,
-  sendClearFields: PropTypes.func.isRequired,
-  exchangeClearFields: PropTypes.func.isRequired,
-  modal: PropTypes.string.isRequired,
-};
-
-const reduxProps = ({ modal }) => ({
-  modal: modal.modal,
-});
-
-export default connect(reduxProps, {
-  modalClose,
-  sendClearFields,
-  exchangeClearFields,
-})(Modal);
+export default connect(
+  reduxProps,
+  {
+    modalClose,
+    sendClearFields,
+    exchangeClearFields,
+  },
+)(Modal);

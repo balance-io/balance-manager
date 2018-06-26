@@ -125,14 +125,16 @@ class TabMenu extends Component {
       activeTab: 'BALANCES_TAB',
       activeLang: 'en',
       tabPosition: 0,
-      tabWidth: 0
+      tabWidth: 0,
     };
   }
 
   componentDidMount() {
     this.setState({
-      tabWidth: ReactDOM.findDOMNode(this.refs.balancesTab).getBoundingClientRect().width - 40,
-      tabPosition: 24
+      tabWidth:
+        ReactDOM.findDOMNode(this.refs.balancesTab).getBoundingClientRect()
+          .width - 40,
+      tabPosition: 24,
     });
   }
 
@@ -146,19 +148,47 @@ class TabMenu extends Component {
 
     switch (tabRoute) {
       case '/':
-        newState = { activeTab: 'BALANCES_TAB', activeLang: i18next.language, tabWidth: ReactDOM.findDOMNode(this.refs.balancesTab).getBoundingClientRect().width - 40, tabPosition: 24};
+        newState = {
+          activeTab: 'BALANCES_TAB',
+          activeLang: i18next.language,
+          tabWidth:
+            ReactDOM.findDOMNode(this.refs.balancesTab).getBoundingClientRect()
+              .width - 40,
+          tabPosition: 24,
+        };
         break;
       case '/transactions':
-        newState = { activeTab: 'TRANSACTIONS_TAB', activeLang: i18next.language, tabWidth: ReactDOM.findDOMNode(this.refs.transactionsTab).getBoundingClientRect().width - 40, tabPosition: ReactDOM.findDOMNode(this.refs.transactionsTab).offsetLeft + 24};
+        newState = {
+          activeTab: 'TRANSACTIONS_TAB',
+          activeLang: i18next.language,
+          tabWidth:
+            ReactDOM.findDOMNode(
+              this.refs.transactionsTab,
+            ).getBoundingClientRect().width - 40,
+          tabPosition:
+            ReactDOM.findDOMNode(this.refs.transactionsTab).offsetLeft + 24,
+        };
         break;
       case '/uniquetokens':
-        newState = { activeTab: 'UNIQUETOKENS_TAB', activeLang: i18next.language, tabWidth: ReactDOM.findDOMNode(this.refs.uniqueTokensTab).getBoundingClientRect().width - 40, tabPosition: ReactDOM.findDOMNode(this.refs.uniqueTokensTab).offsetLeft + 24};
+        newState = {
+          activeTab: 'UNIQUETOKENS_TAB',
+          activeLang: i18next.language,
+          tabWidth:
+            ReactDOM.findDOMNode(
+              this.refs.uniqueTokensTab,
+            ).getBoundingClientRect().width - 40,
+          tabPosition:
+            ReactDOM.findDOMNode(this.refs.uniqueTokensTab).offsetLeft + 24,
+        };
         break;
       default:
         break;
     }
 
-    if (this.state.activeTab !== newState.activeTab || this.state.activeLang !== i18next.language) {
+    if (
+      this.state.activeTab !== newState.activeTab ||
+      this.state.activeLang !== i18next.language
+    ) {
       this.setState(newState);
     }
   }
@@ -166,7 +196,10 @@ class TabMenu extends Component {
   render() {
     return (
       <StyledTabMenu>
-        <StyledTabBackground position={this.state.tabPosition} width={this.state.tabWidth}/>
+        <StyledTabBackground
+          position={this.state.tabPosition}
+          width={this.state.tabWidth}
+        />
         <StyledTabsWrapper>
           <Link to={this.props.match.url}>
             <StyledTab

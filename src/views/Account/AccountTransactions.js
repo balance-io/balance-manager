@@ -223,6 +223,7 @@ class AccountViewTransactions extends Component {
     showTxDetails: null,
     showAllTransactions: false,
   };
+
   onShowTxDetails = hash => {
     if (this.state.showTxDetails === hash) {
       this.setState({ showTxDetails: null });
@@ -230,12 +231,22 @@ class AccountViewTransactions extends Component {
       this.setState({ showTxDetails: hash });
     }
   };
+
   onShowAllTransactions = () =>
     this.setState({ showAllTransactions: !this.state.showAllTransactions });
 
-  componentDidMount() {
-    this.props.accountUpdateHasPendingTransaction(false);
-  }
+  componentDidMount = () => this.resetPendingTransaction();
+  componentDidUpdate = () => this.resetPendingTransaction();
+
+  resetPendingTransaction = () => {
+    // If the user was routed to the '/transactions' route/tab because they
+    // had a pending transaction, reset the hasPendingTransaction state to false now that
+    // the Transactions tab has loaded, and the pending transaction has
+    // been made visible to the user
+    if (this.props.hasPendingTransaction) {
+      this.props.accountUpdateHasPendingTransaction(false);
+    }
+  };
 
   render = () => {
     const {
@@ -460,12 +471,13 @@ class AccountViewTransactions extends Component {
 }
 
 AccountViewTransactions.propTypes = {
-  accountUpdateHasPendingTransaction: PropTypes.func.isRequired,
-  transactions: PropTypes.array.isRequired,
-  fetchingTransactions: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
-  network: PropTypes.string.isRequired,
+  accountUpdateHasPendingTransaction: PropTypes.func.isRequired,
+  fetchingTransactions: PropTypes.bool.isRequired,
+  hasPendingTransaction: PropTypes.bool,
   nativeCurrency: PropTypes.string.isRequired,
+  network: PropTypes.string.isRequired,
+  transactions: PropTypes.array.isRequired,
 };
 
 const reduxProps = ({ account }) => ({
@@ -477,6 +489,9 @@ const reduxProps = ({ account }) => ({
   nativeCurrency: account.nativeCurrency,
 });
 
-export default connect(reduxProps, {
-  accountUpdateHasPendingTransaction,
-})(AccountViewTransactions);
+export default connect(
+  reduxProps,
+  {
+    accountUpdateHasPendingTransaction,
+  },
+)(AccountViewTransactions);

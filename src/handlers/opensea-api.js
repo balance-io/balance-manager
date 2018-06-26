@@ -11,9 +11,8 @@ const api = axios.create({
   baseURL: 'https://api.opensea.io/api/v1',
   timeout: 30000, // 30 secs
   headers: {
-    'Content-Type': 'application/json',
     Accept: 'application/json',
-    'X_API_KEY': openseaApiKey,
+    'X-API-KEY': openseaApiKey,
   },
 });
 

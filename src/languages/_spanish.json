@@ -11,6 +11,12 @@
         "link_title": "Compra un Ledger hardware wallet",
         "button": "Conectar Ledger"
       },
+      "connect_trezor": {
+        "description": "Conéctate y firma tus transacciones con tu ",
+        "link_text": "Trezor Wallet",
+        "link_title": "Compra un Trezor hardware wallet",
+        "button": "Conectar Trezor"
+      },
       "connect_walletconnect": {
         "description": "Conéctate y firmat con tu wallet móvil de WalletConnect.",
         "button": "Conectar Wallet Connect"
@@ -112,9 +118,11 @@
       "click_to_copy_to_clipboard": "Haz clic para copiar al clipboard",
       "failed_request": "Solicitud fallida, por favor refrescar",
       "failed_ledger_connection": "Error al conectar a Ledger, por favor verifica tu dispositivo",
+      "failed_trezor_connection": "Error al conectar a Trezor, por favor verifica tu dispositivo",
       "no_transactions": "No se encontraron transacciones para esta cuenta",
       "no_interactions": "No se encontraron interacciones para esta cuenta",
       "please_connect_ledger": "Por favor conecta y desbloquea Ledger y luego selecciona Ethereum",
+      "please_connect_trezor": "Por favor conecta y desbloquea Trezor y luego selecciona Ethereum",
       "exchange_not_available": "Intercambio no está disponible en su área",
       "learn_more": "Aprende más"
     },

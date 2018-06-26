@@ -12,10 +12,10 @@
         "button": "Połącz z Ledger"
       },
       "connect_trezor": {
-        "description": "Połącz i podpisuj za pomocą",
-        "link_text": "Portfel sprzętowy Trezor",
-        "link_title": "Kup portfel Trezor",
-        "button": "Połącz z Trezor"
+        "description": "Połącz i podpisuj za pomocą ",
+        "link_text": "Portfel sprzętowy Trezor ",
+        "link_title": "Kup portfel Trezor ",
+        "button": "Połącz z Trezor "
       },
       "connect_walletconnect": "Podłącz i podpisz za pomocą WalletConnect-wspierającego portfela mobilnego.",
       "coming_soon": "Dostępne wkrótce."

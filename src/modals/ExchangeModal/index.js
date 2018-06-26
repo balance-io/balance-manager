@@ -2,18 +2,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import lang from '../languages';
-import Card from '../components/Card';
-import Input from '../components/Input';
-import AccountType from '../components/AccountType';
-import LineBreak from '../components/LineBreak';
-import DropdownAsset from '../components/DropdownAsset';
-import Button from '../components/Button';
-import Form from '../components/Form';
-import AssetIcon from '../components/AssetIcon';
-import exchangeIcon from '../assets/exchange-icon.svg';
-import arrowUp from '../assets/arrow-up.svg';
-import { modalClose } from '../reducers/_modal';
+import lang from '../../languages';
+import Card from '../../components/Card';
+import Input from '../../components/Input';
+import LineBreak from '../../components/LineBreak';
+import AccountType from '../../components/AccountType';
+import AssetIcon from '../../components/AssetIcon';
+import DropdownAsset from '../../components/DropdownAsset';
+import Button from '../../components/Button';
+import Form from '../../components/Form';
+import exchangeIcon from '../../assets/exchange-icon.svg';
+import arrowUp from '../../assets/arrow-up.svg';
+import { modalClose } from '../../reducers/_modal';
 import {
   exchangeClearFields,
   exchangeModalInit,
@@ -27,8 +27,8 @@ import {
   exchangeConfirmTransaction,
   exchangeToggleWithdrawalNative,
   exchangeMaxBalance,
-} from '../reducers/_exchange';
-import { notificationShow } from '../reducers/_notification';
+} from '../../reducers/_exchange';
+import { notificationShow } from '../../reducers/_notification';
 import {
   convertAmountFromBigNumber,
   convertAmountToDisplay,
@@ -40,10 +40,10 @@ import {
   smallerThan,
   convertAmountToBigNumber,
   handleSignificantDecimals,
-} from '../helpers/bignumber';
-import { getCountdown } from '../helpers/time';
-import { capitalize } from '../helpers/utilities';
-import { fonts, colors, transitions } from '../styles';
+} from '../../helpers/bignumber';
+import { capitalize } from '../../helpers/utilities';
+import { getCountdown } from '../../helpers/time';
+import { fonts, colors, transitions } from '../../styles';
 
 const StyledSuccessMessage = styled.div`
   width: 100%;

@@ -111,7 +111,7 @@ class DonateModal extends Component {
     e.preventDefault();
 
     const data = transactionData(
-      this.props.accountInfo.assets,
+      this.props.accountInfo,
       this.props.assetAmount,
       this.props.gasPrice,
     );

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { fonts } from '../styles';
-const moment = require('moment');
+import { format } from 'date-fns';
 
 const StyledNewsLink = styled.a`
   display: block;
@@ -37,14 +37,20 @@ const StyledHeaderContainer = styled.div`
 class NewsLink extends Component {
   render() {
     const { post } = this.props;
-
     return (
       <StyledNewsLink href={post.url}>
         <StyledHeaderContainer>
-          <img src={`//${post.source.toLowerCase()}.com/favicon.ico`} alt="" />
+          {post.source ? (
+            <img
+              src={`//${post.source.toLowerCase()}.com/favicon.ico`}
+              alt=""
+            />
+          ) : (
+            ''
+          )}
           <h4>
             {post.title} <br />
-            <small>{moment(post.data).format('YYYY-MM-DD hh:mm')}</small>
+            <small>{format(post.date, 'YYYY-MM-DD hh:mm')}</small>
           </h4>
         </StyledHeaderContainer>
       </StyledNewsLink>

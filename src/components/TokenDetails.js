@@ -176,7 +176,10 @@ class TokenDetails extends Component {
                 {lang.t('account.details.price_chart')}
               </StyledHeading>
               <ResponsiveContainer>
-                <BarChart data={tokenDetails.price_by_day}>
+                <BarChart
+                  data={tokenDetails.price_by_day}
+                  margin={{ top: 15, left: 15, right: 15, bottom: 15 }}
+                >
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                   <Bar
                     dataKey="price"
@@ -197,14 +200,17 @@ class TokenDetails extends Component {
                 {lang.t('account.details.daily_active')}
               </StyledHeading>
               <ResponsiveContainer>
-                <BarChart data={tokenDetails.daily_active_by_day}>
+                <BarChart
+                  data={tokenDetails.daily_active_by_day}
+                  margin={{ top: 15, left: 15, right: 15, bottom: 15 }}
+                >
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                   <Bar
                     dataKey="active"
                     fill={`rgb(${colors.grey})`}
                     label={{
                       position: 'top',
-                      fontSize: 10,
+                      fontSize: 8,
                       angle: -90,
                       offset: 20,
                     }}

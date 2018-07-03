@@ -7,7 +7,7 @@ import {
 import { formatInputDecimals } from '../helpers/bignumber';
 import networkList from '../references/ethereum-networks.json';
 import nativeCurrencies from '../references/native-currencies.json';
-const moment = require('moment');
+import { format } from 'date-fns';
 
 const cryptocompareApiKey = process.env.REACT_APP_CRYPTOCOMPARE_API_KEY || '';
 
@@ -335,7 +335,7 @@ export const apiGetTokenDetails = address => {
       if (response.data.price_by_day) {
         response.data.price_by_day = response.data.price_by_day.map(price => {
           return {
-            name: moment(`${price.ymd}`).format('MM/DD'),
+            name: format(price.ymd.toString(), 'MM/DD'),
             price: parseFloat(price.value),
           };
         });
@@ -345,7 +345,7 @@ export const apiGetTokenDetails = address => {
         response.data.daily_active_by_day = response.data.daily_active_by_day.map(
           active => {
             return {
-              name: moment(`${active.ymd}`).format('MM/DD'),
+              name: format(active.ymd.toString(), 'MM/DD'),
               active: active.value,
             };
           },

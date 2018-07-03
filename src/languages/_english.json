@@ -126,6 +126,8 @@
       "web3_unknown_network": "Unknown network, please switch to another one",
       "page_not_found": "404 Page Not Found",
       "coming_soon": "Coming soon...",
+      "copy": "Copy",
+      "copied": "Copied",
       "click_to_copy_to_clipboard": "Click to copy to clipboard",
       "failed_request": "Failed request, please refresh",
       "failed_ledger_connection": "Failed to connect to Ledger, please check your device",

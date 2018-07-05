@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 
+* Added Greek language translation
 * Added Czech language translation
 * Added Polish language translation
 * Added Brazilian Portuguese language translation #276

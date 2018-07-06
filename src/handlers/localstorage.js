@@ -150,6 +150,14 @@ export const saveSupressReminderRibbon = state => {
   saveLocal('supressreminderribbon', { data: state }, globalSettingsVersion);
 };
 
+export const getAssetList = () => {
+  return getLocal('asset_list', globalSettingsVersion) || {};
+}
+
+export const updateAssetList = (assetList) => {
+  saveLocal('asset_list', assetList, globalSettingsVersion);
+}
+
 /**
  * @desc get wallet connect account
  * @return {Object}

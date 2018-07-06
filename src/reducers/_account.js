@@ -28,6 +28,8 @@ import {
   saveNativeCurrency,
   updateLocalTransactions,
   updateLocalBalances,
+  getAssetList,
+  updateAssetList
 } from '../handlers/localstorage';
 import { web3SetHttpProvider } from '../handlers/web3';
 import { notificationShow } from './_notification';
@@ -93,6 +95,10 @@ const ACCOUNT_SHAPESHIFT_VERIFY_FAILURE =
 
 const ACCOUNT_UPDATE_HAS_PENDING_TRANSACTION =
   'account/ACCOUNT_UPDATE_HAS_PENDING_TRANSACTION';
+
+const ACCOUNT_HIDE_ASSET = 'account/ACCOUNT_HIDE_ASSET';
+
+const ACCOUNT_SHOW_ASSET = 'account/ACCOUNT_SHOW_ASSET';
 
 const ACCOUNT_CHANGE_NATIVE_CURRENCY = 'account/ACCOUNT_CHANGE_NATIVE_CURRENCY';
 
@@ -353,7 +359,7 @@ export const accountGetAccountBalances = () => (dispatch, getState) => {
       cachedAccount = {
         ...cachedAccount,
         assets: accountLocal[network].balances.assets,
-        total: accountLocal[network].balances.total,
+        total: accountLocal[network].balances.total
       };
     }
     if (accountLocal[network].type && !cachedAccount.type) {
@@ -436,6 +442,26 @@ export const accountUpdateBalances = () => (dispatch, getState) => {
       dispatch(notificationShow(message, true));
       dispatch({ type: ACCOUNT_UPDATE_BALANCES_FAILURE });
     });
+};
+
+export const accountHideAsset = address => dispatch => {  
+  const assetList = getAssetList() || {};
+    updateAssetList({
+      visible: _.pull(assetList.visible || [], address),
+      hidden: [...(assetList.hidden || []), address]
+    });
+
+    dispatch({ type: ACCOUNT_HIDE_ASSET, payload: { address } });
+};
+
+export const accountShowAsset = address => dispatch => {
+    const assetList = getAssetList();
+      updateAssetList({
+        visible: [...(assetList.visible || []), address],
+        hidden: _.pull(assetList.hidden || [], address)
+    });
+
+    dispatch({ type: ACCOUNT_SHOW_ASSET, payload: { address } });
 };
 
 export const accountUpdateNetwork = network => dispatch => {
@@ -559,6 +585,8 @@ export const accountClearState = () => dispatch => {
 };
 
 // -- Reducer --------------------------------------------------------------- //
+const assetList = getAssetList();
+
 const INITIAL_STATE = {
   nativePriceRequest: getNativeCurrency() || 'USD',
   nativeCurrency: getNativeCurrency() || 'USD',
@@ -585,6 +613,8 @@ const INITIAL_STATE = {
     ],
     total: '———',
   },
+  hiddenAssets: assetList.hidden || [],
+  visibleAssets: assetList.visible || [],
   transactions: [],
   uniqueTokens: [],
   shapeshiftAvailable: true,
@@ -707,6 +737,18 @@ export default (state = INITIAL_STATE, action) => {
         nativeCurrency: action.payload.nativeCurrency,
         prices: action.payload.prices,
         accountInfo: action.payload.accountInfo,
+      };
+    case ACCOUNT_HIDE_ASSET: 
+      return {
+        ...state,
+        hiddenAssets: [...state.hiddenAssets, action.payload.address],
+        visibleAssets: _.without(state.visibleAssets, action.payload.address)
+      };
+    case ACCOUNT_SHOW_ASSET:
+      return {
+        ...state,
+        hiddenAssets: _.without(state.hiddenAssets, action.payload.address),
+        visibleAssets: [...state.visibleAssets, action.payload.address]
       };
     case ACCOUNT_UPDATE_NETWORK:
       return {

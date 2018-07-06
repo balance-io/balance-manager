@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Ledger affiliate link to wallet selection screen
 * Donate ETH button and modal
 * Input fetching animation
+* Actions that allow user to hide assets they don't want to see on their wallet
 
 
 ### Changed

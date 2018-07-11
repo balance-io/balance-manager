@@ -13,6 +13,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
+## [0.6.1](https://github.com/balance-io/balance-manager/releases/tag/0.6.1)
+
+### Added
+* Added Czech language translation
+* Added Polish language translation
+* Added Brazilian Portuguese language translation #276
+* Added Portuguese translation
+* New util function for transaction prep
+* General componentisation of the modals
+* General improvement to readability/maintainability of the modals
+
+### Changed
+* Changed Shapeshift withdrawal list to default to first item instead of BNT
+* Changed default Ledger addresses shown to 20
+
 ## [0.6.0](https://github.com/balance-io/balance-manager/releases/tag/0.6.0)
 
 ### Added
@@ -36,11 +51,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 * Account interactions tab
+* Duplicative code
 
 ## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 
 ### Added
-
 * Bookmark Reminder (anti-phishing) Ribbon
 * Dropdown on account view for choosing language
 * Link to Ledger support page on Ledger connection page

@@ -12,7 +12,7 @@ import {
  */
 export let ledgerEthInstance = {
   path: "44'/60'/0'/0",
-  length: 5,
+  length: 20,
   accounts: [],
   networkId: 1,
   getTransport: () => TransportU2F.create(),

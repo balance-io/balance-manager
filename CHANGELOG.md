@@ -56,7 +56,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 
 ### Added
-
 * Bookmark Reminder (anti-phishing) Ribbon
 * Dropdown on account view for choosing language
 * Link to Ledger support page on Ledger connection page

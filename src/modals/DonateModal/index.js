@@ -277,6 +277,7 @@ class DonateModal extends Component {
                     <span>{`${lang.t('modal.gas_fee')}: ${calcTxFee(
                       this.props.gasPrices,
                       this.props.gasPriceOption,
+                      this.props.nativeCurrency,
                     )}`}</span>
                   </StyledParagraph>
 

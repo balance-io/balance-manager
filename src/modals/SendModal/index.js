@@ -36,7 +36,10 @@ import {
 import { notificationShow } from '../../reducers/_notification';
 
 import { isValidAddress } from '../../helpers/validators';
-import { greaterThan } from '../../helpers/bignumber';
+import {
+  convertAmountFromBigNumber,
+  greaterThan,
+} from '../../helpers/bignumber';
 
 import {
   capitalize,
@@ -190,20 +193,23 @@ class SendModal extends Component {
           return;
         }
       } else {
-        const { requestedAmount, balance, amountWithFees } = transactionData(
+        const { requestedAmount, balance, txFee } = transactionData(
           this.props.accountInfo,
           this.props.assetAmount,
           this.props.gasPrice,
         );
 
-        if (greaterThan(requestedAmount, balance)) {
+        const tokenBalanceAmount = this.props.selected.balance.amount;
+        const tokenBalance = convertAmountFromBigNumber(tokenBalanceAmount);
+
+        if (greaterThan(requestedAmount, tokenBalance)) {
           this.props.notificationShow(
             lang.t('notification.error.insufficient_balance'),
             true,
           );
 
           return;
-        } else if (greaterThan(amountWithFees, balance)) {
+        } else if (greaterThan(txFee, balance)) {
           this.props.notificationShow(
             lang.t('notification.error.insufficient_for_fees'),
             true,
@@ -399,6 +405,7 @@ class SendModal extends Component {
                     <span>{`${lang.t('modal.gas_fee')}: ${calcTxFee(
                       this.props.gasPrices,
                       this.props.gasPriceOption,
+                      this.props.nativeCurrency,
                     )}`}</span>
                   </StyledParagraph>
 

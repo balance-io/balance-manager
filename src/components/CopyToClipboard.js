@@ -150,4 +150,7 @@ CopyToClipboard.defaultProps = {
   iconOnHover: false,
 };
 
-export default connect(null, { notificationShow })(CopyToClipboard);
+export default connect(
+  null,
+  { notificationShow },
+)(CopyToClipboard);

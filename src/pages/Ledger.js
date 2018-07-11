@@ -121,6 +121,9 @@ const reduxProps = ({ account, ledger }) => ({
   fetching: ledger.fetching,
 });
 
-export default connect(reduxProps, {
-  ledgerConnectInit,
-})(Ledger);
+export default connect(
+  reduxProps,
+  {
+    ledgerConnectInit,
+  },
+)(Ledger);

@@ -41,7 +41,7 @@
   },
   "scripts": {
     "remove-sourcemaps": "rm -rf build/static/js/*.map",
-    "start": "HTTPS=true NODE_ENV=development react-scripts start",
+    "start": "cross-env HTTPS=true NODE_ENV=development react-scripts start",
     "build": "react-scripts build",
     "build:lambda": "netlify-lambda build src/lambda",
     "test": "react-scripts test --env=jsdom",
@@ -59,6 +59,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",
+    "cross-env": "^5.2.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-react-app": "^2.1.0",
     "eslint-plugin-flowtype": "^2.46.1",

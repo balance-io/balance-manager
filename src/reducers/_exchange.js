@@ -539,16 +539,31 @@ export const exchangeModalInit = () => (dispatch, getState) => {
       const depositAssets = accountInfo.assets.filter(
         asset => availableSymbols.indexOf(asset.symbol) !== -1,
       );
+      const withdrawalSelected = withdrawalAssets[0];
       dispatch({
         type: EXCHANGE_GET_AVAILABLE_SUCCESS,
         payload: {
           withdrawalAssets,
           depositAssets,
-          withdrawalSelected: withdrawalAssets[1],
+          withdrawalSelected,
         },
       });
+
       dispatch(exchangeGetGasPrices());
       dispatch(exchangeGetWithdrawalPrice());
+
+      apiShapeshiftSendAmount({
+        depositSymbol: depositSelected.symbol,
+        withdrawalSymbol: withdrawalSelected.symbol,
+        withdrawalAmount: '0.5',
+      })
+        .then(({ data }) => {
+          dispatch(exchangeUpdateExchangeDetails(data.success));
+        })
+        .catch(error => {
+          const message = parseError(error);
+          dispatch(notificationShow(message, true));
+        });
     })
     .catch(error => {
       const message = parseError(error);
@@ -697,20 +712,6 @@ export const exchangeToggleWithdrawalNative = bool => (dispatch, getState) => {
 
 export const exchangeClearFields = () => (dispatch, getState) => {
   dispatch({ type: EXCHANGE_CLEAR_FIELDS });
-  const { shapeshiftAvailable } = getState().account;
-  if (!shapeshiftAvailable) return;
-  apiShapeshiftSendAmount({
-    depositSymbol: 'ETH',
-    withdrawalSymbol: 'BNT',
-    withdrawalAmount: '0.5',
-  })
-    .then(({ data }) => {
-      dispatch(exchangeUpdateExchangeDetails(data.success));
-    })
-    .catch(error => {
-      const message = parseError(error);
-      dispatch(notificationShow(message, true));
-    });
 };
 
 // -- Reducer --------------------------------------------------------------- //

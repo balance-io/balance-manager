@@ -65,7 +65,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 
 ### Changed
-
 * Layout padding definition locations
 * Fix mobile layout on the wallet selection screen (#232)
 * Update spanish translation with consistent voice (tu vs usted)

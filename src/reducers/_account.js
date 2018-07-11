@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import lang, { updateLanguage } from '../languages';
 import {
-  apiShapeshiftSendAmount,
+  apiShapeshiftGetCoins,
   apiShapeshiftGetDepositStatus,
   apiGetAccountBalances,
   apiGetAccountTransactions,
@@ -451,14 +451,9 @@ export const accountShapeshiftVerify = () => dispatch => {
   dispatch({
     type: ACCOUNT_SHAPESHIFT_VERIFY_REQUEST,
   });
-  apiShapeshiftSendAmount({
-    depositSymbol: 'ETH',
-    withdrawalSymbol: 'BNT',
-    withdrawalAmount: '0.5',
-  })
+  apiShapeshiftGetCoins()
     .then(({ data }) => {
       dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS });
-      dispatch(exchangeUpdateExchangeDetails(data.success));
     })
     .catch(() => dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_FAILURE }));
 };

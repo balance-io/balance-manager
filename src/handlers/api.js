@@ -207,6 +207,12 @@ const shapeshift = axios.create({
 });
 
 /**
+ * @desc shapeshift get coins
+ * @return {Promise}
+ */
+export const apiShapeshiftGetCoins = () => shapeshift.get('/getcoins');
+
+/**
  * @desc shapeshift get market info
  * @param  {String}   [pair = '']
  * @return {Promise}
@@ -295,9 +301,9 @@ export const apiShapeshiftSendAmount = async ({
  */
 export const apiShapeshiftGetExchangeDetails = ({
   request = {
-    depositSymbol: 'ETH',
-    withdrawalSymbol: 'BNT',
-    withdrawalAmount: '0.5',
+    depositSymbol: '',
+    withdrawalSymbol: '',
+    withdrawalAmount: '',
   },
   inputOne = '',
   inputTwo = '',

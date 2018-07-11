@@ -79,7 +79,7 @@ const reduxProps = ({ modal, send, account }) => ({
 });
 
 class SendModal extends Component {
-  propTypes = {
+  static propTypes = {
     sendModalInit: PropTypes.func.isRequired,
     sendUpdateGasPrice: PropTypes.func.isRequired,
     sendTransaction: PropTypes.func.isRequired,

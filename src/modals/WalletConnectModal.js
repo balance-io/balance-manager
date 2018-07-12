@@ -81,9 +81,12 @@ const reduxProps = ({ modal, walletconnect }) => ({
   qrcode: walletconnect.qrcode,
 });
 
-export default connect(reduxProps, {
-  modalClose,
-  walletConnectModalInit,
-  walletConnectGetSession,
-  walletConnectClearFields,
-})(WalletConnectModal);
+export default connect(
+  reduxProps,
+  {
+    modalClose,
+    walletConnectModalInit,
+    walletConnectGetSession,
+    walletConnectClearFields,
+  },
+)(WalletConnectModal);

@@ -13,6 +13,7 @@ import ToggleIndicator from '../../components/ToggleIndicator';
 import TransactionStatus from '../../components/TransactionStatus';
 import etherscanLogo from '../../assets/etherscan-logo.svg';
 import ethplorerLogo from '../../assets/ethplorer-logo.svg';
+import { accountUpdateHasPendingTransaction } from '../../reducers/_account';
 import { getLocalTimeDate } from '../../helpers/time';
 import { colors, fonts, shadows, responsive } from '../../styles';
 
@@ -222,6 +223,7 @@ class AccountViewTransactions extends Component {
     showTxDetails: null,
     showAllTransactions: false,
   };
+
   onShowTxDetails = hash => {
     if (this.state.showTxDetails === hash) {
       this.setState({ showTxDetails: null });
@@ -229,8 +231,22 @@ class AccountViewTransactions extends Component {
       this.setState({ showTxDetails: hash });
     }
   };
+
   onShowAllTransactions = () =>
     this.setState({ showAllTransactions: !this.state.showAllTransactions });
+
+  componentDidMount = () => this.resetPendingTransaction();
+  componentDidUpdate = () => this.resetPendingTransaction();
+
+  resetPendingTransaction = () => {
+    // If the user was routed to the '/transactions' route/tab because they
+    // had a pending transaction, reset the hasPendingTransaction state to false now that
+    // the Transactions tab has loaded, and the pending transaction has
+    // been made visible to the user
+    if (this.props.hasPendingTransaction) {
+      this.props.accountUpdateHasPendingTransaction(false);
+    }
+  };
 
   render = () => {
     const {
@@ -316,7 +332,13 @@ class AccountViewTransactions extends Component {
                                 : lang.t('account.tx_from').toUpperCase()}
                           </strong>
                         </p>
-                        <p>{tx.from === accountAddress ? tx.to : tx.from}</p>
+                        <p>
+                          {tx.from === accountAddress
+                            ? tx.to
+                            : tx.from
+                              ? tx.from
+                              : lang.t('account.tx_pending')}
+                        </p>
                       </div>
                     </div>
                     <div>
@@ -326,7 +348,11 @@ class AccountViewTransactions extends Component {
                             {lang.t('account.tx_fee').toUpperCase()}
                           </strong>
                         </p>
-                        <p>{`${tx.txFee.display} ≈ ${
+                        <p>{`${
+                          tx.txFee && tx.txFee.display
+                            ? tx.txFee.display
+                            : '———'
+                        } ≈ ${
                           tx.native &&
                           tx.native[nativeCurrency] &&
                           tx.native[nativeCurrency].txFee
@@ -360,7 +386,11 @@ class AccountViewTransactions extends Component {
                             {lang.t('account.tx_hash').toUpperCase()}
                           </strong>
                         </p>
-                        <p>{tx.hash.replace(/-.*/g, '')}</p>
+                        <p>
+                          {tx.hash.startsWith('shapeshift')
+                            ? lang.t('account.tx_pending')
+                            : tx.hash.replace(/-.*/g, '')}
+                        </p>
                       </div>
                     </div>
 
@@ -374,6 +404,7 @@ class AccountViewTransactions extends Component {
                       >
                         <ButtonCustom
                           left
+                          disabled={tx.hash.startsWith('shapeshift')}
                           txtColor="etherscan"
                           img={etherscanLogo}
                         >
@@ -390,7 +421,10 @@ class AccountViewTransactions extends Component {
                       >
                         <ButtonCustom
                           left
-                          disabled={network !== 'mainnet'}
+                          disabled={
+                            network !== 'mainnet' ||
+                            tx.hash.startsWith('shapeshift')
+                          }
                           txtColor="ethplorer"
                           img={ethplorerLogo}
                         >
@@ -437,11 +471,13 @@ class AccountViewTransactions extends Component {
 }
 
 AccountViewTransactions.propTypes = {
-  transactions: PropTypes.array.isRequired,
-  fetchingTransactions: PropTypes.bool.isRequired,
   account: PropTypes.object.isRequired,
-  network: PropTypes.string.isRequired,
+  accountUpdateHasPendingTransaction: PropTypes.func.isRequired,
+  fetchingTransactions: PropTypes.bool.isRequired,
+  hasPendingTransaction: PropTypes.bool,
   nativeCurrency: PropTypes.string.isRequired,
+  network: PropTypes.string.isRequired,
+  transactions: PropTypes.array.isRequired,
 };
 
 const reduxProps = ({ account }) => ({
@@ -453,4 +489,9 @@ const reduxProps = ({ account }) => ({
   nativeCurrency: account.nativeCurrency,
 });
 
-export default connect(reduxProps, null)(AccountViewTransactions);
+export default connect(
+  reduxProps,
+  {
+    accountUpdateHasPendingTransaction,
+  },
+)(AccountViewTransactions);

@@ -13,7 +13,7 @@ import ledgerLogoImage from '../assets/ledger-logo.svg';
 import walletConnectLogoImage from '../assets/walletconnect-blue.svg';
 import trezorLogoImage from '../assets/trezor-logo.svg';
 import { accountUpdateAccountAddress } from '../reducers/_account';
-import { getLocal } from '../handlers/localstorage';
+import { getWalletConnectAccount } from '../handlers/localstorage';
 import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
 
@@ -126,12 +126,6 @@ const MetamaskLogoText = styled(LogoText)`
   margin: 0 20px 0 196px;
 `;
 
-const StyledSubscribeForm = styled(SubscribeForm)`
-  @media screen and (${responsive.sm.max}) {
-    margin-top: 28px;
-  }
-`;
-
 const TrezorLogo = styled.div`
   background-image: url(${trezorLogoImage});
   background-repeat: no-repeat;
@@ -159,7 +153,7 @@ const StyledWalletConnectButton = ConnectButton.extend`
 
 class Home extends Component {
   onWalletConnectInit = () => {
-    const storedAddress = getLocal('walletconnect');
+    const storedAddress = getWalletConnectAccount();
     if (storedAddress) {
       this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
       this.props.history.push('/wallet');
@@ -173,11 +167,11 @@ class Home extends Component {
         <CardContainer>
           <MetamaskLogo />
           <MetamaskLogoText>
-            {lang.t('homepage.connect_metamask')}
+            {lang.t('homepage.connect_metamask.description')}
           </MetamaskLogoText>
           <Link to="/metamask">
             <MetamaskButton left color="orange">
-              {lang.t('button.connect_metamask')}
+              {lang.t('homepage.connect_metamask.button')}
             </MetamaskButton>
           </Link>
         </CardContainer>
@@ -188,20 +182,20 @@ class Home extends Component {
           <LogoSection>
             <LedgerLogo />
             <LogoText>
-              {lang.t('homepage.connect_ledger')}
+              {lang.t('homepage.connect_ledger.description')}
               <LedgerAffiliateLink
                 href="https://www.ledgerwallet.com/r/7931"
                 target="_blank"
-                title="Buy a Ledger hardware wallet"
+                title={lang.t('homepage.connect_ledger.link_title')}
               >
-                {lang.t('homepage.connect_ledger_link')}
+                {lang.t('homepage.connect_ledger.link_text')}
               </LedgerAffiliateLink>
               .
             </LogoText>
           </LogoSection>
           <Link to="/ledger">
             <LedgerButton left color="ledger">
-              {lang.t('button.connect_ledger')}
+              {lang.t('homepage.connect_ledger.button')}
             </LedgerButton>
           </Link>
         </CardContainer>
@@ -211,11 +205,23 @@ class Home extends Component {
         <CardContainer>
           <LogoSection>
             <TrezorLogo />
-            <LogoText disabled isAlwaysVisible>
-              {lang.t('homepage.coming_soon')}
+            <LogoText>
+              {lang.t('homepage.connect_trezor.description')}
+              <LedgerAffiliateLink
+                href="https://shop.trezor.io/?a=balance.io"
+                target="_blank"
+                title={lang.t('homepage.connect_trezor.link_title')}
+              >
+                {lang.t('homepage.connect_trezor.link_text')}
+              </LedgerAffiliateLink>
+              .
             </LogoText>
           </LogoSection>
-          <StyledSubscribeForm />
+          <Link to="/trezor">
+            <LedgerButton left color="ledger">
+              {lang.t('homepage.connect_trezor.button')}
+            </LedgerButton>
+          </Link>
         </CardContainer>
       </StyledCard>
 
@@ -243,7 +249,10 @@ Home.propTypes = {
   accountUpdateAccountAddress: PropTypes.func.isRequired,
 };
 
-export default connect(null, {
-  modalOpen,
-  accountUpdateAccountAddress,
-})(Home);
+export default connect(
+  null,
+  {
+    modalOpen,
+    accountUpdateAccountAddress,
+  },
+)(Home);

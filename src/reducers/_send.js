@@ -21,7 +21,10 @@ import {
   estimateGasLimit,
 } from '../handlers/web3';
 import { notificationShow } from './_notification';
-import { accountUpdateTransactions } from './_account';
+import {
+  accountUpdateTransactions,
+  accountUpdateHasPendingTransaction,
+} from './_account';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -44,6 +47,8 @@ const SEND_UPDATE_NATIVE_AMOUNT = 'send/SEND_UPDATE_NATIVE_AMOUNT';
 const SEND_UPDATE_RECIPIENT = 'send/SEND_UPDATE_RECIPIENT';
 const SEND_UPDATE_ASSET_AMOUNT = 'send/SEND_UPDATE_ASSET_AMOUNT';
 const SEND_UPDATE_SELECTED = 'send/SEND_UPDATE_SELECTED';
+const SEND_UPDATE_HAS_PENDING_TRANSACTION =
+  'send/SEND_UPDATE_HAS_PENDING_TRANSACTION';
 
 const SEND_CLEAR_FIELDS = 'send/SEND_CLEAR_FIELDS';
 
@@ -149,28 +154,30 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     });
 };
 
-export const sendTransaction = () => (dispatch, getState) => {
+export const sendTransaction = transactionDetails => (dispatch, getState) => {
   dispatch({ type: SEND_TRANSACTION_REQUEST });
   const {
     address,
     recipient,
-    assetAmount,
-    selected,
+    amount,
+    asset,
     gasPrice,
     gasLimit,
-  } = getState().send;
+  } = transactionDetails;
   const { accountType } = getState().account;
   const txDetails = {
-    asset: selected,
+    asset: asset,
     from: address,
     to: recipient,
     nonce: null,
-    amount: assetAmount,
+    amount: amount,
     gasPrice: gasPrice.value.amount,
     gasLimit: gasLimit,
   };
   web3SendTransactionMultiWallet(txDetails, accountType)
     .then(txHash => {
+      // has pending transactions set to true for redirect to Transactions route
+      dispatch(accountUpdateHasPendingTransaction());
       txDetails.hash = txHash;
       dispatch(accountUpdateTransactions(txDetails));
       dispatch({
@@ -358,6 +365,8 @@ export default (state = INITIAL_STATE, action) => {
         txHash: '',
         confirm: false,
       };
+    case SEND_UPDATE_HAS_PENDING_TRANSACTION:
+      return { ...state, hasPendingTransaction: action.payload };
     case SEND_TOGGLE_CONFIRMATION_VIEW:
       return {
         ...state,

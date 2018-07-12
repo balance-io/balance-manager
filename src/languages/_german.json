@@ -1,0 +1,166 @@
+{
+  "translation": {
+    "homepage": {
+      "connect_metamask": {
+        "description": "Mit der MetaMask Chrome Erweiterung verbinden.",
+        "button": "Mit MetaMask verbinden"
+      },
+      "connect_ledger": {
+        "description": "Verbinden und anmelden mit deiner ",
+        "link_text": "Ledger Hardware Wallet",
+        "link_title": "Eine Ledger Hardware Wallet kaufen",
+        "button": "Mit Ledger verbinden"
+      },
+      "connect_walletconnect": "Verbinden und mit einr WalletConnect-fähigen Mobile Wallet anmelden.",
+      "coming_soon": "Coming soon…"
+    },
+    "account": {
+      "tab_balances": "Saldi",
+      "tab_transactions": "Transaktionen",
+      "tab_interactions": "Interaktionen",
+      "tab_balances_tooltip": "Ethereum und Token Saldi",
+      "tab_transactions_tooltip": "Transaktionen und Tokentransfers",
+      "tab_interactions_tooltip": "Smart Contract Interaktionen",
+      "label_asset": "Asset",
+      "label_quantity": "Menge",
+      "label_price": "Preis",
+      "label_24h": "24h",
+      "label_status": "Status",
+      "label_total": "Summe",
+      "show": "Anzeigen",
+      "hide": "Ausblenden",
+      "token": "Token",
+      "tokens": "Tokens",
+      "no_market_value": "ohne Marktwert",
+      "low_market_value": "mit geringem Marktwert",
+      "tx_hash": "Transaktionshash",
+      "tx_timestamp": "Zeitstempel",
+      "tx_fee": "Gebühr",
+      "tx_to": "An",
+      "tx_from": "Von",
+      "tx_self": "Ich",
+      "tx_sent": "Gesendet",
+      "tx_received": "Erhalten",
+      "tx_failed": "Fehlgeschlagen",
+      "tx_pending": "Ausstehend",
+      "show_all": "Alle anzeigen",
+      "show_less": "Weniger anzeigen",
+      "unknown_token": "Unbekannter Token"
+    },
+    "button": {
+      "connect_walletconnect": "WalletConnect benutzen",
+      "exchange": "Umwechseln",
+      "send": "Senden",
+      "donate": "ETH spenden",
+      "receive": "Erhalten",
+      "close": "Schließen",
+      "cancel": "Abbrechen",
+      "go_back": "Zurück",
+      "send_another": "Weitere senden",
+      "notify_me": "Benachrichtige mich",
+      "try_again": "Erneut vesuchen"
+    },
+    "input": {
+      "recipient_address": "Empfängeradresse",
+      "private_key": "Private-Key",
+      "donation_address": "Balance Manager Adresse",
+      "asset_amount": "Menge",
+      "email": "E-Mail-Adresse",
+      "password": "Passwort",
+      "input_text": "Input",
+      "email_placeholder": "deine@email.de",
+      "password_placeholder": "••••••••••",
+      "input_placeholder": "Hier einfügen"
+    },
+    "modal": {
+      "receive_title": "Mit {{walletName}} erhalten",
+      "exchange_title": "Umwechseln von {{walletName}}",
+      "donate_title": "Von {{walletName}} an Balance Manager senden",
+      "send_title": "Gesendet von {{walletName}}",
+      "approve_tx": "Transaktion auf {{walletType}} zustimmen",
+      "confirm_tx": "Transaktion von {{walletName}} bestätigen",
+      "invalid_address": "Ungültige Adresse",
+      "send_max": "maximal",
+      "exchange_max": "maximal",
+      "default_wallet": " Wallet",
+      "gas_slow": "Langsam",
+      "gas_average": "Durchschnittlich",
+      "gas_fast": "Schnell",
+      "gas_fee": "Gebühr",
+      "tx_confirm_sender": "Sender",
+      "tx_confirm_recipient": "Empfänger",
+      "tx_confirm_amount": "Menge",
+      "tx_confirm_fee": "Transaktionsgebühr",
+      "tx_hash": "Transaktionshash",
+      "tx_verify": "Transaktion hier verifizieren",
+      "deposit_dropdown_label": "Tausche mein",
+      "withdrawal_dropdown_label": "gegen",
+      "deposit_input_label": "Bezahlen",
+      "withdrawal_input_label": "Erhalten",
+      "tx_fee": "Transaktionsgebühr",
+      "exchange_fee": "Umtauschgebühr"
+    },
+    "message": {
+      "web3_not_available": "Bitte die MetaMask Chrome Erweiterung installieren",
+      "web3_not_unlocked": "Bitte die MetaMask Wallet entsperren",
+      "web3_unknown_network": "Unbekanntes Netzwerk, bitte auf ein anderes wechseln",
+      "page_not_found": "404 Seite nicht gefunden",
+      "coming_soon": "Coming soon…",
+      "click_to_copy_to_clipboard": "Klicken um in die Zwischenablage zu kopieren",
+      "failed_request": "Anfrage fehlgeschlagen, bitte neu laden",
+      "failed_ledger_connection": "Fehler beim verbinden zu Ledger, bitte Gerät überprüfen",
+      "no_transactions": "Keine Transaktionen für diesen Account gefunden",
+      "no_interactions": "Keine Interaktionen für diesen Account gefunden",
+      "please_connect_ledger": "Mit Ledger verbinden, entsperren und Ethereum auswählen"
+    },
+    "notification": {
+      "error": {
+        "no_accounts_found": "Kein Ethereum Account gefunden",
+        "invalid_address": "Addresse ist ungültig, bitte überprüfen",
+        "insufficient_balance": "Nicht genügend Guthaben in diesem Account",
+        "insufficient_for_fees": "Nicht genügend Guthaben um Transaktionsgebühren zu decken",
+        "invalid_address_scanned": "Gescannte Adresse ungültig, bitte erneut versuchen",
+        "invalid_private_key_scanned": "Gescannter Private-Key ungültig, bitte erneut versuchen",
+        "failed_scanning_qr_code": "QR-Code scannen fehlgeschlagen, bitte erneut versuchen",
+        "failed_get_gas_prices": "Ethereum Gas Preis ermitteln fehlgeschlagen",
+        "failed_get_tx_fee": "Transaktionsgebühr ermitteln fehlgeschlagen",
+        "failed_get_account_tx": "Abrufen der Transaktionen für diesen Account fehlgeschlagen",
+        "generic_error": "Etwas ist schief gelaufen, bitte erneut versuchen"
+      },
+      "info": {
+        "address_copied_to_clipboard": "Adresse in Zwischenablage kopiert"
+      }
+    },
+    "warning": {
+      "user_is_offline": "Verbindung ist offline, bitte Internetverbindung überprüfen",
+      "user_is_online": "Verbunden! Wieder online"
+    },
+    "subscribe_form": {
+      "email_already_subscribed": "Es tut uns Leid, diese E-Mail-Adresse ist bereits in unserem Verteiler",
+      "too_many_signup_request": "Zu viele Anfragen, bitte später erneut versuchen",
+      "successful": "Check deine E-Mails",
+      "sending": "Wird gesendet…",
+      "generic_error": "Ups, irgendwas ist schief gelaufen"
+    },
+    "time": {
+      "ms": "ms",
+      "milisecond": "Millisekunde",
+      "miliseconds": "Millisekunden",
+      "s": "s",
+      "sec": "Sek",
+      "secs": "Sek",
+      "second": "Sekunde",
+      "seconds": "Sekunden",
+      "min": "Min",
+      "mins": "Min",
+      "minute": "Minute",
+      "minutes": "Minuten",
+      "hr": "Std",
+      "hrs": "Stdn",
+      "hour": "Stunde",
+      "hours": "Stunden",
+      "day": "Tag",
+      "days": "Tage"
+    }
+  }
+}

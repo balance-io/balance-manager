@@ -2,7 +2,9 @@
   "translation": {
     "homepage": {
       "connect_metamask": {
-        "description": "Connect to the MetaMask Chrome extension.",
+        "description": "Connect to the ",
+        "link_text": "MetaMask browser wallet",
+        "link_title": "MetaMask browser wallet",
         "button": "Connect to MetaMask"
       },
       "connect_ledger": {
@@ -17,7 +19,12 @@
         "link_title": "Buy a Trezor hardware wallet",
         "button": "Connect to Trezor"
       },
-      "connect_walletconnect": "Connect and sign with your WalletConnect-enabled mobile wallet.",
+      "connect_walletconnect": {
+        "description": "Scan a QR code to link your mobile wallet ",
+        "link_text": "using WalletConnect",
+        "link_title": "Use WalletConnect",
+        "button": "Use WalletConnect"
+      },
       "coming_soon": "Coming soon."
     },
     "account": {

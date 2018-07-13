@@ -58,7 +58,8 @@
       "go_back": "Zurück",
       "send_another": "Weitere senden",
       "notify_me": "Benachrichtige mich",
-      "try_again": "Erneut vesuchen"
+      "try_again": "Erneut vesuchen",
+      "reload": "Nachladen"
     },
     "input": {
       "recipient_address": "Empfängeradresse",

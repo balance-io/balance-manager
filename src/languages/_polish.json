@@ -70,7 +70,8 @@
       "notify_me": "Powiadom mnie",
       "try_again": "Spróbuj ponownie",
       "learn_more": "Dowiedz się więcej",
-      "view": "Zobacz"
+      "view": "Zobacz",
+      "reload": "Zarepetować"
     },
     "input": {
       "recipient_address": "Adres odbiorcy",

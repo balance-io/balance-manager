@@ -70,7 +70,8 @@
       "notify_me": "Dostávat oznámení",
       "try_again": "Zkusit znovu",
       "learn_more": "Zjistit více",
-      "view": "Zobrazit"
+      "view": "Zobrazit",
+      "reload": "Znovu načíst"
     },
     "input": {
       "recipient_address": "Adresa příjemce",

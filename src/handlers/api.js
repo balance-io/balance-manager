@@ -71,6 +71,27 @@ export const apiGetHistoricalPrices = (
 };
 
 /**
+ * @desc get elph selected network
+ * @return {Promise}
+ */
+export const apiGetElphNetwork = () =>
+  new Promise((resolve, reject) => {
+    if (typeof window.web3 !== 'undefined') {
+      window.web3.eth.net.getId((err, networkID) => {
+        if (err) {
+          console.error(err);
+          reject(err);
+        }
+        let networkIDList = {};
+        Object.keys(networkList).forEach(network => {
+          networkIDList[networkList[network].id] = network;
+        });
+        resolve(networkIDList[Number(networkID)] || null);
+      });
+    }
+  });
+
+/**
  * @desc get metmask selected network
  * @return {Promise}
  */

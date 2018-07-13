@@ -26,6 +26,7 @@ export const colors = {
   etherscan: '2, 92, 144',
   walletconnect: '64, 153, 255',
   ledger: '47, 49, 55',
+  elph: '65, 140, 228',
   bodyBackground: '44,47,56',
   darkText: '43,45,51',
   rowDivider: '224,224,224,0.24',

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 * Added Greek language translation
+* Support for [Elph Provider](https://elph.com)
 
 ### Changed
 

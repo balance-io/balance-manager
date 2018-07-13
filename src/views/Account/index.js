@@ -15,6 +15,7 @@ import AccountUniqueTokens from './AccountUniqueTokens';
 import arrowUp from '../../assets/arrow-up.svg';
 import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
+import refreshArrow from '../../assets/refresh-arrow.svg';
 import { modalOpen } from '../../reducers/_modal';
 import { capitalize } from '../../helpers/utilities';
 import { colors, fonts, responsive } from '../../styles';
@@ -54,6 +55,7 @@ const StyledTop = styled.div`
 
 const StyledAddressWrapper = styled.div`
   width: 100%;
+  flex: 1;
 `;
 
 const StyledActions = styled.div`
@@ -79,6 +81,7 @@ const StyledMessage = styled.div`
 `;
 
 class Account extends Component {
+  reloadApp = () => this.props.history.go(0);
   openExchangeModal = () => this.props.modalOpen('EXCHANGE_MODAL');
   openSendModal = () => this.props.modalOpen('SEND_MODAL');
   openReceiveModal = () => this.props.modalOpen('RECEIVE_MODAL');
@@ -118,6 +121,16 @@ class Account extends Component {
               </StyledAddressWrapper>
 
               <StyledActions>
+                <Button
+                  left
+                  color="brightGreen"
+                  hoverColor="brightGreenHover"
+                  activeColor="brightGreenHover"
+                  icon={refreshArrow}
+                  onClick={this.reloadApp}
+                >
+                  {lang.t('button.reload')}
+                </Button>
                 {this.props.network === 'mainnet' && (
                   <Button
                     left

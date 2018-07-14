@@ -15,6 +15,7 @@ import AccountUniqueTokens from './AccountUniqueTokens';
 import arrowUp from '../../assets/arrow-up.svg';
 import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
+import { accountUpdateAccountAddress } from '../../reducers/_account';
 import { modalOpen } from '../../reducers/_modal';
 import { capitalize } from '../../helpers/utilities';
 import { colors, fonts, responsive } from '../../styles';
@@ -82,6 +83,23 @@ class Account extends Component {
   openExchangeModal = () => this.props.modalOpen('EXCHANGE_MODAL');
   openSendModal = () => this.props.modalOpen('SEND_MODAL');
   openReceiveModal = () => this.props.modalOpen('RECEIVE_MODAL');
+
+  componentDidMount() {
+    // update account info every second
+    this.accountUpdateInterval = setInterval(() => {
+      const {
+        accountUpdateAccountAddress,
+        accountAddress,
+        accountType,
+      } = this.props;
+
+      accountUpdateAccountAddress(accountAddress, accountType);
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.accountUpdateInterval);
+  }
 
   componentDidUpdate() {
     const {
@@ -191,6 +209,7 @@ Account.propTypes = {
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
+  accountUpdateAccountAddress: PropTypes.func.isRequired,
   accountInfo: PropTypes.object.isRequired,
   accountAddress: PropTypes.string.isRequired,
   accountType: PropTypes.string.isRequired,
@@ -216,6 +235,7 @@ export default withRouter(
   connect(
     reduxProps,
     {
+      accountUpdateAccountAddress,
       modalOpen,
     },
   )(Account),

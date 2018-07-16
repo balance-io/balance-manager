@@ -2,7 +2,7 @@ import EthereumTx from 'ethereumjs-tx';
 import ethereumNetworks from '../references/ethereum-networks.json';
 import lang from '../languages';
 
-const HDKey = require('hdkey');
+const HDKey = require('ethereumjs-wallet/hdkey');
 export let trezorEthInstance = {
   length: 10,
   accounts: [],

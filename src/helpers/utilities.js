@@ -204,19 +204,18 @@ export const transactionData = (accountInfo, assetAmount, gasPrice) => {
  * @desc calculates the native and tx fee for a transaction
  * @param  {Array} gasPrices
  * @param  {Object} gasPriceOption
+ * @param  {Object} nativeCurrency
  * @return {String} native and txFee
  */
-export const calcTxFee = (gasPrices, gasPriceOption) => {
-  let nativeFee = '$0.00';
-  let txFee = '0.000 ETH';
-
+export const calcTxFee = (gasPrices, gasPriceOption, nativeCurrency) => {
   const option = gasPrices[gasPriceOption];
-  const isAvailable = option && option.txFee;
-
-  if (isAvailable) {
-    nativeFee = gasPrices[gasPriceOption].txFee.native.value.display;
-    txFee = gasPrices[gasPriceOption].txFee.value.display;
-  }
-
-  return `${nativeFee} - (${txFee})`;
+  const txFeeNative =
+    option && option.txFee.native ? option.txFee.native.value.display : '$0.00';
+  const txFee =
+    nativeCurrency !== 'ETH'
+      ? ` (${
+          option && option.txFee ? option.txFee.value.display : '0.000 ETH'
+        })`
+      : '';
+  return `${txFeeNative}${txFee}`;
 };

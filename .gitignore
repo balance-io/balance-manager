@@ -22,3 +22,4 @@ yarn-error.log*
 
 IGNORE_*
 package-lock.json
+yarn.lock

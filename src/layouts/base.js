@@ -121,6 +121,7 @@ const BaseLayout = ({
   metamaskFetching,
   ledgerFetching,
   trezorFetching,
+  elphFetching,
   accountType,
   accountAddress,
   ledgerAccounts,
@@ -158,8 +159,12 @@ const BaseLayout = ({
   });
   const showToolbar =
     window.location.pathname !== '/' &&
-    (!metamaskFetching || !ledgerFetching || !trezorFetching) &&
-    ((accountType === 'METAMASK' && web3Available) ||
+    (!metamaskFetching ||
+      !ledgerFetching ||
+      !trezorFetching ||
+      !elphFetching) &&
+    (((accountType === 'METAMASK' || accountType === 'ELPH') &&
+      web3Available) ||
       accountType !== 'METAMASK') &&
     accountAddress;
   const openSendModal = () => modalOpen('DONATION_MODAL');
@@ -269,6 +274,7 @@ BaseLayout.propTypes = {
   ledgerUpdateNetwork: PropTypes.func.isRequired,
   trezorFetching: PropTypes.bool.isRequired,
   trezorUpdateNetwork: PropTypes.func.isRequired,
+  elphFetching: PropTypes.bool.isRequired,
   accountChangeNativeCurrency: PropTypes.func.isRequired,
   accountUpdateAccountAddress: PropTypes.func.isRequired,
   accountChangeLanguage: PropTypes.func.isRequired,
@@ -282,7 +288,7 @@ BaseLayout.propTypes = {
   modalOpen: PropTypes.func.isRequired,
 };
 
-const reduxProps = ({ account, ledger, trezor, metamask, warning }) => ({
+const reduxProps = ({ account, ledger, trezor, metamask, elph, warning }) => ({
   accountType: account.accountType,
   accountAddress: account.accountAddress,
   nativeCurrency: account.nativeCurrency,
@@ -290,6 +296,7 @@ const reduxProps = ({ account, ledger, trezor, metamask, warning }) => ({
   language: account.language,
   ledgerFetching: ledger.fetching,
   trezorFetching: trezor.fetching,
+  elphFetching: elph.fetching,
   network: account.network,
   ledgerAccounts: ledger.accounts,
   trezorAccounts: trezor.accounts,

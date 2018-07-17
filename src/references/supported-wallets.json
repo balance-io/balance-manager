@@ -14,5 +14,9 @@
   "trezor": {
     "color": "black",
     "value": "Trezor"
+  },
+  "elph": {
+    "color": "blue",
+    "value": "Elph"
   }
 }

@@ -5,6 +5,7 @@ import lang from '../../languages';
 import MetamaskLogo from '../../components/MetamaskLogo';
 import LedgerLogo from '../../components/LedgerLogo';
 import TrezorLogo from '../../components/TrezorLogo';
+import ElphLogo from '../../components/ElphLogo';
 
 import Button from '../../components/Button';
 
@@ -23,6 +24,8 @@ const ApproveTransactionModal = ({ accountType, onClose }) => (
           return <LedgerLogo />;
         case 'TREZOR':
           return <TrezorLogo />;
+        case 'ELPH':
+          return <ElphLogo />;
         default:
           return <div />;
       }

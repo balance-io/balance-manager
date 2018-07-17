@@ -7,6 +7,7 @@ import Wallet from './pages/Wallet';
 import Metamask from './pages/Metamask';
 import Ledger from './pages/Ledger';
 import Trezor from './pages/Trezor';
+import Elph from './pages/Elph';
 import NotFound from './pages/NotFound';
 import { warningOnline, warningOffline } from './reducers/_warning';
 
@@ -23,6 +24,7 @@ class Router extends Component {
       <Route path="/metamask" component={Metamask} />
       <Route path="/ledger" component={Ledger} />
       <Route path="/trezor" component={Trezor} />
+      <Route path="/elph" component={Elph} />
       <Route component={NotFound} />
     </Switch>
   );

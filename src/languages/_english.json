@@ -17,6 +17,12 @@
         "link_title": "Buy a Trezor hardware wallet",
         "button": "Connect to Trezor"
       },
+      "connect_elph": {
+        "description": "Connect and instantly create an ",
+        "link_text": "Elph wallet",
+        "link_title": "Instantly create a wallet on Elph",
+        "button": "Connect to Elph"
+      },
       "connect_walletconnect": "Connect and sign with your WalletConnect-enabled mobile wallet.",
       "coming_soon": "Coming soon."
     },
@@ -124,6 +130,8 @@
       "web3_not_available": "Please install the MetaMask Chrome extension",
       "web3_not_unlocked": "Please unlock your MetaMask wallet",
       "web3_unknown_network": "Unknown network, please switch to another one",
+      "elph_not_available": "Please refresh and connect to Elph",
+      "elph_not_unlocked": "Please unlock your Elph wallet",
       "page_not_found": "404 Page Not Found",
       "coming_soon": "Coming soon...",
       "click_to_copy_to_clipboard": "Click to copy to clipboard",

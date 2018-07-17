@@ -6,12 +6,12 @@ import lang from '../languages';
 import Link from '../components/Link';
 import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
-import SubscribeForm from '../components/SubscribeForm';
 import Button from '../components/Button';
 import metamaskLogoImage from '../assets/metamask-logo.png';
 import ledgerLogoImage from '../assets/ledger-logo.svg';
 // import walletConnectLogoImage from '../assets/walletconnect-blue.svg';
 import trezorLogoImage from '../assets/trezor-logo.svg';
+import elphLogoImage from '../assets/elph-logo.svg';
 import { accountUpdateAccountAddress } from '../reducers/_account';
 import { getWalletConnectAccount } from '../handlers/localstorage';
 import { modalOpen } from '../reducers/_modal';
@@ -68,7 +68,7 @@ const LogoText = styled.p`
   }
 `;
 
-const LedgerAffiliateLink = styled.a`
+const AffiliateLink = styled.a`
   color: rgb(${colors.blue});
 
   &:hover {
@@ -134,6 +134,23 @@ const TrezorLogo = styled.div`
   width: 109px;
 `;
 
+const ElphLogo = styled.div`
+  background-image: url(${elphLogoImage});
+  background-repeat: no-repeat;
+  background-size: 100%;
+  height: 39px;
+  width: 100px;
+`;
+
+const ElphButton = ConnectButton.extend`
+  &:hover {
+    background: #5798e7;
+  }
+  &:active {
+    background: #2a7de0;
+  }
+`;
+
 // const StyledWalletConnectLogo = styled.div`
 //   margin: 8px 0;
 //   height: 54px;
@@ -183,13 +200,13 @@ class Home extends Component {
             <LedgerLogo />
             <LogoText>
               {lang.t('homepage.connect_ledger.description')}
-              <LedgerAffiliateLink
+              <AffiliateLink
                 href="https://www.ledgerwallet.com/r/7931"
                 target="_blank"
                 title={lang.t('homepage.connect_ledger.link_title')}
               >
                 {lang.t('homepage.connect_ledger.link_text')}
-              </LedgerAffiliateLink>
+              </AffiliateLink>
               .
             </LogoText>
           </LogoSection>
@@ -207,13 +224,13 @@ class Home extends Component {
             <TrezorLogo />
             <LogoText>
               {lang.t('homepage.connect_trezor.description')}
-              <LedgerAffiliateLink
+              <AffiliateLink
                 href="https://shop.trezor.io/?a=balance.io"
                 target="_blank"
                 title={lang.t('homepage.connect_trezor.link_title')}
               >
                 {lang.t('homepage.connect_trezor.link_text')}
-              </LedgerAffiliateLink>
+              </AffiliateLink>
               .
             </LogoText>
           </LogoSection>
@@ -221,6 +238,30 @@ class Home extends Component {
             <LedgerButton left color="ledger">
               {lang.t('homepage.connect_trezor.button')}
             </LedgerButton>
+          </Link>
+        </CardContainer>
+      </StyledCard>
+
+      <StyledCard minHeight={102}>
+        <CardContainer>
+          <LogoSection>
+            <ElphLogo />
+            <LogoText>
+              {lang.t('homepage.connect_elph.description')}
+              <AffiliateLink
+                href="https://elph.com/?ref=balance.io"
+                target="_blank"
+                title={lang.t('homepage.connect_elph.link_title')}
+              >
+                {lang.t('homepage.connect_elph.link_text')}
+              </AffiliateLink>
+              .
+            </LogoText>
+          </LogoSection>
+          <Link to="/elph">
+            <ElphButton left color="elph">
+              {lang.t('homepage.connect_elph.button')}
+            </ElphButton>
           </Link>
         </CardContainer>
       </StyledCard>

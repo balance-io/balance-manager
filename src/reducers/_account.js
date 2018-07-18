@@ -29,7 +29,7 @@ import {
   updateLocalTransactions,
   updateLocalBalances,
 } from '../handlers/localstorage';
-import { web3SetHttpProvider } from '../handlers/web3';
+import { web3SetHttpProvider, web3WSInstance } from '../handlers/web3';
 import { notificationShow } from './_notification';
 import { exchangeUpdateExchangeDetails } from './_exchange';
 import nativeCurrencies from '../references/native-currencies.json';
@@ -64,8 +64,6 @@ const ACCOUNT_GET_ACCOUNT_BALANCES_SUCCESS =
 const ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE =
   'account/ACCOUNT_GET_ACCOUNT_BALANCES_FAILURE';
 
-const ACCOUNT_UPDATE_BALANCES_REQUEST =
-  'account/ACCOUNT_UPDATE_BALANCES_REQUEST';
 const ACCOUNT_UPDATE_BALANCES_SUCCESS =
   'account/ACCOUNT_UPDATE_BALANCES_SUCCESS';
 const ACCOUNT_UPDATE_BALANCES_FAILURE =
@@ -105,6 +103,7 @@ const ACCOUNT_CHANGE_LANGUAGE = 'account/ACCOUNT_CHANGE_LANGUAGE';
 
 // -- Actions --------------------------------------------------------------- //
 let getPricesInterval = null;
+let web3Subscription = null;
 
 export const accountUpdateHasPendingTransaction = (
   hasPending = true,
@@ -415,7 +414,6 @@ export const accountGetUniqueTokens = () => (dispatch, getState) => {
 
 export const accountUpdateBalances = () => (dispatch, getState) => {
   const { network, accountAddress, accountType } = getState().account;
-  dispatch({ type: ACCOUNT_UPDATE_BALANCES_REQUEST });
   apiGetAccountBalances(accountAddress, network)
     .then(({ data }) => {
       const prices = getState().account.prices;
@@ -441,10 +439,6 @@ export const accountUpdateBalances = () => (dispatch, getState) => {
 export const accountUpdateNetwork = network => dispatch => {
   web3SetHttpProvider(`https://${network}.infura.io/`);
   dispatch({ type: ACCOUNT_UPDATE_NETWORK, payload: network });
-};
-
-export const accountClearIntervals = () => dispatch => {
-  clearInterval(getPricesInterval);
 };
 
 export const accountShapeshiftVerify = () => dispatch => {
@@ -475,6 +469,19 @@ export const accountUpdateAccountAddress = (accountAddress, accountType) => (
   dispatch(accountGetAccountTransactions());
   dispatch(accountGetAccountBalances());
   dispatch(accountGetUniqueTokens());
+
+  if (web3Subscription) web3Subscription.unsubscribe();
+
+  web3Subscription = web3WSInstance.eth.subscribe('newBlockHeaders', function(
+    error,
+    result,
+  ) {
+    if (result) {
+      dispatch(accountGetAccountTransactions());
+      dispatch(accountGetAccountBalances());
+      dispatch(accountGetUniqueTokens());
+    }
+  });
 };
 
 export const accountChangeLanguage = language => dispatch => {
@@ -550,6 +557,10 @@ export const accountChangeNativeCurrency = nativeCurrency => (
 
 export const accountClearState = () => dispatch => {
   clearInterval(getPricesInterval);
+  if (web3Subscription) {
+    web3Subscription.unsubscribe();
+    web3Subscription = null;
+  }
   dispatch({ type: ACCOUNT_CLEAR_STATE });
 };
 

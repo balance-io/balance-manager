@@ -7,9 +7,19 @@ import Account from '../views/Account';
 import Card from '../components/Card';
 import { getWalletConnectAccount } from '../handlers/localstorage';
 import { accountUpdateAccountAddress } from '../reducers/_account';
+import lang from '../languages';
+import { fonts, colors } from '../styles';
 
 const StyledWrapper = styled.div`
   width: 100%;
+`;
+
+const StyledMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(${colors.grey});
+  font-weight: ${fonts.weight.medium};
 `;
 
 class Wallet extends Component {
@@ -21,14 +31,17 @@ class Wallet extends Component {
       this.props.history.push('/');
     }
   }
+
   render = () => (
     <BaseLayout>
       <StyledWrapper>
         {this.props.fetching || this.props.accountAddress ? (
           <Account match={this.props.match} />
         ) : (
-          <Card fetching={this.props.fetching}>
-            <div />
+          <Card minHeight={200} fetching={this.props.fetching}>
+            <StyledMessage>
+              {lang.t('message.walletconnect_not_unlocked')}
+            </StyledMessage>
           </Card>
         )}
       </StyledWrapper>
@@ -47,9 +60,9 @@ Wallet.defaultProps = {
   accountAddress: null,
 };
 
-const reduxProps = ({ account }) => ({
-  fetching: account.fetching,
-  accountAddress: account.accountAddress,
+const reduxProps = ({ walletconnect }) => ({
+  fetching: walletconnect.fetching,
+  accountAddress: walletconnect.accountAddress,
 });
 
 export default connect(

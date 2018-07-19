@@ -168,6 +168,27 @@ export const saveWalletConnectAccount = account => {
 };
 
 /**
+ * @desc get wallet connect web connector instance
+ * @return {Object}
+ */
+export const getWalletConnectWebConnector = () => {
+  const webConnectorOptions = getLocal('wcwebconnector', walletConnectVersion);
+  return webConnectorOptions ? webConnectorOptions.data : null;
+};
+
+/**
+ * @desc save wallet connect web connector instance
+ * @param  {String}   [address]
+ */
+export const saveWalletConnectWebConnector = webConnectorOptions => {
+  saveLocal(
+    'wcwebconnector',
+    { data: webConnectorOptions },
+    walletConnectVersion,
+  );
+};
+
+/**
  * @desc get language
  * @return {Object}
  */

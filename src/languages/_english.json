@@ -130,7 +130,7 @@
     "message": {
       "web3_not_available": "Please install the MetaMask Chrome extension",
       "web3_not_unlocked": "Please unlock your MetaMask wallet",
-      "walletconnect_not_unlocked": "Please connect using Wallet Connect",
+      "walletconnect_not_unlocked": "Please connect using WalletConnect",
       "web3_unknown_network": "Unknown network, please switch to another one",
       "page_not_found": "404 Page Not Found",
       "coming_soon": "Coming soon...",

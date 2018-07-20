@@ -3,6 +3,8 @@ const accountLocalVersion = '0.1.0';
 const globalSettingsVersion = '0.1.0';
 const walletConnectVersion = '0.1.0';
 
+const expiryBufferInSeconds = 10 * 60;
+
 /**
  * @desc save to local storage
  * @param  {String}  [key='']
@@ -151,39 +153,32 @@ export const saveSupressReminderRibbon = state => {
 };
 
 /**
- * @desc get wallet connect account
+ * @desc get wallet connect session details
  * @return {Object}
  */
-export const getWalletConnectAccount = () => {
-  const walletConnectAccount = getLocal('walletconnect', walletConnectVersion);
-  return walletConnectAccount ? walletConnectAccount.data : null;
+export const getWalletConnectSession = () => {
+  const webConnectorOptions = getLocal('walletconnect', walletConnectVersion);
+  const details = webConnectorOptions ? webConnectorOptions.data : null;
+  if (details) {
+    const expiration = Date.parse(webConnectorOptions.expiration);
+    return new Date() < expiration ? details : null;
+  } else {
+    return null;
+  }
 };
 
 /**
- * @desc save wallet connect account
+ * @desc save wallet connect session details
  * @param  {String}   [address]
  */
-export const saveWalletConnectAccount = account => {
-  saveLocal('walletconnect', { data: account }, walletConnectVersion);
-};
-
-/**
- * @desc get wallet connect web connector instance
- * @return {Object}
- */
-export const getWalletConnectWebConnector = () => {
-  const webConnectorOptions = getLocal('wcwebconnector', walletConnectVersion);
-  return webConnectorOptions ? webConnectorOptions.data : null;
-};
-
-/**
- * @desc save wallet connect web connector instance
- * @param  {String}   [address]
- */
-export const saveWalletConnectWebConnector = webConnectorOptions => {
+export const saveWalletConnectSession = (webConnectorOptions, ttlInSeconds) => {
+  let expiration = new Date();
+  expiration.setSeconds(
+    expiration.getSeconds() + ttlInSeconds - expiryBufferInSeconds,
+  );
   saveLocal(
-    'wcwebconnector',
-    { data: webConnectorOptions },
+    'walletconnect',
+    { data: webConnectorOptions, expiration },
     walletConnectVersion,
   );
 };

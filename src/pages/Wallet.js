@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
-import { getWalletConnectAccount } from '../handlers/localstorage';
-import { accountUpdateAccountAddress } from '../reducers/_account';
+import { checkWalletConnectSession } from '../handlers/localstorage';
+import { walletConnectHasValidSession } from '../reducers/_walletconnect';
 import lang from '../languages';
 import { fonts, colors } from '../styles';
 
@@ -24,12 +24,17 @@ const StyledMessage = styled.div`
 
 class Wallet extends Component {
   componentDidMount() {
-    const storedAddress = getWalletConnectAccount();
-    if (storedAddress) {
-      this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
-    } else {
-      this.props.history.push('/');
-    }
+    this.props
+      .walletConnectHasValidSession()
+      .then(isValid => {
+        if (!isValid) {
+          this.props.history.push('/');
+        }
+      })
+      .catch(error => {
+        console.log('error checking valid session in wallet mount', error);
+        this.props.history.push('/');
+      });
   }
 
   render = () => (
@@ -50,10 +55,10 @@ class Wallet extends Component {
 }
 
 Wallet.propTypes = {
-  accountUpdateAccountAddress: PropTypes.func.isRequired,
   accountAddress: PropTypes.string,
   fetching: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired,
+  walletConnectHasValidSession: PropTypes.func,
 };
 
 Wallet.defaultProps = {
@@ -68,6 +73,6 @@ const reduxProps = ({ walletconnect }) => ({
 export default connect(
   reduxProps,
   {
-    accountUpdateAccountAddress,
+    walletConnectHasValidSession,
   },
 )(Wallet);

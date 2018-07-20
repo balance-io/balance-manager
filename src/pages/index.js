@@ -12,7 +12,7 @@ import metamaskLogoImage from '../assets/metamask-logo.png';
 import ledgerLogoImage from '../assets/ledger-logo.svg';
 import walletConnectLogoImage from '../assets/walletconnect-logo-and-type.svg';
 import trezorLogoImage from '../assets/trezor-logo.svg';
-import { accountUpdateAccountAddress } from '../reducers/_account';
+import { walletConnectHasValidSession } from '../reducers/_walletconnect';
 import { getWalletConnectAccount } from '../handlers/localstorage';
 import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
@@ -153,13 +153,19 @@ const StyledWalletConnectButton = ConnectButton.extend`
 
 class Home extends Component {
   onWalletConnectInit = () => {
-    const storedAddress = getWalletConnectAccount();
-    if (storedAddress) {
-      this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
-      this.props.history.push('/wallet');
-    } else {
-      this.props.modalOpen('WALLET_CONNECT', null);
-    }
+    this.props
+      .walletConnectHasValidSession()
+      .then(isValid => {
+        if (isValid) {
+          this.props.history.push('/wallet');
+        } else {
+          this.props.modalOpen('WALLET_CONNECT', null);
+        }
+      })
+      .catch(error => {
+        console.log('error checking valid session', error);
+        this.props.modalOpen('WALLET_CONNECT', null);
+      });
   };
   render = () => (
     <BaseLayout>
@@ -264,13 +270,13 @@ class Home extends Component {
 
 Home.propTypes = {
   modalOpen: PropTypes.func.isRequired,
-  accountUpdateAccountAddress: PropTypes.func.isRequired,
+  walletConnectHasValidSession: PropTypes.func.isRequired,
 };
 
 export default connect(
   null,
   {
     modalOpen,
-    accountUpdateAccountAddress,
+    walletConnectHasValidSession,
   },
 )(Home);

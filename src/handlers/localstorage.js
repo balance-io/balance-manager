@@ -47,6 +47,7 @@ export const removeLocal = (key = '') => localStorage.removeItem(key);
  * @return {Object}
  */
 export const getAccountLocal = accountAddress => {
+  accountAddress = accountAddress.toLowerCase();
   return getLocal(accountAddress, accountLocalVersion);
 };
 
@@ -93,6 +94,7 @@ export const saveNativeCurrency = nativeCurrency => {
  */
 export const updateLocalBalances = (address, account, network) => {
   if (!address) return;
+  address = address.toLowerCase();
   let accountLocal = getLocal(address) || {};
   if (!accountLocal[network]) {
     accountLocal[network] = {};
@@ -114,6 +116,7 @@ export const updateLocalBalances = (address, account, network) => {
  */
 export const updateLocalTransactions = (address, transactions, network) => {
   if (!address) return;
+  address = address.toLowerCase();
   let accountLocal = getLocal(address) || {};
   const pending = [];
   const _transactions = [];

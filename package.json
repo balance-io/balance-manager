@@ -19,6 +19,7 @@
     "bignumber.js": "^7.0.1",
     "ethereumjs-tx": "^1.3.4",
     "ethjs-ens": "^2.0.1",
+    "ethjs-provider-http": "^0.1.6",
     "i18next": "^11.3.2",
     "jsonp": "^0.2.1",
     "lodash": "^4.17.5",

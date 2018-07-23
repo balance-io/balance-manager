@@ -14,7 +14,12 @@ import { ledgerEthSignTransaction } from './ledger-eth';
 import { walletConnectSignTransaction } from './walletconnect';
 import ethUnits from '../references/ethereum-units.json';
 import smartContractMethods from '../references/smartcontract-methods.json';
-import * as ENS from 'ethjs-ens';
+import ENS from 'ethjs-ens';
+import HttpProvider from 'ethjs-provider-http';
+const provider = `https://mainnet.infura.io/`;
+const httpProvider = new HttpProvider('https://mainnet.infura.io');
+
+export let ens = new ENS({ provider: httpProvider, network: '1' });
 
 Web3.providers.HttpProvider.prototype.sendAsync =
   Web3.providers.HttpProvider.prototype.send;
@@ -22,23 +27,7 @@ Web3.providers.HttpProvider.prototype.sendAsync =
 /**
  * @desc web3 http instance
  */
-export const web3Instance = new Web3(
-  new Web3.providers.HttpProvider(`https://mainnet.infura.io/`),
-);
-
-export let ens;
-if (typeof window.web3 !== 'undefined') {
-  console.log('web3 browser detected, using.');
-  window.web3.version.getNetwork(function(err, network) {
-    if (err) {
-      console.log(err);
-    }
-    ens = new ENS({
-      provider: web3Instance.currentProvider,
-      network: network,
-    });
-  });
-}
+export const web3Instance = new Web3(new Web3.providers.HttpProvider(provider));
 
 /**
  * @desc set a different web3 provider
@@ -48,6 +37,8 @@ export const web3SetHttpProvider = provider => {
   let providerObj = null;
   if (provider.match(/(https?:\/\/)(\w+.)+/g)) {
     providerObj = new Web3.providers.HttpProvider(provider);
+
+    ens = new ENS({ provider: new HttpProvider(provider) });
   }
   if (!providerObj) {
     throw new Error(

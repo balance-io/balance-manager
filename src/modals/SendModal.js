@@ -37,9 +37,11 @@ import {
   add,
   greaterThan,
 } from '../helpers/bignumber';
-import { capitalize } from '../helpers/utilities';
+import { capitalize, debounceRequest } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 import { ens } from '../handlers/web3';
+
+import _ from 'lodash';
 
 const StyledSuccessMessage = styled.div`
   width: 100%;
@@ -261,6 +263,7 @@ class SendModal extends Component {
   componentDidMount() {
     this.props.sendModalInit();
   }
+
   componentDidUpdate(prevProps) {
     if (this.props.recipient.length >= 42) {
       if (this.props.selected.symbol !== prevProps.selected.symbol) {
@@ -285,9 +288,9 @@ class SendModal extends Component {
   };
 
   updateEns = target => {
-    if (target.value.includes('.')) {
+    if (target.value.includes('.eth')) {
       ens
-        .lookup(target.value.trim())
+        .lookup(target.value)
         .then(address => {
           this.props.sendUpdateRecipient(address, this.props.selected.symbol);
         })
@@ -295,12 +298,12 @@ class SendModal extends Component {
           console.log('ENS failed');
           // console.error(reason);
         });
+    } else {
+      this.props.sendUpdateRecipient(target.value, this.props.selected.symbol);
     }
-    this.props.sendUpdateRecipient(
-      target.value.trim(),
-      this.props.selected.symbol,
-    );
   };
+
+  updateEnsDelay = _.debounce(this.updateEns, 300);
 
   onSubmit = e => {
     e.preventDefault();
@@ -446,7 +449,7 @@ class SendModal extends Component {
                   onFocus={this.onAddressInputFocus}
                   onBlur={this.onAddressInputBlur}
                   onChange={({ target }) => {
-                    this.updateEns(target);
+                    this.updateEnsDelay(target);
                   }}
                 />
                 {this.props.recipient &&

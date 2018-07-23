@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 * Added Greek language translation
+* Added refresh balances/transactions every new block
 
 ### Changed
 

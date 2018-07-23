@@ -24,6 +24,13 @@ export const web3Instance = new Web3(
 );
 
 /**
+ * @desc web3 ws instance
+ */
+export const web3WSInstance = new Web3(
+  new Web3.providers.WebsocketProvider(`wss://mainnet.infura.io/_ws/`),
+);
+
+/**
  * @desc set a different web3 provider
  * @param {String}
  */

@@ -66,7 +66,7 @@ export const getAccountLocal = accountAddress => {
  * @return {Object}
  */
 export const getNativePrices = () => {
-  const nativePrices = getLocal('nativePrices', accountLocalVersion);
+  const nativePrices = getLocal('nativeprices', accountLocalVersion);
   return nativePrices ? nativePrices.data : null;
 };
 
@@ -75,7 +75,7 @@ export const getNativePrices = () => {
  * @param  {String}   [address]
  */
 export const saveNativePrices = nativePrices => {
-  saveLocal('nativePrices', { data: nativePrices }, accountLocalVersion);
+  saveLocal('nativeprices', { data: nativePrices }, accountLocalVersion);
 };
 
 /**
@@ -83,7 +83,7 @@ export const saveNativePrices = nativePrices => {
  * @return {Object}
  */
 export const getNativeCurrency = () => {
-  const nativeCurrency = getLocal('nativeCurrency', globalSettingsVersion);
+  const nativeCurrency = getLocal('nativecurrency', globalSettingsVersion);
   return nativeCurrency ? nativeCurrency.data : null;
 };
 
@@ -92,7 +92,7 @@ export const getNativeCurrency = () => {
  * @param  {String}   [currency]
  */
 export const saveNativeCurrency = nativeCurrency => {
-  saveLocal('nativeCurrency', { data: nativeCurrency }, globalSettingsVersion);
+  saveLocal('nativecurrency', { data: nativeCurrency }, globalSettingsVersion);
 };
 
 /**

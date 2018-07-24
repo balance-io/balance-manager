@@ -48,7 +48,6 @@ export const removeLocal = (key = '') => localStorage.removeItem(key);
 export const resetAccount = accountAddress => {
   accountAddress = accountAddress.toLowerCase();
   removeLocal(accountAddress);
-  removeLocal('nativeCurrency');
   removeLocal('nativePrices');
 };
 

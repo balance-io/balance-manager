@@ -50,5 +50,7 @@ export const walletConnectSignTransaction = async transaction => {
       }
     }
     return null;
-  } catch (error) {}
+  } catch (error) {
+    // TODO: error handling
+  }
 };

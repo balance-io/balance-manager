@@ -9,6 +9,7 @@ const TREZOR_CONNECT_SUCCESS = 'trezor/TREZOR_CONNECT_SUCCESS';
 const TREZOR_CONNECT_FAILURE = 'trezor/TREZOR_CONNECT_FAILURE';
 
 const TREZOR_UPDATE_NETWORK = 'trezor/TREZOR_UPDATE_NETWORK';
+const TREZOR_CLEAR_STATE = 'trezor/TREZOR_CLEAR_STATE';
 
 // -- Actions --------------------------------------------------------------- //
 
@@ -53,6 +54,10 @@ export const trezorUpdateNetwork = network => (dispatch, getState) => {
   dispatch(trezorConnectInit());
 };
 
+export const trezorClearState = () => dispatch => {
+  dispatch({ type: TREZOR_CLEAR_STATE });
+};
+
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
   network: 'mainnet',
@@ -82,6 +87,11 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: false,
+      };
+    case TREZOR_CLEAR_STATE:
+      return {
+        ...state,
+        ...INITIAL_STATE,
       };
     default:
       return state;

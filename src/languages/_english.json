@@ -66,6 +66,7 @@
       "connect_walletconnect": "Use WalletConnect",
       "exchange": "Exchange",
       "send": "Send",
+      "disconnect_account": "Disconnect account",
       "donate": "Donate ETH",
       "receive": "Receive",
       "close": "Close",

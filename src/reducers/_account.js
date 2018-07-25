@@ -535,13 +535,14 @@ export const accountChangeNativeCurrency = nativeCurrency => (
 ) => {
   saveNativeCurrency(nativeCurrency);
   let prices = getState().account.prices || getNativePrices();
+  const accountAddress = getState().account.accountAddress;
   const network = getState().account.network;
   const selected = nativeCurrencies[nativeCurrency];
   let newPrices = { ...prices, selected };
   let oldAccountInfo = getState().account.accountInfo;
   const newAccountInfo = parseAccountBalancesPrices(oldAccountInfo, newPrices);
   const accountInfo = { ...oldAccountInfo, ...newAccountInfo };
-  updateLocalBalances(accountInfo, network);
+  updateLocalBalances(accountAddress, accountInfo, network);
   dispatch({
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
     payload: { nativeCurrency, prices: newPrices, accountInfo },

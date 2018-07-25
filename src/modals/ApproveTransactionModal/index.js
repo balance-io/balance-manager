@@ -1,4 +1,5 @@
 import React from 'react';
+import { modalClose } from '../../reducers/_modal';
 
 import lang from '../../languages';
 
@@ -35,7 +36,7 @@ const ApproveTransactionModal = ({ accountType, onClose }) => (
     </StyledParagraph>
 
     <StyledActions single>
-      <Button onClick={this.onClose}>{lang.t('button.close')}</Button>
+      <Button onClick={onClose}>{lang.t('button.close')}</Button>
     </StyledActions>
   </StyledApproveTransaction>
 );

@@ -37,8 +37,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ### Changed
 * Changed Shapeshift withdrawal list to default to first item instead of BNT
 * Changed default Ledger addresses shown to 20
-  
-### Removed
 
 ## [0.6.0](https://github.com/balance-io/balance-manager/releases/tag/0.6.0)
 
@@ -68,7 +66,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [0.5.4](https://github.com/balance-io/balance-manager/releases/tag/0.5.3)
 
 ### Added
-
 * Bookmark Reminder (anti-phishing) Ribbon
 * Dropdown on account view for choosing language
 * Link to Ledger support page on Ledger connection page

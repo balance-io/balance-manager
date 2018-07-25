@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
+## [0.7.0](https://github.com/balance-io/balance-manager/releases/tag/0.7.0)
+
+### Added
+* Added Greek language translation
+* Added WalletConnect support
+
+### Changed
+ 
+### Removed
+
 ## [0.6.1](https://github.com/balance-io/balance-manager/releases/tag/0.6.1)
 
 ### Added

@@ -10,9 +10,9 @@ import SubscribeForm from '../components/SubscribeForm';
 import Button from '../components/Button';
 import metamaskLogoImage from '../assets/metamask-logo.png';
 import ledgerLogoImage from '../assets/ledger-logo.svg';
-// import walletConnectLogoImage from '../assets/walletconnect-blue.svg';
+import walletConnectLogoImage from '../assets/walletconnect-logo-and-type.svg';
 import trezorLogoImage from '../assets/trezor-logo.svg';
-import { accountUpdateAccountAddress } from '../reducers/_account';
+import { walletConnectHasValidSession } from '../reducers/_walletconnect';
 import { getWalletConnectAccount } from '../handlers/localstorage';
 import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
@@ -58,7 +58,7 @@ const LogoSection = styled.div`
 `;
 
 const LogoText = styled.p`
-  color: #a1a2a9;
+  color: #666;
   font-size: ${fonts.size.smedium};
   font-weight: ${fonts.weight.medium};
   margin-top: 6px;
@@ -123,7 +123,7 @@ const MetamaskLogo = styled.div`
 `;
 
 const MetamaskLogoText = styled(LogoText)`
-  margin: 0 20px 0 196px;
+  margin: 0 20px 0 176px;
 `;
 
 const TrezorLogo = styled.div`
@@ -134,32 +134,38 @@ const TrezorLogo = styled.div`
   width: 109px;
 `;
 
-// const StyledWalletConnectLogo = styled.div`
-//   margin: 8px 0;
-//   height: 54px;
-//   background: url(${walletConnectLogoImage});
-//   background-size: contain;
-//   background-repeat: no-repeat;
-// `;
-//
-// const StyledWalletConnectButton = ConnectButton.extend`
-//   &:hover {
-//     background: #454852;
-//   }
-//   &:active {
-//     background: #2b2d33;
-//   }
-// `;
+const StyledWalletConnectLogo = styled.div`
+  margin: 22px 0 8px 0;
+  height: 32px;
+  background: url(${walletConnectLogoImage});
+  background-size: contain;
+  background-repeat: no-repeat;
+`;
+
+const StyledWalletConnectButton = ConnectButton.extend`
+  &:hover {
+    background: #454852;
+  }
+  &:active {
+    background: #2b2d33;
+  }
+`;
 
 class Home extends Component {
   onWalletConnectInit = () => {
-    const storedAddress = getWalletConnectAccount();
-    if (storedAddress) {
-      this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
-      this.props.history.push('/wallet');
-    } else {
-      this.props.modalOpen('WALLET_CONNECT', null);
-    }
+    this.props
+      .walletConnectHasValidSession()
+      .then(isValid => {
+        if (isValid) {
+          this.props.history.push('/wallet');
+        } else {
+          this.props.modalOpen('WALLET_CONNECT', null);
+        }
+      })
+      .catch(error => {
+        console.log('error checking valid session', error);
+        this.props.modalOpen('WALLET_CONNECT', null);
+      });
   };
   render = () => (
     <BaseLayout>
@@ -168,6 +174,14 @@ class Home extends Component {
           <MetamaskLogo />
           <MetamaskLogoText>
             {lang.t('homepage.connect_metamask.description')}
+            <LedgerAffiliateLink
+              href="https://metamask.io"
+              target="_blank"
+              title={lang.t('homepage.connect_metamask.link_title')}
+            >
+              {lang.t('homepage.connect_metamask.link_text')}
+            </LedgerAffiliateLink>
+            .
           </MetamaskLogoText>
           <Link to="/metamask">
             <MetamaskButton left color="orange">
@@ -225,34 +239,44 @@ class Home extends Component {
         </CardContainer>
       </StyledCard>
 
-      {/* <StyledCard>
+      <StyledCard>
         <CardContainer>
           <LogoSection>
             <StyledWalletConnectLogo />
-            <LogoText>{lang.t('homepage.connect_walletconnect')}</LogoText>
+            <LogoText>
+              {lang.t('homepage.connect_walletconnect.description')}
+              <LedgerAffiliateLink
+                href="https://walletconnect.org/"
+                target="_blank"
+                title={lang.t('homepage.connect_walletconnect.link_title')}
+              >
+                {lang.t('homepage.connect_walletconnect.link_text')}
+              </LedgerAffiliateLink>
+              .
+            </LogoText>
           </LogoSection>
           <StyledWalletConnectButton
             left
             color="walletconnect"
             onClick={this.onWalletConnectInit}
           >
-            {lang.t('button.connect_walletconnect')}
+            {lang.t('homepage.connect_walletconnect.button')}
           </StyledWalletConnectButton>
         </CardContainer>
-      </StyledCard> */}
+      </StyledCard>
     </BaseLayout>
   );
 }
 
 Home.propTypes = {
   modalOpen: PropTypes.func.isRequired,
-  accountUpdateAccountAddress: PropTypes.func.isRequired,
+  walletConnectHasValidSession: PropTypes.func.isRequired,
 };
 
 export default connect(
   null,
   {
     modalOpen,
-    accountUpdateAccountAddress,
+    walletConnectHasValidSession,
   },
 )(Home);

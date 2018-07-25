@@ -192,7 +192,8 @@ class AccountBalances extends Component {
     this.setState({ showMoreTokens: !this.state.showMoreTokens });
   };
   render() {
-    if (!this.props.accountInfo.assets) return null;
+    const { accountInfo } = this.props;
+    if (!accountInfo.assets) return null;
     const ethereum = this.props.accountInfo.assets.filter(
       asset => asset.symbol === 'ETH',
     )[0];
@@ -250,9 +251,7 @@ class AccountBalances extends Component {
         </StyledEthereum>
         {!!tokensAlwaysDisplay &&
           tokensAlwaysDisplay.map(token => (
-            <StyledToken
-              key={`${this.props.accountInfo.address}-${token.symbol}`}
-            >
+            <StyledToken key={`${accountInfo.address}-${token.symbol}`}>
               <StyledAsset>
                 <AssetIcon asset={token.address} />
                 <p>{token.name}</p>
@@ -274,9 +273,7 @@ class AccountBalances extends Component {
         {!!tokensToggleDisplay.length &&
           this.state.showMoreTokens &&
           tokensToggleDisplay.map(token => (
-            <StyledToken
-              key={`${this.props.accountInfo.address}-${token.symbol}`}
-            >
+            <StyledToken key={`${accountInfo.address}-${token.symbol}`}>
               <StyledAsset data-toggle="tooltip" title={token.name}>
                 <AssetIcon asset={token.address} />
                 <p>{ellipseText(token.name, 30)}</p>
@@ -316,7 +313,7 @@ class AccountBalances extends Component {
           ) : (
             <div />
           )}
-          <p>{`${this.props.accountInfo.total.display || '———'}`}</p>
+          <p>{`${accountInfo.total.display || '———'}`}</p>
         </StyledLastRow>
       </StyledGrid>
     );

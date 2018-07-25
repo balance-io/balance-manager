@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -10,9 +11,9 @@ import Button from '../../components/Button';
 import CopyToClipboard from '../../components/CopyToClipboard';
 import AccountBalances from './AccountBalances';
 import AccountTransactions from './AccountTransactions';
-import AccountInteractions from './AccountInteractions';
+import AccountUniqueTokens from './AccountUniqueTokens';
 import arrowUp from '../../assets/arrow-up.svg';
-// import exchangeIcon from '../../assets/exchange-icon.svg';
+import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { modalOpen } from '../../reducers/_modal';
 import { capitalize } from '../../helpers/utilities';
@@ -81,93 +82,112 @@ class Account extends Component {
   openExchangeModal = () => this.props.modalOpen('EXCHANGE_MODAL');
   openSendModal = () => this.props.modalOpen('SEND_MODAL');
   openReceiveModal = () => this.props.modalOpen('RECEIVE_MODAL');
-  render() {
-    return (
-      <StyledAccount>
-        <Card
-          fetching={this.props.fetching || this.props.fetchingWallet}
-          fetchingMessage={this.props.fetchingMessage}
-          background={'lightGrey'}
-          minHeight={200}
-        >
-          {!!this.props.accountAddress ? (
-            <StyledFlex>
-              <StyledTop>
-                <StyledAddressWrapper>
-                  <h6>{capitalize(this.props.accountType)} </h6>
-                  <CopyToClipboard
-                    iconOnHover
-                    text={this.props.accountAddress}
-                  />
-                </StyledAddressWrapper>
 
-                <StyledActions>
-                  {/* {this.props.network === 'mainnet' && (
-                    <Button
-                      left
-                      color="brightGreen"
-                      hoverColor="brightGreenHover"
-                      activeColor="brightGreenHover"
-                      icon={exchangeIcon}
-                      onClick={this.openExchangeModal}
-                    >
-                      {lang.t('button.exchange')}
-                    </Button>
-                  )} */}
-                  <Button
-                    left
-                    color="blue"
-                    hoverColor="blueHover"
-                    activeColor="blueActive"
-                    icon={qrCode}
-                    onClick={this.openReceiveModal}
-                  >
-                    {lang.t('button.receive')}
-                  </Button>
-                  <Button
-                    left
-                    color="blue"
-                    hoverColor="blueHover"
-                    activeColor="blueActive"
-                    icon={arrowUp}
-                    onClick={this.openSendModal}
-                  >
-                    {lang.t('button.send')}
-                  </Button>
-                </StyledActions>
-              </StyledTop>
+  componentDidUpdate() {
+    const {
+      hasPendingTransaction,
+      history,
+      location: { pathname },
+      match,
+    } = this.props;
 
-              <TabMenu match={this.props.match} />
+    const transactionsRoute = 'transactions';
+    const isTransactionRoute = pathname.split('/')[2] === transactionsRoute;
 
-              <Switch>
-                <Route
-                  exact
-                  path={this.props.match.url}
-                  component={AccountBalances}
-                />
-                <Route
-                  exact
-                  path={`${this.props.match.url}/transactions`}
-                  component={AccountTransactions}
-                />
-                <Route
-                  exact
-                  path={`${this.props.match.url}/interactions`}
-                  component={AccountInteractions}
-                />
-                <Route render={() => <Redirect to={this.props.match.url} />} />
-              </Switch>
-            </StyledFlex>
-          ) : (
-            <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
-          )}
-        </Card>
-      </StyledAccount>
-    );
+    // If the user initiates a pending transaction, reroute them
+    // to the '/transactions' route/tab so the pending transaction is visible.
+    if (hasPendingTransaction && !isTransactionRoute) {
+      history.push(`${match.url}/${transactionsRoute}`);
+    }
   }
+
+  render = () => (
+    <StyledAccount>
+      <Card
+        fetching={this.props.fetching || this.props.fetchingWallet}
+        fetchingMessage={this.props.fetchingMessage}
+        background={'lightGrey'}
+        minHeight={200}
+      >
+        {!!this.props.accountAddress ? (
+          <StyledFlex>
+            <StyledTop>
+              <StyledAddressWrapper>
+                <h6>{capitalize(this.props.accountType)} </h6>
+                <CopyToClipboard iconOnHover text={this.props.accountAddress} />
+              </StyledAddressWrapper>
+
+              <StyledActions>
+                {this.props.network === 'mainnet' && (
+                  <Button
+                    left
+                    color="brightGreen"
+                    hoverColor="brightGreenHover"
+                    activeColor="brightGreenHover"
+                    icon={exchangeIcon}
+                    onClick={this.openExchangeModal}
+                  >
+                    {lang.t('button.exchange')}
+                  </Button>
+                )}
+                <Button
+                  left
+                  color="blue"
+                  hoverColor="blueHover"
+                  activeColor="blueActive"
+                  icon={qrCode}
+                  onClick={this.openReceiveModal}
+                >
+                  {lang.t('button.receive')}
+                </Button>
+                <Button
+                  left
+                  color="blue"
+                  hoverColor="blueHover"
+                  activeColor="blueActive"
+                  icon={arrowUp}
+                  onClick={this.openSendModal}
+                >
+                  {lang.t('button.send')}
+                </Button>
+              </StyledActions>
+            </StyledTop>
+
+            <TabMenu match={this.props.match} />
+
+            <Switch>
+              <Route
+                exact
+                path={this.props.match.url}
+                component={AccountBalances}
+              />
+              <Route
+                exact
+                path={`${this.props.match.url}/transactions`}
+                render={() => (
+                  <AccountTransactions
+                    hasPendingTransaction={this.props.hasPendingTransaction}
+                  />
+                )}
+              />
+              <Route
+                exact
+                path={`${this.props.match.url}/uniquetokens`}
+                component={AccountUniqueTokens}
+              />
+              <Route render={() => <Redirect to={this.props.match.url} />} />
+            </Switch>
+          </StyledFlex>
+        ) : (
+          <StyledMessage>{lang.t('message.failed_request')}</StyledMessage>
+        )}
+      </Card>
+    </StyledAccount>
+  );
 }
 
 Account.propTypes = {
+  history: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool.isRequired,
@@ -184,16 +204,19 @@ Account.defaultProps = {
 };
 
 const reduxProps = ({ account }) => ({
-  network: account.network,
-  fetching: account.fetching,
-  accountInfo: account.accountInfo,
   accountAddress: account.accountAddress,
+  accountInfo: account.accountInfo,
   accountType: account.accountType,
+  fetching: account.fetching,
+  hasPendingTransaction: account.hasPendingTransaction,
+  network: account.network,
 });
 
-export default connect(
-  reduxProps,
-  {
-    modalOpen,
-  },
-)(Account);
+export default withRouter(
+  connect(
+    reduxProps,
+    {
+      modalOpen,
+    },
+  )(Account),
+);

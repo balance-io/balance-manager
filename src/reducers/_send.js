@@ -21,7 +21,10 @@ import {
   estimateGasLimit,
 } from '../handlers/web3';
 import { notificationShow } from './_notification';
-import { accountUpdateTransactions } from './_account';
+import {
+  accountUpdateTransactions,
+  accountUpdateHasPendingTransaction,
+} from './_account';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -44,6 +47,8 @@ const SEND_UPDATE_NATIVE_AMOUNT = 'send/SEND_UPDATE_NATIVE_AMOUNT';
 const SEND_UPDATE_RECIPIENT = 'send/SEND_UPDATE_RECIPIENT';
 const SEND_UPDATE_ASSET_AMOUNT = 'send/SEND_UPDATE_ASSET_AMOUNT';
 const SEND_UPDATE_SELECTED = 'send/SEND_UPDATE_SELECTED';
+const SEND_UPDATE_HAS_PENDING_TRANSACTION =
+  'send/SEND_UPDATE_HAS_PENDING_TRANSACTION';
 
 const SEND_CLEAR_FIELDS = 'send/SEND_CLEAR_FIELDS';
 
@@ -149,15 +154,16 @@ export const sendUpdateGasPrice = newGasPriceOption => (dispatch, getState) => {
     });
 };
 
-export const sendTransaction = ({
-  address,
-  recipient,
-  amount,
-  asset,
-  gasPrice,
-  gasLimit,
-}) => (dispatch, getState) => {
+export const sendTransaction = transactionDetails => (dispatch, getState) => {
   dispatch({ type: SEND_TRANSACTION_REQUEST });
+  const {
+    address,
+    recipient,
+    amount,
+    asset,
+    gasPrice,
+    gasLimit,
+  } = transactionDetails;
   const { accountType } = getState().account;
   const txDetails = {
     asset: asset,
@@ -170,6 +176,8 @@ export const sendTransaction = ({
   };
   web3SendTransactionMultiWallet(txDetails, accountType)
     .then(txHash => {
+      // has pending transactions set to true for redirect to Transactions route
+      dispatch(accountUpdateHasPendingTransaction());
       txDetails.hash = txHash;
       dispatch(accountUpdateTransactions(txDetails));
       dispatch({
@@ -257,6 +265,7 @@ export const sendUpdateSelected = value => (dispatch, getState) => {
 export const sendMaxBalance = () => (dispatch, getState) => {
   const { selected, gasPrice } = getState().send;
   const { accountInfo } = getState().account;
+  let amount = '';
   if (selected.symbol === 'ETH') {
     const ethereum = accountInfo.assets.filter(
       asset => asset.symbol === 'ETH',
@@ -266,15 +275,11 @@ export const sendMaxBalance = () => (dispatch, getState) => {
     const remaining = convertStringToNumber(
       subtract(balanceAmount, txFeeAmount),
     );
-    const ether = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
-    dispatch(sendUpdateAssetAmount(ether));
+    amount = convertAmountFromBigNumber(remaining < 0 ? '0' : remaining);
   } else {
-    dispatch(
-      sendUpdateAssetAmount(
-        convertAmountFromBigNumber(selected.balance.amount),
-      ),
-    );
+    amount = convertAmountFromBigNumber(selected.balance.amount);
   }
+  dispatch(sendUpdateAssetAmount(amount));
 };
 
 export const sendClearFields = () => ({ type: SEND_CLEAR_FIELDS });
@@ -360,6 +365,8 @@ export default (state = INITIAL_STATE, action) => {
         txHash: '',
         confirm: false,
       };
+    case SEND_UPDATE_HAS_PENDING_TRANSACTION:
+      return { ...state, hasPendingTransaction: action.payload };
     case SEND_TOGGLE_CONFIRMATION_VIEW:
       return {
         ...state,

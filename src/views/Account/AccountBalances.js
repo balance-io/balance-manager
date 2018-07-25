@@ -330,4 +330,7 @@ const reduxProps = ({ account }) => ({
   accountInfo: account.accountInfo,
 });
 
-export default connect(reduxProps, null)(AccountBalances);
+export default connect(
+  reduxProps,
+  null,
+)(AccountBalances);

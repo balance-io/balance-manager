@@ -11,15 +11,16 @@ import {
   convertAmountToAssetAmount,
 } from '../helpers/bignumber';
 import { ledgerEthSignTransaction } from './ledger-eth';
+import { trezorEthSignTransaction } from './trezor-eth';
 import { walletConnectSignTransaction } from './walletconnect';
 import ethUnits from '../references/ethereum-units.json';
 import smartContractMethods from '../references/smartcontract-methods.json';
 import ENS from 'ethjs-ens';
 import HttpProvider from 'ethjs-provider-http';
-const provider = `https://mainnet.infura.io/`;
-const httpProvider = new HttpProvider('https://mainnet.infura.io');
 
-export let ens = new ENS({ provider: httpProvider, network: '1' });
+const provider = `https://mainnet.infura.io/`;
+
+export let ens = new ENS({ provider: new HttpProvider(provider), network: 1 });
 
 Web3.providers.HttpProvider.prototype.sendAsync =
   Web3.providers.HttpProvider.prototype.send;
@@ -38,7 +39,9 @@ export const web3SetHttpProvider = provider => {
   if (provider.match(/(https?:\/\/)(\w+.)+/g)) {
     providerObj = new Web3.providers.HttpProvider(provider);
 
-    ens = new ENS({ provider: new HttpProvider(provider) });
+    let network = provider.includes('mainnet') ? 1 : 3;
+
+    ens = new ENS({ provider: new HttpProvider(provider), network });
   }
   if (!providerObj) {
     throw new Error(
@@ -256,25 +259,6 @@ export const web3MetamaskSendTransaction = transaction =>
   });
 
 /**
- * @desc metamask transfer token
- * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
- * @return {Promise}
- */
-export const web3MetamaskTransferToken = transaction =>
-  new Promise((resolve, reject) => {
-    transaction = getTransferTokenTransaction(transaction);
-    web3MetamaskSendTransaction({
-      from: transaction.from,
-      to: transaction.to,
-      data: transaction.data,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-    })
-      .then(txHash => resolve(txHash))
-      .catch(error => reject(error));
-  });
-
-/**
  * @desc walletconnect send transaction
  * @param  {Object}  transaction { from, to, value, data, gasPrice}
  * @return {Promise}
@@ -310,25 +294,6 @@ export const web3WalletConnectSendTransaction = transaction =>
           })
           .catch(error => reject(error));
       })
-      .catch(error => reject(error));
-  });
-
-/**
- * @desc walletconnect transfer token
- * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
- * @return {Promise}
- */
-export const web3WalletConnectTransferToken = transaction =>
-  new Promise((resolve, reject) => {
-    transaction = getTransferTokenTransaction(transaction);
-    web3WalletConnectSendTransaction({
-      from: transaction.from,
-      to: transaction.to,
-      data: transaction.data,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-    })
-      .then(txHash => resolve(txHash))
       .catch(error => reject(error));
   });
 
@@ -369,22 +334,35 @@ export const web3LedgerSendTransaction = transaction =>
       .catch(error => reject(error));
   });
 
-/**
- * @desc ledger transfer token
- * @param  {Object}  transaction { asset, from, to, amount, gasPrice }
- * @return {Promise}
- */
-export const web3LedgerTransferToken = transaction =>
+export const web3TrezorSendTransaction = transaction =>
   new Promise((resolve, reject) => {
-    transaction = getTransferTokenTransaction(transaction);
-    web3LedgerSendTransaction({
-      from: transaction.from,
-      to: transaction.to,
-      data: transaction.data,
+    const from =
+      transaction.from.substr(0, 2) === '0x'
+        ? transaction.from
+        : `0x${transaction.from}`;
+    const to =
+      transaction.to.substr(0, 2) === '0x'
+        ? transaction.to
+        : `0x${transaction.to}`;
+    const value = transaction.value ? toWei(transaction.value) : '0x00';
+    const data = transaction.data ? transaction.data : '0x';
+    getTxDetails({
+      from,
+      to,
+      data,
+      value,
       gasPrice: transaction.gasPrice,
       gasLimit: transaction.gasLimit,
     })
-      .then(txHash => resolve(txHash))
+      .then(txDetails => {
+        trezorEthSignTransaction(txDetails)
+          .then(signedTx =>
+            web3SendSignedTransaction(signedTx)
+              .then(txHash => resolve(txHash))
+              .catch(error => reject(error)),
+          )
+          .catch(error => reject(error));
+      })
       .catch(error => reject(error));
   });
 
@@ -395,37 +373,26 @@ export const web3LedgerTransferToken = transaction =>
  */
 export const web3SendTransactionMultiWallet = (transaction, accountType) => {
   let method = null;
-  if (transaction.asset.symbol === 'ETH') {
-    transaction.value = transaction.amount;
-    switch (accountType) {
-      case 'METAMASK':
-        method = web3MetamaskSendTransaction;
-        break;
-      case 'LEDGER':
-        method = web3LedgerSendTransaction;
-        break;
-      case 'WALLETCONNECT':
-        method = web3WalletConnectSendTransaction;
-        break;
-      default:
-        method = web3MetamaskSendTransaction;
-        break;
-    }
-  } else {
-    switch (accountType) {
-      case 'METAMASK':
-        method = web3MetamaskTransferToken;
-        break;
-      case 'LEDGER':
-        method = web3LedgerTransferToken;
-        break;
-      case 'WALLETCONNECT':
-        method = web3WalletConnectTransferToken;
-        break;
-      default:
-        method = web3MetamaskTransferToken;
-        break;
-    }
+  transaction.value = transaction.amount;
+  if (transaction.asset.symbol !== 'ETH') {
+    transaction = getTransferTokenTransaction(transaction);
+  }
+  switch (accountType) {
+    case 'METAMASK':
+      method = web3MetamaskSendTransaction;
+      break;
+    case 'LEDGER':
+      method = web3LedgerSendTransaction;
+      break;
+    case 'TREZOR':
+      method = web3TrezorSendTransaction;
+      break;
+    case 'WALLETCONNECT':
+      method = web3WalletConnectSendTransaction;
+      break;
+    default:
+      method = web3MetamaskSendTransaction;
+      break;
   }
   return method(transaction);
 };

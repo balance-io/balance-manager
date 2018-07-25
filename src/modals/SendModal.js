@@ -37,11 +37,11 @@ import {
   add,
   greaterThan,
 } from '../helpers/bignumber';
-import { capitalize, debounceRequest } from '../helpers/utilities';
+import { capitalize } from '../helpers/utilities';
 import { fonts, colors } from '../styles';
 import { ens } from '../handlers/web3';
 
-import _ from 'lodash';
+import _debounce from 'lodash/debounce';
 
 const StyledSuccessMessage = styled.div`
   width: 100%;
@@ -292,18 +292,19 @@ class SendModal extends Component {
       ens
         .lookup(target.value)
         .then(address => {
+          //console.log('ens success', address);
+
           this.props.sendUpdateRecipient(address, this.props.selected.symbol);
         })
         .catch(reason => {
-          console.log('ENS failed');
-          // console.error(reason);
+          console.log('ENS failed', target.value);
         });
     } else {
       this.props.sendUpdateRecipient(target.value, this.props.selected.symbol);
     }
   };
 
-  updateEnsDelay = _.debounce(this.updateEns, 300);
+  updateEnsDelay = _debounce(this.updateEns, 300);
 
   onSubmit = e => {
     e.preventDefault();
@@ -749,17 +750,20 @@ const reduxProps = ({ modal, send, account }) => ({
   prices: account.prices,
 });
 
-export default connect(reduxProps, {
-  modalClose,
-  sendModalInit,
-  sendUpdateGasPrice,
-  sendTransaction,
-  sendClearFields,
-  sendUpdateRecipient,
-  sendUpdateNativeAmount,
-  sendUpdateAssetAmount,
-  sendUpdateSelected,
-  sendMaxBalance,
-  sendToggleConfirmationView,
-  notificationShow,
-})(SendModal);
+export default connect(
+  reduxProps,
+  {
+    modalClose,
+    sendModalInit,
+    sendUpdateGasPrice,
+    sendTransaction,
+    sendClearFields,
+    sendUpdateRecipient,
+    sendUpdateNativeAmount,
+    sendUpdateAssetAmount,
+    sendUpdateSelected,
+    sendMaxBalance,
+    sendToggleConfirmationView,
+    notificationShow,
+  },
+)(SendModal);

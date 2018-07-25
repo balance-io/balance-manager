@@ -36,8 +36,11 @@ Router.contextTypes = {
 };
 
 export default withRouter(
-  connect(null, {
-    warningOffline,
-    warningOnline,
-  })(Router),
+  connect(
+    null,
+    {
+      warningOffline,
+      warningOnline,
+    },
+  )(Router),
 );

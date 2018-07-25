@@ -39,7 +39,7 @@ export const web3SetHttpProvider = provider => {
   if (provider.match(/(https?:\/\/)(\w+.)+/g)) {
     providerObj = new Web3.providers.HttpProvider(provider);
 
-    let network = provider.includes('mainnet') ? 1 : 3;
+    let network = provider.includes('ropsten') ? 3 : 1;
 
     ens = new ENS({ provider: new HttpProvider(provider), network });
   }

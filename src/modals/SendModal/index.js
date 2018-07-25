@@ -119,9 +119,6 @@ class SendModal extends Component {
   state = {
     isValidAddress: true,
     showQRCodeReader: false,
-    input: {
-      recipient: '',
-    },
   };
 
   componentDidMount() {
@@ -167,8 +164,6 @@ class SendModal extends Component {
         .catch(reason => {
           console.log('ENS failed', target.value);
         });
-    } else {
-      this.props.sendUpdateRecipient(target.value, this.props.selected.symbol);
     }
   };
 

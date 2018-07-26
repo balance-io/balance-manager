@@ -57,7 +57,7 @@ class ReminderRibbon extends Component {
       if (window.navigator.platform === 'MacIntel') {
         return '⌘+D to bookmark Balance Manager and protect yourself from phishing attacks';
       } else {
-        return 'CTRL+D to bookmark Balance Manger and protect yourself from phishing attacks';
+        return 'CTRL+D to bookmark Balance Manager and protect yourself from phishing attacks';
       }
     }
   };

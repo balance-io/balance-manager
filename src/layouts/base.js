@@ -20,9 +20,15 @@ import { ledgerUpdateNetwork } from '../reducers/_ledger';
 import { trezorUpdateNetwork } from '../reducers/_trezor';
 import {
   accountChangeNativeCurrency,
+  accountClearState,
   accountUpdateAccountAddress,
   accountChangeLanguage,
 } from '../reducers/_account';
+import { metamaskClearState } from '../reducers/_metamask';
+import { ledgerClearState } from '../reducers/_ledger';
+import { trezorClearState } from '../reducers/_trezor';
+import { walletConnectClearState } from '../reducers/_walletconnect';
+import { resetAccount, resetWalletConnect } from '../handlers/localstorage';
 import ReminderRibbon from '../components/ReminderRibbon';
 import { colors, responsive } from '../styles';
 import { resources } from '../languages';
@@ -117,25 +123,30 @@ const StyledFooterRight = styled.div`
 `;
 
 const BaseLayout = ({
-  children,
-  metamaskFetching,
-  ledgerFetching,
-  trezorFetching,
-  accountType,
   accountAddress,
-  ledgerAccounts,
-  ledgerUpdateNetwork,
-  trezorAccounts,
-  trezorUpdateNetwork,
-  accountChangeNativeCurrency,
-  accountUpdateAccountAddress,
   accountChangeLanguage,
-  nativeCurrency,
+  accountChangeNativeCurrency,
+  accountClearState,
+  accountType,
+  accountUpdateAccountAddress,
+  children,
   language,
-  network,
-  web3Available,
-  online,
+  ledgerAccounts,
+  ledgerClearState,
+  ledgerFetching,
+  ledgerUpdateNetwork,
+  metamaskClearState,
+  metamaskFetching,
   modalOpen,
+  nativeCurrency,
+  network,
+  online,
+  trezorAccounts,
+  trezorClearState,
+  trezorUpdateNetwork,
+  trezorFetching,
+  walletConnectClearState,
+  web3Available,
   ...props
 }) => {
   const addresses = {};
@@ -163,6 +174,20 @@ const BaseLayout = ({
       accountType !== 'METAMASK') &&
     accountAddress;
   const openSendModal = () => modalOpen('DONATION_MODAL');
+  const disconnectAccount = () => {
+    accountClearState();
+    resetAccount(accountAddress);
+    if (accountType === 'TREZOR') {
+      trezorClearState();
+    } else if (accountType === 'LEDGER') {
+      ledgerClearState();
+    } else if (accountType === 'WALLETCONNECT') {
+      walletConnectClearState();
+      resetWalletConnect();
+    } else if (accountType === 'METAMASK') {
+      metamaskClearState();
+    }
+  };
   return (
     <StyledLayout>
       <ReminderRibbon maxWidth={1000} />
@@ -245,12 +270,16 @@ const BaseLayout = ({
       </Column>
       <StyledFooter>
         <StyledFooterLeft>
-          <div />
-        </StyledFooterLeft>
-        <StyledFooterRight>
           {window.location.pathname !== '/' && (
             <TextButton onClick={openSendModal}>
               {lang.t('button.donate')}
+            </TextButton>
+          )}
+        </StyledFooterLeft>
+        <StyledFooterRight>
+          {window.location.pathname !== '/' && (
+            <TextButton onClick={disconnectAccount}>
+              <Link to="/">{lang.t('button.disconnect_account')}</Link>
             </TextButton>
           )}
         </StyledFooterRight>
@@ -263,23 +292,28 @@ const BaseLayout = ({
 };
 
 BaseLayout.propTypes = {
-  children: PropTypes.node.isRequired,
-  metamaskFetching: PropTypes.bool.isRequired,
-  ledgerFetching: PropTypes.bool.isRequired,
-  ledgerUpdateNetwork: PropTypes.func.isRequired,
-  trezorFetching: PropTypes.bool.isRequired,
-  trezorUpdateNetwork: PropTypes.func.isRequired,
   accountChangeNativeCurrency: PropTypes.func.isRequired,
+  accountClearState: PropTypes.func.isRequired,
   accountUpdateAccountAddress: PropTypes.func.isRequired,
   accountChangeLanguage: PropTypes.func.isRequired,
   accountType: PropTypes.string.isRequired,
   accountAddress: PropTypes.string.isRequired,
-  nativeCurrency: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
   language: PropTypes.string.isRequired,
-  network: PropTypes.string.isRequired,
-  web3Available: PropTypes.bool.isRequired,
-  online: PropTypes.bool.isRequired,
+  ledgerClearState: PropTypes.func.isRequired,
+  ledgerFetching: PropTypes.bool.isRequired,
+  ledgerUpdateNetwork: PropTypes.func.isRequired,
+  metamaskClearState: PropTypes.func.isRequired,
+  metamaskFetching: PropTypes.bool.isRequired,
   modalOpen: PropTypes.func.isRequired,
+  nativeCurrency: PropTypes.string.isRequired,
+  network: PropTypes.string.isRequired,
+  online: PropTypes.bool.isRequired,
+  trezorClearState: PropTypes.func.isRequired,
+  trezorFetching: PropTypes.bool.isRequired,
+  trezorUpdateNetwork: PropTypes.func.isRequired,
+  walletConnectClearState: PropTypes.func.isRequired,
+  web3Available: PropTypes.bool.isRequired,
 };
 
 const reduxProps = ({ account, ledger, trezor, metamask, warning }) => ({
@@ -300,11 +334,16 @@ const reduxProps = ({ account, ledger, trezor, metamask, warning }) => ({
 export default connect(
   reduxProps,
   {
-    ledgerUpdateNetwork,
-    trezorUpdateNetwork,
-    accountChangeNativeCurrency,
-    accountUpdateAccountAddress,
-    modalOpen,
     accountChangeLanguage,
+    accountChangeNativeCurrency,
+    accountClearState,
+    accountUpdateAccountAddress,
+    ledgerClearState,
+    ledgerUpdateNetwork,
+    metamaskClearState,
+    modalOpen,
+    trezorClearState,
+    trezorUpdateNetwork,
+    walletConnectClearState,
   },
 )(BaseLayout);

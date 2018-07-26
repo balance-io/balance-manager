@@ -50,7 +50,8 @@
       "send": "Enviar",
       "send_another": "Enviar outro",
       "try_again": "Tente novamente",
-      "view": "Visualizar"
+      "view": "Visualizar",
+      "reload": "Recarregar"
     },
     "homepage": {
       "coming_soon": "Em breve.",

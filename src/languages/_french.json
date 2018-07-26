@@ -75,7 +75,8 @@
       "notify_me": "Recevoir des notifications",
       "try_again": "Réessayer",
       "learn_more": "En savoir plus",
-      "view": "Affichage"
+      "view": "Affichage",
+      "reload": "Recharger"
     },
     "input": {
       "recipient_address": "Adresse du destinataire",

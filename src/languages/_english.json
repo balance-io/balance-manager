@@ -78,7 +78,8 @@
       "notify_me": "Get notified",
       "try_again": "Try again",
       "learn_more": "Learn more",
-      "view": "View"
+      "view": "View",
+      "reload": "Refresh"
     },
     "input": {
       "recipient_address": "Recipient Address",

@@ -67,7 +67,8 @@
       "go_back": "Regressar",
       "send_another": "Enviar otro",
       "notify_me": "Ser notificado",
-      "try_again": "Intentar otra vez"
+      "try_again": "Intentar otra vez",
+      "reload": "Recargar"
     },
     "input": {
       "recipient_address": "Recipiente Dirección",

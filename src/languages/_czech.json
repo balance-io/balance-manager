@@ -17,7 +17,12 @@
         "link_title": "Koupit Trezor HW peněženku",
         "button": "Připojit se k Trezoru"
       },
-      "connect_walletconnect": "Připojit se a podepsat pomocí WalletConnect-enabled mobilní peněženky.",
+      "connect_walletconnect": {
+        "description": "Připojit se a podepsat pomocí WalletConnect-enabled mobilní peněženky.",
+        "link_text": "Trezor hardware wallet",
+        "link_title": "Buy a Trezor hardware wallet",
+        "button": "Connect with WalletConnect"
+      },
       "coming_soon": "Již brzy."
     },
     "account": {

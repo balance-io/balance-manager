@@ -9,6 +9,7 @@ const LEDGER_CONNECT_SUCCESS = 'ledger/LEDGER_CONNECT_SUCCESS';
 const LEDGER_CONNECT_FAILURE = 'ledger/LEDGER_CONNECT_FAILURE';
 
 const LEDGER_UPDATE_NETWORK = 'ledger/LEDGER_UPDATE_NETWORK';
+const LEDGER_CLEAR_STATE = 'ledger/LEDGER_CLEAR_STATE';
 
 // -- Actions --------------------------------------------------------------- //
 
@@ -50,6 +51,10 @@ export const ledgerUpdateNetwork = network => (dispatch, getState) => {
   dispatch(accountUpdateAccountAddress(accountAddress, 'LEDGER'));
 };
 
+export const ledgerClearState = () => dispatch => {
+  dispatch({ type: LEDGER_CLEAR_STATE });
+};
+
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
   network: 'mainnet',
@@ -74,6 +79,11 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: false,
+      };
+    case LEDGER_CLEAR_STATE:
+      return {
+        ...state,
+        ...INITIAL_STATE,
       };
     default:
       return state;

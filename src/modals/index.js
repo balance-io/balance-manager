@@ -53,7 +53,7 @@ const reduxProps = ({ modal }) => ({
 });
 
 class Modal extends Component {
-  propTypes = {
+  static propTypes = {
     modalClose: PropTypes.func.isRequired,
     sendClearFields: PropTypes.func.isRequired,
     exchangeClearFields: PropTypes.func.isRequired,

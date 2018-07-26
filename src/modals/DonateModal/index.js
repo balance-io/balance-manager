@@ -74,7 +74,7 @@ const reduxProps = ({ modal, send, account }) => ({
 });
 
 class DonateModal extends Component {
-  propTypes = {
+  static propTypes = {
     sendModalInit: PropTypes.func.isRequired,
     sendUpdateGasPrice: PropTypes.func.isRequired,
     sendTransaction: PropTypes.func.isRequired,
@@ -277,6 +277,7 @@ class DonateModal extends Component {
                     <span>{`${lang.t('modal.gas_fee')}: ${calcTxFee(
                       this.props.gasPrices,
                       this.props.gasPriceOption,
+                      this.props.nativeCurrency,
                     )}`}</span>
                   </StyledParagraph>
 

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import lang, { updateLanguage } from '../languages';
 import {
-  apiShapeshiftSendAmount,
+  apiShapeshiftGetCoins,
   apiShapeshiftGetDepositStatus,
   apiGetAccountBalances,
   apiGetAccountTransactions,
@@ -451,14 +451,9 @@ export const accountShapeshiftVerify = () => dispatch => {
   dispatch({
     type: ACCOUNT_SHAPESHIFT_VERIFY_REQUEST,
   });
-  apiShapeshiftSendAmount({
-    depositSymbol: 'ETH',
-    withdrawalSymbol: 'BNT',
-    withdrawalAmount: '0.5',
-  })
+  apiShapeshiftGetCoins()
     .then(({ data }) => {
       dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_SUCCESS });
-      dispatch(exchangeUpdateExchangeDetails(data.success));
     })
     .catch(() => dispatch({ type: ACCOUNT_SHAPESHIFT_VERIFY_FAILURE }));
 };
@@ -540,13 +535,14 @@ export const accountChangeNativeCurrency = nativeCurrency => (
 ) => {
   saveNativeCurrency(nativeCurrency);
   let prices = getState().account.prices || getNativePrices();
+  const accountAddress = getState().account.accountAddress;
   const network = getState().account.network;
   const selected = nativeCurrencies[nativeCurrency];
   let newPrices = { ...prices, selected };
   let oldAccountInfo = getState().account.accountInfo;
   const newAccountInfo = parseAccountBalancesPrices(oldAccountInfo, newPrices);
   const accountInfo = { ...oldAccountInfo, ...newAccountInfo };
-  updateLocalBalances(accountInfo, network);
+  updateLocalBalances(accountAddress, accountInfo, network);
   dispatch({
     type: ACCOUNT_CHANGE_NATIVE_CURRENCY,
     payload: { nativeCurrency, prices: newPrices, accountInfo },

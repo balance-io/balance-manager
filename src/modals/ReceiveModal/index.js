@@ -28,7 +28,7 @@ const reduxProps = ({ account }) => ({
 });
 
 class ReceiveModal extends Component {
-  propTypes = {
+  static propTypes = {
     modalClose: PropTypes.func.isRequired,
     accountAddress: PropTypes.string.isRequired,
     accountType: PropTypes.string.isRequired,

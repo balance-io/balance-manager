@@ -17,7 +17,12 @@
         "link_title": "Acheter un hardware wallet Trezor",
         "button": "Se connecter à Trezor"
       },
-      "connect_walletconnect": "Connectez-vous et signez vos transactions avec votre portefeuille mobile WalletConnect",
+      "connect_walletconnect": {
+        "description": "Connectez-vous et signez vos transactions avec votre portefeuille mobile WalletConnect",
+        "link_text": "Trezor hardware wallet",
+        "link_title": "Buy a Trezor hardware wallet",
+        "button": "Use WalletConnect"
+      },
       "coming_soon": "À venir."
     },
     "account": {

@@ -1,12 +1,13 @@
-import { saveLocal } from '../handlers/localstorage';
+import WalletConnect from 'walletconnect';
+import {
+  getWalletConnectSession,
+  saveWalletConnectSession,
+} from '../handlers/localstorage';
 import { parseError } from '../handlers/parsers';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
 import { accountUpdateAccountAddress } from './_account';
-import {
-  walletConnectInit,
-  walletConnectGetAccounts,
-} from '../handlers/walletconnect';
+import { walletConnectNewSession } from '../handlers/walletconnect';
 
 // -- Constants ------------------------------------------------------------- //
 
@@ -25,21 +26,26 @@ const WALLET_CONNECT_GET_SESSION_FAILURE =
   'walletConnect/WALLET_CONNECT_GET_SESSION_FAILURE';
 
 const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
+const WALLET_CONNECT_CLEAR_STATE = 'walletConnect/WALLET_CONNECT_CLEAR_STATE';
 
 // -- Actions --------------------------------------------------------------- //
 
-let getSessionInterval = null;
-let getTransactionStatusInterval = null;
-
-export const walletConnectModalInit = () => async (dispatch, getState) => {
+export const walletConnectModalInit = () => (dispatch, getState) => {
   dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST });
-  walletConnectInit()
-    .then(walletConnectInstance => {
+  walletConnectNewSession()
+    .then(webConnector => {
+      const request = {
+        domain: webConnector.bridgeUrl,
+        sessionId: webConnector.sessionId,
+        sharedKey: webConnector.sharedKey,
+        dappName: webConnector.dappName,
+      };
+      const qrcode = JSON.stringify(request); //webConnector.qrcode;
       dispatch({
         type: WALLET_CONNECT_NEW_SESSION_SUCCESS,
-        payload: walletConnectInstance.webConnector,
+        payload: { qrcode },
       });
-      dispatch(walletConnectGetSession());
+      dispatch(walletConnectListenForSession(webConnector));
     })
     .catch(error => {
       console.error(error);
@@ -49,19 +55,63 @@ export const walletConnectModalInit = () => async (dispatch, getState) => {
     });
 };
 
-export const walletConnectGetSession = () => (dispatch, getState) => {
+export const walletConnectHasValidSession = () => (dispatch, getState) => {
+  return new Promise((resolve, reject) => {
+    const walletConnectDetails = getWalletConnectSession();
+    if (!walletConnectDetails) {
+      resolve(false);
+    }
+    dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
+    const webConnector = new WalletConnect(walletConnectDetails);
+    webConnector
+      .getSessionStatus()
+      .then(response => {
+        if (response) {
+          const accountAddress = response.data[0] || null;
+          dispatch({
+            type: WALLET_CONNECT_GET_SESSION_SUCCESS,
+            payload: accountAddress,
+          });
+          dispatch(
+            accountUpdateAccountAddress(accountAddress, 'WALLETCONNECT'),
+          );
+          resolve(true);
+        } else {
+          dispatch({ type: WALLET_CONNECT_GET_SESSION_FAILURE });
+          resolve(false);
+        }
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
+export const walletConnectListenForSession = webConnector => (
+  dispatch,
+  getState,
+) => {
   dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
-  walletConnectGetAccounts((error, data) => {
-    if (error) {
-      const message = parseError(error);
-      dispatch(notificationShow(message), true);
+  webConnector.listenSessionStatus((error, data) => {
+    const fetching = getState().walletconnect.fetching;
+    if (error && fetching) {
       dispatch({ type: WALLET_CONNECT_GET_SESSION_FAILURE });
-    } else if (data) {
+      dispatch(walletConnectModalInit());
+    } else if (!error && data) {
+      const accountAddress = data ? data.data[0].toLowerCase() : null;
+      saveWalletConnectSession(
+        {
+          bridgeUrl: webConnector.bridgeUrl,
+          dappName: webConnector.dappName,
+          sessionId: webConnector.sessionId,
+          sharedKey: webConnector.sharedKey,
+        },
+        data.ttlInSeconds,
+      );
       dispatch({
         type: WALLET_CONNECT_GET_SESSION_SUCCESS,
+        payload: accountAddress,
       });
-      const accountAddress = data.address.toLowerCase();
-      saveLocal('walletconnect', accountAddress);
       dispatch(accountUpdateAccountAddress(accountAddress, 'WALLETCONNECT'));
       dispatch(modalClose());
       window.browserHistory.push('/wallet');
@@ -69,16 +119,21 @@ export const walletConnectGetSession = () => (dispatch, getState) => {
   });
 };
 
-export const walletConnectClearFields = () => dispatch => {
-  clearTimeout(getSessionInterval);
-  clearTimeout(getTransactionStatusInterval);
-  dispatch({ type: WALLET_CONNECT_CLEAR_FIELDS });
+export const walletConnectClearFields = () => (dispatch, getState) => {
+  dispatch({
+    type: WALLET_CONNECT_CLEAR_FIELDS,
+  });
+};
+
+export const walletConnectClearState = () => dispatch => {
+  dispatch({ type: WALLET_CONNECT_CLEAR_STATE });
 };
 
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
+  accountAddress: '',
   fetching: false,
-  webConnector: null,
+  qrcode: '',
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -92,13 +147,13 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: false,
-        webConnector: action.payload,
+        qrcode: action.payload.qrcode,
       };
     case WALLET_CONNECT_NEW_SESSION_FAILURE:
       return {
         ...state,
         fetching: false,
-        webConnector: null,
+        qrcode: '',
       };
     case WALLET_CONNECT_GET_SESSION_REQUEST:
       return { ...state, fetching: true };
@@ -106,15 +161,25 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         fetching: false,
+        accountAddress: action.payload,
       };
     case WALLET_CONNECT_GET_SESSION_FAILURE:
       return {
         ...state,
         fetching: false,
-        webConnector: null,
+        qrcode: '',
       };
     case WALLET_CONNECT_CLEAR_FIELDS:
-      return { ...state, ...INITIAL_STATE };
+      return {
+        ...state,
+        fetching: false,
+        qrcode: '',
+      };
+    case WALLET_CONNECT_CLEAR_STATE:
+      return {
+        ...state,
+        ...INITIAL_STATE,
+      };
     default:
       return state;
   }

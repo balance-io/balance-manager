@@ -19,7 +19,7 @@
       },
       "connect_walletconnect": {
         "description": "Conéctate y firmat con tu wallet móvil de WalletConnect.",
-        "button": "Conectar Wallet Connect"
+        "button": "Conectar WalletConnect"
       },
       "coming_soon": "Próximamente."
     },

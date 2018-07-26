@@ -171,7 +171,14 @@ const StyledStaticCurrency = styled(StyledAmountCurrency)`
   color: rgb(${colors.dark});
 `;
 
+const StyledDynamicCurrencyContainer = styled.div`
+  position: absolute;
+  right: 6px;
+`;
+
 const StyledDynamicCurrency = styled(StyledAmountCurrency)`
+  position: relative;
+  display: inline-block;
   cursor: pointer;
   transition: ${transitions.short};
   color: ${({ selected }) =>
@@ -191,7 +198,7 @@ const StyledDynamicCurrency = styled(StyledAmountCurrency)`
 `;
 
 const StyledNativeCurrency = styled(StyledDynamicCurrency)`
-  right: 46px;
+  margin-right: 4px;
 `;
 
 const StyledExchangeIcon = styled.div`
@@ -635,28 +642,30 @@ class ExchangeModal extends Component {
                         value={this.props.withdrawalInput}
                         onChange={this.onChangeWithdrawalInput}
                       />
-                      <StyledNativeCurrency
-                        onClick={() => this.onToggleWithdrawalNative(true)}
-                        selected={this.props.showWithdrawalNative}
-                        disabled={
-                          this.props.fetchingRate &&
-                          this.state.activeInput !== 'WITHDRAWAL'
-                        }
-                      >
-                        {this.props.prices && this.props.prices.selected
-                          ? this.props.prices.selected.currency
-                          : 'USD'}
-                      </StyledNativeCurrency>
-                      <StyledDynamicCurrency
-                        onClick={() => this.onToggleWithdrawalNative(false)}
-                        selected={!this.props.showWithdrawalNative}
-                        disabled={
-                          this.props.fetchingRate &&
-                          this.state.activeInput !== 'WITHDRAWAL'
-                        }
-                      >
-                        {this.props.withdrawalSelected.symbol}
-                      </StyledDynamicCurrency>
+                      <StyledDynamicCurrencyContainer>
+                        <StyledNativeCurrency
+                          onClick={() => this.onToggleWithdrawalNative(true)}
+                          selected={this.props.showWithdrawalNative}
+                          disabled={
+                            this.props.fetchingRate &&
+                            this.state.activeInput !== 'WITHDRAWAL'
+                          }
+                        >
+                          {this.props.prices && this.props.prices.selected
+                            ? this.props.prices.selected.currency
+                            : 'USD'}
+                        </StyledNativeCurrency>
+                        <StyledDynamicCurrency
+                          onClick={() => this.onToggleWithdrawalNative(false)}
+                          selected={!this.props.showWithdrawalNative}
+                          disabled={
+                            this.props.fetchingRate &&
+                            this.state.activeInput !== 'WITHDRAWAL'
+                          }
+                        >
+                          {this.props.withdrawalSelected.symbol}
+                        </StyledDynamicCurrency>
+                      </StyledDynamicCurrencyContainer>
                       <StyledHelperContainer>
                         <StyledHelperText
                           fetching={this.props.fetchingRate}

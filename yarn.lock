@@ -5013,8 +5013,8 @@ jsprim@^1.2.2:
     verror "1.10.0"
 
 jsqr@^1.0.1:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/jsqr/-/jsqr-1.1.0.tgz#49cfc1b2dd3d11aca8c761d84f434d84d970ae2c"
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/jsqr/-/jsqr-1.1.1.tgz#a0d7f95e6c3b0bec913dfef2ca64a877f28ed05f"
 
 jsx-ast-utils@^1.4.0:
   version "1.4.1"
@@ -5760,8 +5760,8 @@ npm-bundled@^1.0.1:
   resolved "https://registry.yarnpkg.com/npm-bundled/-/npm-bundled-1.0.3.tgz#7e71703d973af3370a9591bafe3a63aca0be2308"
 
 npm-packlist@^1.1.6:
-  version "1.1.10"
-  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-1.1.10.tgz#1039db9e985727e464df066f4cf0ab6ef85c398a"
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-1.1.11.tgz#84e8c683cbe7867d34b1d357d893ce29e28a02de"
   dependencies:
     ignore-walk "^3.0.1"
     npm-bundled "^1.0.1"
@@ -8100,8 +8100,8 @@ tr46@~0.0.3:
   resolved "https://registry.yarnpkg.com/tr46/-/tr46-0.0.3.tgz#8184fd347dac9cdc185992f3a6622e14b9d9ab6a"
 
 trezor-connect@^5.0.13:
-  version "5.0.24"
-  resolved "https://registry.yarnpkg.com/trezor-connect/-/trezor-connect-5.0.24.tgz#ef7074b906f71c9893b408af56e995f3a2ca4a36"
+  version "5.0.25"
+  resolved "https://registry.yarnpkg.com/trezor-connect/-/trezor-connect-5.0.25.tgz#8f06c98ddde08653aaed4d5649b294465b497beb"
   dependencies:
     babel-polyfill "^6.26.0"
     babel-runtime "^6.26.0"
@@ -8418,7 +8418,7 @@ walker@~1.0.5:
   dependencies:
     makeerror "1.0.x"
 
-walletconnect@^0.0.1-beta.11:
+walletconnect@0.0.1-beta.23:
   version "0.0.1-beta.23"
   resolved "https://registry.yarnpkg.com/walletconnect/-/walletconnect-0.0.1-beta.23.tgz#2bc5be917d86b1e88e412c5829ac71b4c48163be"
   dependencies:

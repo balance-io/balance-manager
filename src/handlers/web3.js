@@ -289,7 +289,7 @@ export const web3WalletConnectSendTransaction = transaction =>
             if (txHash) {
               resolve(txHash);
             } else {
-              throw new Error('Could not send transaction via Wallet Connect');
+              throw new Error('Could not send transaction via WalletConnect');
             }
           })
           .catch(error => reject(error));

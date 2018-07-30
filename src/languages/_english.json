@@ -25,6 +25,17 @@
         "link_title": "Use WalletConnect",
         "button": "Use WalletConnect"
       },
+      "reassurance": {
+        "work_title": "How does Manager work?",
+        "work": "This is a web-based tool to help you manage your the funds in your wallet. It does this by connecting to your wallet through its Application Programming Interface (API). Here are some important points about how we designed Balance Manager:",
+        "access_link": "No access to your funds",
+        "tracking_link": "We do not track you",
+        "security_title": "How secure is Manager?",
+        "security": "We work incredibly hard to make sure your funds are safe. This tool never touches your private keys so that great reduces the surface area for attack. We recommend doing this short course to learn best ways to secure your wallet to keep safe.",
+        "source": "View our source code",
+        "assessment": "Results of our security assessment"
+      },
+      "back": "Back to balance.io",
       "coming_soon": "Coming soon."
     },
     "account": {

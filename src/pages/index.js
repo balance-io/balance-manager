@@ -24,6 +24,52 @@ const StyledCard = styled(Card)`
   width: 100%;
 `;
 
+const ReassuranceCard = StyledCard.extend`
+  background: #34363d;
+  padding: 15px 0px;
+  display: flex;
+  background-border: 1px solid #42444b;
+`;
+
+const ReassuranceSection = styled.div`
+  flex: 1;
+  position: relative;
+  padding: 10px;
+`;
+
+const ReassuranceTitle = styled.p`
+  color: #f5f6fa;
+  font-size: ${fonts.size.large};
+  font-weight: ${fonts.weight.medium};
+  margin-top: 6px;
+  // align-items: flex-start;
+  // flex-direction: column;
+  //Fix with Mike
+  opacity: ${({ disabled }) => (disabled ? 0.7 : 1)};
+  @media screen and (max-width: 50%) {
+    display: ${({ isAlwaysVisible }) => (isAlwaysVisible ? 'block' : 'none')};
+  }
+`;
+
+const ReassuranceExplanation = ReassuranceTitle.extend`
+  color: #f5f6fa;
+  opacity: 0.7;
+  font-size: ${fonts.size.medium};
+  font-weight: ${fonts.weight.normal};
+  // flex-direction: column;
+  // align-items: flex-start;
+  // Fix with Mike
+  @media screen and (max-width: 50%) {
+    display: ${({ isAlwaysVisible }) => (isAlwaysVisible ? 'block' : 'none')};
+  }
+`;
+
+const ReassuranceLinks = ReassuranceTitle.extend`
+  color: #fff;
+  margin-top: 10px;
+  font-size: ${fonts.size.medium};
+`;
+
 const CardContainer = styled.div`
   align-items: center;
   display: flex;
@@ -137,7 +183,7 @@ const TrezorLogo = styled.div`
   }
 `;
 
-const StyledWalletConnectLogo = styled.div`
+const WalletConnectLogo = styled.div`
   background-image: url(${walletConnectLogoImage});
   background-repeat: no-repeat;
   background-size: cover;
@@ -249,7 +295,7 @@ class Home extends Component {
       <StyledCard>
         <CardContainer>
           <LogoSection>
-            <StyledWalletConnectLogo />
+            <WalletConnectLogo />
             <LogoText>
               {lang.t('homepage.connect_walletconnect.description')}
               <LedgerAffiliateLink
@@ -271,6 +317,45 @@ class Home extends Component {
           </StyledWalletConnectButton>
         </CardContainer>
       </StyledCard>
+
+      <ReassuranceCard>
+        <CardContainer>
+          <ReassuranceSection>
+            <ReassuranceTitle>
+              {lang.t('homepage.reassurance.work_title')}
+            </ReassuranceTitle>
+            <ReassuranceExplanation>
+              {lang.t('homepage.reassurance.work')}
+            </ReassuranceExplanation>
+            <ReassuranceLinks>
+              <LedgerAffiliateLink
+                href="https://www.youtube.com/watch?v=dMYa0-t4MAI"
+                target="_blank"
+                title={lang.t('homepage.reassurance.access_link')}
+              >
+                {lang.t('homepage.reassurance.access_link')}
+              </LedgerAffiliateLink>
+            </ReassuranceLinks>
+          </ReassuranceSection>
+          <ReassuranceSection>
+            <ReassuranceTitle>
+              {lang.t('homepage.reassurance.security_title')}
+            </ReassuranceTitle>
+            <ReassuranceExplanation>
+              {lang.t('homepage.reassurance.security')}
+            </ReassuranceExplanation>
+            <ReassuranceLinks>
+              <LedgerAffiliateLink
+                href="https://github.com/balance-io"
+                target="_blank"
+                title={lang.t('homepage.reassurance.access_link')}
+              >
+                {lang.t('homepage.reassurance.source')}
+              </LedgerAffiliateLink>
+            </ReassuranceLinks>
+          </ReassuranceSection>
+        </CardContainer>
+      </ReassuranceCard>
     </BaseLayout>
   );
 }

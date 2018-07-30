@@ -15,13 +15,20 @@ import { trezorEthSignTransaction } from './trezor-eth';
 import { walletConnectSignTransaction } from './walletconnect';
 import ethUnits from '../references/ethereum-units.json';
 import smartContractMethods from '../references/smartcontract-methods.json';
+import ENS from 'ethjs-ens';
+import HttpProvider from 'ethjs-provider-http';
+
+const provider = `https://mainnet.infura.io/`;
+
+export let ens = new ENS({ provider: new HttpProvider(provider), network: 1 });
+
+Web3.providers.HttpProvider.prototype.sendAsync =
+  Web3.providers.HttpProvider.prototype.send;
 
 /**
  * @desc web3 http instance
  */
-export const web3Instance = new Web3(
-  new Web3.providers.HttpProvider(`https://mainnet.infura.io/`),
-);
+export const web3Instance = new Web3(new Web3.providers.HttpProvider(provider));
 
 /**
  * @desc set a different web3 provider
@@ -31,6 +38,10 @@ export const web3SetHttpProvider = provider => {
   let providerObj = null;
   if (provider.match(/(https?:\/\/)(\w+.)+/g)) {
     providerObj = new Web3.providers.HttpProvider(provider);
+
+    let network = provider.includes('ropsten') ? 3 : 1;
+
+    ens = new ENS({ provider: new HttpProvider(provider), network });
   }
   if (!providerObj) {
     throw new Error(

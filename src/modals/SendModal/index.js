@@ -46,6 +46,8 @@ import {
   transactionData,
   calcTxFee,
 } from '../../helpers/utilities';
+import { ens } from '../../handlers/web3';
+import _debounce from 'lodash/debounce';
 
 import {
   StyledIcon,
@@ -149,6 +151,23 @@ class SendModal extends Component {
     this.props.sendClearFields();
     this.props.sendModalInit();
   };
+
+  updateEns = target => {
+    if (target.value.includes('.eth')) {
+      ens
+        .lookup(target.value)
+        .then(address => {
+          //console.log('ens success', address);
+
+          this.props.sendUpdateRecipient(address, this.props.selected.symbol);
+        })
+        .catch(reason => {
+          console.log('ENS failed', target.value);
+        });
+    }
+  };
+
+  updateEnsDelay = _debounce(this.updateEns, 300);
 
   onSubmit = e => {
     e.preventDefault();
@@ -328,7 +347,13 @@ class SendModal extends Component {
                   value={recipient}
                   onFocus={this.onAddressInputFocus}
                   onBlur={this.onAddressInputBlur}
-                  onChange={({ target }) => sendUpdateRecipient(target.value)}
+                  onChange={({ target }) => {
+                    this.props.sendUpdateRecipient(
+                      target.value,
+                      this.props.selected.symbol,
+                    );
+                    this.updateEnsDelay(target);
+                  }}
                 />
 
                 {recipient &&

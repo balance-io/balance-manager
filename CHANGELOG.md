@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+* Add ENS Support
+
 ### Added
 
 ### Changed

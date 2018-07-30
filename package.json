@@ -21,6 +21,8 @@
     "ethereumjs-wallet": "^0.6.0",
     "hdkey": "^1.0.0",
     "i18next": "^11.3.2",
+    "ethjs-ens": "^2.0.1",
+    "ethjs-provider-http": "^0.1.6",
     "jsonp": "^0.2.1",
     "lodash": "^4.17.5",
     "prop-types": "^15.6.1",
@@ -72,3 +74,4 @@
     "prettier": "^1.13.5"
   }
 }
+

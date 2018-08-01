@@ -136,6 +136,7 @@
       "page_not_found": "404 Page Not Found",
       "coming_soon": "Coming soon...",
       "click_to_copy_to_clipboard": "Click to copy to clipboard",
+      "view_on_etherscan": "View on Etherscan",
       "failed_request": "Failed request, please refresh",
       "failed_ledger_connection": "Failed to connect to Ledger, please check your device",
       "failed_trezor_connection": "Failed to connect to Trezor, please check your device",

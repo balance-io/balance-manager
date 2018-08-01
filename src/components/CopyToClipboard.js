@@ -50,43 +50,22 @@ const StyledContainer = styled.div`
   }
 `;
 
-const StyledInputText = styled.input`
+const StyledInput = styled.input`
+  display: none;
+`;
+
+const StyledAddressLink = styled.a`
   background-color: transparent;
   color: transparent;
   text-shadow: 0 0 0 rgb(${colors.mediumGrey});
   font-style: normal;
   font-stretch: normal;
-  line-height: normal;
-  letter-spacing: normal;
-  text-align: left;
   font-weight: ${fonts.weight.medium};
   font-size: ${fonts.size.medium};
   font-family: ${fonts.family.SFMono};
-  line-height: 1.25;
   @media screen and (${responsive.sm.max}) {
     font-size: ${fonts.size.small};
   }
-`;
-
-const StyledInput = styled(StyledInputText)`
-  width: 100%;
-  position: absolute;
-  left: 0;
-  top: calc((100% - 1.25em) / 2)
-  margin: 0;
-  cursor: pointer;
-  border: none;
-  -webkit-appearance: none;
-  outline: none;
-`;
-
-const StyledInputParagraph = StyledInputText.withComponent('p');
-
-const StyledInvisible = styled(StyledInputParagraph)`
-  width: auto;
-  display: inline;
-  opacity: 0;
-  margin-left: 4px;
 `;
 
 let timeout = null;
@@ -119,7 +98,13 @@ class CopyToClipboard extends Component {
     return (
       <StyledCopyToClipboard {...props}>
         <StyledContainer iconOnHover={iconOnHover}>
-          <StyledInvisible>{text}</StyledInvisible>
+          <StyledAddressLink
+            target="_blank"
+            title={lang.t('message.view_on_etherscan')}
+            href={`https://etherscan.io/address/${text}`}
+          >
+            {text}
+          </StyledAddressLink>
           <StyledInput
             value={text}
             spellCheck={false}

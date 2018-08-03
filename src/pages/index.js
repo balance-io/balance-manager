@@ -21,7 +21,7 @@ const StyledCard = styled(Card)`
   background: #f5f6fa;
   display: block;
   margin-bottom: 18px;
-  min-height: 102px;
+  height: 102px;
   overflow: visible;
   width: 100%;
 `;

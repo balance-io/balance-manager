@@ -42,6 +42,16 @@ export const getLocal = (key = '', version = defaultVersion) => {
 export const removeLocal = (key = '') => localStorage.removeItem(key);
 
 /**
+ * @desc reset account local
+ * @param  {String}   [address]
+ */
+export const resetAccount = accountAddress => {
+  accountAddress = accountAddress.toLowerCase();
+  removeLocal(accountAddress);
+  removeLocal('nativePrices');
+};
+
+/**
  * @desc get account local
  * @param  {String}   [address]
  * @return {Object}
@@ -56,7 +66,7 @@ export const getAccountLocal = accountAddress => {
  * @return {Object}
  */
 export const getNativePrices = () => {
-  const nativePrices = getLocal('native_prices', accountLocalVersion);
+  const nativePrices = getLocal('nativeprices', accountLocalVersion);
   return nativePrices ? nativePrices.data : null;
 };
 
@@ -65,7 +75,7 @@ export const getNativePrices = () => {
  * @param  {String}   [address]
  */
 export const saveNativePrices = nativePrices => {
-  saveLocal('native_prices', { data: nativePrices }, accountLocalVersion);
+  saveLocal('nativeprices', { data: nativePrices }, accountLocalVersion);
 };
 
 /**
@@ -73,7 +83,7 @@ export const saveNativePrices = nativePrices => {
  * @return {Object}
  */
 export const getNativeCurrency = () => {
-  const nativeCurrency = getLocal('native_currency', globalSettingsVersion);
+  const nativeCurrency = getLocal('nativecurrency', globalSettingsVersion);
   return nativeCurrency ? nativeCurrency.data : null;
 };
 
@@ -82,7 +92,7 @@ export const getNativeCurrency = () => {
  * @param  {String}   [currency]
  */
 export const saveNativeCurrency = nativeCurrency => {
-  saveLocal('native_currency', { data: nativeCurrency }, globalSettingsVersion);
+  saveLocal('nativecurrency', { data: nativeCurrency }, globalSettingsVersion);
 };
 
 /**
@@ -184,6 +194,14 @@ export const saveWalletConnectSession = (webConnectorOptions, ttlInSeconds) => {
     { data: webConnectorOptions, expiration },
     walletConnectVersion,
   );
+};
+
+/**
+ * @desc reset wallet connect session details
+ * @param  {String}   [address]
+ */
+export const resetWalletConnect = () => {
+  removeLocal('walletconnect');
 };
 
 /**

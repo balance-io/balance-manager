@@ -26,6 +26,7 @@ const WALLET_CONNECT_GET_SESSION_FAILURE =
   'walletConnect/WALLET_CONNECT_GET_SESSION_FAILURE';
 
 const WALLET_CONNECT_CLEAR_FIELDS = 'walletConnect/WALLET_CONNECT_CLEAR_FIELDS';
+const WALLET_CONNECT_CLEAR_STATE = 'walletConnect/WALLET_CONNECT_CLEAR_STATE';
 
 // -- Actions --------------------------------------------------------------- //
 
@@ -124,6 +125,10 @@ export const walletConnectClearFields = () => (dispatch, getState) => {
   });
 };
 
+export const walletConnectClearState = () => dispatch => {
+  dispatch({ type: WALLET_CONNECT_CLEAR_STATE });
+};
+
 // -- Reducer --------------------------------------------------------------- //
 const INITIAL_STATE = {
   accountAddress: '',
@@ -169,6 +174,11 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         fetching: false,
         qrcode: '',
+      };
+    case WALLET_CONNECT_CLEAR_STATE:
+      return {
+        ...state,
+        ...INITIAL_STATE,
       };
     default:
       return state;

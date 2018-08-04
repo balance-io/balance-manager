@@ -85,6 +85,10 @@ export const responsive = {
     min: 'min-height: 479px',
     max: 'max-height: 480px',
   },
+  xxs: {
+    min: 'min-width: 399px',
+    max: 'max-width: 400px',
+  },
   xs: {
     min: 'min-width: 479px',
     max: 'max-width: 480px',

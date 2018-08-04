@@ -17,7 +17,7 @@ import { colors, fonts, responsive } from '../styles';
 
 const StyledCard = styled(Card)`
   background: #f5f6fa;
-  display: block;
+  display: flex;
   margin-bottom: 18px;
   min-height: 102px;
   overflow: visible;
@@ -27,40 +27,37 @@ const StyledCard = styled(Card)`
 const CardContainer = styled.div`
   align-items: center;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding-left: 28px;
   padding-right: 28px;
   width: 100%;
-
-  @media screen and (${responsive.sm.max}) {
-    align-items: flex-start;
-    flex-direction: column;
-    padding-bottom: 28px;
-    padding-top: 28px;
-  }
 `;
 
 const ConnectButton = styled(Button)`
   border-radius: 8px;
+  display: inline-block;
   font-size: ${fonts.size.medium};
   height: 44px;
   padding: 0 15px 2px 15px;
-  position: absolute;
-  right: 29px;
-  top: 29px;
+  white-space: nowrap;
 `;
 
 const LogoSection = styled.div`
-  flex: none;
-  position: relative;
+  align-items: center;
+  display: flex;
+  flex: 1;
+  margin-right: 20px;
 `;
 
 const LogoText = styled.p`
   color: #666;
+  flex: 1;
   font-size: ${fonts.size.smedium};
   font-weight: ${fonts.weight.medium};
-  margin-top: 6px;
+  line-height: 20px;
+  margin-left: 20px;
   opacity: ${({ disabled }) => (disabled ? 0.7 : 1)};
+
   @media screen and (max-width: 736px) {
     display: ${({ isAlwaysVisible }) => (isAlwaysVisible ? 'block' : 'none')};
   }
@@ -89,9 +86,13 @@ const LedgerButton = ConnectButton.extend`
 const LedgerLogo = styled.div`
   background-image: url(${ledgerLogoImage});
   background-repeat: no-repeat;
-  background-size: 100%;
+  background-size: cover;
   height: 28px;
   width: 100px;
+
+  @media screen and (${responsive.xxs.max}) {
+    width: 22px;
+  }
 `;
 
 const MetamaskButton = ConnectButton.extend`
@@ -127,17 +128,25 @@ const MetamaskLogoText = styled(LogoText)`
 const TrezorLogo = styled.div`
   background-image: url(${trezorLogoImage});
   background-repeat: no-repeat;
-  background-size: 100%;
+  background-size: cover;
   height: 31px;
   width: 109px;
+
+  @media screen and (${responsive.xxs.max}) {
+    width: 22px;
+  }
 `;
 
 const StyledWalletConnectLogo = styled.div`
-  margin: 22px 0 8px 0;
-  height: 32px;
-  background: url(${walletConnectLogoImage});
-  background-size: contain;
+  background-image: url(${walletConnectLogoImage});
   background-repeat: no-repeat;
+  background-size: cover;
+  height: 32px;
+  width: 210px;
+
+  @media screen and (${responsive.xs.max}) {
+    width: 52px;
+  }
 `;
 
 const StyledWalletConnectButton = ConnectButton.extend`

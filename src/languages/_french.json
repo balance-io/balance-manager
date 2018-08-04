@@ -2,26 +2,28 @@
   "translation": {
     "homepage": {
       "connect_metamask": {
-        "description": "Connectez-vous à l’extension Chrome de MetaMask.",
+        "description": "Connectez-vous au ",
+        "link_text": "portefeuille navigateur MetaMask",
+        "link_title": "portefeuille navigateur MetaMask",
         "button": "Se connecter à MetaMask"
       },
       "connect_ledger": {
         "description": "Connectez-vous et signez vos transactions avec votre ",
-        "link_text": "hardware wallet Ledger",
+        "link_text": "portefeuille matériel Ledger",
         "link_title": "Acheter un hardware wallet Ledger",
         "button": "Se connecter à Ledger"
       },
       "connect_trezor": {
         "description": " Connectez-vous et signez vos transactions avec votre ",
-        "link_text": "hardware wallet Trezor",
+        "link_text": "portefeuille matériel Trezor",
         "link_title": "Acheter un hardware wallet Trezor",
         "button": "Se connecter à Trezor"
       },
       "connect_walletconnect": {
-        "description": "Connectez-vous et signez vos transactions avec votre portefeuille mobile WalletConnect",
-        "link_text": "Trezor hardware wallet",
-        "link_title": "Buy a Trezor hardware wallet",
-        "button": "Use WalletConnect"
+        "description": "Connectez-vous et signez vos transactions avec votre ",
+        "link_text": "portefeuille mobile WalletConnect",
+        "link_title": "portefeuille mobile WalletConnect",
+        "button": "Utilisez WalletConnect"
       },
       "coming_soon": "À venir."
     },

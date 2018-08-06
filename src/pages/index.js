@@ -15,6 +15,8 @@ import { walletConnectHasValidSession } from '../reducers/_walletconnect';
 import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
 
+import isValidBrowser from '../helpers/device';
+
 const StyledCard = styled(Card)`
   background: #f5f6fa;
   display: flex;
@@ -26,57 +28,44 @@ const StyledCard = styled(Card)`
 
 const ReassuranceCard = StyledCard.extend`
   background: #34363d;
-  padding: 15px 0px;
+  border: 1px solid #42444b;
   display: flex;
-  background-border: 1px solid #42444b;
-`;
-
-const ReassuranceSection = styled.div`
-  flex: 1;
-  position: relative;
-  padding: 10px;
-`;
-
-const ReassuranceTitle = styled.p`
-  color: #f5f6fa;
-  font-size: ${fonts.size.large};
-  font-weight: ${fonts.weight.medium};
-  margin-top: 6px;
-  // align-items: flex-start;
-  // flex-direction: column;
-  //Fix with Mike
-  opacity: ${({ disabled }) => (disabled ? 0.7 : 1)};
-  @media screen and (max-width: 50%) {
-    display: ${({ isAlwaysVisible }) => (isAlwaysVisible ? 'block' : 'none')};
-  }
-`;
-
-const ReassuranceExplanation = ReassuranceTitle.extend`
-  color: #f5f6fa;
-  opacity: 0.7;
-  font-size: ${fonts.size.medium};
-  font-weight: ${fonts.weight.normal};
-  // flex-direction: column;
-  // align-items: flex-start;
-  // Fix with Mike
-  @media screen and (max-width: 50%) {
-    display: ${({ isAlwaysVisible }) => (isAlwaysVisible ? 'block' : 'none')};
-  }
-`;
-
-const ReassuranceLinks = ReassuranceTitle.extend`
-  color: #fff;
-  margin-top: 10px;
-  font-size: ${fonts.size.medium};
+  margin-bottom: 0;
+  padding: 26px 0;
 `;
 
 const CardContainer = styled.div`
   align-items: center;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding-left: 28px;
   padding-right: 28px;
   width: 100%;
+`;
+
+const ReassuranceContainer = CardContainer.extend`
+  align-items: flex-start;
+
+  @media screen and (${responsive.sm.max}) {
+    flex-direction: column;
+  }
+`;
+
+const ReassuranceSection = styled.div`
+  max-width: 424px;
+  width: 100%;
+
+  &:not(:last-child) {
+    padding-right: 18px;
+  }
+
+  @media screen and (${responsive.sm.max}) {
+    max-width: 100%;
+
+    &:not(:last-child) {
+      padding: 0 0 28px;
+    }
+  }
 `;
 
 const ConnectButton = styled(Button)`
@@ -171,6 +160,27 @@ const MetamaskLogoText = styled(LogoText)`
   margin: 0 20px 0 176px;
 `;
 
+const ReassuranceTitle = styled.p`
+  color: #f5f6fa;
+  font-size: ${fonts.size.large};
+  font-weight: ${fonts.weight.medium};
+  line-height: 1;
+  opacity: ${({ disabled }) => (disabled ? 0.7 : 1)};
+  margin-bottom: 12px;
+`;
+
+const ReassuranceExplanation = ReassuranceTitle.extend`
+  color: #f5f6fa;
+  font-size: ${fonts.size.smedium};
+  font-weight: ${fonts.weight.normal};
+  line-height: 22px;
+  opacity: 0.7;
+`;
+
+const ReassuranceLink = LedgerAffiliateLink.extend`
+  font-size: ${fonts.size.medium};
+`;
+
 const TrezorLogo = styled.div`
   background-image: url(${trezorLogoImage});
   background-repeat: no-repeat;
@@ -205,6 +215,10 @@ const StyledWalletConnectButton = ConnectButton.extend`
 `;
 
 class Home extends Component {
+  constructor(props) {
+    super(props);
+    console.log(isValidBrowser());
+  }
   onWalletConnectInit = () => {
     this.props
       .walletConnectHasValidSession()
@@ -225,17 +239,19 @@ class Home extends Component {
       <MetamaskCard minHeight={102}>
         <CardContainer>
           <MetamaskLogo />
-          <MetamaskLogoText>
-            {lang.t('homepage.connect_metamask.description')}
-            <LedgerAffiliateLink
-              href="https://metamask.io"
-              target="_blank"
-              title={lang.t('homepage.connect_metamask.link_title')}
-            >
-              {lang.t('homepage.connect_metamask.link_text')}
-            </LedgerAffiliateLink>
-            .
-          </MetamaskLogoText>
+          <LogoSection>
+            <MetamaskLogoText>
+              {lang.t('homepage.connect_metamask.description')}
+              <LedgerAffiliateLink
+                href="https://metamask.io"
+                target="_blank"
+                title={lang.t('homepage.connect_metamask.link_title')}
+              >
+                {lang.t('homepage.connect_metamask.link_text')}
+              </LedgerAffiliateLink>
+              .
+            </MetamaskLogoText>
+          </LogoSection>
           <Link to="/metamask">
             <MetamaskButton left color="orange">
               {lang.t('homepage.connect_metamask.button')}
@@ -318,44 +334,42 @@ class Home extends Component {
         </CardContainer>
       </StyledCard>
 
-      <ReassuranceCard>
-        <CardContainer>
-          <ReassuranceSection>
-            <ReassuranceTitle>
-              {lang.t('homepage.reassurance.work_title')}
-            </ReassuranceTitle>
-            <ReassuranceExplanation>
-              {lang.t('homepage.reassurance.work')}
-            </ReassuranceExplanation>
-            <ReassuranceLinks>
-              <LedgerAffiliateLink
+      {isValidBrowser() ? (
+        <ReassuranceCard>
+          <ReassuranceContainer>
+            <ReassuranceSection>
+              <ReassuranceTitle>
+                {lang.t('homepage.reassurance.work_title')}
+              </ReassuranceTitle>
+              <ReassuranceExplanation>
+                {lang.t('homepage.reassurance.work')}
+              </ReassuranceExplanation>
+              <ReassuranceLink
                 href="https://www.youtube.com/watch?v=dMYa0-t4MAI"
                 target="_blank"
                 title={lang.t('homepage.reassurance.access_link')}
               >
                 {lang.t('homepage.reassurance.access_link')}
-              </LedgerAffiliateLink>
-            </ReassuranceLinks>
-          </ReassuranceSection>
-          <ReassuranceSection>
-            <ReassuranceTitle>
-              {lang.t('homepage.reassurance.security_title')}
-            </ReassuranceTitle>
-            <ReassuranceExplanation>
-              {lang.t('homepage.reassurance.security')}
-            </ReassuranceExplanation>
-            <ReassuranceLinks>
-              <LedgerAffiliateLink
+              </ReassuranceLink>
+            </ReassuranceSection>
+            <ReassuranceSection>
+              <ReassuranceTitle>
+                {lang.t('homepage.reassurance.security_title')}
+              </ReassuranceTitle>
+              <ReassuranceExplanation>
+                {lang.t('homepage.reassurance.security')}
+              </ReassuranceExplanation>
+              <ReassuranceLink
                 href="https://github.com/balance-io"
                 target="_blank"
                 title={lang.t('homepage.reassurance.access_link')}
               >
                 {lang.t('homepage.reassurance.source')}
-              </LedgerAffiliateLink>
-            </ReassuranceLinks>
-          </ReassuranceSection>
-        </CardContainer>
-      </ReassuranceCard>
+              </ReassuranceLink>
+            </ReassuranceSection>
+          </ReassuranceContainer>
+        </ReassuranceCard>
+      ) : null}
     </BaseLayout>
   );
 }

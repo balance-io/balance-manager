@@ -1,7 +1,10 @@
 import { apiGetMetamaskNetwork } from '../handlers/api';
 import { parseError } from '../handlers/parsers';
 import { modalClose } from './_modal';
-import { accountUpdateAccountAddress, accountUpdateNetwork } from './_account';
+import {
+  accountUpdateAccountAddress,
+  accountUpdateNetwork,
+} from 'balance-common';
 import { notificationShow } from './_notification';
 
 // -- Constants ------------------------------------------------------------- //

@@ -1,5 +1,8 @@
 import lang from '../languages';
-import { accountUpdateAccountAddress, accountUpdateNetwork } from './_account';
+import {
+  accountUpdateAccountAddress,
+  accountUpdateNetwork,
+} from 'balance-common';
 import { ledgerEthInit, ledgerEthAccounts } from '../handlers/ledger-eth';
 import { notificationShow } from './_notification';
 

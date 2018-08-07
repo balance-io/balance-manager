@@ -13,13 +13,14 @@
     "url": "https://github.com/balance-io/balance-manager/issues"
   },
   "dependencies": {
+    "@devshack/react-native-storage": "^0.2.2",
     "@ledgerhq/hw-app-eth": "^4.7.3",
     "@ledgerhq/hw-transport-u2f": "^4.7.3",
     "axios": "^0.18.0",
+    "balance-common": "git+https://github.com/balance-io/balance-common.git#sendAndTxns",
     "bignumber.js": "^7.0.1",
     "ethereumjs-tx": "^1.3.4",
-    "ethereumjs-wallet": "^0.6.0",
-    "balance-common": "^0.1.4",
+    "ethereumjs-wallet": "0.6.0",
     "hdkey": "^1.0.0",
     "i18next": "^11.3.2",
     "jsonp": "^0.2.1",

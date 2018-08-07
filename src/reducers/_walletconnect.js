@@ -6,7 +6,7 @@ import {
 import { parseError } from '../handlers/parsers';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
-import { accountUpdateAccountAddress } from './_account';
+import { accountUpdateAccountAddress } from 'balance-common';
 import { walletConnectNewSession } from '../handlers/walletconnect';
 
 // -- Constants ------------------------------------------------------------- //

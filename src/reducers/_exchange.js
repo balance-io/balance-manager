@@ -26,7 +26,7 @@ import { notificationShow } from './_notification';
 import {
   accountUpdateExchange,
   accountUpdateHasPendingTransaction,
-} from './_account';
+} from 'balance-common';
 import ethUnits from '../references/ethereum-units.json';
 
 // -- Constants ------------------------------------------------------------- //

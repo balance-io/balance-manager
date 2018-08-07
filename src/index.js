@@ -7,6 +7,16 @@ import { bootIntercom } from './helpers/utilities';
 import { getLanguage } from './handlers/localstorage';
 import lang, { resources } from './languages';
 import Root from './Root';
+import Storage from '@devshack/react-native-storage';
+
+const storage = new Storage({
+  size: 1000,
+  storageBackend: window.localStorage,
+  defaultExpires: null,
+  enableCache: true,
+});
+
+window.storage = storage;
 
 // eslint-disable-next-line
 injectGlobal`${globalStyles}`;

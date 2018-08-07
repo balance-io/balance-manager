@@ -23,7 +23,7 @@ import {
   accountClearState,
   accountUpdateAccountAddress,
   accountChangeLanguage,
-} from '../reducers/_account';
+} from 'balance-common';
 import { metamaskClearState } from '../reducers/_metamask';
 import { ledgerClearState } from '../reducers/_ledger';
 import { trezorClearState } from '../reducers/_trezor';

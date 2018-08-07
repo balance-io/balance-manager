@@ -313,7 +313,7 @@ class AccountBalances extends Component {
           ) : (
             <div />
           )}
-          <p>{`${accountInfo.total.display || '———'}`}</p>
+          <p>{`${accountInfo.total ? accountInfo.total.display : '———'}`}</p>
         </StyledLastRow>
       </StyledGrid>
     );

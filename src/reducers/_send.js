@@ -24,7 +24,7 @@ import { notificationShow } from './_notification';
 import {
   accountUpdateTransactions,
   accountUpdateHasPendingTransaction,
-} from './_account';
+} from 'balance-common';
 
 // -- Constants ------------------------------------------------------------- //
 

@@ -11,6 +11,14 @@ import metamaskLogoImage from '../assets/metamask-logo.png';
 import ledgerLogoImage from '../assets/ledger-logo.svg';
 import walletConnectLogoImage from '../assets/walletconnect-logo-and-type.svg';
 import trezorLogoImage from '../assets/trezor-logo.svg';
+import braveLogoImage from '../assets/brave-logo.svg';
+import braveLogoText from '../assets/brave-text.svg';
+import chromeLogoImage from '../assets/chrome-logo.svg';
+import chromeLogoText from '../assets/chrome-text.svg';
+import firefoxLogoImage from '../assets/firefox-logo.svg';
+import firefoxLogoText from '../assets/firefox-text.svg';
+import operaLogoImage from '../assets/opera-logo.svg';
+import operaLogoText from '../assets/opera-text.svg';
 import { walletConnectHasValidSession } from '../reducers/_walletconnect';
 import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
@@ -20,10 +28,13 @@ import isValidBrowser from '../helpers/device';
 const StyledCard = styled(Card)`
   background: #f5f6fa;
   display: flex;
-  margin-bottom: 18px;
   min-height: 102px;
   overflow: visible;
   width: 100%;
+
+  &:not(:last-child) {
+    margin-bottom: 18px;
+  }
 `;
 
 const ReassuranceCard = StyledCard.extend`
@@ -214,11 +225,54 @@ const StyledWalletConnectButton = ConnectButton.extend`
   }
 `;
 
-class Home extends Component {
-  constructor(props) {
-    super(props);
-    console.log(isValidBrowser());
+const BrowserLogosContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+`;
+
+const BrowserLogo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &:not(:last-child) {
+    padding-right: 24px;
   }
+`;
+
+const BraveLogoImage = styled.img`
+  margin-bottom: 9px;
+  height: 48px;
+`;
+
+const BraveLogoText = styled.img`
+  width: 52px;
+`;
+
+const ChromeLogoImage = styled.img`
+  margin-bottom: 9px;
+  width: 48px;
+`;
+
+const ChromeLogoText = styled.img`
+  width: 60px;
+`;
+
+const FirefoxLogoImage = ChromeLogoImage.extend`
+  width: 46px;
+`;
+
+const FirefoxLogoText = styled.img`
+  width: 54px;
+`;
+
+const OperaLogoImage = ChromeLogoImage.extend`
+  margin-bottom: 8px;
+`;
+
+const OperaLogoText = BraveLogoText.extend``;
+
+class Home extends Component {
   onWalletConnectInit = () => {
     this.props
       .walletConnectHasValidSession()
@@ -252,11 +306,32 @@ class Home extends Component {
               .
             </MetamaskLogoText>
           </LogoSection>
-          <Link to="/metamask">
-            <MetamaskButton left color="orange">
-              {lang.t('homepage.connect_metamask.button')}
-            </MetamaskButton>
-          </Link>
+          {isValidBrowser() ? (
+            <Link to="/metamask">
+              <MetamaskButton left color="orange">
+                {lang.t('homepage.connect_metamask.button')}
+              </MetamaskButton>
+            </Link>
+          ) : (
+            <BrowserLogosContainer>
+              <BrowserLogo>
+                <BraveLogoImage src={braveLogoImage} alt="Brave Logo" />
+                <BraveLogoText src={braveLogoText} alt="Brave Text" />
+              </BrowserLogo>
+              <BrowserLogo>
+                <FirefoxLogoImage src={firefoxLogoImage} alt="Firefox Logo" />
+                <FirefoxLogoText src={firefoxLogoText} alt="Firefox Text" />
+              </BrowserLogo>
+              <BrowserLogo>
+                <OperaLogoImage src={operaLogoImage} alt="Opera Logo" />
+                <OperaLogoText src={operaLogoText} alt="Opera Text" />
+              </BrowserLogo>
+              <BrowserLogo>
+                <ChromeLogoImage src={chromeLogoImage} alt="Chrome Logo" />
+                <ChromeLogoText src={chromeLogoText} alt="Chrome Text" />
+              </BrowserLogo>
+            </BrowserLogosContainer>
+          )}
         </CardContainer>
       </MetamaskCard>
 
@@ -276,11 +351,18 @@ class Home extends Component {
               .
             </LogoText>
           </LogoSection>
-          <Link to="/ledger">
-            <LedgerButton left color="ledger">
-              {lang.t('homepage.connect_ledger.button')}
-            </LedgerButton>
-          </Link>
+          {isValidBrowser() ? (
+            <Link to="/ledger">
+              <LedgerButton left color="ledger">
+                {lang.t('homepage.connect_ledger.button')}
+              </LedgerButton>
+            </Link>
+          ) : (
+            <BrowserLogo>
+              <ChromeLogoImage src={chromeLogoImage} alt="Chrome Logo" />
+              <ChromeLogoText src={chromeLogoText} alt="Chrome Text" />
+            </BrowserLogo>
+          )}
         </CardContainer>
       </StyledCard>
 
@@ -300,11 +382,24 @@ class Home extends Component {
               .
             </LogoText>
           </LogoSection>
-          <Link to="/trezor">
-            <LedgerButton left color="ledger">
-              {lang.t('homepage.connect_trezor.button')}
-            </LedgerButton>
-          </Link>
+          {isValidBrowser() ? (
+            <Link to="/trezor">
+              <LedgerButton left color="ledger">
+                {lang.t('homepage.connect_trezor.button')}
+              </LedgerButton>
+            </Link>
+          ) : (
+            <BrowserLogosContainer>
+              <BrowserLogo>
+                <FirefoxLogoImage src={firefoxLogoImage} alt="Firefox Logo" />
+                <FirefoxLogoText src={firefoxLogoText} alt="Firefox Text" />
+              </BrowserLogo>
+              <BrowserLogo>
+                <ChromeLogoImage src={chromeLogoImage} alt="Chrome Logo" />
+                <ChromeLogoText src={chromeLogoText} alt="Chrome Text" />
+              </BrowserLogo>
+            </BrowserLogosContainer>
+          )}
         </CardContainer>
       </StyledCard>
 

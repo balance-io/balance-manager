@@ -24,6 +24,7 @@ export const colors = {
   red: '214, 75, 71',
   ethplorer: '80, 102, 133',
   etherscan: '2, 92, 144',
+  trustwallet: '50, 117, 187',
   walletconnect: '64, 153, 255',
   ledger: '47, 49, 55',
   bodyBackground: '44,47,56',

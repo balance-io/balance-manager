@@ -24,6 +24,7 @@ const StyledCard = styled.div`
 
 const StyledContent = styled.div`
   min-height: ${({ minHeight }) => (minHeight ? `${minHeight}px` : '0')};
+  padding: ${({ padding }) => (padding ? padding : null)};
   transition: ${transitions.base};
   opacity: ${({ fetching }) => (fetching ? 0 : 1)};
   visibility: ${({ fetching }) => (fetching ? 'hidden' : 'visible')};
@@ -66,6 +67,7 @@ const Card = ({
   background,
   maxWidth,
   minHeight,
+  padding,
   children,
   ...props
 }) => (
@@ -79,7 +81,7 @@ const Card = ({
       <StyledMessage>{fetchingMessage}</StyledMessage>
       <Loader color="darkGrey" background={background} />
     </StyledFetching>
-    <StyledContent minHeight={minHeight} fetching={fetching}>
+    <StyledContent minHeight={minHeight} padding={padding} fetching={fetching}>
       {children}
     </StyledContent>
   </StyledCard>

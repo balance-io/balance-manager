@@ -21,7 +21,7 @@ const StyledCard = styled(Card)`
   background: #f5f6fa;
   display: block;
   margin-bottom: 18px;
-  min-height: 102px;
+  height: 102px;
   overflow: visible;
   width: 100%;
 `;
@@ -144,10 +144,10 @@ const StyledWalletConnectLogo = styled.div`
 
 const StyledWalletConnectButton = ConnectButton.extend`
   &:hover {
-    background: #454852;
+    background: #4fa1ff;
   }
   &:active {
-    background: #2b2d33;
+    background: #408df7;
   }
 `;
 

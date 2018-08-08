@@ -41,6 +41,15 @@ const StyledCenter = styled.div`
   align-items: center;
 `;
 
+const StyledButton = styled(Button)`
+  &:hover {
+    background: #4fa1ff;
+  }
+  &:active {
+    background: #408df7;
+  }
+`;
+
 class WalletConnectModal extends Component {
   componentDidMount() {
     this.props.walletConnectModalInit();
@@ -63,9 +72,9 @@ class WalletConnectModal extends Component {
             )}
           </StyledQRCodeWrapper>
           <StyledCenter>
-            <Button color="walletconnect" onClick={this.onClose}>
+            <StyledButton color="walletconnect" onClick={this.onClose}>
               {lang.t('button.close')}
-            </Button>
+            </StyledButton>
           </StyledCenter>
         </StyledContainer>
       </Card>

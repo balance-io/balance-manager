@@ -144,10 +144,10 @@ const StyledWalletConnectLogo = styled.div`
 
 const StyledWalletConnectButton = ConnectButton.extend`
   &:hover {
-    background: #454852;
+    background: #4fa1ff;
   }
   &:active {
-    background: #2b2d33;
+    background: #408df7;
   }
 `;
 

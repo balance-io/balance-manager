@@ -38,6 +38,10 @@ const StyledCard = styled(Card)`
   }
 `;
 
+const ContentContainer = styled.div`
+  width: 100%;
+`;
+
 const CardContainer = styled.div`
   align-items: center;
   display: flex;
@@ -316,7 +320,7 @@ class Home extends Component {
   render = () => (
     <BaseLayout>
       {isMobile() ? (
-        <div>
+        <ContentContainer>
           <StyledCard padding={`14px 0`}>
             <CardContainerMobile>
               <LogoSectionMobile>
@@ -389,9 +393,9 @@ class Home extends Component {
               {lang.t('homepage.reassurance.text_mobile')}
             </ReassuranceExplanation>
           </CardContainerMobile>
-        </div>
+        </ContentContainer>
       ) : (
-        <div>
+        <ContentContainer>
           <MetamaskCard minHeight={102}>
             <CardContainer>
               <MetamaskLogo />
@@ -573,7 +577,7 @@ class Home extends Component {
               </ReassuranceContainer>
             </ReassuranceCard>
           ) : null}
-        </div>
+        </ContentContainer>
       )}
     </BaseLayout>
   );

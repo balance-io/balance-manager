@@ -225,6 +225,8 @@ const TrezorLogo = styled.div`
 `;
 
 const TrustWalletLink = styled.a`
+  margin: 0 auto;
+  max-width: 315px;
   width: 100%;
 `;
 
@@ -246,12 +248,8 @@ const WalletConnectLogo = styled.div`
 `;
 
 const WalletConnectButton = ConnectButton.extend`
-  &:hover {
-    background: #454852;
-  }
-  &:active {
-    background: #2b2d33;
-  }
+  margin: 0 auto;
+  max-width: 315px;
 `;
 
 const BrowserLogosContainer = styled.div`
@@ -355,7 +353,12 @@ class Home extends Component {
                 </LogoText>
               </LogoSectionMobile>
               <TrustWalletLink href="//links.trustwalletapp.com">
-                <ConnectButton color="trustwallet" width={`100%`}>
+                <ConnectButton
+                  color="trustwallet"
+                  hoverColor="trustwalletHover"
+                  activeColor="trustwalletActive"
+                  width={`100%`}
+                >
                   {lang.t('homepage.connect_trustwallet.button')}
                 </ConnectButton>
               </TrustWalletLink>
@@ -381,6 +384,8 @@ class Home extends Component {
               </LogoSectionMobile>
               <WalletConnectButton
                 color="walletconnect"
+                hoverColor="walletconnectHover"
+                activeColor="walletconnectActive"
                 onClick={this.onWalletConnectInit}
                 width={`100%`}
               >

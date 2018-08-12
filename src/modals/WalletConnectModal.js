@@ -14,34 +14,34 @@ import {
 } from '../reducers/_walletconnect';
 import { responsive } from '../styles';
 
+const StyledCard = styled(Card)`
+  margin: 0 16px;
+  max-height: 500px;
+`;
+
 const StyledContainer = styled.div`
-  padding: 22px;
-  @media screen and (${responsive.sm.max}) {
-    padding: 15px;
-    & h4 {
-      margin: 20px auto;
-    }
-  }
+  padding: 0 0 16px;
 `;
 
 const StyledQRCodeWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 500px;
 `;
 
 const StyledQRCodeDisplay = styled(QRCodeDisplay)`
-  margin: 35px auto;
+  margin: 0 auto;
 `;
 
 const StyledCenter = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
 `;
 
 class WalletConnectModal extends Component {
+  constructor(props) {
+    super(props);
+    this.isSmallScreen = window.innerWidth < 530;
+  }
   componentDidMount() {
     this.props.walletConnectModalInit();
   }
@@ -53,11 +53,14 @@ class WalletConnectModal extends Component {
   render = () => {
     const { qrcode } = this.props;
     return (
-      <Card maxWidth={500} background="white">
+      <StyledCard maxWidth={this.isSmallScreen ? 305 : 427} background="white">
         <StyledContainer>
           <StyledQRCodeWrapper>
             {qrcode ? (
-              <StyledQRCodeDisplay data={qrcode} />
+              <StyledQRCodeDisplay
+                data={qrcode}
+                scale={this.isSmallScreen ? 5 : 7}
+              />
             ) : (
               <Loader color="dark" background="white" />
             )}
@@ -68,7 +71,7 @@ class WalletConnectModal extends Component {
             </Button>
           </StyledCenter>
         </StyledContainer>
-      </Card>
+      </StyledCard>
     );
   };
 }

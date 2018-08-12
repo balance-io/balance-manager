@@ -838,13 +838,16 @@ class ExchangeModal extends Component {
           )
         ) : (
           <StyledBlockedMessage>
-            {lang.t('message.exchange_not_available')}.&nbsp;<a
+            {lang.t('message.exchange_not_available')}
+            .&nbsp;
+            <a
               href="http://pleaseprotectconsumers.org"
               target="_blank"
               rel="noopener noreferrer"
             >
               {lang.t('message.learn_more')}
-            </a>.
+            </a>
+            .
           </StyledBlockedMessage>
         )}
       </Card>

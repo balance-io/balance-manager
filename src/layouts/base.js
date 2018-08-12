@@ -58,32 +58,25 @@ const StyledHeader = styled.div`
 `;
 
 const StyledBranding = styled.div`
-  display: flex;
   align-items: center;
-  position: relative;
+  display: flex;
 `;
 
 const StyledBalanceLogo = styled.div`
-  width: 198px;
-  height: 23px;
   background: url(${balanceManagerLogo}) no-repeat;
-  @media screen and (${responsive.sm.max}) {
-  }
+  height: 23px;
+  margin-right: 8px;
+  width: 198px;
 `;
 
 const StyledBeta = styled.div`
-  margin: 0;
-  position: absolute;
-  top: 5.5px;
-  right: -40px;
-  display: inline-block;
-  letter-spacing: 0.4px;
+  background: rgba(${colors.white}, 0.5);
+  border-radius: 4px;
+  color: rgb(${colors.bodyBackground});
   font-size: 8px;
   font-weight: 500;
+  letter-spacing: 0.4px;
   padding: 2px 3px;
-  border-radius: 4px;
-  background: rgba(${colors.white}, 0.5);
-  color: rgb(${colors.bodyBackground});
 `;
 
 const StyledIndicators = styled.div`

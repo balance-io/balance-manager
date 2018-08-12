@@ -47,14 +47,18 @@ const StyledContent = styled(Wrapper)`
 `;
 
 const StyledHeader = styled.div`
-  margin-top: -1px;
-  margin-bottom: 1px;
-  width: 100%;
-  height: 72px;
-  display: flex;
   align-items: center;
+  display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  min-height: 72px;
   padding: 0 16px;
+  width: 100%;
+
+  @media screen and (max-width: ${({ isHomepage }) =>
+      isHomepage ? '337px' : '505px'}) {
+    padding: 16px 16px 0;
+  }
 `;
 
 const StyledBranding = styled.div`
@@ -80,11 +84,17 @@ const StyledBeta = styled.div`
 `;
 
 const StyledIndicators = styled.div`
-  display: flex;
   align-items: center;
-  justify-content: flex-end;
+  display: flex;
+
   & > div {
     margin-left: 2px;
+  }
+
+  @media screen and (max-width: ${({ isHomepage }) =>
+      isHomepage ? '337px' : '505px'}) {
+    margin: 0 auto;
+    padding: 8px 0;
   }
 `;
 
@@ -143,6 +153,7 @@ const BaseLayout = ({
   ...props
 }) => {
   const addresses = {};
+  const isHomepage = window.location.pathname === '/';
   if (accountType === 'LEDGER') {
     ledgerAccounts.forEach(account => {
       addresses[account.address] = account;
@@ -161,7 +172,7 @@ const BaseLayout = ({
     };
   });
   const showToolbar =
-    window.location.pathname !== '/' &&
+    !isHomepage &&
     (!metamaskFetching || !ledgerFetching || !trezorFetching) &&
     ((accountType === 'METAMASK' && web3Available) ||
       accountType !== 'METAMASK') &&
@@ -186,14 +197,14 @@ const BaseLayout = ({
       <ReminderRibbon maxWidth={1000} />
       <Background />
       <Column maxWidth={1000}>
-        <StyledHeader>
+        <StyledHeader isHomepage={isHomepage}>
           <Link to="/">
             <StyledBranding>
               <StyledBalanceLogo alt="Balance" />
               <StyledBeta>{'BETA'}</StyledBeta>
             </StyledBranding>
           </Link>
-          <StyledIndicators>
+          <StyledIndicators isHomepage={isHomepage}>
             {showToolbar &&
               accountType === 'LEDGER' &&
               !!Object.keys(addresses).length && (

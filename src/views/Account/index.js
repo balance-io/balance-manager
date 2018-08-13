@@ -30,43 +30,57 @@ const StyledFlex = styled.div`
 `;
 
 const StyledTop = styled.div`
-  width: 100%;
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   padding: 16px 16px 13px 20px;
+  width: 100%;
+
   & h6 {
     margin-bottom: 2px;
     color: rgba(${colors.headerTitle});
     font-size: ${fonts.size.small};
     font-weight: ${fonts.weight.semibold};
   }
-  @media screen and (${responsive.sm.max}) {
-    padding: 16px;
-    & h6 {
-      margin-top: 15px;
-    }
-  }
-  @media screen and (max-width: 768px) {
+
+  @media screen and (max-width: 712px) {
     flex-direction: column-reverse;
+    padding: 16px;
   }
 `;
 
 const StyledAddressWrapper = styled.div`
+  display: inline-flex;
+  flex-direction: column;
+  flex: 1
   width: 100%;
 `;
 
 const StyledActions = styled.div`
-  display: flex;
+  display: inline-flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
-  & button {
-    margin-left: 8px;
+
+  @media screen and (max-width: 712px) {
+    justify-content: space-around;
+    margin: 0 auto;
+    max-width: 360px;
+    width: 100%;
   }
-  @media screen and (${responsive.sm.max}) {
-    justify-content: space-between;
-    & button {
-      margin: 2px;
-    }
+
+  @media screen and (max-width: 363px) {
+    flex-wrap: wrap-reverse;
+  }
+`;
+
+const StyledButton = styled(Button)`
+  margin: 0 4px;
+
+  @media screen and (max-width: 712px) {
+    margin-bottom: 14px;
+  }
+
+  @media screen and (max-width: 363px) {
+    order: ${({ order }) => order};
   }
 `;
 
@@ -119,37 +133,40 @@ class Account extends Component {
 
               <StyledActions>
                 {this.props.network === 'mainnet' && (
-                  <Button
+                  <StyledButton
                     left
                     color="brightGreen"
                     hoverColor="brightGreenHover"
                     activeColor="brightGreenHover"
+                    order={3}
                     icon={exchangeIcon}
                     onClick={this.openExchangeModal}
                   >
                     {lang.t('button.exchange')}
-                  </Button>
+                  </StyledButton>
                 )}
-                <Button
+                <StyledButton
                   left
                   color="blue"
                   hoverColor="blueHover"
                   activeColor="blueActive"
+                  order={1}
                   icon={qrCode}
                   onClick={this.openReceiveModal}
                 >
                   {lang.t('button.receive')}
-                </Button>
-                <Button
+                </StyledButton>
+                <StyledButton
                   left
                   color="blue"
                   hoverColor="blueHover"
                   activeColor="blueActive"
+                  order={2}
                   icon={arrowUp}
                   onClick={this.openSendModal}
                 >
                   {lang.t('button.send')}
-                </Button>
+                </StyledButton>
               </StyledActions>
             </StyledTop>
 

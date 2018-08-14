@@ -32,7 +32,8 @@ import {
   sendUpdateSelected,
   sendMaxBalance,
   sendToggleConfirmationView,
-} from '../../reducers/_send';
+} from 'balance-common';
+import { web3SendTransactionMultiWallet } from '../../handlers/web3';
 import { notificationShow } from '../../reducers/_notification';
 
 import { isValidAddress } from '../../helpers/validators';
@@ -219,14 +220,17 @@ class SendModal extends Component {
         }
       }
 
-      this.props.sendTransaction({
-        address: this.props.accountInfo.address,
-        recipient: this.props.recipient,
-        amount: this.props.assetAmount,
-        asset: this.props.selected,
-        gasPrice: this.props.gasPrice,
-        gasLimit: this.props.gasLimit,
-      });
+      this.props.sendTransaction(
+        {
+          address: this.props.accountInfo.address,
+          recipient: this.props.recipient,
+          amount: this.props.assetAmount,
+          asset: this.props.selected,
+          gasPrice: this.props.gasPrice,
+          gasLimit: this.props.gasLimit,
+        },
+        web3SendTransactionMultiWallet,
+      );
     }
 
     this.props.sendToggleConfirmationView(true);

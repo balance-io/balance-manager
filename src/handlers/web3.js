@@ -212,39 +212,18 @@ export const web3SendSignedTransaction = signedTx =>
  * @param  {Object}  transaction { from, to, value, data, gasPrice}
  * @return {Promise}
  */
-export const web3MetamaskSendTransaction = transaction =>
+export const web3MetamaskSendTransaction = txDetails =>
   new Promise((resolve, reject) => {
-    const from =
-      transaction.from.substr(0, 2) === '0x'
-        ? transaction.from
-        : `0x${transaction.from}`;
-    const to =
-      transaction.to.substr(0, 2) === '0x'
-        ? transaction.to
-        : `0x${transaction.to}`;
-    const value = transaction.value ? toWei(transaction.value) : '0x00';
-    const data = transaction.data ? transaction.data : '0x';
-    getTxDetails({
-      from,
-      to,
-      data,
-      value,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-    })
-      .then(txDetails => {
-        if (typeof window.web3 !== 'undefined') {
-          window.web3.eth.sendTransaction(txDetails, (err, txHash) => {
-            if (err) {
-              reject(err);
-            }
-            resolve(txHash);
-          });
-        } else {
-          throw new Error(`Metamask is not present`);
+    if (typeof window.web3 !== 'undefined') {
+      window.web3.eth.sendTransaction(txDetails, (err, txHash) => {
+        if (err) {
+          reject(err);
         }
-      })
-      .catch(error => reject(error));
+        resolve(txHash);
+      });
+    } else {
+      throw new Error(`Metamask is not present`);
+    }
   });
 
 /**
@@ -252,36 +231,15 @@ export const web3MetamaskSendTransaction = transaction =>
  * @param  {Object}  transaction { from, to, value, data, gasPrice}
  * @return {Promise}
  */
-export const web3WalletConnectSendTransaction = transaction =>
+export const web3WalletConnectSendTransaction = txDetails =>
   new Promise((resolve, reject) => {
-    const from =
-      transaction.from.substr(0, 2) === '0x'
-        ? transaction.from
-        : `0x${transaction.from}`;
-    const to =
-      transaction.to.substr(0, 2) === '0x'
-        ? transaction.to
-        : `0x${transaction.to}`;
-    const value = transaction.value ? toWei(transaction.value) : '0x00';
-    const data = transaction.data ? transaction.data : '0x';
-    getTxDetails({
-      from,
-      to,
-      data,
-      value,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-    })
-      .then(txDetails => {
-        walletConnectSignTransaction(txDetails)
-          .then(txHash => {
-            if (txHash) {
-              resolve(txHash);
-            } else {
-              throw new Error('Could not send transaction via WalletConnect');
-            }
-          })
-          .catch(error => reject(error));
+    walletConnectSignTransaction(txDetails)
+      .then(txHash => {
+        if (txHash) {
+          resolve(txHash);
+        } else {
+          throw new Error('Could not send transaction via WalletConnect');
+        }
       })
       .catch(error => reject(error));
   });
@@ -291,67 +249,25 @@ export const web3WalletConnectSendTransaction = transaction =>
  * @param  {Object}  transaction { from, to, value, data, gasPrice}
  * @return {Promise}
  */
-export const web3LedgerSendTransaction = transaction =>
+export const web3LedgerSendTransaction = txDetails =>
   new Promise((resolve, reject) => {
-    const from =
-      transaction.from.substr(0, 2) === '0x'
-        ? transaction.from
-        : `0x${transaction.from}`;
-    const to =
-      transaction.to.substr(0, 2) === '0x'
-        ? transaction.to
-        : `0x${transaction.to}`;
-    const value = transaction.value ? toWei(transaction.value) : '0x00';
-    const data = transaction.data ? transaction.data : '0x';
-    getTxDetails({
-      from,
-      to,
-      data,
-      value,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-    })
-      .then(txDetails => {
-        ledgerEthSignTransaction(txDetails)
-          .then(signedTx =>
-            web3SendSignedTransaction(signedTx)
-              .then(txHash => resolve(txHash))
-              .catch(error => reject(error)),
-          )
-          .catch(error => reject(error));
-      })
+    ledgerEthSignTransaction(txDetails)
+      .then(signedTx =>
+        web3SendSignedTransaction(signedTx)
+          .then(txHash => resolve(txHash))
+          .catch(error => reject(error)),
+      )
       .catch(error => reject(error));
   });
 
-export const web3TrezorSendTransaction = transaction =>
+export const web3TrezorSendTransaction = txDetails =>
   new Promise((resolve, reject) => {
-    const from =
-      transaction.from.substr(0, 2) === '0x'
-        ? transaction.from
-        : `0x${transaction.from}`;
-    const to =
-      transaction.to.substr(0, 2) === '0x'
-        ? transaction.to
-        : `0x${transaction.to}`;
-    const value = transaction.value ? toWei(transaction.value) : '0x00';
-    const data = transaction.data ? transaction.data : '0x';
-    getTxDetails({
-      from,
-      to,
-      data,
-      value,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-    })
-      .then(txDetails => {
-        trezorEthSignTransaction(txDetails)
-          .then(signedTx =>
-            web3SendSignedTransaction(signedTx)
-              .then(txHash => resolve(txHash))
-              .catch(error => reject(error)),
-          )
-          .catch(error => reject(error));
-      })
+    trezorEthSignTransaction(txDetails)
+      .then(signedTx =>
+        web3SendSignedTransaction(signedTx)
+          .then(txHash => resolve(txHash))
+          .catch(error => reject(error)),
+      )
       .catch(error => reject(error));
   });
 
@@ -362,10 +278,6 @@ export const web3TrezorSendTransaction = transaction =>
  */
 export const web3SendTransactionMultiWallet = (transaction, accountType) => {
   let method = null;
-  transaction.value = transaction.amount;
-  if (transaction.asset.symbol !== 'ETH') {
-    transaction = getTransferTokenTransaction(transaction);
-  }
   switch (accountType) {
     case 'METAMASK':
       method = web3MetamaskSendTransaction;

@@ -3,7 +3,7 @@ import {
   getWalletConnectSession,
   saveWalletConnectSession,
 } from '../handlers/localstorage';
-import { parseError } from '../handlers/parsers';
+import { parseError } from 'balance-common';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
 import { accountUpdateAccountAddress } from 'balance-common';

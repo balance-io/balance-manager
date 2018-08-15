@@ -6,7 +6,7 @@ import {
   apiGetGasPrices,
   apiGetSinglePrice,
 } from '../handlers/api';
-import { parseError, parseGasPrices } from '../handlers/parsers';
+import { parseError, parseGasPrices } from 'balance-common';
 import {
   web3SendTransactionMultiWallet,
   estimateGasLimit,

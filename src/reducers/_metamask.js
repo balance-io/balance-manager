@@ -1,5 +1,5 @@
 import { apiGetMetamaskNetwork } from '../handlers/api';
-import { parseError } from '../handlers/parsers';
+import { parseError } from 'balance-common';
 import { modalClose } from './_modal';
 import {
   accountUpdateAccountAddress,

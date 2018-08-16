@@ -84,6 +84,11 @@ const StyledButton = styled(Button)`
   }
 `;
 
+const StyledButtonText = styled.p`
+  display: inline-block;
+  vertical-align: middle;
+`;
+
 const StyledMessage = styled.div`
   display: flex;
   align-items: center;
@@ -142,7 +147,9 @@ class Account extends Component {
                     icon={exchangeIcon}
                     onClick={this.openExchangeModal}
                   >
-                    {lang.t('button.exchange')}
+                    <StyledButtonText>
+                      {lang.t('button.exchange')}
+                    </StyledButtonText>
                   </StyledButton>
                 )}
                 <StyledButton
@@ -154,7 +161,9 @@ class Account extends Component {
                   icon={qrCode}
                   onClick={this.openReceiveModal}
                 >
-                  {lang.t('button.receive')}
+                  <StyledButtonText>
+                    {lang.t('button.receive')}
+                  </StyledButtonText>
                 </StyledButton>
                 <StyledButton
                   left
@@ -165,7 +174,7 @@ class Account extends Component {
                   icon={arrowUp}
                   onClick={this.openSendModal}
                 >
-                  {lang.t('button.send')}
+                  <StyledButtonText>{lang.t('button.send')}</StyledButtonText>
                 </StyledButton>
               </StyledActions>
             </StyledTop>

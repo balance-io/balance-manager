@@ -4,17 +4,14 @@ import styled from 'styled-components';
 import Loader from './Loader';
 import { colors, fonts, shadows, transitions } from '../styles';
 
-const StyledIcon = styled.div`
-  position: absolute;
-  height: 15px;
-  width: 15px;
-  margin: 0 8px;
-  top: calc((100% - 15px) / 2);
+const StyledIcon = styled.span`
+  height: 16px;
+  margin-right: 6px;
+  width: 16px;
 `;
 
 const StyledButton = styled.button`
   transition: ${transitions.button};
-  position: relative;
   border: none;
   border-style: none;
   box-sizing: border-box;
@@ -29,8 +26,7 @@ const StyledButton = styled.button`
   font-size: ${fonts.size.h6};
   font-weight: ${fonts.weight.semibold};
   padding: ${({ icon, left }) =>
-    icon ? (left ? '7px 12px 8px 28px' : '7px 28px 8px 12px') : '8px 12px'};
-  height: 32px;
+    icon ? (left ? '8px 12px' : '7px 28px 8px 12px') : '8px 12px'};
   cursor: ${({ disabled }) => (disabled ? 'auto' : 'pointer')};
   will-change: transform;
 
@@ -75,13 +71,12 @@ const StyledButton = styled.button`
   }
 
   & ${StyledIcon} {
-    right: ${({ left }) => (left ? 'auto' : '0')};
-    left: ${({ left }) => (left ? '0' : 'auto')};
-    display: ${({ icon }) => (icon ? 'block' : 'none')};
+    display: ${({ icon }) => (icon ? 'inline-block' : 'none')};
     mask: ${({ icon }) => (icon ? `url(${icon}) center no-repeat` : 'none')};
     background-color: ${({ outline, color }) =>
       outline ? `rgb(${colors[color]})` : `rgb(${colors.white})`};
     transition: 0.15s ease;
+    vertical-align: middle;
   }
 `;
 

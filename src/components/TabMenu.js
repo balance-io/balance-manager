@@ -25,16 +25,6 @@ const StyledTabsWrapper = styled.div`
   grid-template-columns: auto;
   box-shadow: none;
   display: flex;
-
-  & a:nth-child(2) button {
-    padding-left: 35px;
-    margin-left: 4px;
-  }
-
-  & a:nth-child(3) button {
-    padding-left: 38px;
-    margin-left: 8px;
-  }
 `;
 
 const StyledTabBackground = styled.div`
@@ -80,16 +70,13 @@ const StyledTab = styled(Button)`
   -webkit-box-shadow: ${shadows.medium};
   box-shadow: ${shadows.medium};
   margin: 0;
-  display: flex;
   opacity: 1 !important;
-  padding-top: 12.5px;
-  padding-left: 34px;
+  padding: 8px 16px;
   outline: none !important;
   box-shadow: none !important;
   background-size: 181px 46px !important;
   background-position: -47px 0;
 
-  &:hover,
   &:active,
   &:focus {
     opacity: 1 !important;
@@ -100,21 +87,36 @@ const StyledTab = styled(Button)`
     color: ${({ active }) =>
       active ? `rgb(${colors.blue})` : `rgba(${colors.purpleTextTransparent})`};
 
-    & > div {
+    & > span {
       opacity: 1 !important;
     }
   }
 
-  & > div {
+  &:hover {
+    background-color: transparent;
+    color: ${`rgb(${colors.blue})`};
+    transform: none;
+
+    & > span {
+      background-color: ${`rgb(${colors.blue})`} !important;
+    }
+  }
+
+  & > span {
     transition: ${transitions.base};
     -webkit-mask-size: auto !important;
     mask-size: auto !important;
-    margin: 1px 0 0 16px;
+    margin-right: 6px;
     background-color: ${({ active }) =>
       active
         ? `rgb(${colors.blue})`
         : `rgb(${colors.purpleTextTransparent})`} !important;
   }
+`;
+
+const StyledTabText = styled.p`
+  display: inline-block;
+  vertical-align: middle;
 `;
 
 class TabMenu extends Component {
@@ -210,7 +212,7 @@ class TabMenu extends Component {
               ref="balancesTab"
               left
             >
-              {lang.t('account.tab_balances')}
+              <StyledTabText>{lang.t('account.tab_balances')}</StyledTabText>
             </StyledTab>
           </Link>
           <Link to={`${this.props.match.url}/transactions`}>
@@ -222,7 +224,9 @@ class TabMenu extends Component {
               ref="transactionsTab"
               left
             >
-              {lang.t('account.tab_transactions')}
+              <StyledTabText>
+                {lang.t('account.tab_transactions')}
+              </StyledTabText>
             </StyledTab>
           </Link>
           <Link to={`${this.props.match.url}/uniquetokens`}>
@@ -234,7 +238,9 @@ class TabMenu extends Component {
               ref="uniqueTokensTab"
               left
             >
-              {lang.t('account.tab_uniquetokens')}
+              <StyledTabText>
+                {lang.t('account.tab_uniquetokens')}
+              </StyledTabText>
             </StyledTab>
           </Link>
         </StyledTabsWrapper>

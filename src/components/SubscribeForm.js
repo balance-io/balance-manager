@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import jsonp from 'jsonp';
-import { lang } from 'balance-common';
 import Button from './Button';
-import { isValidEmail } from '../helpers/validators';
+import { isValidEmail, lang } from 'balance-common';
 import { fonts, colors, transitions } from '../styles';
 
 const SForm = styled.form`

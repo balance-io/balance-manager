@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { lang } from 'balance-common';
-
 import QRCodeReader from '../../components/QRCodeReader';
 import Card from '../../components/Card';
 import Input from '../../components/Input';
@@ -22,6 +20,12 @@ import qrIcon from '../../assets/qr-code-bnw.png';
 
 import { modalClose } from '../../reducers/_modal';
 import {
+  calcTxFee,
+  capitalize,
+  convertAmountFromBigNumber,
+  greaterThan,
+  lang,
+  isValidAddress,
   sendModalInit,
   sendUpdateGasPrice,
   sendTransaction,
@@ -32,18 +36,10 @@ import {
   sendUpdateSelected,
   sendMaxBalance,
   sendToggleConfirmationView,
+  transactionData,
 } from 'balance-common';
 import { web3SendTransactionMultiWallet } from '../../handlers/web3';
 import { notificationShow } from '../../reducers/_notification';
-
-import { isValidAddress } from '../../helpers/validators';
-import {
-  calcTxFee,
-  capitalize,
-  convertAmountFromBigNumber,
-  greaterThan,
-  transactionData,
-} from 'balance-common';
 
 import {
   StyledIcon,

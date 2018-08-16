@@ -1,10 +1,10 @@
 import Web3 from 'web3';
-import { isValidAddress } from '../helpers/validators';
 import {
   convertAmountToBigNumber,
   convertAssetAmountFromBigNumber,
   convertStringToHex,
   getDataString,
+  isValidAddress,
   removeHexPrefix,
 } from 'balance-common';
 import { ledgerEthSignTransaction } from './ledger-eth';

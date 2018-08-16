@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import lang from '../../languages';
+import { lang } from 'balance-common';
 import Card from '../../components/Card';
 import Input from '../../components/Input';
 import LineBreak from '../../components/LineBreak';
@@ -42,7 +42,7 @@ import {
   handleSignificantDecimals,
 } from '../../helpers/bignumber';
 import { capitalize } from '../../helpers/utilities';
-import { getCountdown } from '../../helpers/time';
+import { getCountdown } from 'balance-common';
 import { fonts, colors, transitions } from '../../styles';
 
 const StyledSuccessMessage = styled.div`

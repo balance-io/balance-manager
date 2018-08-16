@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import lang from '../../languages';
+import { lang } from 'balance-common';
 
 import QRCodeReader from '../../components/QRCodeReader';
 import Card from '../../components/Card';

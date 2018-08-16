@@ -5,9 +5,8 @@ import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
-import { checkWalletConnectSession } from '../handlers/localstorage';
 import { walletConnectHasValidSession } from '../reducers/_walletconnect';
-import lang from '../languages';
+import { lang } from 'balance-common';
 import { fonts, colors } from '../styles';
 
 const StyledWrapper = styled.div`

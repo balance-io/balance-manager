@@ -1,4 +1,4 @@
-import { toChecksumAddress } from '../handlers/web3';
+import { toChecksumAddress } from 'balance-common';
 
 /**
  * @desc validate email

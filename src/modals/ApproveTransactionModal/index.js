@@ -1,7 +1,7 @@
 import React from 'react';
 import { modalClose } from '../../reducers/_modal';
 
-import lang from '../../languages';
+import { lang } from 'balance-common';
 
 import MetamaskLogo from '../../components/MetamaskLogo';
 import LedgerLogo from '../../components/LedgerLogo';

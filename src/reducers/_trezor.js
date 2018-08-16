@@ -1,4 +1,4 @@
-import lang from '../languages';
+import { lang } from 'balance-common';
 import {
   accountUpdateAccountAddress,
   accountUpdateNetwork,

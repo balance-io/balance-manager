@@ -1,16 +1,15 @@
 import {
+  apiGetGasPrices,
+  apiGetSinglePrice,
   apiShapeshiftGetMarketInfo,
   apiShapeshiftGetCurrencies,
   apiShapeshiftSendAmount,
   apiShapeshiftGetExchangeDetails,
-  apiGetGasPrices,
-  apiGetSinglePrice,
-} from '../handlers/api';
-import { parseError, parseGasPrices } from 'balance-common';
-import {
-  web3SendTransactionMultiWallet,
   estimateGasLimit,
-} from '../handlers/web3';
+  parseError,
+  parseGasPrices,
+} from 'balance-common';
+import { web3SendTransactionMultiWallet } from '../handlers/web3';
 import {
   divide,
   multiply,
@@ -113,7 +112,9 @@ export const exchangeGetGasPrices = () => (dispatch, getState) => {
   dispatch({ type: EXCHANGE_GET_GAS_PRICE_REQUEST });
   apiGetGasPrices()
     .then(({ data }) => {
+      console.log('get gas prices', data);
       const gasPrices = parseGasPrices(data, prices, gasLimit);
+      console.log('parsed gas prices', gasPrices);
       const gasPrice = gasPrices.fast;
       dispatch({ type: EXCHANGE_GET_GAS_PRICE_SUCCESS, payload: gasPrice });
     })
@@ -163,6 +164,7 @@ export const exchangeUpdateGasLimit = depositSelected => (
     amount: depositAmount,
   })
     .then(gasLimit => {
+      console.log('>>>> gas limit', gasLimit);
       dispatch({
         type: EXCHANGE_UPDATE_GAS_LIMIT_SUCCESS,
         payload: gasLimit,

@@ -1,12 +1,8 @@
 import WalletConnect from 'walletconnect';
-import {
-  getWalletConnectSession,
-  saveWalletConnectSession,
-} from '../handlers/localstorage';
 import { parseError } from 'balance-common';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';
-import { accountUpdateAccountAddress } from 'balance-common';
+import { accountUpdateAccountAddress, commonStorage } from 'balance-common';
 import { walletConnectNewSession } from '../handlers/walletconnect';
 
 // -- Constants ------------------------------------------------------------- //
@@ -57,32 +53,38 @@ export const walletConnectModalInit = () => (dispatch, getState) => {
 
 export const walletConnectHasValidSession = () => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
-    const walletConnectDetails = getWalletConnectSession();
-    if (!walletConnectDetails) {
-      resolve(false);
-    }
-    dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
-    const webConnector = new WalletConnect(walletConnectDetails);
-    webConnector
-      .getSessionStatus()
-      .then(response => {
-        if (response) {
-          const accountAddress = response.data[0] || null;
-          dispatch({
-            type: WALLET_CONNECT_GET_SESSION_SUCCESS,
-            payload: accountAddress,
-          });
-          dispatch(
-            accountUpdateAccountAddress(accountAddress, 'WALLETCONNECT'),
-          );
-          resolve(true);
-        } else {
-          dispatch({ type: WALLET_CONNECT_GET_SESSION_FAILURE });
+    commonStorage
+      .getWalletConnectSession()
+      .then(walletConnectDetails => {
+        if (!walletConnectDetails) {
           resolve(false);
         }
+        dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
+        const webConnector = new WalletConnect(walletConnectDetails);
+        webConnector
+          .getSessionStatus()
+          .then(response => {
+            if (response) {
+              const accountAddress = response.data[0] || null;
+              dispatch({
+                type: WALLET_CONNECT_GET_SESSION_SUCCESS,
+                payload: accountAddress,
+              });
+              dispatch(
+                accountUpdateAccountAddress(accountAddress, 'WALLETCONNECT'),
+              );
+              resolve(true);
+            } else {
+              dispatch({ type: WALLET_CONNECT_GET_SESSION_FAILURE });
+              resolve(false);
+            }
+          })
+          .catch(error => {
+            reject(error);
+          });
       })
       .catch(error => {
-        reject(error);
+        resolve(false);
       });
   });
 };
@@ -99,7 +101,7 @@ export const walletConnectListenForSession = webConnector => (
       dispatch(walletConnectModalInit());
     } else if (!error && data) {
       const accountAddress = data ? data.data[0].toLowerCase() : null;
-      saveWalletConnectSession(
+      commonStorage.saveWalletConnectSession(
         {
           bridgeUrl: webConnector.bridgeUrl,
           dappName: webConnector.dappName,

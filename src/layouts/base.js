@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import lang from '../languages';
+import { lang, resources } from 'balance-common';
 import Link from '../components/Link';
 import Dropdown from '../components/Dropdown';
 import Background from '../components/Background';
@@ -28,10 +28,9 @@ import { metamaskClearState } from '../reducers/_metamask';
 import { ledgerClearState } from '../reducers/_ledger';
 import { trezorClearState } from '../reducers/_trezor';
 import { walletConnectClearState } from '../reducers/_walletconnect';
-import { resetAccount, resetWalletConnect } from '../handlers/localstorage';
+import { commonStorage } from 'balance-common';
 import ReminderRibbon from '../components/ReminderRibbon';
 import { colors, responsive } from '../styles';
-import { resources } from '../languages';
 
 const StyledLayout = styled.div`
   position: relative;
@@ -176,14 +175,14 @@ const BaseLayout = ({
   const openSendModal = () => modalOpen('DONATION_MODAL');
   const disconnectAccount = () => {
     accountClearState();
-    resetAccount(accountAddress);
+    commonStorage.resetAccount(accountAddress);
     if (accountType === 'TREZOR') {
       trezorClearState();
     } else if (accountType === 'LEDGER') {
       ledgerClearState();
     } else if (accountType === 'WALLETCONNECT') {
       walletConnectClearState();
-      resetWalletConnect();
+      commonStorage.resetWalletConnect();
     } else if (accountType === 'METAMASK') {
       metamaskClearState();
     }

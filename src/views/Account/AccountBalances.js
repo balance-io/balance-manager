@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import lang from '../../languages';
+import { lang } from 'balance-common';
 import AssetIcon from '../../components/AssetIcon';
 import ToggleIndicator from '../../components/ToggleIndicator';
 import { ellipseText } from '../../helpers/utilities';

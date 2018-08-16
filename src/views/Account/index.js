@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import lang from '../../languages';
+import { lang } from 'balance-common';
 import TabMenu from '../../components/TabMenu';
 import Card from '../../components/Card';
 import Button from '../../components/Button';

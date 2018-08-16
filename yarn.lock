@@ -1207,7 +1207,7 @@ babylon@^6.17.0, babylon@^6.18.0:
 
 "balance-common@git+https://github.com/balance-io/balance-common.git#sendAndTxns":
   version "0.2.0"
-  resolved "git+https://github.com/balance-io/balance-common.git#3ace16237d3975bc03d9a3e48715cf8e28f142f1"
+  resolved "git+https://github.com/balance-io/balance-common.git#e9afa5ddea2b69259a32bf6aac227e40f57e8598"
   dependencies:
     axios "^0.18.0"
     bignumber.js "^7.0.1"

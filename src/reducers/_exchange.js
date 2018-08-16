@@ -11,16 +11,16 @@ import {
 } from 'balance-common';
 import { web3SendTransactionMultiWallet } from '../handlers/web3';
 import {
-  divide,
-  multiply,
-  subtract,
-  greaterThan,
-  greaterThanOrEqual,
   convertAmountFromBigNumber,
   convertStringToNumber,
   convertAmountToBigNumber,
   convertAmountToDisplay,
-} from '../helpers/bignumber';
+  divide,
+  greaterThan,
+  greaterThanOrEqual,
+  multiply,
+  subtract,
+} from 'balance-common';
 import { notificationShow } from './_notification';
 import {
   accountUpdateExchange,

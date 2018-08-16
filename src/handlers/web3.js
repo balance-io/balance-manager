@@ -1,11 +1,12 @@
 import Web3 from 'web3';
 import { isValidAddress } from '../helpers/validators';
-import { getDataString, removeHexPrefix } from '../helpers/utilities';
 import {
   convertAmountToBigNumber,
   convertAssetAmountFromBigNumber,
   convertStringToHex,
-} from '../helpers/bignumber';
+  getDataString,
+  removeHexPrefix,
+} from 'balance-common';
 import { ledgerEthSignTransaction } from './ledger-eth';
 import { trezorEthSignTransaction } from './trezor-eth';
 import { walletConnectSignTransaction } from './walletconnect';

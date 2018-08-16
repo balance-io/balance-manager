@@ -38,15 +38,12 @@ import { notificationShow } from '../../reducers/_notification';
 
 import { isValidAddress } from '../../helpers/validators';
 import {
+  calcTxFee,
+  capitalize,
   convertAmountFromBigNumber,
   greaterThan,
-} from '../../helpers/bignumber';
-
-import {
-  capitalize,
   transactionData,
-  calcTxFee,
-} from '../../helpers/utilities';
+} from 'balance-common';
 
 import {
   StyledIcon,

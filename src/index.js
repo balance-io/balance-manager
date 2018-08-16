@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './helpers/intercom';
 import { injectGlobal } from 'styled-components';
 import { globalStyles } from './styles';
-import { bootIntercom } from './helpers/utilities';
+import { bootIntercom } from './helpers/bootIntercom';
 import Root from './Root';
 import Storage from '@devshack/react-native-storage';
 import { commonStorage, lang, resources } from 'balance-common';

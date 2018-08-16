@@ -2,15 +2,15 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { lang } from 'balance-common';
 import AssetIcon from '../../components/AssetIcon';
 import ToggleIndicator from '../../components/ToggleIndicator';
-import { ellipseText } from '../../helpers/utilities';
 import {
   convertStringToNumber,
+  ellipseText,
   hasHighMarketValue,
   hasLowMarketValue,
-} from '../../helpers/bignumber';
+  lang,
+} from 'balance-common';
 import { colors, fonts, responsive } from '../../styles';
 
 const StyledGrid = styled.div`

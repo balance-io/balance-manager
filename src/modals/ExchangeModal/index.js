@@ -30,19 +30,19 @@ import {
 } from '../../reducers/_exchange';
 import { notificationShow } from '../../reducers/_notification';
 import {
+  add,
+  capitalize,
   convertAmountFromBigNumber,
   convertAmountToDisplay,
   convertNumberToString,
-  add,
+  getCountdown,
   multiply,
   divide,
   greaterThan,
   smallerThan,
   convertAmountToBigNumber,
   handleSignificantDecimals,
-} from '../../helpers/bignumber';
-import { capitalize } from '../../helpers/utilities';
-import { getCountdown } from 'balance-common';
+} from 'balance-common';
 import { fonts, colors, transitions } from '../../styles';
 
 const StyledSuccessMessage = styled.div`

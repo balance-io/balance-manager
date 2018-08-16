@@ -32,13 +32,13 @@ import {
 import { web3SendTransactionMultiWallet } from '../../handlers/web3';
 import { notificationShow } from '../../reducers/_notification';
 
-import { greaterThan } from '../../helpers/bignumber';
 import {
   capitalize,
   getEth,
+  greaterThan,
   transactionData,
   calcTxFee,
-} from '../../helpers/utilities';
+} from 'balance-common';
 
 import {
   StyledIcon,

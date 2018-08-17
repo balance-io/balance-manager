@@ -88,17 +88,24 @@ const StyledTransactionWrapper = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 0;
   z-index: 0;
+
   & > div {
     transition: box-shadow 0.1s ease;
     border-radius: 0;
+
     @media (hover: hover) {
       &:hover {
         z-index: 10;
         box-shadow: ${({ showTxDetails }) =>
           showTxDetails ? `${shadows.big}` : `${shadows.soft}`};
       }
+    }
+  }
+
+  &:last-child {
+    & > div > div {
+      border-radius: 0 0 10px 10px;
     }
   }
 `;

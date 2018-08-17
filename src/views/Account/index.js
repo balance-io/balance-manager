@@ -17,7 +17,10 @@ import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { modalOpen } from '../../reducers/_modal';
 import { capitalize } from '../../helpers/utilities';
-import { colors, fonts, responsive } from '../../styles';
+import { colors, fonts } from '../../styles';
+
+const mdBreakpoint = '712px';
+const xsBreakpoint = '363px';
 
 const StyledAccount = styled.div`
   width: 100%;
@@ -42,9 +45,9 @@ const StyledTop = styled.div`
     font-weight: ${fonts.weight.semibold};
   }
 
-  @media screen and (max-width: 712px) {
+  @media screen and (max-width: ${mdBreakpoint}) {
     flex-direction: column-reverse;
-    padding: 16px;
+    padding: 16px 16px 8px;
   }
 `;
 
@@ -60,14 +63,14 @@ const StyledActions = styled.div`
   flex-wrap: wrap;
   justify-content: flex-end;
 
-  @media screen and (max-width: 712px) {
+  @media screen and (max-width: ${mdBreakpoint}) {
     justify-content: space-around;
     margin: 0 auto;
     max-width: 360px;
     width: 100%;
   }
 
-  @media screen and (max-width: 363px) {
+  @media screen and (max-width: ${xsBreakpoint}) {
     flex-wrap: wrap-reverse;
   }
 `;
@@ -75,11 +78,11 @@ const StyledActions = styled.div`
 const StyledButton = styled(Button)`
   margin: 0 4px;
 
-  @media screen and (max-width: 712px) {
+  @media screen and (max-width: ${mdBreakpoint}) {
     margin-bottom: 14px;
   }
 
-  @media screen and (max-width: 363px) {
+  @media screen and (max-width: ${xsBreakpoint}) {
     order: ${({ order }) => order};
   }
 `;

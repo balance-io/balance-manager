@@ -58,7 +58,6 @@ class SendModal extends Component {
   };
 
   render = () => {
-    console.log('this', this);
     return (
       <Card background="lightGrey">
         {!this.props.txHash ? (

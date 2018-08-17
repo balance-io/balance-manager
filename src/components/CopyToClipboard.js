@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import lang from '../languages';
+import { lang } from 'balance-common';
 import clipboardIcon from '../assets/clipboard.png';
-import { toChecksumAddress } from '../handlers/web3';
+import { toChecksumAddress } from 'balance-common';
 import { notificationShow } from '../reducers/_notification';
 import { fonts, colors, transitions, responsive } from '../styles';
 

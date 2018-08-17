@@ -1,4 +1,4 @@
-import lang from '../languages';
+import { lang } from 'balance-common';
 
 // -- Constants ------------------------------------------------------------- //
 const WARNING_PARSE = 'warning/WARNING_PARSE';

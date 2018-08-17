@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import lang from '../../languages';
+import { lang } from 'balance-common';
 import Card from '../../components/Card';
 import ButtonCustom from '../../components/ButtonCustom';
 import LineBreak from '../../components/LineBreak';
@@ -13,8 +13,10 @@ import ToggleIndicator from '../../components/ToggleIndicator';
 import TransactionStatus from '../../components/TransactionStatus';
 import etherscanLogo from '../../assets/etherscan-logo.svg';
 import ethplorerLogo from '../../assets/ethplorer-logo.svg';
-import { accountUpdateHasPendingTransaction } from '../../reducers/_account';
-import { getLocalTimeDate } from '../../helpers/time';
+import {
+  accountUpdateHasPendingTransaction,
+  getLocalTimeDate,
+} from 'balance-common';
 import { colors, fonts, shadows, responsive } from '../../styles';
 
 const StyledGrid = styled.div`
@@ -325,15 +327,17 @@ class AccountViewTransactions extends Component {
                       <div>
                         <p>
                           <strong>
-                            {tx.from === tx.to
+                            {tx.from.toLowerCase() === tx.to.toLowerCase()
                               ? lang.t('account.tx_self').toUpperCase()
-                              : tx.from === accountAddress
+                              : tx.from.toLowerCase() ===
+                                accountAddress.toLowerCase()
                                 ? lang.t('account.tx_to').toUpperCase()
                                 : lang.t('account.tx_from').toUpperCase()}
                           </strong>
                         </p>
                         <p>
-                          {tx.from === accountAddress
+                          {tx.from.toLowerCase() ===
+                          accountAddress.toLowerCase()
                             ? tx.to
                             : tx.from
                               ? tx.from

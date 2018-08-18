@@ -224,7 +224,7 @@ const TrezorLogo = styled.div`
   }
 `;
 
-const TrustWalletLink = styled.a`
+const TrustWalletLink = styled(Link)`
   margin: 0 auto;
   max-width: 315px;
   width: 100%;
@@ -352,7 +352,7 @@ class Home extends Component {
                   )}
                 </LogoText>
               </LogoSectionMobile>
-              <TrustWalletLink href="//links.trustwalletapp.com">
+              <TrustWalletLink to="/metamask">
                 <ConnectButton
                   color="trustwallet"
                   hoverColor="trustwalletHover"

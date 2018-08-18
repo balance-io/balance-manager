@@ -1,5 +1,4 @@
 import React from 'react';
-import { modalClose } from '../../reducers/_modal';
 
 import { capitalize, lang } from 'balance-common';
 

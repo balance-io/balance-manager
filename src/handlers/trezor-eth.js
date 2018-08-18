@@ -3,6 +3,7 @@ import ethereumNetworks from '../references/ethereum-networks.json';
 import { lang } from 'balance-common';
 
 const HDKey = require('ethereumjs-wallet/hdkey');
+
 export let trezorEthInstance = {
   length: 10,
   accounts: [],

@@ -1,8 +1,11 @@
-import { apiGetMetamaskNetwork } from '../handlers/api';
-import { parseError } from '../handlers/parsers';
+import { parseError } from 'balance-common';
 import { modalClose } from './_modal';
-import { accountUpdateAccountAddress, accountUpdateNetwork } from './_account';
+import {
+  accountUpdateAccountAddress,
+  accountUpdateNetwork,
+} from 'balance-common';
 import { notificationShow } from './_notification';
+import networkList from '../references/ethereum-networks.json';
 
 // -- Constants ------------------------------------------------------------- //
 const METAMASK_CONNECT_REQUEST = 'metamask/METAMASK_CONNECT_REQUEST';
@@ -18,6 +21,27 @@ const METAMASK_UPDATE_METAMASK_ACCOUNT =
 // -- Actions --------------------------------------------------------------- //
 
 let accountInterval = null;
+
+/**
+ * @desc get metmask selected network
+ * @return {Promise}
+ */
+const getMetamaskNetwork = () =>
+  new Promise((resolve, reject) => {
+    if (typeof window.web3 !== 'undefined') {
+      window.web3.version.getNetwork((err, networkID) => {
+        if (err) {
+          console.error(err);
+          reject(err);
+        }
+        let networkIDList = {};
+        Object.keys(networkList).forEach(network => {
+          networkIDList[networkList[network].id] = network;
+        });
+        resolve(networkIDList[Number(networkID)] || null);
+      });
+    }
+  });
 
 export const metamaskUpdateMetamaskAccount = () => (dispatch, getState) => {
   if (window.web3.eth.defaultAccount !== getState().metamask.accountAddress) {
@@ -38,7 +62,7 @@ export const metamaskConnectInit = () => (dispatch, getState) => {
     dispatch(accountUpdateAccountAddress(accountAddress, 'METAMASK'));
   dispatch({ type: METAMASK_CONNECT_REQUEST });
   if (typeof window.web3 !== 'undefined') {
-    apiGetMetamaskNetwork()
+    getMetamaskNetwork()
       .then(network => {
         dispatch({ type: METAMASK_CONNECT_SUCCESS, payload: network });
         dispatch(accountUpdateNetwork(network));

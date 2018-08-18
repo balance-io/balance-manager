@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import lang from '../../languages';
+import { capitalize, lang } from 'balance-common';
 import TabMenu from '../../components/TabMenu';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -16,7 +16,6 @@ import arrowUp from '../../assets/arrow-up.svg';
 import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { modalOpen } from '../../reducers/_modal';
-import { capitalize } from '../../helpers/utilities';
 import { colors, fonts } from '../../styles';
 
 const mdBreakpoint = '712px';

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import lang from '../languages';
+import { lang } from 'balance-common';
 import i18next from 'i18next';
 import Link from './Link';
 import Button from './Button';

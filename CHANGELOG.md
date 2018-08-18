@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ### Added
 
 ### Changed
+* Use of balance-common shared library for features common in Wallet as well as Manager
 
 ### Removed
 

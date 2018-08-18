@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import lang from '../languages';
+import { lang } from 'balance-common';
 import OpenSeaLogo from '../assets/opensea-logo.svg';
 import { fonts, responsive } from '../styles';
 

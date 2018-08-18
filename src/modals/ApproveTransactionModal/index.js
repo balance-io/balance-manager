@@ -1,14 +1,12 @@
 import React from 'react';
 
-import lang from '../../languages';
+import { capitalize, lang } from 'balance-common';
 
 import MetamaskLogo from '../../components/MetamaskLogo';
 import LedgerLogo from '../../components/LedgerLogo';
 import TrezorLogo from '../../components/TrezorLogo';
 
 import Button from '../../components/Button';
-
-import { capitalize } from '../../helpers/utilities';
 
 import { StyledApproveTransaction } from './styles';
 import { StyledParagraph, StyledActions } from '../modalStyles';

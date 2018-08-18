@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import lang from '../../languages';
+import { lang } from 'balance-common';
 import Card from '../../components/Card';
 import Input from '../../components/Input';
 import LineBreak from '../../components/LineBreak';
@@ -30,19 +30,19 @@ import {
 } from '../../reducers/_exchange';
 import { notificationShow } from '../../reducers/_notification';
 import {
+  add,
+  capitalize,
   convertAmountFromBigNumber,
   convertAmountToDisplay,
   convertNumberToString,
-  add,
+  getCountdown,
   multiply,
   divide,
   greaterThan,
   smallerThan,
   convertAmountToBigNumber,
   handleSignificantDecimals,
-} from '../../helpers/bignumber';
-import { capitalize } from '../../helpers/utilities';
-import { getCountdown } from '../../helpers/time';
+} from 'balance-common';
 import { fonts, colors, transitions } from '../../styles';
 
 const StyledSuccessMessage = styled.div`

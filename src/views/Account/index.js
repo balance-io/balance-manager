@@ -16,10 +16,10 @@ import arrowUp from '../../assets/arrow-up.svg';
 import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { modalOpen } from '../../reducers/_modal';
-import { colors, fonts } from '../../styles';
+import { colors, fonts, responsive } from '../../styles';
 
 const mdBreakpoint = '712px';
-const xsBreakpoint = '363px';
+const xsBreakpoint = '365px';
 
 const StyledAccount = styled.div`
   width: 100%;
@@ -48,6 +48,11 @@ const StyledTop = styled.div`
     flex-direction: column-reverse;
     padding: 16px 16px 8px;
   }
+
+  @media screen and (${responsive.xxs.max}) {
+    flex-direction: column-reverse;
+    padding: 16px 8px 8px;
+  }
 `;
 
 const StyledAddressWrapper = styled.div`
@@ -58,6 +63,7 @@ const StyledAddressWrapper = styled.div`
 `;
 
 const StyledActions = styled.div`
+  align-items: flex-start;
   display: inline-flex;
   flex-wrap: wrap;
   justify-content: flex-end;

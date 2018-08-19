@@ -44,6 +44,26 @@ const StyledCopyToClipboard = styled.div`
   }
 `;
 
+const StyledInputTextSize = `
+  font-size: ${fonts.size.medium};
+  max-width: 400px;
+`;
+
+const StyledInputTextSizeSMedium = `
+  font-size: ${fonts.size.smedium};
+  max-width: 370px;
+`;
+
+const StyledInputTextSizeSmall = `
+  font-size: ${fonts.size.small};
+  max-width: 320px;
+`;
+
+const StyledInputTextSizeXSmall = `
+  font-size: ${fonts.size.xsmall};
+  max-width: 294px;
+`;
+
 const StyledInputText = styled.input`
   background-color: transparent;
   color: transparent;
@@ -54,20 +74,41 @@ const StyledInputText = styled.input`
   letter-spacing: normal;
   text-align: left;
   font-weight: ${fonts.weight.medium};
-  font-size: ${fonts.size.medium};
   font-family: ${fonts.family.SFMono};
   line-height: 1.25;
-  max-width: 400px;
   width: 100%;
+  ${StyledInputTextSize};
 
-  @media screen and (max-width: 792px) {
-    font-size: ${fonts.size.smedium};
-    max-width: 370px;
+  @media screen and (max-width: 810px) {
+    ${StyledInputTextSizeSMedium};
   }
 
-  @media screen and (max-width: 768px) {
-    font-size: ${fonts.size.small};
-    max-width: 320px;
+  @media screen and (max-width: 780px) {
+    ${StyledInputTextSizeSmall};
+  }
+
+  @media screen and (max-width: 730px) {
+    ${StyledInputTextSizeXSmall};
+  }
+
+  @media screen and (max-width: 712px) {
+    ${StyledInputTextSize};
+  }
+
+  @media screen and (${responsive.xs.max}) {
+    ${StyledInputTextSizeSMedium};
+  }
+
+  @media screen and (max-width: 450px) {
+    ${StyledInputTextSizeSmall};
+  }
+
+  @media screen and (max-width: 360px) {
+    ${StyledInputTextSizeXSmall};
+  }
+
+  @media screen and (max-width: 336px) {
+    font-size: ${fonts.size.tiny};
   }
 `;
 

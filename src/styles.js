@@ -39,6 +39,7 @@ export const colors = {
 export const fonts = {
   size: {
     tiny: '10px',
+    xsmall: '11px',
     small: '12px',
     smedium: '14px',
     medium: '15px',

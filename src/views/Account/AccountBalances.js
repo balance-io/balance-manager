@@ -32,21 +32,30 @@ const StyledRow = styled.div`
   grid-template-columns: 5fr repeat(4, 4fr);
   min-height: 0;
   min-width: 0;
+
   & p {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     font-size: ${fonts.size.h6};
+
+    &:not(:first-child) {
+      padding-left: 8px;
+    }
   }
+
   &:last-child {
     border-radius: 0 0 10px 10px;
   }
+
   @media screen and (${responsive.sm.max}) {
-    grid-template-columns: 5fr repeat(4, 4fr);
+    grid-template-columns: 5fr repeat(2, 4fr) 3fr 5fr;
     padding: 16px;
   }
+
   @media screen and (${responsive.xs.max}) {
-    grid-template-columns: 1fr repeat(3, 3fr);
+    grid-template-columns: 1fr repeat(3, 2fr);
+
     & p:nth-child(3) {
       display: none;
     }
@@ -59,8 +68,13 @@ const StyledLabelsRow = styled(StyledRow)`
   border-color: rgba(136, 136, 136, 0.03);
   border-style: solid;
   padding: 12px 20px;
+
   & p:first-child {
     justify-content: flex-start;
+  }
+
+  @media screen and (${responsive.sm.max}) {
+    padding: 12px 16px;
   }
 `;
 
@@ -112,14 +126,12 @@ const StyledAsset = styled.div`
   text-align: left;
   min-height: 0;
   min-width: 0;
+
   & p {
     font-size: ${fonts.size.medium};
-    margin-left: 10px;
   }
+
   @media screen and (${responsive.xs.max}) {
-    & > img {
-      margin-left: 12px;
-    }
     & p {
       display: none;
     }

@@ -22,6 +22,7 @@ const StyledContainer = styled.div`
 
 const StyledCard = styled(Card)`
   box-shadow: none;
+  padding: 0 16px;
 `;
 
 const StyledMessage = styled.div`

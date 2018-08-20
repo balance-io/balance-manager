@@ -149,48 +149,28 @@ const StyledPercentage = styled.p`
       : `inherit`};
 `;
 
-const StyledLastRow = styled(StyledRow)`
+const StyledLastRow = styled.div`
+  padding: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   z-index: 2;
-  grid-template-columns: 3fr 1fr;
-  min-height: 0;
-  min-width: 0;
   border-top: 1px solid rgba(${colors.rowDivider});
-  & > p {
+  border-radius: 0 0 10px 10px;
+  background-color: rgb(${colors.white});
+
+  & > p:last-child {
     font-size: ${fonts.size.medium};
     font-weight: ${fonts.weight.semibold};
     font-family: ${fonts.family.SFMono};
   }
-  & > p:first-child {
-    font-family: ${fonts.family.SFProText};
-    justify-content: flex-start;
-  }
+
   @media screen and (${responsive.sm.max}) {
-    & p {
+    padding: 16px;
+
+    & > p:last-child {
       font-size: ${fonts.size.h6};
-    }
-  }
-`;
-
-const StyledShowMoreTokens = styled(StyledToken)`
-  grid-template-columns: 100%;
-  min-height: 0;
-  min-width: 0;
-  padding: 0;
-  position: relative;
-  cursor: pointer;
-  text-align: left;
-  justify-content: flex-start;
-  font-family: ${fonts.family.SFProText};
-  font-weight: ${fonts.weight.medium};
-  font-size: 13px;
-  color: rgb(${colors.grey});
-  margin-top: -1px;
-  padding-left: 19px;
-
-  @media (hover: hover) {
-    &:hover p {
-      opacity: 0.7;
     }
   }
 `;
@@ -306,8 +286,10 @@ class AccountBalances extends Component {
           ))}
         <StyledLastRow>
           {!!tokensToggleDisplay.length && !this.state.disableToggle ? (
-            <StyledShowMoreTokens onClick={this.onShowMoreTokens}>
-              <ToggleIndicator show={this.state.showMoreTokens} />
+            <ToggleIndicator
+              onClick={this.onShowMoreTokens}
+              show={this.state.showMoreTokens}
+            >
               {`${
                 this.state.showMoreTokens
                   ? lang.t('account.hide')
@@ -321,7 +303,7 @@ class AccountBalances extends Component {
                   ? lang.t('account.no_market_value')
                   : lang.t('account.low_market_value')
               }`}
-            </StyledShowMoreTokens>
+            </ToggleIndicator>
           ) : (
             <div />
           )}

@@ -201,26 +201,19 @@ const StyledAsset = styled.div`
   }
 `;
 
-const StyledToggleIndicator = styled(ToggleIndicator)`
-  left: 18px;
-`;
-
-const StyledShowAllTransactions = styled(StyledRow)`
-  grid-template-columns: auto;
-  min-height: 0;
-  min-width: 0;
+const StyledLastRow = styled.div`
+  padding: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   z-index: 2;
-  & p {
-    padding-left: 17px;
-    margin-top: -3px;
-    cursor: pointer;
-    text-align: left;
-    justify-content: flex-start;
-    font-family: ${fonts.family.SFProText};
-    font-weight: ${fonts.weight.medium};
-    font-size: 13px;
-    color: rgb(${colors.grey});
+  border-top: 1px solid rgba(${colors.rowDivider});
+  border-radius: 0 0 10px 10px;
+  background-color: rgb(${colors.white});
+
+  @media screen and (${responsive.sm.max}) {
+    padding: 16px;
   }
 `;
 
@@ -466,16 +459,18 @@ class AccountViewTransactions extends Component {
             );
           })}
           {transactions.length > 10 && (
-            <StyledShowAllTransactions onClick={this.onShowAllTransactions}>
-              <StyledToggleIndicator show={this.state.showAllTransactions} />
-              <p>
+            <StyledLastRow>
+              <ToggleIndicator
+                onClick={this.onShowAllTransactions}
+                show={this.state.showAllTransactions}
+              >
                 {`${
                   !this.state.showAllTransactions
                     ? lang.t('account.show_all')
                     : lang.t('account.show_less')
                 } ${lang.t('account.tab_transactions').toLowerCase()}`}
-              </p>
-            </StyledShowAllTransactions>
+              </ToggleIndicator>
+            </StyledLastRow>
           )}
         </StyledGrid>
       ) : (

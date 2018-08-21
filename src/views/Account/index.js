@@ -141,7 +141,12 @@ class Account extends Component {
             <StyledTop>
               <StyledAddressWrapper>
                 <h6>{capitalize(this.props.accountType)} </h6>
-                <CopyToClipboard iconOnHover text={this.props.accountAddress} />
+                <CopyToClipboard
+                  displayIcon
+                  iconOnHover
+                  isTopAddress
+                  text={this.props.accountAddress}
+                />
               </StyledAddressWrapper>
 
               <StyledActions>

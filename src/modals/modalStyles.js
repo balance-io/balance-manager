@@ -159,9 +159,10 @@ export const StyledSubTitle = styled.div`
   color: rgb(${colors.grey});
   font-size: ${fonts.size.h6};
   font-weight: ${fonts.weight.semibold};
-  width: 100%;
+  margin-right: 16px;
+
   & ${StyledIcon} {
-    margin-right: 5px;
+    margin-right: 8px;
   }
 `;
 
@@ -208,17 +209,21 @@ export const StyledActions = styled.div`
 
 export const StyledContainer = styled.div`
   width: 100%;
-  padding: 22px;
+  padding: 16px;
+
   @media screen and (${responsive.sm.max}) {
-    padding: 15px;
     & h4 {
       margin: 20px auto;
     }
   }
+
+  @media screen and (${responsive.xs.max}) {
+    padding: 8px;
+  }
 `;
 
 export const StyledQRCodeDisplay = styled(QRCodeDisplay)`
-  margin: 35px auto;
+  margin: 16px auto;
 `;
 
 export const StyledJustifyContent = styled.div`
@@ -233,15 +238,13 @@ export const StyledCopyToClipboard = styled(CopyToClipboard)`
   letter-spacing: 2px;
   background: rgb(${colors.white});
   border-radius: 8px;
-  margin: 15px auto;
-  padding: 12px 18px;
+  margin: 16px auto 0;
+  padding: 12px 0;
+
   & input {
     color: transparent;
+    max-width: inherit;
+    text-align: center;
     text-shadow: 0 0 0 rgba(${colors.darkGrey});
-  }
-  @media screen and (${responsive.sm.max}) {
-    font-size: 3vw;
-    letter-spacing: 0;
-    padding: 12px;
   }
 `;

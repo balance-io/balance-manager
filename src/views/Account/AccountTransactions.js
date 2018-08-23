@@ -151,8 +151,9 @@ const StyledTransactionDetails = styled(StyledTransaction)`
   border-top-color: rgba(${colors.rowDivider});
   border-top-style: solid;
   border-top-width: ${({ showTxDetails }) => (showTxDetails ? `1px` : '0')};
-  max-height: ${({ showTxDetails }) => (showTxDetails ? '80px' : '0')};
-  padding: ${({ showTxDetails }) => (showTxDetails ? '20px' : '0 20px')};
+  max-height: ${({ showTxDetails }) => (showTxDetails ? '100%' : '0')};
+  padding: ${({ showTxDetails }) =>
+    showTxDetails ? '12px 20px 20px' : '0 20px'};
   background-color: rgb(${colors.white});
   overflow: hidden;
   & > div {
@@ -161,16 +162,98 @@ const StyledTransactionDetails = styled(StyledTransaction)`
   & p {
     justify-content: flex-start;
   }
+
+  @media screen and (${responsive.sm.max}) {
+    padding: ${({ showTxDetails }) =>
+      showTxDetails ? '4px 16px 16px' : '0 16px'};
+  }
 `;
 
 const StyledTransactionTopDetails = styled(StyledTransactionDetails)`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   border-radius: 0;
-  grid-template-columns: 2fr 1fr 1fr;
+
+  p:not(:first-child) {
+    padding-left: 0;
+  }
+
+  > div {
+    text-align: left;
+    padding-top: 8px;
+
+    &:not(:last-child) {
+      padding-right: 16px;
+
+      p:last-child {
+        word-break: break-all;
+      }
+    }
+
+    &:last-child {
+      flex: 1;
+      justify-content: space-around;
+
+      > div {
+        &:not(:last-child) {
+          padding-right: 16px;
+          min-width: 152px;
+        }
+
+        &:last-child {
+          min-width: 144px;
+        }
+      }
+
+      @media screen and (${responsive.xxs.max}) {
+        > div {
+          &:not(:last-child) {
+            padding-right: 8px;
+            min-width: 0;
+          }
+
+          &:last-child {
+            min-width: 0;
+          }
+        }
+      }
+    }
+  }
 `;
 
-const StyledTransactionBottomDetails = styled(StyledTransactionDetails)`
+const StyledTransactionBottomDetails = styled(StyledTransactionTopDetails)`
   border-radius: 0 0 10px 10px;
-  grid-template-columns: 3fr 1fr;
+
+  > div {
+    padding-top: 12px;
+
+    &:last-child {
+      flex: inherit;
+      justify-content: inherit;
+
+      > div {
+        &:not(:last-child) {
+          min-width: 0;
+        }
+
+        &:last-child {
+          min-width: 0;
+        }
+      }
+    }
+  }
+
+  a {
+    &:first-child {
+      margin-right: 9px;
+    }
+
+    button {
+      margin-left: 0;
+      margin-top: 0;
+    }
+  }
 `;
 
 const StyledLineBreak = styled(LineBreak)`
@@ -357,36 +440,38 @@ class AccountViewTransactions extends Component {
                     </div>
                     <div>
                       <div>
-                        <p>
-                          <strong>
-                            {lang.t('account.tx_fee').toUpperCase()}
-                          </strong>
-                        </p>
-                        <p>{`${
-                          tx.txFee && tx.txFee.display
-                            ? tx.txFee.display
-                            : '———'
-                        } ≈ ${
-                          tx.native &&
-                          tx.native[nativeCurrency] &&
-                          tx.native[nativeCurrency].txFee
-                            ? tx.native[nativeCurrency].txFee.display
-                            : '———'
-                        }`}</p>
+                        <div>
+                          <p>
+                            <strong>
+                              {lang.t('account.tx_fee').toUpperCase()}
+                            </strong>
+                          </p>
+                          <p>{`${
+                            tx.txFee && tx.txFee.display
+                              ? tx.txFee.display
+                              : '———'
+                          } ≈ ${
+                            tx.native &&
+                            tx.native[nativeCurrency] &&
+                            tx.native[nativeCurrency].txFee
+                              ? tx.native[nativeCurrency].txFee.display
+                              : '———'
+                          }`}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div>
                       <div>
-                        <p>
-                          <strong>
-                            {lang.t('account.tx_timestamp').toUpperCase()}
-                          </strong>
-                        </p>
-                        <p>
-                          {tx.timestamp
-                            ? getLocalTimeDate(tx.timestamp.ms)
-                            : '———'}
-                        </p>
+                        <div>
+                          <p>
+                            <strong>
+                              {lang.t('account.tx_timestamp').toUpperCase()}
+                            </strong>
+                          </p>
+                          <p>
+                            {tx.timestamp
+                              ? getLocalTimeDate(tx.timestamp.ms)
+                              : '———'}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </StyledTransactionTopDetails>

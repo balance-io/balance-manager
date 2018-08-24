@@ -40,24 +40,33 @@ const StyledRow = styled.div`
   grid-template-columns: repeat(5, 1fr);
   min-height: 0;
   min-width: 0;
+
   & p {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     font-size: ${fonts.size.h6};
+
+    &:not(:first-child) {
+      padding-left: 8px;
+    }
   }
+
   &:last-child {
     border-radius: 0 0 10px 10px;
   }
+
   @media screen and (${responsive.sm.max}) {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: 1fr repeat(4, 3fr);
     padding: 16px;
+
     & p {
       font-size: ${fonts.size.small};
     }
   }
+
   @media screen and (${responsive.xs.max}) {
-    grid-template-columns: 1fr repeat(3, 3fr);
+    grid-template-columns: 1fr repeat(3, 2fr);
     & p:nth-child(3) {
       display: none;
     }
@@ -70,11 +79,13 @@ const StyledLabelsRow = styled(StyledRow)`
   border-color: rgba(136, 136, 136, 0.03);
   border-style: solid;
   padding: 12px 20px;
+
   & p:first-child {
     justify-content: flex-start;
   }
-  & p:nth-child(2) {
-    margin-right: -20px;
+
+  @media screen and (${responsive.sm.max}) {
+    padding: 12px 16px;
   }
 `;
 
@@ -90,17 +101,24 @@ const StyledTransactionWrapper = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 0;
   z-index: 0;
+
   & > div {
     transition: box-shadow 0.1s ease;
     border-radius: 0;
+
     @media (hover: hover) {
       &:hover {
         z-index: 10;
         box-shadow: ${({ showTxDetails }) =>
           showTxDetails ? `${shadows.big}` : `${shadows.soft}`};
       }
+    }
+  }
+
+  &:last-child {
+    & > div > div {
+      border-radius: 0 0 10px 10px;
     }
   }
 `;
@@ -133,8 +151,9 @@ const StyledTransactionDetails = styled(StyledTransaction)`
   border-top-color: rgba(${colors.rowDivider});
   border-top-style: solid;
   border-top-width: ${({ showTxDetails }) => (showTxDetails ? `1px` : '0')};
-  max-height: ${({ showTxDetails }) => (showTxDetails ? '80px' : '0')};
-  padding: ${({ showTxDetails }) => (showTxDetails ? '20px' : '0 20px')};
+  max-height: ${({ showTxDetails }) => (showTxDetails ? '100%' : '0')};
+  padding: ${({ showTxDetails }) =>
+    showTxDetails ? '12px 20px 20px' : '0 20px'};
   background-color: rgb(${colors.white});
   overflow: hidden;
   & > div {
@@ -143,16 +162,98 @@ const StyledTransactionDetails = styled(StyledTransaction)`
   & p {
     justify-content: flex-start;
   }
+
+  @media screen and (${responsive.sm.max}) {
+    padding: ${({ showTxDetails }) =>
+      showTxDetails ? '4px 16px 16px' : '0 16px'};
+  }
 `;
 
 const StyledTransactionTopDetails = styled(StyledTransactionDetails)`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   border-radius: 0;
-  grid-template-columns: 2fr 1fr 1fr;
+
+  p:not(:first-child) {
+    padding-left: 0;
+  }
+
+  > div {
+    text-align: left;
+    padding-top: 8px;
+
+    &:not(:last-child) {
+      padding-right: 16px;
+
+      p:last-child {
+        word-break: break-all;
+      }
+    }
+
+    &:last-child {
+      flex: 1;
+      justify-content: space-around;
+
+      > div {
+        &:not(:last-child) {
+          padding-right: 16px;
+          min-width: 152px;
+        }
+
+        &:last-child {
+          min-width: 144px;
+        }
+      }
+
+      @media screen and (${responsive.xxs.max}) {
+        > div {
+          &:not(:last-child) {
+            padding-right: 8px;
+            min-width: 0;
+          }
+
+          &:last-child {
+            min-width: 0;
+          }
+        }
+      }
+    }
+  }
 `;
 
-const StyledTransactionBottomDetails = styled(StyledTransactionDetails)`
+const StyledTransactionBottomDetails = styled(StyledTransactionTopDetails)`
   border-radius: 0 0 10px 10px;
-  grid-template-columns: 3fr 1fr;
+
+  > div {
+    padding-top: 12px;
+
+    &:last-child {
+      flex: inherit;
+      justify-content: inherit;
+
+      > div {
+        &:not(:last-child) {
+          min-width: 0;
+        }
+
+        &:last-child {
+          min-width: 0;
+        }
+      }
+    }
+  }
+
+  a {
+    &:first-child {
+      margin-right: 9px;
+    }
+
+    button {
+      margin-left: 0;
+      margin-top: 0;
+    }
+  }
 `;
 
 const StyledLineBreak = styled(LineBreak)`
@@ -171,40 +272,31 @@ const StyledAsset = styled.div`
   text-align: left;
   min-height: 0;
   min-width: 0;
+
   & p {
     font-size: ${fonts.size.medium};
-    margin-left: 10px;
   }
-  @media screen and (${responsive.xs.max}) {
-    & > img {
-      margin-left: 12px;
-    }
+
+  @media screen and (${responsive.sm.max}) {
     & p {
       display: none;
     }
   }
 `;
 
-const StyledToggleIndicator = styled(ToggleIndicator)`
-  left: 18px;
-`;
-
-const StyledShowAllTransactions = styled(StyledRow)`
-  grid-template-columns: auto;
-  min-height: 0;
-  min-width: 0;
+const StyledLastRow = styled.div`
+  padding: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   z-index: 2;
-  & p {
-    padding-left: 17px;
-    margin-top: -3px;
-    cursor: pointer;
-    text-align: left;
-    justify-content: flex-start;
-    font-family: ${fonts.family.SFProText};
-    font-weight: ${fonts.weight.medium};
-    font-size: 13px;
-    color: rgb(${colors.grey});
+  border-top: 1px solid rgba(${colors.rowDivider});
+  border-radius: 0 0 10px 10px;
+  background-color: rgb(${colors.white});
+
+  @media screen and (${responsive.sm.max}) {
+    padding: 16px;
   }
 `;
 
@@ -290,14 +382,15 @@ class AccountViewTransactions extends Component {
                       />
                       <p>{tx.asset.name}</p>
                     </StyledAsset>
-                    <TransactionStatus
-                      tx={tx}
-                      accountAddress={accountAddress}
-                    />
-
+                    <p>
+                      <TransactionStatus
+                        tx={tx}
+                        accountAddress={accountAddress}
+                      />
+                    </p>
                     <p>
                       {tx.from === accountAddress
-                        ? `- ${tx.value.display}`
+                        ? `-\u00a0${tx.value.display}`
                         : `${tx.value.display}`}
                     </p>
                     <p>
@@ -312,7 +405,7 @@ class AccountViewTransactions extends Component {
                       tx.native[nativeCurrency] &&
                       tx.native[nativeCurrency].value
                         ? tx.from === accountAddress
-                          ? `- ${tx.native[nativeCurrency].value.display}`
+                          ? `-\u00a0${tx.native[nativeCurrency].value.display}`
                           : `${tx.native[nativeCurrency].value.display}`
                         : '———'}
                     </p>
@@ -347,36 +440,38 @@ class AccountViewTransactions extends Component {
                     </div>
                     <div>
                       <div>
-                        <p>
-                          <strong>
-                            {lang.t('account.tx_fee').toUpperCase()}
-                          </strong>
-                        </p>
-                        <p>{`${
-                          tx.txFee && tx.txFee.display
-                            ? tx.txFee.display
-                            : '———'
-                        } ≈ ${
-                          tx.native &&
-                          tx.native[nativeCurrency] &&
-                          tx.native[nativeCurrency].txFee
-                            ? tx.native[nativeCurrency].txFee.display
-                            : '———'
-                        }`}</p>
+                        <div>
+                          <p>
+                            <strong>
+                              {lang.t('account.tx_fee').toUpperCase()}
+                            </strong>
+                          </p>
+                          <p>{`${
+                            tx.txFee && tx.txFee.display
+                              ? tx.txFee.display
+                              : '———'
+                          } ≈ ${
+                            tx.native &&
+                            tx.native[nativeCurrency] &&
+                            tx.native[nativeCurrency].txFee
+                              ? tx.native[nativeCurrency].txFee.display
+                              : '———'
+                          }`}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div>
                       <div>
-                        <p>
-                          <strong>
-                            {lang.t('account.tx_timestamp').toUpperCase()}
-                          </strong>
-                        </p>
-                        <p>
-                          {tx.timestamp
-                            ? getLocalTimeDate(tx.timestamp.ms)
-                            : '———'}
-                        </p>
+                        <div>
+                          <p>
+                            <strong>
+                              {lang.t('account.tx_timestamp').toUpperCase()}
+                            </strong>
+                          </p>
+                          <p>
+                            {tx.timestamp
+                              ? getLocalTimeDate(tx.timestamp.ms)
+                              : '———'}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </StyledTransactionTopDetails>
@@ -449,16 +544,18 @@ class AccountViewTransactions extends Component {
             );
           })}
           {transactions.length > 10 && (
-            <StyledShowAllTransactions onClick={this.onShowAllTransactions}>
-              <StyledToggleIndicator show={this.state.showAllTransactions} />
-              <p>
+            <StyledLastRow>
+              <ToggleIndicator
+                onClick={this.onShowAllTransactions}
+                show={this.state.showAllTransactions}
+              >
                 {`${
                   !this.state.showAllTransactions
                     ? lang.t('account.show_all')
                     : lang.t('account.show_less')
                 } ${lang.t('account.tab_transactions').toLowerCase()}`}
-              </p>
-            </StyledShowAllTransactions>
+              </ToggleIndicator>
+            </StyledLastRow>
           )}
         </StyledGrid>
       ) : (

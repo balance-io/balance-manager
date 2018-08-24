@@ -22,14 +22,10 @@ import { modalClose } from '../../reducers/_modal';
 import {
   calcTxFee,
   capitalize,
-  convertAmountFromBigNumber,
-  greaterThan,
   lang,
-  isValidAddress,
   withSendComponentWithData,
 } from 'balance-common';
 import { web3SendTransactionMultiWallet } from '../../handlers/web3';
-import { notificationShow } from '../../reducers/_notification';
 
 import {
   StyledIcon,
@@ -37,15 +33,17 @@ import {
   StyledBottomModal,
   StyledParagraph,
   StyledAmountCurrency,
+  StyledInputContainer,
+  StyledConversionContainer,
+  StyledConversionIconContainer,
   StyledConversionIcon,
   StyledSubTitle,
   StyledActions,
   StyledInvalidAddress,
   StyledQRIcon,
   StyledMaxBalance,
+  StyledJustifyContent,
 } from '../modalStyles';
-
-const reduxProps = ({ modal }) => ({});
 
 class SendModal extends Component {
   static propTypes = {
@@ -63,17 +61,18 @@ class SendModal extends Component {
         {!this.props.txHash ? (
           !this.props.confirm ? (
             <Form onSubmit={this.props.onSubmit}>
-              <StyledSubTitle>
-                <StyledIcon color="grey" icon={arrowUp} />
-                {lang.t('modal.send_title', {
-                  walletName: capitalize(
-                    `${this.props.accountType}${lang.t(
-                      'modal.default_wallet',
-                    )}`,
-                  ),
-                })}
-              </StyledSubTitle>
-
+              <StyledJustifyContent>
+                <StyledSubTitle>
+                  <StyledIcon color="grey" icon={arrowUp} />
+                  {lang.t('modal.send_title', {
+                    walletName: capitalize(
+                      `${this.props.accountType}${lang.t(
+                        'modal.default_wallet',
+                      )}`,
+                    ),
+                  })}
+                </StyledSubTitle>
+              </StyledJustifyContent>
               <div>
                 <DropdownAsset
                   selected={this.props.selected.symbol}
@@ -83,33 +82,35 @@ class SendModal extends Component {
               </div>
 
               <StyledFlex>
-                <Input
-                  monospace
-                  label={lang.t('input.recipient_address')}
-                  spellCheck="false"
-                  placeholder="0x..."
-                  type="text"
-                  value={this.props.recipient}
-                  onFocus={this.props.onAddressInputFocus}
-                  onBlur={this.props.onAddressInputBlur}
-                  onChange={({ target }) =>
-                    this.props.sendUpdateRecipient(target.value)
-                  }
-                />
-
-                {this.props.recipient &&
-                  !this.props.isValidAddress && (
-                    <StyledInvalidAddress>
-                      {lang.t('modal.invalid_address')}
-                    </StyledInvalidAddress>
-                  )}
-                <StyledQRIcon onClick={this.props.toggleQRCodeReader}>
-                  <img src={qrIcon} alt="recipient" />
-                </StyledQRIcon>
+                <StyledInputContainer>
+                  <Input
+                    monospace
+                    label={lang.t('input.recipient_address')}
+                    spellCheck="false"
+                    placeholder="0x..."
+                    type="text"
+                    value={this.props.recipient}
+                    onFocus={this.props.onAddressInputFocus}
+                    onBlur={this.props.onAddressInputBlur}
+                    onChange={({ target }) =>
+                      this.props.sendUpdateRecipient(target.value)
+                    }
+                  >
+                    {this.props.recipient &&
+                      !this.props.isValidAddress && (
+                        <StyledInvalidAddress>
+                          {lang.t('modal.invalid_address')}
+                        </StyledInvalidAddress>
+                      )}
+                    <StyledQRIcon onClick={this.props.toggleQRCodeReader}>
+                      <img src={qrIcon} alt="recipient" />
+                    </StyledQRIcon>
+                  </Input>
+                </StyledInputContainer>
               </StyledFlex>
 
-              <StyledFlex>
-                <StyledFlex>
+              <StyledConversionContainer>
+                <StyledInputContainer>
                   <Input
                     monospace
                     label={lang.t('input.asset_amount')}
@@ -119,24 +120,21 @@ class SendModal extends Component {
                     onChange={({ target }) =>
                       this.props.sendUpdateAssetAmount(target.value)
                     }
-                  />
-
+                  >
+                    <StyledAmountCurrency>
+                      {this.props.selected.symbol}
+                    </StyledAmountCurrency>
+                  </Input>
                   <StyledMaxBalance onClick={this.props.onSendMaxBalance}>
                     {lang.t('modal.send_max')}
                   </StyledMaxBalance>
+                </StyledInputContainer>
 
-                  <StyledAmountCurrency>
-                    {this.props.selected.symbol}
-                  </StyledAmountCurrency>
-                </StyledFlex>
+                <StyledConversionIconContainer>
+                  <StyledConversionIcon src={convertIcon} alt="≈" />
+                </StyledConversionIconContainer>
 
-                <StyledFlex>
-                  <StyledConversionIcon>
-                    <img src={convertIcon} alt="≈" />
-                  </StyledConversionIcon>
-                </StyledFlex>
-
-                <StyledFlex>
+                <StyledInputContainer>
                   <Input
                     monospace
                     placeholder="0.0"
@@ -151,16 +149,17 @@ class SendModal extends Component {
                     onChange={({ target }) =>
                       this.props.sendUpdateNativeAmount(target.value)
                     }
-                  />
-                  <StyledAmountCurrency
-                    disabled={!this.props.prices[this.props.selected.symbol]}
                   >
-                    {this.props.prices && this.props.prices.selected
-                      ? this.props.prices.selected.currency
-                      : ''}
-                  </StyledAmountCurrency>
-                </StyledFlex>
-              </StyledFlex>
+                    <StyledAmountCurrency
+                      disabled={!this.props.prices[this.props.selected.symbol]}
+                    >
+                      {this.props.prices &&
+                        this.props.prices.selected &&
+                        this.props.prices.selected.currency}
+                    </StyledAmountCurrency>
+                  </Input>
+                </StyledInputContainer>
+              </StyledConversionContainer>
 
               <GasPanel
                 gasPriceOption={this.props.gasPriceOption}
@@ -186,6 +185,7 @@ class SendModal extends Component {
 
                   <Button
                     left
+                    isModalButton
                     color="blue"
                     icon={arrowUp}
                     disabled={
@@ -195,7 +195,7 @@ class SendModal extends Component {
                     }
                     type="submit"
                   >
-                    {lang.t('button.send')}
+                    <span>{lang.t('button.send')}</span>
                   </Button>
                 </StyledActions>
               </StyledBottomModal>

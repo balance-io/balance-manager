@@ -13,86 +13,122 @@ import tabBackground from '../assets/tab-background.png';
 import tabBackgroundSprite from '../assets/tab-background-sprite.png';
 import { colors, fonts, shadows, transitions } from '../styles';
 
+const tabSize = '46px';
+
+const smBreakpoint = '442px';
+const smTabSize = '54px';
+
+const xsBreakpoint = '375px';
+const xsTabSize = '68px';
+
 const StyledTabMenu = styled.div`
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 10;
+  z-index: 1;
 `;
 
 const StyledTabsWrapper = styled.div`
-  grid-template-columns: auto;
   box-shadow: none;
   display: flex;
-
-  & a:nth-child(2) button {
-    padding-left: 35px;
-    margin-left: 4px;
-  }
-
-  & a:nth-child(3) button {
-    padding-left: 38px;
-    margin-left: 8px;
-  }
 `;
 
 const StyledTabBackground = styled.div`
   width: ${({ width }) => `${width}`}px;
-  height: 46px;
+  height: 100%;
   position: absolute;
-  top: -1px;
+  bottom: 0;
   left: 0;
+  right: 0;
   transform: ${({ position }) => `translate(${position}px, 0)`};
-  background-position-y: 86px;
+  background-position-y: -6px;
   background-image: url(${tabBackground});
   transition: ease 0.2s;
+  z-index: -1;
 
   &:before,
   &:after {
     content: '\00a0';
     position: absolute;
-    top: 0;
-    width: 46px;
-    height: 46px;
+    bottom: 0;
+    width: ${tabSize};
+    height: ${tabSize};
     background-size: 100%;
     background-image: url(${tabBackgroundSprite});
   }
 
   &:before {
-    left: -46px;
+    left: -16px;
   }
 
   &:after {
-    right: -46px;
-    background-position: 0 46px;
+    right: -16px;
+    background-position: 0 100%;
+  }
+
+  @media screen and (max-width: ${smBreakpoint}) {
+    background-position-y: -5px;
+
+    &:before,
+    &:after {
+      width: ${smTabSize};
+      height: ${smTabSize};
+    }
+
+    &:before {
+      left: -20px;
+    }
+
+    &:after {
+      right: -20px;
+    }
+  }
+
+  @media screen and (max-width: ${xsBreakpoint}) {
+    background-position-y: -3px;
+
+    &:before,
+    &:after {
+      width: ${xsTabSize};
+      height: ${xsTabSize};
+    }
+
+    &:before {
+      left: -24px;
+    }
+
+    &:after {
+      right: -24px;
+    }
   }
 `;
 
 const StyledTab = styled(Button)`
-  height: 45px;
+  height: ${tabSize};
   font-weight: ${fonts.weight.medium};
   border-radius: 0;
   border: none;
   background: none;
   color: ${({ active }) =>
     active ? `rgb(${colors.blue})` : `rgba(${colors.purpleTextTransparent})`};
-  -webkit-box-shadow: ${shadows.medium};
   box-shadow: ${shadows.medium};
   margin: 0;
-  display: flex;
-  opacity: 1 !important;
-  padding-top: 12.5px;
-  padding-left: 34px;
+  opacity: 1;
+  padding: 0 16px;
+  line-height: 50px;
   outline: none !important;
   box-shadow: none !important;
-  background-size: 181px 46px !important;
-  background-position: -47px 0;
 
-  &:hover,
+  @media screen and (max-width: ${smBreakpoint}) {
+    height: ${smTabSize};
+    line-height: 1;
+  }
+
+  @media screen and (max-width: ${xsBreakpoint}) {
+    height: ${xsTabSize};
+  }
+
   &:active,
   &:focus {
-    opacity: 1 !important;
+    opacity: 1;
     outline: none !important;
     box-shadow: none !important;
     background: none;
@@ -100,20 +136,46 @@ const StyledTab = styled(Button)`
     color: ${({ active }) =>
       active ? `rgb(${colors.blue})` : `rgba(${colors.purpleTextTransparent})`};
 
-    & > div {
-      opacity: 1 !important;
+    & > span {
+      opacity: 1;
     }
   }
 
-  & > div {
+  &:hover {
+    background-color: transparent;
+    color: ${`rgb(${colors.blue})`};
+    transform: none;
+
+    & > span {
+      background-color: ${`rgb(${colors.blue})`} !important;
+    }
+  }
+
+  & > span {
     transition: ${transitions.base};
-    -webkit-mask-size: auto !important;
-    mask-size: auto !important;
-    margin: 1px 0 0 16px;
+    mask-size: auto;
     background-color: ${({ active }) =>
       active
         ? `rgb(${colors.blue})`
         : `rgb(${colors.purpleTextTransparent})`} !important;
+
+    @media screen and (max-width: ${smBreakpoint}) {
+      display: block !important;
+      margin: 3px auto;
+    }
+
+    @media screen and (max-width: ${xsBreakpoint}) {
+      margin-top: 10px;
+    }
+  }
+`;
+
+const StyledTabText = styled.p`
+  display: inline-block;
+  vertical-align: middle;
+
+  @media screen and (max-width: 375px) {
+    line-height: 16px;
   }
 `;
 
@@ -131,10 +193,10 @@ class TabMenu extends Component {
 
   componentDidMount() {
     this.setState({
-      tabWidth:
-        ReactDOM.findDOMNode(this.refs.balancesTab).getBoundingClientRect()
-          .width - 40,
-      tabPosition: 24,
+      tabWidth: ReactDOM.findDOMNode(
+        this.refs.balancesTab,
+      ).getBoundingClientRect().width,
+      tabPosition: 0,
     });
   }
 
@@ -151,34 +213,32 @@ class TabMenu extends Component {
         newState = {
           activeTab: 'BALANCES_TAB',
           activeLang: i18next.language,
-          tabWidth:
-            ReactDOM.findDOMNode(this.refs.balancesTab).getBoundingClientRect()
-              .width - 40,
-          tabPosition: 24,
+          tabWidth: ReactDOM.findDOMNode(
+            this.refs.balancesTab,
+          ).getBoundingClientRect().width,
+          tabPosition: 0,
         };
         break;
       case '/transactions':
         newState = {
           activeTab: 'TRANSACTIONS_TAB',
           activeLang: i18next.language,
-          tabWidth:
-            ReactDOM.findDOMNode(
-              this.refs.transactionsTab,
-            ).getBoundingClientRect().width - 40,
-          tabPosition:
-            ReactDOM.findDOMNode(this.refs.transactionsTab).offsetLeft + 24,
+          tabWidth: ReactDOM.findDOMNode(
+            this.refs.transactionsTab,
+          ).getBoundingClientRect().width,
+          tabPosition: ReactDOM.findDOMNode(this.refs.transactionsTab)
+            .offsetLeft,
         };
         break;
       case '/uniquetokens':
         newState = {
           activeTab: 'UNIQUETOKENS_TAB',
           activeLang: i18next.language,
-          tabWidth:
-            ReactDOM.findDOMNode(
-              this.refs.uniqueTokensTab,
-            ).getBoundingClientRect().width - 40,
-          tabPosition:
-            ReactDOM.findDOMNode(this.refs.uniqueTokensTab).offsetLeft + 24,
+          tabWidth: ReactDOM.findDOMNode(
+            this.refs.uniqueTokensTab,
+          ).getBoundingClientRect().width,
+          tabPosition: ReactDOM.findDOMNode(this.refs.uniqueTokensTab)
+            .offsetLeft,
         };
         break;
       default:
@@ -210,7 +270,7 @@ class TabMenu extends Component {
               ref="balancesTab"
               left
             >
-              {lang.t('account.tab_balances')}
+              <StyledTabText>{lang.t('account.tab_balances')}</StyledTabText>
             </StyledTab>
           </Link>
           <Link to={`${this.props.match.url}/transactions`}>
@@ -222,7 +282,9 @@ class TabMenu extends Component {
               ref="transactionsTab"
               left
             >
-              {lang.t('account.tab_transactions')}
+              <StyledTabText>
+                {lang.t('account.tab_transactions')}
+              </StyledTabText>
             </StyledTab>
           </Link>
           <Link to={`${this.props.match.url}/uniquetokens`}>
@@ -234,7 +296,9 @@ class TabMenu extends Component {
               ref="uniqueTokensTab"
               left
             >
-              {lang.t('account.tab_uniquetokens')}
+              <StyledTabText>
+                {lang.t('account.tab_uniquetokens')}
+              </StyledTabText>
             </StyledTab>
           </Link>
         </StyledTabsWrapper>

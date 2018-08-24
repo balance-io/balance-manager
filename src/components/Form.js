@@ -2,17 +2,28 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { responsive } from '../styles';
+
 const StyledForm = styled.form`
   width: 100%;
   display: block;
+
   & > * {
-    padding: 22px 22px 0;
+    padding: 16px 16px 0;
   }
+
   & > *:last-child {
-    padding: 22px;
+    padding: 16px;
   }
-  & button {
-    float: right;
+
+  @media screen and (${responsive.xs.max}) {
+    & > * {
+      padding: 16px 8px 0;
+    }
+
+    & > *:last-child {
+      padding: 16px 8px;
+    }
   }
 `;
 

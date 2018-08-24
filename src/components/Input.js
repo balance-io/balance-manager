@@ -16,6 +16,9 @@ const shimmer = keyframes`
 `;
 
 const StyledInputWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   width: 100%;
   opacity: ${({ fetching, disabled }) => (disabled && !fetching ? '0.5' : '1')};
 `;
@@ -25,12 +28,14 @@ const StyledLabel = styled.label`
   font-size: 13px;
   font-weight: ${fonts.weight.semibold};
   width: 100%;
-  opacity: ${({ hide }) => (hide ? 0 : 1)};
+
+  & ~ input {
+    margin-top: 8px;
+  }
 `;
 
 const StyledInput = styled.input`
   width: 100%;
-  margin-top: 8px;
   background: rgb(${colors.white});
   padding: 12px;
   border: none;
@@ -63,17 +68,20 @@ const StyledInput = styled.input`
     background-repeat: no-repeat;
     background-size: 800px 104px;
   `};
+
   &::placeholder {
     color: rgba(${colors.grey}, 0.8);
     font-weight: ${fonts.weight.medium};
     opacity: 1;
   }
+
   @media screen and (${responsive.sm.max}) {
     padding: 8px 10px;
   }
 `;
 
 const Input = ({
+  children,
   fetching,
   label,
   type,
@@ -107,7 +115,7 @@ const Input = ({
   }
   return (
     <StyledInputWrapper disabled={fetching || disabled}>
-      <StyledLabel hide={_label === 'Input'}>{_label}</StyledLabel>
+      {_label !== 'Input' && <StyledLabel>{_label}</StyledLabel>}
       <StyledInput
         fetching={fetching}
         disabled={fetching || disabled}
@@ -117,6 +125,7 @@ const Input = ({
         monospace={monospace}
         {...props}
       />
+      {children}
     </StyledInputWrapper>
   );
 };

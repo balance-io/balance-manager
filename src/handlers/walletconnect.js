@@ -51,6 +51,7 @@ export const walletConnectSignTransaction = async transaction => {
     }
     return null;
   } catch (error) {
-    // TODO: error handling
+    console.log('WC sign transaction error', error);
+    throw error;
   }
 };

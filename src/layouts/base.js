@@ -30,7 +30,14 @@ import { trezorClearState } from '../reducers/_trezor';
 import { walletConnectClearState } from '../reducers/_walletconnect';
 import { commonStorage } from 'balance-common';
 import ReminderRibbon from '../components/ReminderRibbon';
-import { colors, responsive } from '../styles';
+import { colors, fonts } from '../styles';
+
+// Style variables
+const contentMaxWidth = 1000;
+const backButtonWidth = 180;
+const headerHeight = 72;
+const contentPadding = 16;
+const backLinkHeight = 27;
 
 const StyledLayout = styled.div`
   position: relative;
@@ -42,10 +49,15 @@ const StyledLayout = styled.div`
 
 const StyledContent = styled(Wrapper)`
   width: 100%;
-  padding: 0 16px;
+  padding: 0 ${contentPadding}px;
 `;
 
 const StyledHeader = styled.div`
+  margin-top: -1px;
+  margin-bottom: 1px;
+  width: 100%;
+  height: ${headerHeight}px;
+  display: flex;
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -104,7 +116,7 @@ const StyledVerticalLine = styled.div`
 
 const StyledFooter = styled.div`
   width: 100%;
-  max-width: 1000px;
+  max-width: ${contentMaxWidth}px;
   margin: 0 auto;
   padding: 8px 16px;
   display: flex;
@@ -122,6 +134,33 @@ const StyledFooterRight = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
+`;
+
+const StyledBackButton = styled.div`
+  display: flex;
+  width: ${backButtonWidth}px;
+  position: absolute;
+  height: ${headerHeight}px;
+  align-items: center;
+  padding-left: ${contentPadding}px;
+
+  @media screen and (max-width: ${contentMaxWidth + 2 * backButtonWidth}px) {
+    position: initial;
+    margin-bottom: -${headerHeight / 2 - backLinkHeight / 2}px;
+  }
+`;
+const StyledBackLink = styled.a`
+  background-color: rgb(${colors.darkGrey});
+  padding: 0 12px;
+  border-radius: 15px;
+  font-size: ${fonts.size.smedium};
+  line-height: ${backLinkHeight}px;
+`;
+
+const StyledContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
 `;
 
 const BaseLayout = ({
@@ -193,84 +232,62 @@ const BaseLayout = ({
   };
   return (
     <StyledLayout>
-      <ReminderRibbon maxWidth={1000} />
+      <ReminderRibbon maxWidth={contentMaxWidth} />
       <Background />
-      <Column maxWidth={1000}>
-        <StyledHeader isHomepage={isHomepage}>
-          <Link to="/">
-            <StyledBranding>
-              <StyledBalanceLogo alt="Balance" />
-              <StyledBeta>{'BETA'}</StyledBeta>
-            </StyledBranding>
-          </Link>
-          <StyledIndicators isHomepage={isHomepage}>
-            {showToolbar &&
-              accountType === 'LEDGER' &&
-              !!Object.keys(addresses).length && (
-                <Fragment>
-                  <Dropdown
-                    monospace
-                    displayKey={`address`}
-                    selected={accountAddress}
-                    options={addresses}
-                    onChange={address =>
-                      accountUpdateAccountAddress(address, 'LEDGER')
-                    }
-                  />
-                  <StyledVerticalLine />
-                </Fragment>
-              )}
-            {showToolbar &&
-              accountType === 'TREZOR' &&
-              !!Object.keys(addresses).length && (
-                <Fragment>
-                  <Dropdown
-                    monospace
-                    displayKey={`address`}
-                    selected={accountAddress}
-                    options={addresses}
-                    onChange={address =>
-                      accountUpdateAccountAddress(address, 'TREZOR')
-                    }
-                  />
-                  <StyledVerticalLine />
-                </Fragment>
-              )}
-            {showToolbar && (
-              <Fragment>
-                <Dropdown
-                  displayKey={`value`}
-                  selected={network}
-                  iconColor={online ? 'green' : 'red'}
-                  options={ethereumNetworks}
-                  onChange={
-                    accountType === 'LEDGER'
-                      ? ledgerUpdateNetwork
-                      : accountType === 'TREZOR'
-                        ? trezorUpdateNetwork
-                        : null
-                  }
-                />
-                <StyledVerticalLine />
-                <Dropdown
-                  displayKey={`currency`}
-                  selected={nativeCurrency}
-                  options={nativeCurrencies}
-                  onChange={accountChangeNativeCurrency}
-                />
-                <StyledVerticalLine />
-              </Fragment>
-            )}
-            <Dropdown
-              displayKey={`description`}
-              selected={language}
-              options={languages}
-              onChange={accountChangeLanguage}
-            />
-          </StyledIndicators>
-        </StyledHeader>
-        <StyledContent>{children}</StyledContent>
-      </Column>
+      <StyledContentContainer>
+        <StyledBackButton>
+          <StyledBackLink href="https://balance.io/">
+            &#8592;&nbsp;&nbsp;
+            {`Back to balance.io`}
+          </StyledBackLink>
+        </StyledBackButton>
+        <Column maxWidth={contentMaxWidth}>
+          <StyledHeader>
+            <Link to="/">
+              <StyledBranding>
+                <StyledBalanceLogo alt="Balance" />
+                <StyledBeta>{'BETA'}</StyledBeta>
+              </StyledBranding>
+            </Link>
+            <StyledIndicators isHomepage={isHomepage}>
+              {showToolbar &&
+                accountType === 'LEDGER' &&
+                !!Object.keys(addresses).length && (
+                  <Fragment>
+                    <Dropdown
+                      displayKey={`value`}
+                      selected={network}
+                      iconColor={online ? 'green' : 'red'}
+                      options={ethereumNetworks}
+                      onChange={
+                        accountType === 'LEDGER'
+                          ? ledgerUpdateNetwork
+                          : accountType === 'TREZOR'
+                            ? trezorUpdateNetwork
+                            : null
+                      }
+                    />
+                    <StyledVerticalLine />
+                    <Dropdown
+                      displayKey={`currency`}
+                      selected={nativeCurrency}
+                      options={nativeCurrencies}
+                      onChange={accountChangeNativeCurrency}
+                    />
+                    <StyledVerticalLine />
+                  </Fragment>
+                )}
+              <Dropdown
+                displayKey={`description`}
+                selected={language}
+                options={languages}
+                onChange={accountChangeLanguage}
+              />
+            </StyledIndicators>
+          </StyledHeader>
+          <StyledContent>{children}</StyledContent>
+        </Column>
+      </StyledContentContainer>
       <StyledFooter>
         <StyledFooterLeft>
           {window.location.pathname !== '/' && (

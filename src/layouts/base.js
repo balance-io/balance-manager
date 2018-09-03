@@ -53,22 +53,18 @@ const StyledContent = styled(Wrapper)`
 `;
 
 const StyledHeader = styled.div`
-  margin-top: -1px;
-  margin-bottom: 1px;
   width: 100%;
   height: ${headerHeight}px;
-  display: flex;
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  min-height: 72px;
-  padding: 0 16px;
+  padding: 0 ${contentPadding}px;
   width: 100%;
 
   @media screen and (max-width: ${({ isHomepage }) =>
       isHomepage ? '337px' : '505px'}) {
-    padding: 16px 16px 0;
+    padding: ${contentPadding}px ${contentPadding}px 0;
   }
 `;
 
@@ -147,6 +143,11 @@ const StyledBackButton = styled.div`
   @media screen and (max-width: ${contentMaxWidth + 2 * backButtonWidth}px) {
     position: initial;
     margin-bottom: -${headerHeight / 2 - backLinkHeight / 2}px;
+  }
+
+  @media screen and (max-width: ${({ isHomepage }) =>
+      isHomepage ? '337px' : '505px'}) {
+    padding-top: ${contentPadding}px;
   }
 `;
 const StyledBackLink = styled.a`
@@ -235,14 +236,14 @@ const BaseLayout = ({
       <ReminderRibbon maxWidth={contentMaxWidth} />
       <Background />
       <StyledContentContainer>
-        <StyledBackButton>
+        <StyledBackButton isHomepage={isHomepage}>
           <StyledBackLink href="https://balance.io/">
             &#8592;&nbsp;&nbsp;
             {`Back to balance.io`}
           </StyledBackLink>
         </StyledBackButton>
         <Column maxWidth={contentMaxWidth}>
-          <StyledHeader>
+          <StyledHeader isHomepage={isHomepage}>
             <Link to="/">
               <StyledBranding>
                 <StyledBalanceLogo alt="Balance" />

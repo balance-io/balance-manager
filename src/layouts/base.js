@@ -256,28 +256,58 @@ const BaseLayout = ({
                 !!Object.keys(addresses).length && (
                   <Fragment>
                     <Dropdown
-                      displayKey={`value`}
-                      selected={network}
-                      iconColor={online ? 'green' : 'red'}
-                      options={ethereumNetworks}
-                      onChange={
-                        accountType === 'LEDGER'
-                          ? ledgerUpdateNetwork
-                          : accountType === 'TREZOR'
-                            ? trezorUpdateNetwork
-                            : null
+                      monospace
+                      displayKey={`address`}
+                      selected={accountAddress}
+                      options={addresses}
+                      onChange={address =>
+                        accountUpdateAccountAddress(address, 'LEDGER')
                       }
-                    />
-                    <StyledVerticalLine />
-                    <Dropdown
-                      displayKey={`currency`}
-                      selected={nativeCurrency}
-                      options={nativeCurrencies}
-                      onChange={accountChangeNativeCurrency}
                     />
                     <StyledVerticalLine />
                   </Fragment>
                 )}
+              {showToolbar &&
+                accountType === 'TREZOR' &&
+                !!Object.keys(addresses).length && (
+                  <Fragment>
+                    <Dropdown
+                      monospace
+                      displayKey={`address`}
+                      selected={accountAddress}
+                      options={addresses}
+                      onChange={address =>
+                        accountUpdateAccountAddress(address, 'TREZOR')
+                      }
+                    />
+                    <StyledVerticalLine />
+                  </Fragment>
+                )}
+              {showToolbar && (
+                <Fragment>
+                  <Dropdown
+                    displayKey={`value`}
+                    selected={network}
+                    iconColor={online ? 'green' : 'red'}
+                    options={ethereumNetworks}
+                    onChange={
+                      accountType === 'LEDGER'
+                        ? ledgerUpdateNetwork
+                        : accountType === 'TREZOR'
+                          ? trezorUpdateNetwork
+                          : null
+                    }
+                  />
+                  <StyledVerticalLine />
+                  <Dropdown
+                    displayKey={`currency`}
+                    selected={nativeCurrency}
+                    options={nativeCurrencies}
+                    onChange={accountChangeNativeCurrency}
+                  />
+                  <StyledVerticalLine />
+                </Fragment>
+              )}
               <Dropdown
                 displayKey={`description`}
                 selected={language}

@@ -63,6 +63,7 @@
   "devDependencies": {
     "babel-eslint": "^8.2.2",
     "cross-env": "^5.2.0",
+    "eslint": "^5.5.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-react-app": "^2.1.0",
     "eslint-plugin-flowtype": "^2.46.1",

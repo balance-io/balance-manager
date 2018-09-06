@@ -186,7 +186,6 @@ const BaseLayout = ({
       ledgerClearState();
     } else if (accountType === 'WALLETCONNECT') {
       walletConnectClearState();
-      commonStorage.resetWalletConnect();
     } else if (accountType === 'METAMASK') {
       metamaskClearState();
     }

@@ -20,7 +20,7 @@ import firefoxLogoImage from '../assets/firefox-logo.svg';
 import firefoxLogoText from '../assets/firefox-text.svg';
 import operaLogoImage from '../assets/opera-logo.svg';
 import operaLogoText from '../assets/opera-text.svg';
-import { walletConnectHasValidSession } from '../reducers/_walletconnect';
+import { walletConnectHasExistingSession } from '../reducers/_walletconnect';
 import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
 
@@ -302,7 +302,7 @@ const OperaLogoText = BraveLogoText.extend``;
 class Home extends Component {
   onWalletConnectInit = () => {
     this.props
-      .walletConnectHasValidSession()
+      .walletConnectHasExistingSession()
       .then(isValid => {
         if (isValid) {
           this.props.history.push('/wallet');
@@ -590,13 +590,13 @@ class Home extends Component {
 
 Home.propTypes = {
   modalOpen: PropTypes.func.isRequired,
-  walletConnectHasValidSession: PropTypes.func.isRequired,
+  walletConnectHasExistingSession: PropTypes.func.isRequired,
 };
 
 export default connect(
   null,
   {
     modalOpen,
-    walletConnectHasValidSession,
+    walletConnectHasExistingSession,
   },
 )(Home);

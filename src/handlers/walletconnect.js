@@ -8,10 +8,10 @@ const bridgeUrl = 'https://walletconnect.balance.io';
  * @desc init WalletConnect webConnector instance
  * @return {Object}
  */
-export const walletConnectNewSession = async () => {
+export const walletConnectGetSession = async () => {
   const webConnector = new WalletConnect({ bridgeUrl, dappName });
-  await webConnector.initSession();
-  return webConnector;
+  const session = await webConnector.initSession();
+  return { webConnector, session };
 };
 
 const walletConnectListenTransactionStatus = async (
@@ -32,9 +32,10 @@ const walletConnectListenTransactionStatus = async (
  * @return {String}
  */
 export const walletConnectSignTransaction = async transaction => {
-  const webConnectorOptions = await commonStorage.getWalletConnectSession();
-  const webConnector = new WalletConnect(webConnectorOptions);
-  try {
+  const { webConnector, session } = await walletConnectGetSession();
+  if (session.new) {
+    throw new Error('WalletConnect session has expired. Please reconnect.');
+  } else {
     const transactionId = await webConnector.createTransaction(transaction);
     const data = await walletConnectListenTransactionStatus(
       webConnector,
@@ -50,7 +51,5 @@ export const walletConnectSignTransaction = async transaction => {
       }
     }
     return null;
-  } catch (error) {
-    // TODO: error handling
   }
 };

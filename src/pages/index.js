@@ -539,6 +539,8 @@ class Home extends Component {
               <WalletConnectButton
                 left
                 color="walletconnect"
+                hoverColor="walletconnectHover"
+                activeColor="walletconnectActive"
                 onClick={this.onWalletConnectInit}
               >
                 {lang.t('homepage.connect_walletconnect.button')}

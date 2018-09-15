@@ -95,6 +95,7 @@ const StyledRow = styled.div`
   font-weight: ${({ selected }) =>
     selected ? fonts.weight.bold : fonts.weight.normal};
   padding: 6px;
+  margin: auto 6px;
   width: auto;
   text-align: center;
   align-items: center;

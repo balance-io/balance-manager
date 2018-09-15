@@ -2,7 +2,8 @@ import WalletConnect from 'walletconnect';
 import { commonStorage } from 'balance-common';
 
 const dappName = 'Balance Manager';
-const bridgeUrl = 'https://walletconnect.balance.io';
+// TODO change bridge url back
+const bridgeUrl = 'https://bridge.walletconnect.org';
 
 /**
  * @desc init WalletConnect webConnector instance
@@ -11,6 +12,7 @@ const bridgeUrl = 'https://walletconnect.balance.io';
 export const walletConnectGetSession = async () => {
   const webConnector = new WalletConnect({ bridgeUrl, dappName });
   const session = await webConnector.initSession();
+  console.log('session', session);
   return { webConnector, session };
 };
 

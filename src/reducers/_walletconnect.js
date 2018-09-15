@@ -68,12 +68,9 @@ export const walletConnectListenForSession = webConnector => (
   getState,
 ) => {
   dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
-  webConnector.listenSessionStatus((error, data) => {
-    const fetching = getState().walletconnect.fetching;
-    if (error && fetching) {
-      dispatch({ type: WALLET_CONNECT_GET_SESSION_FAILURE });
-      dispatch(walletConnectHasExistingSession());
-    } else if (!error && data) {
+  webConnector
+    .listenSessionStatus()
+    .then(data => {
       const accountAddress = data ? data.data[0].toLowerCase() : null;
       dispatch({
         type: WALLET_CONNECT_GET_SESSION_SUCCESS,
@@ -82,8 +79,14 @@ export const walletConnectListenForSession = webConnector => (
       dispatch(accountUpdateAccountAddress(accountAddress, 'WALLETCONNECT'));
       dispatch(modalClose());
       window.browserHistory.push('/wallet');
-    }
-  });
+    })
+    .catch(error => {
+      const fetching = getState().walletconnect.fetching;
+      if (fetching) {
+        dispatch({ type: WALLET_CONNECT_GET_SESSION_FAILURE });
+        dispatch(walletConnectHasExistingSession());
+      }
+    });
 };
 
 export const walletConnectClearFields = () => (dispatch, getState) => {

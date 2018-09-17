@@ -10,9 +10,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ### Added
 
 ### Changed
-* Use of balance-common shared library for features common in Wallet as well as Manager
 
 ### Removed
+
+## [0.7.2](https://github.com/balance-io/balance-manager/releases/tag/0.7.2)
+
+### Added
+* New copy on home page of Manager
+
+### Changed
+* Use of balance-common shared library for features common in Wallet as well as Manager
+* Improved responsiveness
 
 ## [0.7.1](https://github.com/balance-io/balance-manager/releases/tag/0.7.1)
 

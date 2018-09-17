@@ -11,7 +11,7 @@ import ReceiveModal from './ReceiveModal';
 import DonateModal from './DonateModal';
 import WalletConnectModal from './WalletConnectModal';
 import { modalClose } from '../reducers/_modal';
-import { sendClearFields } from '../reducers/_send';
+import { sendClearFields } from 'balance-common';
 import { exchangeClearFields } from '../reducers/_exchange';
 
 import { colors, transitions } from '../styles';

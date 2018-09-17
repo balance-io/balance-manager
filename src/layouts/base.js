@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import lang from '../languages';
+import { lang, resources } from 'balance-common';
 import Link from '../components/Link';
 import Dropdown from '../components/Dropdown';
 import Background from '../components/Background';
@@ -23,15 +23,14 @@ import {
   accountClearState,
   accountUpdateAccountAddress,
   accountChangeLanguage,
-} from '../reducers/_account';
+} from 'balance-common';
 import { metamaskClearState } from '../reducers/_metamask';
 import { ledgerClearState } from '../reducers/_ledger';
 import { trezorClearState } from '../reducers/_trezor';
 import { walletConnectClearState } from '../reducers/_walletconnect';
-import { resetAccount, resetWalletConnect } from '../handlers/localstorage';
+import { commonStorage } from 'balance-common';
 import ReminderRibbon from '../components/ReminderRibbon';
 import { colors, responsive } from '../styles';
-import { resources } from '../languages';
 
 const StyledLayout = styled.div`
   position: relative;
@@ -47,51 +46,54 @@ const StyledContent = styled(Wrapper)`
 `;
 
 const StyledHeader = styled.div`
-  margin-top: -1px;
-  margin-bottom: 1px;
-  width: 100%;
-  height: 72px;
-  display: flex;
   align-items: center;
+  display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  min-height: 72px;
   padding: 0 16px;
-`;
+  width: 100%;
 
-const StyledBranding = styled.div`
-  display: flex;
-  align-items: center;
-  position: relative;
-`;
-
-const StyledBalanceLogo = styled.div`
-  width: 198px;
-  height: 23px;
-  background: url(${balanceManagerLogo}) no-repeat;
-  @media screen and (${responsive.sm.max}) {
+  @media screen and (max-width: ${({ isHomepage }) =>
+      isHomepage ? '337px' : '505px'}) {
+    padding: 16px 16px 0;
   }
 `;
 
+const StyledBranding = styled.div`
+  align-items: center;
+  display: flex;
+`;
+
+const StyledBalanceLogo = styled.div`
+  background: url(${balanceManagerLogo}) no-repeat;
+  height: 23px;
+  margin-right: 8px;
+  width: 198px;
+`;
+
 const StyledBeta = styled.div`
-  margin: 0;
-  position: absolute;
-  top: 5.5px;
-  right: -40px;
-  display: inline-block;
-  letter-spacing: 0.4px;
+  background: rgba(${colors.white}, 0.5);
+  border-radius: 4px;
+  color: rgb(${colors.bodyBackground});
   font-size: 8px;
   font-weight: 500;
+  letter-spacing: 0.4px;
   padding: 2px 3px;
-  border-radius: 4px;
-  background: rgba(${colors.white}, 0.5);
-  color: rgb(${colors.bodyBackground});
 `;
 
 const StyledIndicators = styled.div`
-  display: flex;
   align-items: center;
-  justify-content: flex-end;
+  display: flex;
+
   & > div {
     margin-left: 2px;
+  }
+
+  @media screen and (max-width: ${({ isHomepage }) =>
+      isHomepage ? '337px' : '505px'}) {
+    margin: 0 auto;
+    padding: 8px 0;
   }
 `;
 
@@ -150,6 +152,7 @@ const BaseLayout = ({
   ...props
 }) => {
   const addresses = {};
+  const isHomepage = window.location.pathname === '/';
   if (accountType === 'LEDGER') {
     ledgerAccounts.forEach(account => {
       addresses[account.address] = account;
@@ -168,7 +171,7 @@ const BaseLayout = ({
     };
   });
   const showToolbar =
-    window.location.pathname !== '/' &&
+    !isHomepage &&
     (!metamaskFetching || !ledgerFetching || !trezorFetching) &&
     ((accountType === 'METAMASK' && web3Available) ||
       accountType !== 'METAMASK') &&
@@ -176,14 +179,14 @@ const BaseLayout = ({
   const openSendModal = () => modalOpen('DONATION_MODAL');
   const disconnectAccount = () => {
     accountClearState();
-    resetAccount(accountAddress);
+    commonStorage.resetAccount(accountAddress);
     if (accountType === 'TREZOR') {
       trezorClearState();
     } else if (accountType === 'LEDGER') {
       ledgerClearState();
     } else if (accountType === 'WALLETCONNECT') {
       walletConnectClearState();
-      resetWalletConnect();
+      commonStorage.resetWalletConnect();
     } else if (accountType === 'METAMASK') {
       metamaskClearState();
     }
@@ -193,14 +196,14 @@ const BaseLayout = ({
       <ReminderRibbon maxWidth={1000} />
       <Background />
       <Column maxWidth={1000}>
-        <StyledHeader>
+        <StyledHeader isHomepage={isHomepage}>
           <Link to="/">
             <StyledBranding>
               <StyledBalanceLogo alt="Balance" />
               <StyledBeta>{'BETA'}</StyledBeta>
             </StyledBranding>
           </Link>
-          <StyledIndicators>
+          <StyledIndicators isHomepage={isHomepage}>
             {showToolbar &&
               accountType === 'LEDGER' &&
               !!Object.keys(addresses).length && (

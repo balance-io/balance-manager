@@ -1,6 +1,6 @@
 import React from 'react';
 
-import lang from '../../languages';
+import { lang } from 'balance-common';
 
 import { StyledGasButton } from './styles';
 

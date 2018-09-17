@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import lang from '../../languages';
+import { lang } from 'balance-common';
 
 import Card from '../../components/Card';
 import Input from '../../components/Input';
@@ -28,16 +28,17 @@ import {
   sendUpdateNativeAmount,
   sendUpdateAssetAmount,
   sendToggleConfirmationView,
-} from '../../reducers/_send';
+} from 'balance-common';
+import { web3SendTransactionMultiWallet } from '../../handlers/web3';
 import { notificationShow } from '../../reducers/_notification';
 
-import { greaterThan } from '../../helpers/bignumber';
 import {
   capitalize,
   getEth,
+  greaterThan,
   transactionData,
   calcTxFee,
-} from '../../helpers/utilities';
+} from 'balance-common';
 
 import {
   StyledIcon,
@@ -144,14 +145,17 @@ class DonateModal extends Component {
         return;
       }
 
-      this.props.sendTransaction({
-        address: this.props.accountInfo.address,
-        recipient: balanceManagerEthAddress,
-        amount: this.props.assetAmount,
-        asset: this.props.selected,
-        gasPrice: this.props.gasPrice,
-        gasLimit: this.props.gasLimit,
-      });
+      this.props.sendTransaction(
+        {
+          address: this.props.accountInfo.address,
+          recipient: balanceManagerEthAddress,
+          amount: this.props.assetAmount,
+          asset: this.props.selected,
+          gasPrice: this.props.gasPrice,
+          gasLimit: this.props.gasLimit,
+        },
+        web3SendTransactionMultiWallet,
+      );
     }
 
     this.props.sendToggleConfirmationView(true);

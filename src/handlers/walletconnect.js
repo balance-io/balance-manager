@@ -1,5 +1,5 @@
 import WalletConnect from 'walletconnect';
-import { getWalletConnectSession } from './localstorage';
+import { commonStorage } from 'balance-common';
 
 const dappName = 'Balance Manager';
 const bridgeUrl = 'https://walletconnect.balance.io';
@@ -32,7 +32,7 @@ const walletConnectListenTransactionStatus = async (
  * @return {String}
  */
 export const walletConnectSignTransaction = async transaction => {
-  const webConnectorOptions = getWalletConnectSession();
+  const webConnectorOptions = await commonStorage.getWalletConnectSession();
   const webConnector = new WalletConnect(webConnectorOptions);
   try {
     const transactionId = await webConnector.createTransaction(transaction);

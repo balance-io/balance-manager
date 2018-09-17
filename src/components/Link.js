@@ -8,6 +8,7 @@ const SLink = styled(Link)`
   color: inherit;
   margin: 0;
   padding: 0;
+  width: ${({ width }) => (width ? width : null)};
 `;
 
 const LinkWrapper = ({ children, ...props }) => (

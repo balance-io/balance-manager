@@ -24,7 +24,12 @@ export const colors = {
   red: '214, 75, 71',
   ethplorer: '80, 102, 133',
   etherscan: '2, 92, 144',
+  trustwallet: '50, 117, 187',
+  trustwalletHover: '76, 143, 213',
+  trustwalletActive: '25, 92, 162',
   walletconnect: '64, 153, 255',
+  walletconnectHover: '90, 179, 255',
+  walletconnectActive: '39, 128, 230',
   ledger: '47, 49, 55',
   bodyBackground: '44,47,56',
   darkText: '43,45,51',
@@ -34,6 +39,7 @@ export const colors = {
 export const fonts = {
   size: {
     tiny: '10px',
+    xsmall: '11px',
     small: '12px',
     smedium: '14px',
     medium: '15px',
@@ -84,6 +90,10 @@ export const responsive = {
   short: {
     min: 'min-height: 479px',
     max: 'max-height: 480px',
+  },
+  xxs: {
+    min: 'min-width: 399px',
+    max: 'max-width: 400px',
   },
   xs: {
     min: 'min-width: 479px',

@@ -286,6 +286,7 @@ class SendModal extends Component {
       sendUpdateRecipient,
       assetAmount,
       sendUpdateAssetAmount,
+      sendUpdateNativeAmount,
       nativeAmount,
       prices,
       gasPrices,

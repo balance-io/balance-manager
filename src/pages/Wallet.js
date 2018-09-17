@@ -5,30 +5,48 @@ import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
-import { getWalletConnectAccount } from '../handlers/localstorage';
-import { accountUpdateAccountAddress } from '../reducers/_account';
+import { checkWalletConnectSession } from '../handlers/localstorage';
+import { walletConnectHasValidSession } from '../reducers/_walletconnect';
+import lang from '../languages';
+import { fonts, colors } from '../styles';
 
 const StyledWrapper = styled.div`
   width: 100%;
 `;
 
+const StyledMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(${colors.grey});
+  font-weight: ${fonts.weight.medium};
+`;
+
 class Wallet extends Component {
   componentDidMount() {
-    const storedAddress = getWalletConnectAccount();
-    if (storedAddress) {
-      this.props.accountUpdateAccountAddress(storedAddress, 'WALLETCONNECT');
-    } else {
-      this.props.history.push('/');
-    }
+    this.props
+      .walletConnectHasValidSession()
+      .then(isValid => {
+        if (!isValid) {
+          this.props.history.push('/');
+        }
+      })
+      .catch(error => {
+        console.log('error checking valid session in wallet mount', error);
+        this.props.history.push('/');
+      });
   }
+
   render = () => (
     <BaseLayout>
       <StyledWrapper>
         {this.props.fetching || this.props.accountAddress ? (
           <Account match={this.props.match} />
         ) : (
-          <Card fetching={this.props.fetching}>
-            <div />
+          <Card minHeight={200} fetching={this.props.fetching}>
+            <StyledMessage>
+              {lang.t('message.walletconnect_not_unlocked')}
+            </StyledMessage>
           </Card>
         )}
       </StyledWrapper>
@@ -37,24 +55,24 @@ class Wallet extends Component {
 }
 
 Wallet.propTypes = {
-  accountUpdateAccountAddress: PropTypes.func.isRequired,
   accountAddress: PropTypes.string,
   fetching: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired,
+  walletConnectHasValidSession: PropTypes.func,
 };
 
 Wallet.defaultProps = {
   accountAddress: null,
 };
 
-const reduxProps = ({ account }) => ({
-  fetching: account.fetching,
-  accountAddress: account.accountAddress,
+const reduxProps = ({ walletconnect }) => ({
+  fetching: walletconnect.fetching,
+  accountAddress: walletconnect.accountAddress,
 });
 
 export default connect(
   reduxProps,
   {
-    accountUpdateAccountAddress,
+    walletConnectHasValidSession,
   },
 )(Wallet);

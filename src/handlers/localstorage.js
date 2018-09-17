@@ -3,6 +3,8 @@ const accountLocalVersion = '0.1.0';
 const globalSettingsVersion = '0.1.0';
 const walletConnectVersion = '0.1.0';
 
+const expiryBufferInSeconds = 10 * 60;
+
 /**
  * @desc save to local storage
  * @param  {String}  [key='']
@@ -40,11 +42,22 @@ export const getLocal = (key = '', version = defaultVersion) => {
 export const removeLocal = (key = '') => localStorage.removeItem(key);
 
 /**
+ * @desc reset account local
+ * @param  {String}   [address]
+ */
+export const resetAccount = accountAddress => {
+  accountAddress = accountAddress.toLowerCase();
+  removeLocal(accountAddress);
+  removeLocal('nativePrices');
+};
+
+/**
  * @desc get account local
  * @param  {String}   [address]
  * @return {Object}
  */
 export const getAccountLocal = accountAddress => {
+  accountAddress = accountAddress.toLowerCase();
   return getLocal(accountAddress, accountLocalVersion);
 };
 
@@ -53,7 +66,7 @@ export const getAccountLocal = accountAddress => {
  * @return {Object}
  */
 export const getNativePrices = () => {
-  const nativePrices = getLocal('native_prices', accountLocalVersion);
+  const nativePrices = getLocal('nativeprices', accountLocalVersion);
   return nativePrices ? nativePrices.data : null;
 };
 
@@ -62,7 +75,7 @@ export const getNativePrices = () => {
  * @param  {String}   [address]
  */
 export const saveNativePrices = nativePrices => {
-  saveLocal('native_prices', { data: nativePrices }, accountLocalVersion);
+  saveLocal('nativeprices', { data: nativePrices }, accountLocalVersion);
 };
 
 /**
@@ -70,7 +83,7 @@ export const saveNativePrices = nativePrices => {
  * @return {Object}
  */
 export const getNativeCurrency = () => {
-  const nativeCurrency = getLocal('native_currency', globalSettingsVersion);
+  const nativeCurrency = getLocal('nativecurrency', globalSettingsVersion);
   return nativeCurrency ? nativeCurrency.data : null;
 };
 
@@ -79,7 +92,7 @@ export const getNativeCurrency = () => {
  * @param  {String}   [currency]
  */
 export const saveNativeCurrency = nativeCurrency => {
-  saveLocal('native_currency', { data: nativeCurrency }, globalSettingsVersion);
+  saveLocal('nativecurrency', { data: nativeCurrency }, globalSettingsVersion);
 };
 
 /**
@@ -91,6 +104,7 @@ export const saveNativeCurrency = nativeCurrency => {
  */
 export const updateLocalBalances = (address, account, network) => {
   if (!address) return;
+  address = address.toLowerCase();
   let accountLocal = getLocal(address) || {};
   if (!accountLocal[network]) {
     accountLocal[network] = {};
@@ -112,6 +126,7 @@ export const updateLocalBalances = (address, account, network) => {
  */
 export const updateLocalTransactions = (address, transactions, network) => {
   if (!address) return;
+  address = address.toLowerCase();
   let accountLocal = getLocal(address) || {};
   const pending = [];
   const _transactions = [];
@@ -151,20 +166,42 @@ export const saveSupressReminderRibbon = state => {
 };
 
 /**
- * @desc get wallet connect account
+ * @desc get wallet connect session details
  * @return {Object}
  */
-export const getWalletConnectAccount = () => {
-  const walletConnectAccount = getLocal('walletconnect', walletConnectVersion);
-  return walletConnectAccount ? walletConnectAccount.data : null;
+export const getWalletConnectSession = () => {
+  const webConnectorOptions = getLocal('walletconnect', walletConnectVersion);
+  const details = webConnectorOptions ? webConnectorOptions.data : null;
+  if (details) {
+    const expiration = Date.parse(webConnectorOptions.expiration);
+    return new Date() < expiration ? details : null;
+  } else {
+    return null;
+  }
 };
 
 /**
- * @desc save wallet connect account
+ * @desc save wallet connect session details
  * @param  {String}   [address]
  */
-export const saveWalletConnectAccount = account => {
-  saveLocal('walletconnect', { data: account }, walletConnectVersion);
+export const saveWalletConnectSession = (webConnectorOptions, ttlInSeconds) => {
+  let expiration = new Date();
+  expiration.setSeconds(
+    expiration.getSeconds() + ttlInSeconds - expiryBufferInSeconds,
+  );
+  saveLocal(
+    'walletconnect',
+    { data: webConnectorOptions, expiration },
+    walletConnectVersion,
+  );
+};
+
+/**
+ * @desc reset wallet connect session details
+ * @param  {String}   [address]
+ */
+export const resetWalletConnect = () => {
+  removeLocal('walletconnect');
 };
 
 /**

@@ -42,8 +42,18 @@ const StyledReminderRibbonMessage = styled.div`
 
 class ReminderRibbon extends Component {
   state = {
-    show: !getSupressReminderRibbon(),
+    show: false,
   };
+
+  componentDidMount() {
+    getSupressReminderRibbon()
+      .then(suppressReminder => {
+        this.setState({ show: !suppressReminder });
+      })
+      .catch(error => {
+        this.setState({ show: true });
+      });
+  }
 
   onClose = () => {
     this.setState({ show: false });

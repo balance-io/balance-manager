@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import lang from '../../languages';
+import { lang } from 'balance-common';
 import Card from '../../components/Card';
 import Input from '../../components/Input';
 import LineBreak from '../../components/LineBreak';
@@ -30,20 +30,27 @@ import {
 } from '../../reducers/_exchange';
 import { notificationShow } from '../../reducers/_notification';
 import {
+  add,
+  capitalize,
   convertAmountFromBigNumber,
   convertAmountToDisplay,
   convertNumberToString,
-  add,
+  getCountdown,
   multiply,
   divide,
   greaterThan,
   smallerThan,
   convertAmountToBigNumber,
   handleSignificantDecimals,
-} from '../../helpers/bignumber';
-import { capitalize } from '../../helpers/utilities';
-import { getCountdown } from '../../helpers/time';
-import { fonts, colors, transitions } from '../../styles';
+} from 'balance-common';
+import { fonts, colors, responsive, transitions } from '../../styles';
+
+import {
+  StyledAmountCurrency,
+  StyledConversionContainer,
+  StyledConversionIconContainer,
+  StyledInputContainer,
+} from '../modalStyles';
 
 const StyledSuccessMessage = styled.div`
   width: 100%;
@@ -69,6 +76,8 @@ const StyledIcon = styled.div`
 const StyledFlex = styled.div`
   width: ${({ spanWidth }) => (spanWidth ? '100%' : 'auto')};
   display: flex;
+  flex-grow: 1;
+  align-items: flex-start;
   position: relative;
   transform: none;
 `;
@@ -102,7 +111,6 @@ const StyledHelperContainer = styled.div`
 const StyledHelperText = styled.div`
   width: 100%;
   text-align: left;
-  padding-left: 8px;
   opacity: ${({ fetching }) => (fetching ? `0.5` : `1.0`)};
   cursor: ${({ onClick }) =>
     typeof onClick !== 'undefined' ? 'pointer' : 'default'};
@@ -113,12 +121,22 @@ const StyledHelperText = styled.div`
       opacity: 0.7;
     }
   `};
+
+  &:not(:first-child) {
+    padding-left: 8px;
+  }
+
+  @media screen and (${responsive.xs.max}) {
+    text-align: ${({ centerOnMobile }) => (centerOnMobile ? 'center' : 'left')};
+  }
+
   & p {
     color: ${({ warn }) =>
       warn ? `rgb(${colors.red})` : `rgb(${colors.grey})`};
     font-size: 13px;
     font-weight: ${fonts.weight.normal};
   }
+
   & strong {
     color: ${({ warn }) =>
       warn ? `rgb(${colors.red})` : `rgb(${colors.grey})`};
@@ -152,18 +170,6 @@ const StyledHash = styled.p`
   border-radius: 8px;
   margin: 0 auto;
   padding: 12px 18px;
-`;
-
-const StyledAmountCurrency = styled.div`
-  position: absolute;
-  top: 34px;
-  right: 6px;
-  padding: 4px;
-  border-radius: 6px;
-  color: rgba(${colors.darkGrey}, 0.7);
-  background: rgb(${colors.white});
-  font-size: ${fonts.size.medium};
-  opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
 `;
 
 const StyledStaticCurrency = styled(StyledAmountCurrency)`
@@ -201,14 +207,26 @@ const StyledNativeCurrency = styled(StyledDynamicCurrency)`
   margin-right: 4px;
 `;
 
-const StyledExchangeIcon = styled.div`
-  width: 46px;
-  position: relative;
-  & img {
-    width: 20px;
-    position: absolute;
-    top: 40px;
-    left: calc(50% - 10px);
+const StyledExchangeIconContainer = styled(StyledConversionIconContainer)`
+  align-self: flex-start;
+  height: 94px;
+
+  @media screen and (${responsive.sm.max}) {
+    height: 88px;
+  }
+
+  @media screen and (${responsive.xs.max}) {
+    height: inherit;
+  }
+`;
+
+const StyledExchangeIcon = styled.img`
+  height: 15px;
+  width: 20px;
+  margin: 0 16px;
+
+  @media screen and (${responsive.xs.max}) {
+    margin: 16px 0 0;
   }
 `;
 
@@ -253,12 +271,39 @@ const StyledApproveTransaction = styled.div`
   }
 `;
 
-const StyledActions = styled.div`
+export const StyledActions = styled.div`
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   justify-content: ${({ single }) => (single ? `center` : `space-between`)};
+
   & button {
     margin: 0 5px;
+  }
+
+  @media screen and (${responsive.sm.max}) {
+    > div {
+      order: 1;
+      width: 100%;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    button {
+      &:first-child {
+        order: 2;
+      }
+
+      &:last-child {
+        order: 3;
+      }
+    }
+  }
+
+  @media screen and (${responsive.xxs.max}) {
+    > div {
+      margin-bottom: 16px;
+    }
   }
 `;
 
@@ -523,86 +568,107 @@ class ExchangeModal extends Component {
                     ),
                   })}
                 </StyledSubTitle>
-                <StyledFlex>
-                  <StyledHelperWrapper spanWidth>
-                    <StyledDropdownLabel>
-                      {lang.t('modal.deposit_dropdown_label')}
-                    </StyledDropdownLabel>
-                    <DropdownAsset
-                      noBalance
-                      selected={this.props.depositSelected.symbol}
-                      assets={this.props.depositAssets}
-                      onChange={this.onChangeDepositSelected}
-                    />
-                    <StyledHelperContainer>
-                      <StyledHelperText fetching={this.props.fetchingRate}>
-                        <strong>{lang.t('modal.helper_balance')}</strong>
-                        <p>{balance || '———'}</p>
-                      </StyledHelperText>
-                      <StyledHelperText fetching={this.props.fetchingRate}>
-                        <strong>{lang.t('modal.helper_value')}</strong>
-                        <p>{depositValue || '———'}</p>
-                      </StyledHelperText>
-                    </StyledHelperContainer>
-                  </StyledHelperWrapper>
+                <StyledConversionContainer>
                   <StyledFlex>
-                    <StyledExchangeIcon>
-                      <img src={exchangeIcon} alt="conversion" />
-                    </StyledExchangeIcon>
-                  </StyledFlex>
-                  <StyledHelperWrapper spanWidth>
-                    <StyledDropdownLabel>
-                      {lang.t('modal.withdrawal_dropdown_label')}
-                    </StyledDropdownLabel>
-                    <DropdownAsset
-                      noBalance
-                      selected={this.props.withdrawalSelected.symbol}
-                      assets={withdrawalAssets}
-                      onChange={this.onChangeWithdrawalSelected}
-                    />
-                    <StyledHelperContainer>
-                      <StyledHelperText fetching={this.props.fetchingRate}>
-                        <strong>{lang.t('modal.helper_rate')}</strong>
-                        <p>{rate || '———'}</p>
-                      </StyledHelperText>
-                      <StyledHelperText fetching={this.props.fetchingRate}>
-                        <strong>{lang.t('modal.helper_price')}</strong>
-                        <p>{this.props.withdrawalPrice.display || '———'}</p>
-                      </StyledHelperText>
-                    </StyledHelperContainer>
-                  </StyledHelperWrapper>
-                </StyledFlex>
-
-                <StyledFlex>
-                  <StyledFlex spanWidth>
-                    <StyledHelperWrapper>
-                      <Input
-                        fetching={
-                          this.props.fetchingRate &&
-                          this.state.activeInput !== 'DEPOSIT'
-                        }
-                        onFocus={() => this.onFocus('DEPOSIT')}
-                        onBlur={this.onBlur}
-                        monospace
-                        label={lang.t('modal.deposit_input_label')}
-                        placeholder="0.0"
-                        type="text"
-                        value={this.props.depositAmount}
-                        onChange={this.onChangeDepositInput}
+                    <StyledHelperWrapper spanWidth>
+                      <StyledDropdownLabel>
+                        {lang.t('modal.deposit_dropdown_label')}
+                      </StyledDropdownLabel>
+                      <DropdownAsset
+                        noBalance
+                        selected={this.props.depositSelected.symbol}
+                        assets={this.props.depositAssets}
+                        onChange={this.onChangeDepositSelected}
                       />
-                      <StyledMaxBalance onClick={this.onExchangeMaxBalance}>
-                        {lang.t('modal.exchange_max')}
-                      </StyledMaxBalance>
-                      <StyledStaticCurrency
-                        disabled={
-                          this.props.fetchingRate &&
-                          this.state.activeInput !== 'DEPOSIT'
-                        }
-                      >
-                        {this.props.depositSelected.symbol}
-                      </StyledStaticCurrency>
                       <StyledHelperContainer>
                         <StyledHelperText
+                          centerOnMobile
+                          fetching={this.props.fetchingRate}
+                        >
+                          <strong>{lang.t('modal.helper_balance')}</strong>
+                          <p>{balance || '———'}</p>
+                        </StyledHelperText>
+                        <StyledHelperText
+                          centerOnMobile
+                          fetching={this.props.fetchingRate}
+                        >
+                          <strong>{lang.t('modal.helper_value')}</strong>
+                          <p>{depositValue || '———'}</p>
+                        </StyledHelperText>
+                      </StyledHelperContainer>
+                    </StyledHelperWrapper>
+                  </StyledFlex>
+                  <StyledFlex>
+                    <StyledExchangeIconContainer>
+                      <StyledExchangeIcon src={exchangeIcon} alt="conversion" />
+                    </StyledExchangeIconContainer>
+                  </StyledFlex>
+                  <StyledFlex>
+                    <StyledHelperWrapper spanWidth>
+                      <StyledDropdownLabel>
+                        {lang.t('modal.withdrawal_dropdown_label')}
+                      </StyledDropdownLabel>
+                      <DropdownAsset
+                        noBalance
+                        selected={this.props.withdrawalSelected.symbol}
+                        assets={withdrawalAssets}
+                        onChange={this.onChangeWithdrawalSelected}
+                      />
+                      <StyledHelperContainer>
+                        <StyledHelperText
+                          centerOnMobile
+                          fetching={this.props.fetchingRate}
+                        >
+                          <strong>{lang.t('modal.helper_rate')}</strong>
+                          <p>{rate || '———'}</p>
+                        </StyledHelperText>
+                        <StyledHelperText
+                          centerOnMobile
+                          fetching={this.props.fetchingRate}
+                        >
+                          <strong>{lang.t('modal.helper_price')}</strong>
+                          <p>{this.props.withdrawalPrice.display || '———'}</p>
+                        </StyledHelperText>
+                      </StyledHelperContainer>
+                    </StyledHelperWrapper>
+                  </StyledFlex>
+                </StyledConversionContainer>
+
+                <StyledConversionContainer>
+                  <StyledFlex spanWidth>
+                    <StyledHelperWrapper>
+                      <StyledInputContainer>
+                        <Input
+                          fetching={
+                            this.props.fetchingRate &&
+                            this.state.activeInput !== 'DEPOSIT'
+                          }
+                          onFocus={() => this.onFocus('DEPOSIT')}
+                          onBlur={this.onBlur}
+                          monospace
+                          label={lang.t('modal.deposit_input_label')}
+                          placeholder="0.0"
+                          type="text"
+                          value={this.props.depositAmount}
+                          onChange={this.onChangeDepositInput}
+                        >
+                          <StyledStaticCurrency
+                            disabled={
+                              this.props.fetchingRate &&
+                              this.state.activeInput !== 'DEPOSIT'
+                            }
+                          >
+                            {this.props.depositSelected.symbol}
+                          </StyledStaticCurrency>
+                        </Input>
+                        <StyledMaxBalance onClick={this.onExchangeMaxBalance}>
+                          {lang.t('modal.exchange_max')}
+                        </StyledMaxBalance>
+                      </StyledInputContainer>
+
+                      <StyledHelperContainer>
+                        <StyledHelperText
+                          centerOnMobile
                           onClick={this.onExchangeMin}
                           fetching={this.props.fetchingRate}
                           warn={!this.props.fetchingRate && depositUnder}
@@ -611,6 +677,7 @@ class ExchangeModal extends Component {
                           <p>{depositMin || '———'}</p>
                         </StyledHelperText>
                         <StyledHelperText
+                          centerOnMobile
                           onClick={this.onExchangeMaxBalance}
                           fetching={this.props.fetchingRate}
                           warn={!this.props.fetchingRate && depositOver}
@@ -622,50 +689,57 @@ class ExchangeModal extends Component {
                     </StyledHelperWrapper>
                   </StyledFlex>
                   <StyledFlex>
-                    <StyledExchangeIcon>
-                      <img src={exchangeIcon} alt="conversion" />
-                    </StyledExchangeIcon>
+                    <StyledExchangeIconContainer>
+                      <StyledExchangeIcon src={exchangeIcon} alt="conversion" />
+                    </StyledExchangeIconContainer>
                   </StyledFlex>
                   <StyledFlex spanWidth>
                     <StyledHelperWrapper>
-                      <Input
-                        fetching={
-                          this.props.fetchingRate &&
-                          this.state.activeInput !== 'WITHDRAWAL'
-                        }
-                        onFocus={() => this.onFocus('WITHDRAWAL')}
-                        onBlur={this.onBlur}
-                        monospace
-                        placeholder="0.0"
-                        label={lang.t('modal.withdrawal_input_label')}
-                        type="text"
-                        value={this.props.withdrawalInput}
-                        onChange={this.onChangeWithdrawalInput}
-                      />
-                      <StyledDynamicCurrencyContainer>
-                        <StyledNativeCurrency
-                          onClick={() => this.onToggleWithdrawalNative(true)}
-                          selected={this.props.showWithdrawalNative}
-                          disabled={
+                      <StyledInputContainer>
+                        <Input
+                          fetching={
                             this.props.fetchingRate &&
                             this.state.activeInput !== 'WITHDRAWAL'
                           }
+                          onFocus={() => this.onFocus('WITHDRAWAL')}
+                          onBlur={this.onBlur}
+                          monospace
+                          placeholder="0.0"
+                          label={lang.t('modal.withdrawal_input_label')}
+                          type="text"
+                          value={this.props.withdrawalInput}
+                          onChange={this.onChangeWithdrawalInput}
                         >
-                          {this.props.prices && this.props.prices.selected
-                            ? this.props.prices.selected.currency
-                            : 'USD'}
-                        </StyledNativeCurrency>
-                        <StyledDynamicCurrency
-                          onClick={() => this.onToggleWithdrawalNative(false)}
-                          selected={!this.props.showWithdrawalNative}
-                          disabled={
-                            this.props.fetchingRate &&
-                            this.state.activeInput !== 'WITHDRAWAL'
-                          }
-                        >
-                          {this.props.withdrawalSelected.symbol}
-                        </StyledDynamicCurrency>
-                      </StyledDynamicCurrencyContainer>
+                          <StyledDynamicCurrencyContainer>
+                            <StyledNativeCurrency
+                              onClick={() =>
+                                this.onToggleWithdrawalNative(true)
+                              }
+                              selected={this.props.showWithdrawalNative}
+                              disabled={
+                                this.props.fetchingRate &&
+                                this.state.activeInput !== 'WITHDRAWAL'
+                              }
+                            >
+                              {this.props.prices && this.props.prices.selected
+                                ? this.props.prices.selected.currency
+                                : 'USD'}
+                            </StyledNativeCurrency>
+                            <StyledDynamicCurrency
+                              onClick={() =>
+                                this.onToggleWithdrawalNative(false)
+                              }
+                              selected={!this.props.showWithdrawalNative}
+                              disabled={
+                                this.props.fetchingRate &&
+                                this.state.activeInput !== 'WITHDRAWAL'
+                              }
+                            >
+                              {this.props.withdrawalSelected.symbol}
+                            </StyledDynamicCurrency>
+                          </StyledDynamicCurrencyContainer>
+                        </Input>
+                      </StyledInputContainer>
                       <StyledHelperContainer>
                         <StyledHelperText
                           fetching={this.props.fetchingRate}
@@ -689,13 +763,13 @@ class ExchangeModal extends Component {
                       </StyledHelperContainer>
                     </StyledHelperWrapper>
                   </StyledFlex>
-                </StyledFlex>
+                </StyledConversionContainer>
 
                 <LineBreak />
 
                 <StyledBottomModal>
                   <StyledActions>
-                    <Button onClick={this.onClose}>
+                    <Button isModalButton onClick={this.onClose}>
                       {lang.t('button.cancel')}
                     </Button>
                     <StyledFees>
@@ -731,6 +805,7 @@ class ExchangeModal extends Component {
                     </StyledFees>
                     <Button
                       left
+                      isModalButton
                       color="brightGreen"
                       hoverColor="brightGreenHover"
                       activeColor="brightGreenHover"
@@ -765,9 +840,7 @@ class ExchangeModal extends Component {
                     }`}</StyledParagraph>
                   </StyledColumn>
                   <StyledFlex>
-                    <StyledExchangeIcon>
-                      <img src={exchangeIcon} alt="conversion" />
-                    </StyledExchangeIcon>
+                    <StyledExchangeIcon src={exchangeIcon} alt="conversion" />
                   </StyledFlex>
                   <StyledColumn>
                     <AssetIcon
@@ -838,13 +911,16 @@ class ExchangeModal extends Component {
           )
         ) : (
           <StyledBlockedMessage>
-            {lang.t('message.exchange_not_available')}.&nbsp;<a
+            {lang.t('message.exchange_not_available')}
+            .&nbsp;
+            <a
               href="http://pleaseprotectconsumers.org"
               target="_blank"
               rel="noopener noreferrer"
             >
               {lang.t('message.learn_more')}
-            </a>.
+            </a>
+            .
           </StyledBlockedMessage>
         )}
       </Card>

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import lang from '../languages';
+import { lang } from 'balance-common';
 import HelpSvg from '../assets/help.svg';
 import BaseLayout from '../layouts/base';
 import Card from '../components/Card';

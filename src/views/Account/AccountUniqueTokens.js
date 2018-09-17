@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import lang from '../../languages';
+import { lang } from 'balance-common';
 import Card from '../../components/Card';
 import Footer from '../../components/Footer';
 import UniqueToken from '../../components/UniqueToken';
@@ -22,6 +22,7 @@ const StyledContainer = styled.div`
 
 const StyledCard = styled(Card)`
   box-shadow: none;
+  padding: 0 16px;
 `;
 
 const StyledMessage = styled.div`

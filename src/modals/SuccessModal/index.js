@@ -1,5 +1,5 @@
 import React from 'react';
-import lang from '../../languages';
+import { lang } from 'balance-common';
 import Button from '../../components/Button';
 import arrowUp from '../../assets/arrow-up.svg';
 import {

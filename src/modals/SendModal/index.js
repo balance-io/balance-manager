@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import lang from '../../languages';
-
 import QRCodeReader from '../../components/QRCodeReader';
 import Card from '../../components/Card';
 import Input from '../../components/Input';
@@ -22,30 +20,12 @@ import qrIcon from '../../assets/qr-code-bnw.png';
 
 import { modalClose } from '../../reducers/_modal';
 import {
-  sendModalInit,
-  sendUpdateGasPrice,
-  sendTransaction,
-  sendClearFields,
-  sendUpdateRecipient,
-  sendUpdateNativeAmount,
-  sendUpdateAssetAmount,
-  sendUpdateSelected,
-  sendMaxBalance,
-  sendToggleConfirmationView,
-} from '../../reducers/_send';
-import { notificationShow } from '../../reducers/_notification';
-
-import { isValidAddress } from '../../helpers/validators';
-import {
-  convertAmountFromBigNumber,
-  greaterThan,
-} from '../../helpers/bignumber';
-
-import {
-  capitalize,
-  transactionData,
   calcTxFee,
-} from '../../helpers/utilities';
+  capitalize,
+  lang,
+  withSendComponentWithData,
+} from 'balance-common';
+import { web3SendTransactionMultiWallet } from '../../handlers/web3';
 
 import {
   StyledIcon,
@@ -53,187 +33,21 @@ import {
   StyledBottomModal,
   StyledParagraph,
   StyledAmountCurrency,
+  StyledInputContainer,
+  StyledConversionContainer,
+  StyledConversionIconContainer,
   StyledConversionIcon,
   StyledSubTitle,
   StyledActions,
   StyledInvalidAddress,
   StyledQRIcon,
   StyledMaxBalance,
+  StyledJustifyContent,
 } from '../modalStyles';
-
-const reduxProps = ({ modal, send, account }) => ({
-  fetching: send.fetching,
-  recipient: send.recipient,
-  nativeAmount: send.nativeAmount,
-  assetAmount: send.assetAmount,
-  txHash: send.txHash,
-  address: send.address,
-  selected: send.selected,
-  gasPrices: send.gasPrices,
-  gasPrice: send.gasPrice,
-  gasLimit: send.gasLimit,
-  gasPriceOption: send.gasPriceOption,
-  confirm: send.confirm,
-  accountInfo: account.accountInfo,
-  accountType: account.accountType,
-  network: account.network,
-  nativeCurrency: account.nativeCurrency,
-  prices: account.prices,
-});
 
 class SendModal extends Component {
   static propTypes = {
-    sendModalInit: PropTypes.func.isRequired,
-    sendUpdateGasPrice: PropTypes.func.isRequired,
-    sendTransaction: PropTypes.func.isRequired,
-    sendClearFields: PropTypes.func.isRequired,
-    sendUpdateRecipient: PropTypes.func.isRequired,
-    sendUpdateNativeAmount: PropTypes.func.isRequired,
-    sendUpdateAssetAmount: PropTypes.func.isRequired,
-    sendUpdateSelected: PropTypes.func.isRequired,
-    sendMaxBalance: PropTypes.func.isRequired,
-    sendToggleConfirmationView: PropTypes.func.isRequired,
-    notificationShow: PropTypes.func.isRequired,
     modalClose: PropTypes.func.isRequired,
-    fetching: PropTypes.bool.isRequired,
-    recipient: PropTypes.string.isRequired,
-    nativeAmount: PropTypes.string.isRequired,
-    assetAmount: PropTypes.string.isRequired,
-    txHash: PropTypes.string.isRequired,
-    // address: PropTypes.string.isRequired,
-    selected: PropTypes.object.isRequired,
-    gasPrice: PropTypes.object.isRequired,
-    gasPrices: PropTypes.object.isRequired,
-    gasLimit: PropTypes.number.isRequired,
-    gasPriceOption: PropTypes.string.isRequired,
-    confirm: PropTypes.bool.isRequired,
-    accountInfo: PropTypes.object.isRequired,
-    accountType: PropTypes.string.isRequired,
-    network: PropTypes.string.isRequired,
-    nativeCurrency: PropTypes.string.isRequired,
-    prices: PropTypes.object.isRequired,
-  };
-
-  state = {
-    isValidAddress: true,
-    showQRCodeReader: false,
-  };
-
-  componentDidMount() {
-    this.props.sendModalInit();
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.recipient.length >= 42) {
-      if (this.props.selected.symbol !== prevProps.selected.symbol) {
-        this.props.sendUpdateGasPrice();
-      } else if (this.props.recipient !== prevProps.recipient) {
-        this.props.sendUpdateGasPrice();
-      } else if (this.props.assetAmount !== prevProps.assetAmount) {
-        this.props.sendUpdateGasPrice();
-      }
-    }
-  }
-
-  onAddressInputFocus = () => this.setState({ isValidAddress: true });
-
-  onAddressInputBlur = () =>
-    this.setState({ isValidAddress: isValidAddress(this.props.recipient) });
-
-  onGoBack = () => this.props.sendToggleConfirmationView(false);
-
-  onSendMaxBalance = () => this.props.sendMaxBalance();
-
-  onSendAnother = () => {
-    this.props.sendToggleConfirmationView(false);
-    this.props.sendClearFields();
-    this.props.sendModalInit();
-  };
-
-  onSubmit = e => {
-    e.preventDefault();
-
-    if (!this.props.gasPrice.txFee) {
-      this.props.notificationShow(
-        lang.t('notification.error.generic_error'),
-        true,
-      );
-
-      return;
-    }
-
-    if (!this.props.confirm) {
-      if (!isValidAddress(this.props.recipient)) {
-        this.props.notificationShow(
-          lang.t('notification.error.invalid_address'),
-          true,
-        );
-
-        return;
-      } else if (this.props.selected.symbol === 'ETH') {
-        const { requestedAmount, balance, amountWithFees } = transactionData(
-          this.props.accountInfo,
-          this.props.assetAmount,
-          this.props.gasPrice,
-        );
-
-        if (greaterThan(requestedAmount, balance)) {
-          this.props.notificationShow(
-            lang.t('notification.error.insufficient_balance'),
-            true,
-          );
-
-          return;
-        } else if (greaterThan(amountWithFees, balance)) {
-          this.props.notificationShow(
-            lang.t('notification.error.insufficient_for_fees'),
-            true,
-          );
-
-          return;
-        }
-      } else {
-        const { requestedAmount, balance, txFee } = transactionData(
-          this.props.accountInfo,
-          this.props.assetAmount,
-          this.props.gasPrice,
-        );
-
-        const tokenBalanceAmount = this.props.selected.balance.amount;
-        const tokenBalance = convertAmountFromBigNumber(tokenBalanceAmount);
-
-        if (greaterThan(requestedAmount, tokenBalance)) {
-          this.props.notificationShow(
-            lang.t('notification.error.insufficient_balance'),
-            true,
-          );
-
-          return;
-        } else if (greaterThan(txFee, balance)) {
-          this.props.notificationShow(
-            lang.t('notification.error.insufficient_for_fees'),
-            true,
-          );
-
-          return;
-        }
-      }
-
-      this.props.sendTransaction({
-        address: this.props.accountInfo.address,
-        recipient: this.props.recipient,
-        amount: this.props.assetAmount,
-        asset: this.props.selected,
-        gasPrice: this.props.gasPrice,
-        gasLimit: this.props.gasLimit,
-      });
-    }
-
-    this.props.sendToggleConfirmationView(true);
-  };
-
-  updateGasPrice = gasPrice => {
-    this.props.sendUpdateGasPrice(gasPrice);
   };
 
   onClose = () => {
@@ -241,157 +55,116 @@ class SendModal extends Component {
     this.props.modalClose();
   };
 
-  updateGasPrice = gasPrice => {
-    this.props.sendUpdateGasPrice(gasPrice);
-  };
-
-  // QR Code Reader Handlers
-  toggleQRCodeReader = () =>
-    this.setState({ showQRCodeReader: !this.state.showQRCodeReader });
-
-  onQRCodeValidate = rawData => {
-    const data = rawData.match(/0x\w{40}/g)
-      ? rawData.match(/0x\w{40}/g)[0]
-      : null;
-    const result = data ? isValidAddress(data) : false;
-    const onError = () =>
-      this.props.notificationShow(
-        lang.t('notification.error.invalid_address_scanned'),
-        true,
-      );
-
-    return { data, result, onError };
-  };
-
-  onQRCodeScan = data => {
-    this.props.sendUpdateRecipient(data);
-    this.setState({ showQRCodeReader: false });
-  };
-
-  onQRCodeError = () => {
-    this.props.notificationShow(
-      lang.t('notification.error.failed_scanning_qr_code'),
-      true,
-    );
-  };
-
   render = () => {
-    const {
-      txHash,
-      confirm,
-      selected,
-      accountInfo,
-      sendUpdateSelected,
-      recipient,
-      sendUpdateRecipient,
-      assetAmount,
-      sendUpdateAssetAmount,
-      sendUpdateNativeAmount,
-      nativeAmount,
-      prices,
-      gasPrices,
-      gasPriceOption,
-      accountType,
-      nativeCurrency,
-      network,
-    } = this.props;
-
     return (
       <Card background="lightGrey">
-        {!txHash ? (
-          !confirm ? (
-            <Form onSubmit={this.onSubmit}>
-              <StyledSubTitle>
-                <StyledIcon color="grey" icon={arrowUp} />
-                {lang.t('modal.send_title', {
-                  walletName: capitalize(
-                    `${accountType}${lang.t('modal.default_wallet')}`,
-                  ),
-                })}
-              </StyledSubTitle>
-
+        {!this.props.txHash ? (
+          !this.props.confirm ? (
+            <Form onSubmit={this.props.onSubmit}>
+              <StyledJustifyContent>
+                <StyledSubTitle>
+                  <StyledIcon color="grey" icon={arrowUp} />
+                  {lang.t('modal.send_title', {
+                    walletName: capitalize(
+                      `${this.props.accountType}${lang.t(
+                        'modal.default_wallet',
+                      )}`,
+                    ),
+                  })}
+                </StyledSubTitle>
+              </StyledJustifyContent>
               <div>
                 <DropdownAsset
-                  selected={selected.symbol}
-                  assets={accountInfo.assets}
-                  onChange={value => sendUpdateSelected(value)}
+                  selected={this.props.selected.symbol}
+                  assets={this.props.accountInfo.assets}
+                  onChange={value => this.props.sendUpdateSelected(value)}
                 />
               </div>
 
               <StyledFlex>
-                <Input
-                  monospace
-                  label={lang.t('input.recipient_address')}
-                  spellCheck="false"
-                  placeholder="0x..."
-                  type="text"
-                  value={recipient}
-                  onFocus={this.onAddressInputFocus}
-                  onBlur={this.onAddressInputBlur}
-                  onChange={({ target }) => sendUpdateRecipient(target.value)}
-                />
-
-                {recipient &&
-                  !this.state.isValidAddress && (
-                    <StyledInvalidAddress>
-                      {lang.t('modal.invalid_address')}
-                    </StyledInvalidAddress>
-                  )}
-                <StyledQRIcon onClick={this.toggleQRCodeReader}>
-                  <img src={qrIcon} alt="recipient" />
-                </StyledQRIcon>
+                <StyledInputContainer>
+                  <Input
+                    monospace
+                    label={lang.t('input.recipient_address')}
+                    spellCheck="false"
+                    placeholder="0x..."
+                    type="text"
+                    value={this.props.recipient}
+                    onFocus={this.props.onAddressInputFocus}
+                    onBlur={this.props.onAddressInputBlur}
+                    onChange={({ target }) =>
+                      this.props.sendUpdateRecipient(target.value)
+                    }
+                  >
+                    {this.props.recipient &&
+                      !this.props.isValidAddress && (
+                        <StyledInvalidAddress>
+                          {lang.t('modal.invalid_address')}
+                        </StyledInvalidAddress>
+                      )}
+                    <StyledQRIcon onClick={this.props.toggleQRCodeReader}>
+                      <img src={qrIcon} alt="recipient" />
+                    </StyledQRIcon>
+                  </Input>
+                </StyledInputContainer>
               </StyledFlex>
 
-              <StyledFlex>
-                <StyledFlex>
+              <StyledConversionContainer>
+                <StyledInputContainer>
                   <Input
                     monospace
                     label={lang.t('input.asset_amount')}
                     placeholder="0.0"
                     type="text"
-                    value={assetAmount}
+                    value={this.props.assetAmount}
                     onChange={({ target }) =>
-                      sendUpdateAssetAmount(target.value)
+                      this.props.sendUpdateAssetAmount(target.value)
                     }
-                  />
-
-                  <StyledMaxBalance onClick={this.onSendMaxBalance}>
+                  >
+                    <StyledAmountCurrency>
+                      {this.props.selected.symbol}
+                    </StyledAmountCurrency>
+                  </Input>
+                  <StyledMaxBalance onClick={this.props.onSendMaxBalance}>
                     {lang.t('modal.send_max')}
                   </StyledMaxBalance>
+                </StyledInputContainer>
 
-                  <StyledAmountCurrency>{selected.symbol}</StyledAmountCurrency>
-                </StyledFlex>
+                <StyledConversionIconContainer>
+                  <StyledConversionIcon src={convertIcon} alt="≈" />
+                </StyledConversionIconContainer>
 
-                <StyledFlex>
-                  <StyledConversionIcon>
-                    <img src={convertIcon} alt="≈" />
-                  </StyledConversionIcon>
-                </StyledFlex>
-
-                <StyledFlex>
+                <StyledInputContainer>
                   <Input
                     monospace
                     placeholder="0.0"
                     type="text"
-                    value={nativeAmount}
+                    value={this.props.nativeAmount}
                     disabled={
-                      !prices[nativeCurrency] ||
-                      !prices[nativeCurrency][selected.symbol]
+                      !this.props.prices[this.props.nativeCurrency] ||
+                      !this.props.prices[this.props.nativeCurrency][
+                        this.props.selected.symbol
+                      ]
                     }
                     onChange={({ target }) =>
-                      sendUpdateNativeAmount(target.value)
+                      this.props.sendUpdateNativeAmount(target.value)
                     }
-                  />
-                  <StyledAmountCurrency disabled={!prices[selected.symbol]}>
-                    {prices && prices.selected ? prices.selected.currency : ''}
-                  </StyledAmountCurrency>
-                </StyledFlex>
-              </StyledFlex>
+                  >
+                    <StyledAmountCurrency
+                      disabled={!this.props.prices[this.props.selected.symbol]}
+                    >
+                      {this.props.prices &&
+                        this.props.prices.selected &&
+                        this.props.prices.selected.currency}
+                    </StyledAmountCurrency>
+                  </Input>
+                </StyledInputContainer>
+              </StyledConversionContainer>
 
               <GasPanel
-                gasPriceOption={gasPriceOption}
-                gasPrices={gasPrices}
-                updateGasPrice={this.updateGasPrice}
+                gasPriceOption={this.props.gasPriceOption}
+                gasPrices={this.props.gasPrices}
+                updateGasPrice={this.props.updateGasPrice}
               />
 
               <LineBreak noMargin />
@@ -412,38 +185,40 @@ class SendModal extends Component {
 
                   <Button
                     left
+                    isModalButton
                     color="blue"
                     icon={arrowUp}
                     disabled={
-                      recipient.length !== 42 ||
-                      (selected.symbol !== 'ETH' && !Number(assetAmount))
+                      this.props.recipient.length !== 42 ||
+                      (this.props.selected.symbol !== 'ETH' &&
+                        !Number(this.props.assetAmount))
                     }
                     type="submit"
                   >
-                    {lang.t('button.send')}
+                    <span>{lang.t('button.send')}</span>
                   </Button>
                 </StyledActions>
               </StyledBottomModal>
 
-              {this.state.showQRCodeReader && (
+              {this.props.showQRCodeReader && (
                 <QRCodeReader
-                  onValidate={this.onQRCodeValidate}
-                  onScan={this.onQRCodeScan}
-                  onError={this.onQRCodeError}
-                  onClose={this.toggleQRCodeReader}
+                  onValidate={this.props.onQRCodeValidate}
+                  onScan={this.props.onQRCodeScan}
+                  onError={this.props.onQRCodeError}
+                  onClose={this.props.toggleQRCodeReader}
                 />
               )}
             </Form>
           ) : (
             <ApproveTransactionModal
-              accountType={accountType}
+              accountType={this.props.accountType}
               onClose={this.onClose}
             />
           )
         ) : (
           <SuccessModal
-            txHash={txHash}
-            network={network}
+            txHash={this.props.txHash}
+            network={this.props.network}
             onClose={this.onClose}
           />
         )}
@@ -453,19 +228,6 @@ class SendModal extends Component {
 }
 
 export default connect(
-  reduxProps,
-  {
-    modalClose,
-    sendModalInit,
-    sendUpdateGasPrice,
-    sendTransaction,
-    sendClearFields,
-    sendUpdateRecipient,
-    sendUpdateNativeAmount,
-    sendUpdateAssetAmount,
-    sendUpdateSelected,
-    sendMaxBalance,
-    sendToggleConfirmationView,
-    notificationShow,
-  },
-)(SendModal);
+  () => ({}),
+  { modalClose },
+)(withSendComponentWithData(SendModal, web3SendTransactionMultiWallet));

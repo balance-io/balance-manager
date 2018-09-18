@@ -16,6 +16,7 @@ const StyledTextButton = styled.button`
   margin: 5px;
   cursor: pointer;
   will-change: transform;
+  line-height: normal;
 
   @media (hover: hover) {
     &:hover {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { lang } from 'balance-common';
+import { accountInitializeState, lang } from 'balance-common';
 import Link from '../components/Link';
 import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
@@ -300,6 +300,10 @@ const OperaLogoImage = ChromeLogoImage.extend`
 const OperaLogoText = BraveLogoText.extend``;
 
 class Home extends Component {
+  componentDidMount = () => {
+    this.props.accountInitializeState();
+  };
+
   onWalletConnectInit = () => {
     this.props
       .walletConnectHasValidSession()
@@ -589,6 +593,7 @@ class Home extends Component {
 }
 
 Home.propTypes = {
+  accountInitializeState: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired,
   walletConnectHasValidSession: PropTypes.func.isRequired,
 };
@@ -596,6 +601,7 @@ Home.propTypes = {
 export default connect(
   null,
   {
+    accountInitializeState,
     modalOpen,
     walletConnectHasValidSession,
   },

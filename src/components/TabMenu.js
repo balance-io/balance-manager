@@ -157,7 +157,7 @@ const StyledTab = styled(Button)`
     background-color: ${({ active }) =>
       active
         ? `rgb(${colors.blue})`
-        : `rgb(${colors.purpleTextTransparent})`} !important;
+        : `rgba(${colors.purpleTextTransparent})`} !important;
 
     @media screen and (max-width: ${smBreakpoint}) {
       display: block !important;

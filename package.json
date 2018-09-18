@@ -1,7 +1,7 @@
 {
   "name": "balance-manager",
   "description": "Ethereum Wallet Manager Interface for MetaMask, Ledger, Trezor and WalletConnect",
-  "version": "0.5.4",
+  "version": "0.7.2",
   "author": "Pedro Gomes <pedro@balance.io>",
   "license": "GPL-3",
   "homepage": "https://manager.balance.io",
@@ -17,7 +17,7 @@
     "@ledgerhq/hw-app-eth": "^4.7.3",
     "@ledgerhq/hw-transport-u2f": "^4.7.3",
     "axios": "^0.18.0",
-    "balance-common": "^0.3.6",
+    "balance-common": "0.4.5",
     "bignumber.js": "^7.0.1",
     "bowser": "^2.0.0-alpha.4",
     "ethereumjs-tx": "^1.3.4",

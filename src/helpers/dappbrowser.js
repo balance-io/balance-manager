@@ -2,19 +2,28 @@ import trustWalletLogoImage from '../assets/trustwallet-logo.svg';
 import statusWalletLogoImage from '../assets/statuswallet-logo.svg';
 import ethImage from '../assets/eth.svg';
 
-export const isDappBrowser = () => {
+const isDappBrowser = () => {
   return typeof window.web3 !== 'undefined';
 };
 
-export const isTrust = () => {
+const detectDappBrowser = () => {
+  let result = defaultWallet;
+
+  if (isTrust()) result = trustWallet;
+  else if (isStatus()) result = statusWallet;
+
+  return result;
+};
+
+const isTrust = () => {
   return isDappBrowser() && window.web3.currentProvider.isTrust;
 };
 
-export const isStatus = () => {
+const isStatus = () => {
   return isDappBrowser() && window.web3.currentProvider.isStatus;
 };
 
-export const trustWallet = {
+const trustWallet = {
   image: trustWalletLogoImage,
   imageAlt: 'Trust Wallet Logo',
   descriptionPartOne: 'homepage.connect_trustwallet.description_part_one',
@@ -32,7 +41,7 @@ export const trustWallet = {
   buttonText: 'homepage.connect_trustwallet.button',
 };
 
-export const statusWallet = {
+const statusWallet = {
   image: statusWalletLogoImage,
   imageAlt: 'Status Wallet Logo',
   descriptionPartOne: 'Use the Status Ethereum dapp browser app to connect',
@@ -50,7 +59,7 @@ export const statusWallet = {
   buttonText: 'Connect to Status',
 };
 
-export const defaultWallet = {
+const defaultWallet = {
   image: ethImage,
   imageAlt: 'Ethereum Logo',
   descriptionPartOne: 'Connect with your current dapp browser',
@@ -67,3 +76,5 @@ export const defaultWallet = {
   activeColor: 'ledger',
   buttonText: 'Connect to dapp browser',
 };
+
+export { isDappBrowser, detectDappBrowser };

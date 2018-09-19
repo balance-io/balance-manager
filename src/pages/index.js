@@ -25,14 +25,7 @@ import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
 
 import { isMobile, isValidBrowser } from '../helpers/device';
-import {
-  isDappBrowser,
-  isStatus,
-  isTrust,
-  trustWallet,
-  statusWallet,
-  defaultWallet,
-} from '../helpers/dappbrowser';
+import { isDappBrowser, detectDappBrowser } from '../helpers/dappbrowser';
 
 const StyledCard = styled(Card)`
   background: #f5f6fa;
@@ -332,13 +325,7 @@ class Home extends Component {
   detectedDappBrowser = () => {
     if (!isDappBrowser()) return;
 
-    let wallet = defaultWallet;
-
-    if (isTrust()) {
-      wallet = trustWallet;
-    } else if (isStatus()) {
-      wallet = statusWallet;
-    }
+    let wallet = detectDappBrowser();
 
     return (
       <StyledCard padding={`14px 0`}>

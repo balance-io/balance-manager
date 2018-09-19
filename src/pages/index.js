@@ -25,6 +25,14 @@ import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
 
 import { isMobile, isValidBrowser } from '../helpers/device';
+import {
+  isDappBrowser,
+  isStatus,
+  isTrust,
+  trustWallet,
+  statusWallet,
+  defaultWallet,
+} from '../helpers/dappbrowser';
 
 const StyledCard = styled(Card)`
   background: #f5f6fa;
@@ -230,9 +238,10 @@ const TrustWalletLink = styled(Link)`
   width: 100%;
 `;
 
-const TrustWalletLogo = styled.img`
+const WalletLogo = styled.img`
   border-radius: 8px;
   width: 52px;
+  max-height: 52px;
 `;
 
 const WalletConnectLogo = styled.div`
@@ -319,55 +328,63 @@ class Home extends Component {
         this.props.modalOpen('WALLET_CONNECT', null);
       });
   };
+
+  detectedDappBrowser = () => {
+    if (!isDappBrowser()) return;
+
+    let wallet = defaultWallet;
+
+    if (isTrust()) {
+      wallet = trustWallet;
+    } else if (isStatus()) {
+      wallet = statusWallet;
+    }
+
+    return (
+      <StyledCard padding={`14px 0`}>
+        <CardContainerMobile>
+          <LogoSectionMobile>
+            <WalletLogo src={wallet.image} alt={wallet.imageAlt} />
+            <LogoText isAlwaysVisible>
+              {lang.t(wallet.descriptionPartOne)}
+              <LedgerAffiliateLink
+                href={wallet.link}
+                target="_blank"
+                title={lang.t(wallet.linkTitle)}
+              >
+                {lang.t(wallet.linkText)}
+              </LedgerAffiliateLink>
+              {lang.t(wallet.descriptionPartTwo)}
+              <LedgerAffiliateLink
+                href={wallet.linkBrowser}
+                target="_blank"
+                title={lang.t(wallet.linkTitleBrowser)}
+              >
+                {lang.t(wallet.linkTextBrowser)}
+              </LedgerAffiliateLink>
+              {lang.t(wallet.descriptionPartThree)}
+            </LogoText>
+          </LogoSectionMobile>
+          <TrustWalletLink to="/metamask">
+            <ConnectButton
+              color={wallet.color}
+              hoverColor={wallet.hoverColor}
+              activeColor={wallet.activeColor}
+              width={`100%`}
+            >
+              {lang.t(wallet.buttonText)}
+            </ConnectButton>
+          </TrustWalletLink>
+        </CardContainerMobile>
+      </StyledCard>
+    );
+  };
+
   render = () => (
     <BaseLayout>
       {isMobile() ? (
         <ContentContainer>
-          <StyledCard padding={`14px 0`}>
-            <CardContainerMobile>
-              <LogoSectionMobile>
-                <TrustWalletLogo
-                  src={trustWalletLogoImage}
-                  alt="Trust Wallet Logo"
-                />
-                <LogoText isAlwaysVisible>
-                  {lang.t('homepage.connect_trustwallet.description_part_one')}
-                  <LedgerAffiliateLink
-                    href="https://trustwalletapp.com/"
-                    target="_blank"
-                    title={lang.t(
-                      'homepage.connect_trustwallet.link_title_wallet',
-                    )}
-                  >
-                    {lang.t('homepage.connect_trustwallet.link_text_wallet')}
-                  </LedgerAffiliateLink>
-                  {lang.t('homepage.connect_trustwallet.description_part_two')}
-                  <LedgerAffiliateLink
-                    href="https://trustwalletapp.com/features/trust-browser"
-                    target="_blank"
-                    title={lang.t(
-                      'homepage.connect_trustwallet.link_title_browser',
-                    )}
-                  >
-                    {lang.t('homepage.connect_trustwallet.link_text_browser')}
-                  </LedgerAffiliateLink>
-                  {lang.t(
-                    'homepage.connect_trustwallet.description_part_three',
-                  )}
-                </LogoText>
-              </LogoSectionMobile>
-              <TrustWalletLink to="/metamask">
-                <ConnectButton
-                  color="trustwallet"
-                  hoverColor="trustwalletHover"
-                  activeColor="trustwalletActive"
-                  width={`100%`}
-                >
-                  {lang.t('homepage.connect_trustwallet.button')}
-                </ConnectButton>
-              </TrustWalletLink>
-            </CardContainerMobile>
-          </StyledCard>
+          {this.detectedDappBrowser()}
           <StyledCard padding={`14px 0`}>
             <CardContainerMobile>
               <LogoSectionMobile>

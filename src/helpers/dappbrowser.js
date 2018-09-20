@@ -39,6 +39,9 @@ const trustWallet = {
   hoverColor: 'trustwalletHover',
   activeColor: 'trustwalletActive',
   buttonText: 'homepage.connect_trustwallet.button',
+  downloadLink:
+    'https://itunes.apple.com/us/app/trust-ethereum-wallet/id1288339409',
+  downloadButtonText: 'Download Trust Wallet',
 };
 
 const statusWallet = {
@@ -77,4 +80,4 @@ const defaultWallet = {
   buttonText: 'Connect to dapp browser',
 };
 
-export { isDappBrowser, detectDappBrowser };
+export { isDappBrowser, detectDappBrowser, trustWallet };

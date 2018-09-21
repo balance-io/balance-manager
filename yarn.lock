@@ -1209,9 +1209,9 @@ babylon@^6.17.0, babylon@^6.18.0:
   version "6.18.0"
   resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.18.0.tgz#af2f3b88fa6f5c1e4c634d1a0f8eac4f55b395e3"
 
-balance-common@0.4.6:
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/balance-common/-/balance-common-0.4.6.tgz#a060700a721c128a358265852980fa2b4851d30f"
+balance-common@^0.4.7:
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/balance-common/-/balance-common-0.4.7.tgz#d9c29872123e426e3e975a1e0cec22a504b6fc45"
   dependencies:
     axios "^0.18.0"
     bignumber.js "^7.0.1"

@@ -8,6 +8,15 @@ import Root from './Root';
 import Storage from '@devshack/react-native-storage';
 import { commonStorage, lang, resources } from 'balance-common';
 
+const storage = new Storage({
+  size: 1000,
+  storageBackend: window.localStorage,
+  defaultExpires: null,
+  enableCache: true,
+});
+
+window.storage = storage;
+
 // Languages (i18n)
 lang.init({
   lng: 'en',
@@ -20,7 +29,7 @@ commonStorage
   .getLanguage()
   .then(language => {
     lang.init({
-      lng: language || 'en',
+      lng: language,
       fallbackLng: 'en',
       debug: process.env.NODE_ENV === 'development',
       resources,
@@ -34,15 +43,6 @@ commonStorage
       resources,
     });
   });
-
-const storage = new Storage({
-  size: 1000,
-  storageBackend: window.localStorage,
-  defaultExpires: null,
-  enableCache: true,
-});
-
-window.storage = storage;
 
 // eslint-disable-next-line
 injectGlobal`${globalStyles}`;

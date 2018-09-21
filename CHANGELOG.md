@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
+## [0.7.3](https://github.com/balance-io/balance-manager/releases/tag/0.7.3)
+
+### Changed
+* Log out button fix
+* Language and currency selection fix
+* Stylistic fixes
+
 ## [0.7.2](https://github.com/balance-io/balance-manager/releases/tag/0.7.2)
 
 ### Added

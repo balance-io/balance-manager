@@ -1162,7 +1162,7 @@ babylon@^6.17.0, babylon@^6.18.0:
   version "6.18.0"
   resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.18.0.tgz#af2f3b88fa6f5c1e4c634d1a0f8eac4f55b395e3"
 
-balance-common@^0.5.3:
+balance-common@^0.5.4:
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/balance-common/-/balance-common-0.5.4.tgz#e21d984aa4db2adc504f393272cfe29babee2403"
   dependencies:
@@ -4890,9 +4890,9 @@ js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
 
-js-walletconnect-core@^0.6.26:
-  version "0.6.26"
-  resolved "https://registry.yarnpkg.com/js-walletconnect-core/-/js-walletconnect-core-0.6.26.tgz#37c9548c7a788f948c1747637f8e008f8801705a"
+js-walletconnect-core@^0.6.27:
+  version "0.6.27"
+  resolved "https://registry.yarnpkg.com/js-walletconnect-core/-/js-walletconnect-core-0.6.27.tgz#7f0b862376d10a98784bbe5dc653df1e50c53ca9"
   dependencies:
     eth-parse-uri "^0.6.7"
 
@@ -8411,11 +8411,11 @@ walker@~1.0.5:
   dependencies:
     makeerror "1.0.x"
 
-walletconnect@^0.6.26:
-  version "0.6.26"
-  resolved "https://registry.yarnpkg.com/walletconnect/-/walletconnect-0.6.26.tgz#6ee379535cf79f7bcb6ee17a190eb5cb668e7854"
+walletconnect@^0.6.27:
+  version "0.6.27"
+  resolved "https://registry.yarnpkg.com/walletconnect/-/walletconnect-0.6.27.tgz#c888772a951eaeace2fa289d7a80e1177e2557d8"
   dependencies:
-    js-walletconnect-core "^0.6.26"
+    js-walletconnect-core "^0.6.27"
 
 warning@^3.0.0:
   version "3.0.0"

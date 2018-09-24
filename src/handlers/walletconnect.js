@@ -20,12 +20,10 @@ const walletConnectListenTransactionStatus = async (
   webConnector,
   transactionId,
 ) => {
-  return new Promise((resolve, reject) => {
-    webConnector.listenTransactionStatus(transactionId, (err, data) => {
-      if (err) reject(err);
-      resolve(data);
-    });
-  });
+  const transactionStatus = await webConnector.listenTransactionStatus(
+    transactionId,
+  );
+  return transactionStatus;
 };
 
 /**

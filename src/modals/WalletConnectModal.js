@@ -60,7 +60,12 @@ class WalletConnectModal extends Component {
             )}
           </StyledQRCodeWrapper>
           <StyledCenter>
-            <Button color="walletconnect" onClick={this.onClose}>
+            <Button
+              color="walletconnect"
+              hoverColor="walletconnectHover"
+              activeColor="walletconnectActive"
+              onClick={this.onClose}
+            >
               {lang.t('button.close')}
             </Button>
           </StyledCenter>

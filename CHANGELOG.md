@@ -10,9 +10,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ### Added
 
 ### Changed
-* Use of balance-common shared library for features common in Wallet as well as Manager
 
 ### Removed
+
+## [0.7.3](https://github.com/balance-io/balance-manager/releases/tag/0.7.3)
+
+### Changed
+* Log out button fix
+* Language and currency selection fix
+* Stylistic fixes
+
+## [0.7.2](https://github.com/balance-io/balance-manager/releases/tag/0.7.2)
+
+### Added
+* New copy on home page of Manager
+
+### Changed
+* Use of balance-common shared library for features common in Wallet as well as Manager
+* Improved responsiveness
 
 ## [0.7.1](https://github.com/balance-io/balance-manager/releases/tag/0.7.1)
 
@@ -81,7 +96,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 
 ### Changed
-
 * Layout padding definition locations
 * Fix mobile layout on the wallet selection screen (#232)
 * Update spanish translation with consistent voice (tu vs usted)

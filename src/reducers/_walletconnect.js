@@ -70,8 +70,9 @@ export const walletConnectListenForSession = webConnector => (
   dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
   webConnector
     .listenSessionStatus()
-    .then(data => {
-      const accountAddress = data ? data.data[0].toLowerCase() : null;
+    .then(sessionStatus => {
+      const { accounts } = sessionStatus;
+      const accountAddress = accounts ? accounts[0].toLowerCase() : null;
       dispatch({
         type: WALLET_CONNECT_GET_SESSION_SUCCESS,
         payload: accountAddress,

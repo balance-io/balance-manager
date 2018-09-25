@@ -11,7 +11,6 @@ import metamaskLogoImage from '../assets/metamask-logo.png';
 import ledgerLogoImage from '../assets/ledger-logo.svg';
 import walletConnectLogoImage from '../assets/walletconnect-logo-and-type.svg';
 import trezorLogoImage from '../assets/trezor-logo.svg';
-import trustWalletLogoImage from '../assets/trustwallet-logo.svg';
 import braveLogoImage from '../assets/brave-logo.svg';
 import braveLogoText from '../assets/brave-text.svg';
 import chromeLogoImage from '../assets/chrome-logo.svg';
@@ -25,6 +24,11 @@ import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
 
 import { isMobile, isValidBrowser } from '../helpers/device';
+import {
+  isDappBrowser,
+  detectDappBrowser,
+  trustWallet,
+} from '../helpers/dappbrowser';
 
 const StyledCard = styled(Card)`
   background: #f5f6fa;
@@ -230,9 +234,16 @@ const TrustWalletLink = styled(Link)`
   width: 100%;
 `;
 
-const TrustWalletLogo = styled.img`
+const TrustWalletDownloadLink = styled.a`
+  margin: 0 auto;
+  max-width: 315px;
+  width: 100%;
+`;
+
+const WalletLogo = styled.img`
   border-radius: 8px;
   width: 52px;
+  max-height: 52px;
 `;
 
 const WalletConnectLogo = styled.div`
@@ -319,84 +330,132 @@ class Home extends Component {
         this.props.modalOpen('WALLET_CONNECT', null);
       });
   };
+
+  detectedDappBrowser = () => {
+    if (!isDappBrowser())
+      return (
+        <StyledCard padding={`14px 0`}>
+          <CardContainerMobile>
+            <LogoSectionMobile>
+              <WalletLogo src={trustWallet.image} alt={trustWallet.imageAlt} />
+              <LogoText isAlwaysVisible>
+                {lang.t(trustWallet.descriptionPartOne)}
+                <LedgerAffiliateLink
+                  href={trustWallet.linkWallet}
+                  target="_blank"
+                  title={lang.t(trustWallet.linkTitleWallet)}
+                >
+                  {lang.t(trustWallet.linkTextWallet)}
+                </LedgerAffiliateLink>
+                {lang.t(trustWallet.descriptionPartTwo)}
+                <LedgerAffiliateLink
+                  href={trustWallet.linkBrowser}
+                  target="_blank"
+                  title={lang.t(trustWallet.linkTitleBrowser)}
+                >
+                  {lang.t(trustWallet.linkTextBrowser)}
+                </LedgerAffiliateLink>
+                {lang.t(trustWallet.descriptionPartThree)}
+              </LogoText>
+            </LogoSectionMobile>
+            <TrustWalletDownloadLink href={trustWallet.downloadLink}>
+              <ConnectButton
+                color={trustWallet.color}
+                hoverColor={trustWallet.hoverColor}
+                activeColor={trustWallet.activeColor}
+                width={`100%`}
+              >
+                {lang.t(trustWallet.downloadButtonText)}
+              </ConnectButton>
+            </TrustWalletDownloadLink>
+          </CardContainerMobile>
+        </StyledCard>
+      );
+
+    let wallet = detectDappBrowser();
+
+    return (
+      <StyledCard padding={`14px 0`}>
+        <CardContainerMobile>
+          <LogoSectionMobile>
+            <WalletLogo src={wallet.image} alt={wallet.imageAlt} />
+            <LogoText isAlwaysVisible>
+              {lang.t(wallet.descriptionPartOne)}
+              <LedgerAffiliateLink
+                href={wallet.linkWallet}
+                target="_blank"
+                title={lang.t(wallet.linkTitleWallet)}
+              >
+                {lang.t(wallet.linkTextWallet)}
+              </LedgerAffiliateLink>
+              {lang.t(wallet.descriptionPartTwo)}
+              <LedgerAffiliateLink
+                href={wallet.linkBrowser}
+                target="_blank"
+                title={lang.t(wallet.linkTitleBrowser)}
+              >
+                {lang.t(wallet.linkTextBrowser)}
+              </LedgerAffiliateLink>
+              {lang.t(wallet.descriptionPartThree)}
+            </LogoText>
+          </LogoSectionMobile>
+          <TrustWalletLink to="/metamask">
+            <ConnectButton
+              color={wallet.color}
+              hoverColor={wallet.hoverColor}
+              activeColor={wallet.activeColor}
+              width={`100%`}
+            >
+              {lang.t(wallet.buttonText)}
+            </ConnectButton>
+          </TrustWalletLink>
+        </CardContainerMobile>
+      </StyledCard>
+    );
+  };
+
+  showWalletConnect = () => {
+    if (isDappBrowser()) return;
+
+    return (
+      <StyledCard padding={`14px 0`}>
+        <CardContainerMobile>
+          <LogoSectionMobile>
+            <WalletConnectLogo />
+            <LogoText isAlwaysVisible>
+              {lang.t('homepage.connect_walletconnect.description_mobile')}
+              <LedgerAffiliateLink
+                href="https://walletconnect.org/"
+                target="_blank"
+                title={lang.t(
+                  'homepage.connect_walletconnect.link_title_mobile',
+                )}
+              >
+                {lang.t('homepage.connect_walletconnect.link_text_mobile')}
+              </LedgerAffiliateLink>
+              .
+            </LogoText>
+          </LogoSectionMobile>
+          <WalletConnectButton
+            color="walletconnect"
+            hoverColor="walletconnectHover"
+            activeColor="walletconnectActive"
+            onClick={this.onWalletConnectInit}
+            width={`100%`}
+          >
+            {lang.t('homepage.connect_walletconnect.button_mobile')}
+          </WalletConnectButton>
+        </CardContainerMobile>
+      </StyledCard>
+    );
+  };
+
   render = () => (
     <BaseLayout>
       {isMobile() ? (
         <ContentContainer>
-          <StyledCard padding={`14px 0`}>
-            <CardContainerMobile>
-              <LogoSectionMobile>
-                <TrustWalletLogo
-                  src={trustWalletLogoImage}
-                  alt="Trust Wallet Logo"
-                />
-                <LogoText isAlwaysVisible>
-                  {lang.t('homepage.connect_trustwallet.description_part_one')}
-                  <LedgerAffiliateLink
-                    href="https://trustwalletapp.com/"
-                    target="_blank"
-                    title={lang.t(
-                      'homepage.connect_trustwallet.link_title_wallet',
-                    )}
-                  >
-                    {lang.t('homepage.connect_trustwallet.link_text_wallet')}
-                  </LedgerAffiliateLink>
-                  {lang.t('homepage.connect_trustwallet.description_part_two')}
-                  <LedgerAffiliateLink
-                    href="https://trustwalletapp.com/features/trust-browser"
-                    target="_blank"
-                    title={lang.t(
-                      'homepage.connect_trustwallet.link_title_browser',
-                    )}
-                  >
-                    {lang.t('homepage.connect_trustwallet.link_text_browser')}
-                  </LedgerAffiliateLink>
-                  {lang.t(
-                    'homepage.connect_trustwallet.description_part_three',
-                  )}
-                </LogoText>
-              </LogoSectionMobile>
-              <TrustWalletLink to="/metamask">
-                <ConnectButton
-                  color="trustwallet"
-                  hoverColor="trustwalletHover"
-                  activeColor="trustwalletActive"
-                  width={`100%`}
-                >
-                  {lang.t('homepage.connect_trustwallet.button')}
-                </ConnectButton>
-              </TrustWalletLink>
-            </CardContainerMobile>
-          </StyledCard>
-          <StyledCard padding={`14px 0`}>
-            <CardContainerMobile>
-              <LogoSectionMobile>
-                <WalletConnectLogo />
-                <LogoText isAlwaysVisible>
-                  {lang.t('homepage.connect_walletconnect.description_mobile')}
-                  <LedgerAffiliateLink
-                    href="https://walletconnect.org/"
-                    target="_blank"
-                    title={lang.t(
-                      'homepage.connect_walletconnect.link_title_mobile',
-                    )}
-                  >
-                    {lang.t('homepage.connect_walletconnect.link_text_mobile')}
-                  </LedgerAffiliateLink>
-                  .
-                </LogoText>
-              </LogoSectionMobile>
-              <WalletConnectButton
-                color="walletconnect"
-                hoverColor="walletconnectHover"
-                activeColor="walletconnectActive"
-                onClick={this.onWalletConnectInit}
-                width={`100%`}
-              >
-                {lang.t('homepage.connect_walletconnect.button_mobile')}
-              </WalletConnectButton>
-            </CardContainerMobile>
-          </StyledCard>
+          {this.detectedDappBrowser()}
+          {this.showWalletConnect()}
           <CardContainerMobile>
             <ReassuranceExplanation textAlign="left">
               {lang.t('homepage.reassurance.text_mobile')}

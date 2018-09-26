@@ -585,6 +585,7 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
     gasPrice,
     gasLimit,
   } = getState().exchange;
+  console.log('send txn dep', depositAmount);
   dispatch({ type: EXCHANGE_TRANSACTION_REQUEST });
   const { accountType } = getState().account;
   const txDetails = {
@@ -654,6 +655,7 @@ export const exchangeConfirmTransaction = request => (dispatch, getState) => {
     depositSelected,
     withdrawalSelected,
   } = getState().exchange;
+  console.log('deposit amount', depositAmount);
   let request = {
     address,
     depositSymbol: depositSelected.symbol,
@@ -672,6 +674,7 @@ export const exchangeConfirmTransaction = request => (dispatch, getState) => {
         const recipient = exchangeDetails.deposit;
         const withdrawalAmount = exchangeDetails.withdrawalAmount;
         const depositAmount = exchangeDetails.depositAmount;
+        console.log('shapeshift send amount dep', depositAmount);
         dispatch({
           type: EXCHANGE_CONFIRM_TRANSACTION_SUCCESS,
           payload: {

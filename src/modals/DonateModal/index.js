@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { lang } from 'balance-common';
-
 import Card from '../../components/Card';
 import Input from '../../components/Input';
 import LineBreak from '../../components/LineBreak';
@@ -19,16 +17,6 @@ import convertIcon from '../../assets/convert-icon.svg';
 import arrowUp from '../../assets/arrow-up.svg';
 
 import { modalClose } from '../../reducers/_modal';
-import {
-  sendModalInit,
-  sendUpdateGasPrice,
-  sendTransaction,
-  sendClearFields,
-  sendUpdateRecipient,
-  sendUpdateNativeAmount,
-  sendUpdateAssetAmount,
-  sendToggleConfirmationView,
-} from 'balance-common';
 import { web3SendTransactionMultiWallet } from '../../handlers/web3';
 import { notificationShow } from '../../reducers/_notification';
 
@@ -36,8 +24,10 @@ import {
   capitalize,
   getEth,
   greaterThan,
+  lang,
   transactionData,
   calcTxFee,
+  withSendComponentWithData,
 } from 'balance-common';
 
 import {
@@ -76,89 +66,8 @@ const reduxProps = ({ modal, send, account }) => ({
 
 class DonateModal extends Component {
   static propTypes = {
-    sendModalInit: PropTypes.func.isRequired,
-    sendUpdateGasPrice: PropTypes.func.isRequired,
-    sendTransaction: PropTypes.func.isRequired,
-    sendClearFields: PropTypes.func.isRequired,
-    sendUpdateRecipient: PropTypes.func.isRequired,
-    sendUpdateNativeAmount: PropTypes.func.isRequired,
-    sendUpdateAssetAmount: PropTypes.func.isRequired,
-    sendToggleConfirmationView: PropTypes.func.isRequired,
     notificationShow: PropTypes.func.isRequired,
     modalClose: PropTypes.func.isRequired,
-    recipient: PropTypes.string.isRequired,
-    nativeAmount: PropTypes.string.isRequired,
-    assetAmount: PropTypes.string.isRequired,
-    txHash: PropTypes.string.isRequired,
-    address: PropTypes.string.isRequired,
-    selected: PropTypes.object.isRequired,
-    gasPrice: PropTypes.object.isRequired,
-    gasPrices: PropTypes.object.isRequired,
-    gasLimit: PropTypes.number.isRequired,
-    gasPriceOption: PropTypes.string.isRequired,
-    confirm: PropTypes.bool.isRequired,
-    accountInfo: PropTypes.object.isRequired,
-    accountType: PropTypes.string.isRequired,
-    network: PropTypes.string.isRequired,
-    nativeCurrency: PropTypes.string.isRequired,
-    prices: PropTypes.object.isRequired,
-  };
-
-  componentDidMount() {
-    this.props.sendModalInit();
-  }
-
-  onSubmit = e => {
-    e.preventDefault();
-
-    const data = transactionData(
-      this.props.accountInfo,
-      this.props.assetAmount,
-      this.props.gasPrice,
-    );
-
-    if (!this.props.gasPrice.txFee) {
-      this.props.notificationShow(
-        lang.t('notification.error.generic_error'),
-        true,
-      );
-      return;
-    }
-
-    if (!this.props.confirm) {
-      if (this.props.selected.symbol !== 'ETH') {
-        return;
-      }
-
-      if (greaterThan(data.requestedAmount, data.balance)) {
-        this.props.notificationShow(
-          lang.t('notification.error.insufficient_balance'),
-          true,
-        );
-        return;
-      } else if (greaterThan(data.amountWithFees, data.balance)) {
-        this.props.notificationShow(
-          lang.t('notification.error.insufficient_for_fees'),
-          true,
-        );
-
-        return;
-      }
-
-      this.props.sendTransaction(
-        {
-          address: this.props.accountInfo.address,
-          recipient: balanceManagerEthAddress,
-          amount: this.props.assetAmount,
-          asset: this.props.selected,
-          gasPrice: this.props.gasPrice,
-          gasLimit: this.props.gasLimit,
-        },
-        web3SendTransactionMultiWallet,
-      );
-    }
-
-    this.props.sendToggleConfirmationView(true);
   };
 
   onClose = () => {
@@ -166,15 +75,12 @@ class DonateModal extends Component {
     this.props.modalClose();
   };
 
-  updateGasPrice = gasPrice => {
-    this.props.sendUpdateGasPrice(gasPrice);
-  };
-
   render = () => {
     const {
       accountInfo,
       accountType,
       assetAmount,
+      sendUpdateNativeAmount,
       sendUpdateAssetAmount,
       selected,
       prices,
@@ -322,14 +228,6 @@ export default connect(
   reduxProps,
   {
     modalClose,
-    sendModalInit,
-    sendUpdateGasPrice,
-    sendTransaction,
-    sendClearFields,
-    sendUpdateRecipient,
-    sendUpdateNativeAmount,
-    sendUpdateAssetAmount,
-    sendToggleConfirmationView,
     notificationShow,
   },
-)(DonateModal);
+)(withSendComponentWithData(DonateModal, web3SendTransactionMultiWallet));

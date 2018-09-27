@@ -8,6 +8,7 @@ import {
   estimateGasLimit,
   parseError,
   parseGasPrices,
+  sendTransaction,
 } from 'balance-common';
 import { web3SendTransactionMultiWallet } from '../handlers/web3';
 import {
@@ -23,7 +24,7 @@ import {
 } from 'balance-common';
 import { notificationShow } from './_notification';
 import {
-  accountUpdateExchange,
+  accountUpdateTransactions,
   accountUpdateHasPendingTransaction,
 } from 'balance-common';
 import ethUnits from '../references/ethereum-units.json';
@@ -585,23 +586,17 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
     gasPrice,
     gasLimit,
   } = getState().exchange;
-  console.log('send txn dep', depositAmount);
   dispatch({ type: EXCHANGE_TRANSACTION_REQUEST });
-  const { accountType } = getState().account;
-  const txDetails = {
-    asset: depositSelected,
-    from: address,
-    to: recipient,
-    nonce: null,
+  const transactionDetails = {
+    address,
+    recipient,
     amount: depositAmount,
-    gasPrice: gasPrice.value.amount,
-    gasLimit: gasLimit,
+    asset: depositSelected,
+    gasPrice,
+    gasLimit,
   };
-  web3SendTransactionMultiWallet(txDetails, accountType)
+  dispatch(sendTransaction(transactionDetails, web3SendTransactionMultiWallet))
     .then(txHash => {
-      // has pending transactions set to true for redirect to Transactions route
-      dispatch(accountUpdateHasPendingTransaction());
-      txDetails.hash = txHash;
       const incomingTx = {
         hash: `shapeshift_${recipient}`,
         asset: withdrawalSelected,
@@ -613,7 +608,8 @@ export const exchangeSendTransaction = () => (dispatch, getState) => {
         gasPrice: '',
         gasLimit: '',
       };
-      dispatch(accountUpdateExchange([txDetails, incomingTx]));
+      dispatch(accountUpdateHasPendingTransaction());
+      dispatch(accountUpdateTransactions(incomingTx));
       dispatch({
         type: EXCHANGE_TRANSACTION_SUCCESS,
         payload: txHash,
@@ -655,7 +651,6 @@ export const exchangeConfirmTransaction = request => (dispatch, getState) => {
     depositSelected,
     withdrawalSelected,
   } = getState().exchange;
-  console.log('deposit amount', depositAmount);
   let request = {
     address,
     depositSymbol: depositSelected.symbol,
@@ -674,7 +669,6 @@ export const exchangeConfirmTransaction = request => (dispatch, getState) => {
         const recipient = exchangeDetails.deposit;
         const withdrawalAmount = exchangeDetails.withdrawalAmount;
         const depositAmount = exchangeDetails.depositAmount;
-        console.log('shapeshift send amount dep', depositAmount);
         dispatch({
           type: EXCHANGE_CONFIRM_TRANSACTION_SUCCESS,
           payload: {

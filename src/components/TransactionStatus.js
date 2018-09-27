@@ -78,7 +78,7 @@ const TransactionStatus = ({ tx, accountAddress, ...props }) => {
     <StyledTransactionStatus color={color} {...props}>
       {tx.pending && <StyledSpinner size={9} />}
       {text}
-      <img src={icon} alt={iconAlt} />
+      {icon && <img src={icon} alt={iconAlt} />}
     </StyledTransactionStatus>
   );
 };

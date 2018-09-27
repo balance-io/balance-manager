@@ -49,8 +49,8 @@ const TransactionStatus = ({ tx, accountAddress, ...props }) => {
   if (tx.pending) {
     text = lang.t('account.tx_pending');
     color = 'darkGrey';
-    icon = null;
-    iconAlt = null;
+    icon = '';
+    iconAlt = '';
   } else if (tx.error) {
     text = lang.t('account.tx_failed');
     color = 'red';

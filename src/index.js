@@ -25,8 +25,6 @@ lang.init({
   resources,
 });
 
-const cryptocompareApiKey = process.env.REACT_APP_CRYPTOCOMPARE_API_KEY;
-console.log('### cryptocompareApiKey', cryptocompareApiKey);
 commonStorage
   .getLanguage()
   .then(language => {

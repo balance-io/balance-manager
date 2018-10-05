@@ -28,7 +28,7 @@ let accountInterval = null;
  */
 const getMetamaskNetwork = () =>
   new Promise((resolve, reject) => {
-    if (window.ethereum) {
+    if (window.ethereum || window.web) {
       window.ethereum
         .enable()
         .then(() => {
@@ -69,7 +69,7 @@ export const metamaskConnectInit = () => (dispatch, getState) => {
   if (accountAddress)
     dispatch(accountUpdateAccountAddress(accountAddress, 'METAMASK'));
   dispatch({ type: METAMASK_CONNECT_REQUEST });
-  if (window.ethereum) {
+  if (window.ethereum || window.web3) {
     getMetamaskNetwork()
       .then(network => {
         dispatch({ type: METAMASK_CONNECT_SUCCESS, payload: network });

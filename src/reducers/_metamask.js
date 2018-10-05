@@ -28,7 +28,7 @@ let accountInterval = null;
  */
 const getMetamaskNetwork = () =>
   new Promise((resolve, reject) => {
-    if (window.ethereum || window.web) {
+    if (window.ethereum) {
       window.ethereum
         .enable()
         .then(() => {
@@ -48,6 +48,18 @@ const getMetamaskNetwork = () =>
           console.error(err);
           reject();
         });
+    } else if (window.web3) {
+      window.web3.version.getNetwork((err, networkID) => {
+        if (err) {
+          console.error(err);
+          reject(err);
+        }
+        let networkIDList = {};
+        Object.keys(networkList).forEach(network => {
+          networkIDList[networkList[network].id] = network;
+        });
+        resolve(networkIDList[Number(networkID)] || null);
+      });
     }
   });
 

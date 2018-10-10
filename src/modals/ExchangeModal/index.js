@@ -326,8 +326,8 @@ const StyledMessage = styled.div`
 
 const StyledBlockedMessage = StyledMessage.extend`
   min-height: 400px;
-  padding-bottom: 12px;
-
+  padding: 0 20px 12px 20px;
+  text-align: center;
   & a {
     color: #657fe6 !important;
   }
@@ -912,15 +912,6 @@ class ExchangeModal extends Component {
         ) : (
           <StyledBlockedMessage>
             {lang.t('message.exchange_not_available')}
-            .&nbsp;
-            <a
-              href="http://pleaseprotectconsumers.org"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {lang.t('message.learn_more')}
-            </a>
-            .
           </StyledBlockedMessage>
         )}
       </Card>

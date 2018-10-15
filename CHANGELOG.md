@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
+## [0.7.9](https://github.com/balance-io/balance-manager/releases/tag/0.7.9)
+### Changed
+* Send transaction hash fix
+
 ## [0.7.8](https://github.com/balance-io/balance-manager/releases/tag/0.7.8)
 ### Changed
 * Send modal fix

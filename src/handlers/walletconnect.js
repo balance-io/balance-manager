@@ -2,8 +2,7 @@ import WalletConnect from 'walletconnect';
 import { commonStorage } from 'balance-common';
 
 const dappName = 'Balance Manager';
-// TODO change bridge url back
-const bridgeUrl = 'https://bridge.walletconnect.org';
+const bridgeUrl = process.env.REACT_APP_WALLETCONNECT_BRIDGE;
 
 /**
  * @desc init WalletConnect webConnector instance

@@ -56,6 +56,7 @@ class SendModal extends Component {
   };
 
   render = () => {
+    const selectedSymbol = this.props.selected.symbol || 'ETH';
     return (
       <Card background="lightGrey">
         {!this.props.txHash ? (
@@ -75,7 +76,7 @@ class SendModal extends Component {
               </StyledJustifyContent>
               <div>
                 <DropdownAsset
-                  selected={this.props.selected.symbol}
+                  selected={selectedSymbol}
                   assets={this.props.accountInfo.assets}
                   onChange={value => this.props.sendUpdateSelected(value)}
                 />
@@ -122,7 +123,7 @@ class SendModal extends Component {
                     }
                   >
                     <StyledAmountCurrency>
-                      {this.props.selected.symbol}
+                      {selectedSymbol}
                     </StyledAmountCurrency>
                   </Input>
                   <StyledMaxBalance onClick={this.props.onSendMaxBalance}>
@@ -143,7 +144,7 @@ class SendModal extends Component {
                     disabled={
                       !this.props.prices[this.props.nativeCurrency] ||
                       !this.props.prices[this.props.nativeCurrency][
-                        this.props.selected.symbol
+                        selectedSymbol
                       ]
                     }
                     onChange={({ target }) =>
@@ -151,7 +152,7 @@ class SendModal extends Component {
                     }
                   >
                     <StyledAmountCurrency
-                      disabled={!this.props.prices[this.props.selected.symbol]}
+                      disabled={!this.props.prices[selectedSymbol]}
                     >
                       {this.props.prices &&
                         this.props.prices.selected &&
@@ -190,7 +191,7 @@ class SendModal extends Component {
                     icon={arrowUp}
                     disabled={
                       this.props.recipient.length !== 42 ||
-                      (this.props.selected.symbol !== 'ETH' &&
+                      (selectedSymbol !== 'ETH' &&
                         !Number(this.props.assetAmount))
                     }
                     type="submit"

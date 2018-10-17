@@ -28,7 +28,27 @@ let accountInterval = null;
  */
 const getMetamaskNetwork = () =>
   new Promise((resolve, reject) => {
-    if (typeof window.web3 !== 'undefined') {
+    if (window.ethereum) {
+      window.ethereum
+        .enable()
+        .then(() => {
+          window.web3.version.getNetwork((err, networkID) => {
+            if (err) {
+              console.error(err);
+              reject(err);
+            }
+            let networkIDList = {};
+            Object.keys(networkList).forEach(network => {
+              networkIDList[networkList[network].id] = network;
+            });
+            resolve(networkIDList[Number(networkID)] || null);
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          reject();
+        });
+    } else if (window.web3) {
       window.web3.version.getNetwork((err, networkID) => {
         if (err) {
           console.error(err);
@@ -40,6 +60,8 @@ const getMetamaskNetwork = () =>
         });
         resolve(networkIDList[Number(networkID)] || null);
       });
+    } else {
+      reject();
     }
   });
 
@@ -61,7 +83,7 @@ export const metamaskConnectInit = () => (dispatch, getState) => {
   if (accountAddress)
     dispatch(accountUpdateAccountAddress(accountAddress, 'METAMASK'));
   dispatch({ type: METAMASK_CONNECT_REQUEST });
-  if (typeof window.web3 !== 'undefined') {
+  if (window.ethereum || window.web3) {
     getMetamaskNetwork()
       .then(network => {
         dispatch({ type: METAMASK_CONNECT_SUCCESS, payload: network });

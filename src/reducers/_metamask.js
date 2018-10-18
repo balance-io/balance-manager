@@ -28,41 +28,27 @@ let accountInterval = null;
  */
 const getMetamaskNetwork = () =>
   new Promise((resolve, reject) => {
-    if (window.ethereum) {
-      window.ethereum
-        .enable()
-        .then(() => {
-          window.web3.version.getNetwork((err, networkID) => {
-            if (err) {
-              console.error(err);
-              reject(err);
-            }
-            let networkIDList = {};
-            Object.keys(networkList).forEach(network => {
-              networkIDList[networkList[network].id] = network;
-            });
-            resolve(networkIDList[Number(networkID)] || null);
+    Promise.resolve(window.web3 || window.ethereum)
+      .then(() => {
+        return window.web3.eth.defaultAccount || window.ethereum.enable();
+      })
+      .then(() => {
+        window.web3.version.getNetwork((err, networkID) => {
+          if (err) {
+            console.error(err);
+            reject(err);
+          }
+          let networkIDList = {};
+          Object.keys(networkList).forEach(network => {
+            networkIDList[networkList[network].id] = network;
           });
-        })
-        .catch(error => {
-          console.error(error);
-          reject();
+          resolve(networkIDList[Number(networkID)] || null);
         });
-    } else if (window.web3) {
-      window.web3.version.getNetwork((err, networkID) => {
-        if (err) {
-          console.error(err);
-          reject(err);
-        }
-        let networkIDList = {};
-        Object.keys(networkList).forEach(network => {
-          networkIDList[networkList[network].id] = network;
-        });
-        resolve(networkIDList[Number(networkID)] || null);
+      })
+      .catch(err => {
+        console.error(err);
+        reject();
       });
-    } else {
-      reject();
-    }
   });
 
 export const metamaskUpdateMetamaskAccount = () => (dispatch, getState) => {

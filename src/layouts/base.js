@@ -185,7 +185,6 @@ const BaseLayout = ({
     } else if (accountType === 'LEDGER') {
       ledgerClearState();
     } else if (accountType === 'WALLETCONNECT') {
-      //localStorage.removeItem('wcsmngt');
       walletConnectClearState();
     } else if (accountType === 'METAMASK') {
       metamaskClearState();

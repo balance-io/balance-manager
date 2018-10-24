@@ -62,13 +62,11 @@ export const web3WalletConnectSendTransaction = txDetails =>
   new Promise((resolve, reject) => {
     walletConnectSignTransaction(txDetails)
       .then(txHash => {
-        if (txHash) {
-          resolve(txHash);
-        } else {
-          throw new Error('Could not send transaction via WalletConnect');
-        }
+        resolve(txHash);
       })
-      .catch(error => reject(error));
+      .catch(error => {
+        reject(error);
+      });
   });
 
 /**

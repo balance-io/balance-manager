@@ -39,7 +39,7 @@
     "redux-thunk": "^2.2.0",
     "styled-components": "^3.2.3",
     "trezor-connect": "^5.0.13",
-    "walletconnect": "^0.6.29",
+    "walletconnect": "^0.7.22",
     "web3": "^1.0.0-beta.34"
   },
   "scripts": {

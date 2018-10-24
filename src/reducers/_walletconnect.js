@@ -29,20 +29,10 @@ const WALLET_CONNECT_CLEAR_STATE = 'walletConnect/WALLET_CONNECT_CLEAR_STATE';
 export const walletConnectHasExistingSession = () => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     walletConnectGetSession()
-      .then(walletConnectDetails => {
-        const { webConnector, session } = walletConnectDetails;
-        if (session.new) {
-          dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST });
-          const qrcode = session.uri;
-          dispatch({
-            type: WALLET_CONNECT_NEW_SESSION_SUCCESS,
-            payload: { qrcode },
-          });
-          dispatch(walletConnectListenForSession(webConnector));
-          resolve(false);
-        } else {
+      .then(webConnector => {
+        if (webConnector.isConnected) {
           dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
-          const accountAddress = session.accounts[0] || null;
+          const accountAddress = webConnector.accounts[0] || null;
           dispatch({
             type: WALLET_CONNECT_GET_SESSION_SUCCESS,
             payload: accountAddress,
@@ -51,6 +41,15 @@ export const walletConnectHasExistingSession = () => (dispatch, getState) => {
             accountUpdateAccountAddress(accountAddress, 'WALLETCONNECT'),
           );
           resolve(true);
+        } else {
+          dispatch({ type: WALLET_CONNECT_NEW_SESSION_REQUEST });
+          const qrcode = webConnector.uri;
+          dispatch({
+            type: WALLET_CONNECT_NEW_SESSION_SUCCESS,
+            payload: { qrcode },
+          });
+          dispatch(walletConnectListenForSession(webConnector));
+          resolve(false);
         }
       })
       .catch(error => {
@@ -70,8 +69,8 @@ export const walletConnectListenForSession = webConnector => (
   dispatch({ type: WALLET_CONNECT_GET_SESSION_REQUEST });
   webConnector
     .listenSessionStatus()
-    .then(sessionStatus => {
-      const { accounts } = sessionStatus;
+    .then(() => {
+      const { accounts } = webConnector;
       const accountAddress = accounts ? accounts[0].toLowerCase() : null;
       dispatch({
         type: WALLET_CONNECT_GET_SESSION_SUCCESS,
@@ -98,9 +97,8 @@ export const walletConnectClearFields = () => (dispatch, getState) => {
 
 export const walletConnectClearState = () => dispatch => {
   walletConnectGetSession()
-    .then(walletConnectDetails => {
-      const { webConnector, session } = walletConnectDetails;
-      webConnector.deleteLocalSession(session);
+    .then(webConnector => {
+      webConnector.deleteLocalSession();
     })
     .catch(error => {
       console.error(error);

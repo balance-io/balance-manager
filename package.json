@@ -17,7 +17,7 @@
     "@ledgerhq/hw-app-eth": "^4.7.3",
     "@ledgerhq/hw-transport-u2f": "^4.7.3",
     "axios": "^0.18.0",
-    "balance-common": "^0.5.17",
+    "balance-common": "git+https://github.com/balance-io/balance-common.git#wc-storage",
     "bignumber.js": "^7.0.1",
     "bowser": "^2.0.0-alpha.4",
     "ethereumjs-tx": "^1.3.4",
@@ -39,7 +39,7 @@
     "redux-thunk": "^2.2.0",
     "styled-components": "^3.2.3",
     "trezor-connect": "^5.0.13",
-    "walletconnect": "^0.6.29",
+    "walletconnect": "^0.7.22",
     "web3": "^1.0.0-beta.34"
   },
   "scripts": {

@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
-import { walletConnectHasValidSession } from '../reducers/_walletconnect';
 import { lang } from 'balance-common';
 import { fonts, colors } from '../styles';
 
@@ -23,17 +22,10 @@ const StyledMessage = styled.div`
 
 class Wallet extends Component {
   componentDidMount() {
-    this.props
-      .walletConnectHasValidSession()
-      .then(isValid => {
-        if (!isValid) {
-          this.props.history.push('/');
-        }
-      })
-      .catch(error => {
-        console.log('error checking valid session in wallet mount', error);
-        this.props.history.push('/');
-      });
+    if (!this.props.accountAddress) {
+      console.log('wallet page does not have account address');
+      this.props.history.push('/');
+    }
   }
 
   render = () => (
@@ -57,7 +49,6 @@ Wallet.propTypes = {
   accountAddress: PropTypes.string,
   fetching: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired,
-  walletConnectHasValidSession: PropTypes.func,
 };
 
 Wallet.defaultProps = {
@@ -71,7 +62,5 @@ const reduxProps = ({ walletconnect }) => ({
 
 export default connect(
   reduxProps,
-  {
-    walletConnectHasValidSession,
-  },
+  null,
 )(Wallet);

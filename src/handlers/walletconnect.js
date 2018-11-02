@@ -2,55 +2,28 @@ import WalletConnect from 'walletconnect';
 import { commonStorage } from 'balance-common';
 
 const dappName = 'Balance Manager';
-const bridgeUrl = 'https://walletconnect.balance.io';
+const bridgeUrl = process.env.REACT_APP_WALLETCONNECT_BRIDGE_v7;
 
 /**
  * @desc init WalletConnect webConnector instance
  * @return {Object}
  */
-export const walletConnectNewSession = async () => {
+export const walletConnectGetSession = async () => {
   const webConnector = new WalletConnect({ bridgeUrl, dappName });
   await webConnector.initSession();
   return webConnector;
 };
 
-const walletConnectListenTransactionStatus = async (
-  webConnector,
-  transactionId,
-) => {
-  return new Promise((resolve, reject) => {
-    webConnector.listenTransactionStatus(transactionId, (err, data) => {
-      if (err) reject(err);
-      resolve(data);
-    });
-  });
-};
-
 /**
- * @desc WalletConnect sign transaction
+ * @desc WalletConnect send transaction
  * @param  {Object}  transaction { from, to, data, value, gasPrice, gasLimit }
  * @return {String}
  */
 export const walletConnectSignTransaction = async transaction => {
-  const webConnectorOptions = await commonStorage.getWalletConnectSession();
-  const webConnector = new WalletConnect(webConnectorOptions);
-  try {
-    const transactionId = await webConnector.createTransaction(transaction);
-    const data = await walletConnectListenTransactionStatus(
-      webConnector,
-      transactionId.transactionId,
-    );
-    if (data) {
-      const transactionSentSuccess = data.success;
-      if (transactionSentSuccess) {
-        const transactionHash = data.txHash;
-        return transactionHash;
-      } else {
-        return null;
-      }
-    }
-    return null;
-  } catch (error) {
-    // TODO: error handling
+  const webConnector = await walletConnectGetSession();
+  if (webConnector.isConnected) {
+    return await webConnector.sendTransaction(transaction);
+  } else {
+    throw new Error('WalletConnect session has expired. Please reconnect.');
   }
 };

@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
+## [0.8.1](https://github.com/balance-io/balance-manager/releases/tag/0.8.1)
+### Changed
+* Fix for send confirm toggle logic
+
 ## [0.8.0](https://github.com/balance-io/balance-manager/releases/tag/0.8.0)
 ### Changed
 * Support for WalletConnect v0.7.0

@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
+## [0.8.2](https://github.com/balance-io/balance-manager/releases/tag/0.8.2)
+### Removed
+* Removed CryptoCompare API key for current balances prices
+
 ## [0.8.1](https://github.com/balance-io/balance-manager/releases/tag/0.8.1)
 ### Changed
 * Fix for send confirm toggle logic

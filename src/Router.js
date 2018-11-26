@@ -16,6 +16,7 @@ class Router extends Component {
     window.onoffline = () => this.props.warningOffline();
     window.ononline = () => this.props.warningOnline();
   }
+
   render = () => (
     <Switch>
       <Route exact path="/" component={Homepage} />

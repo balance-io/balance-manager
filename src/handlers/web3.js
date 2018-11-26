@@ -1,17 +1,7 @@
 import Web3 from 'web3';
-import {
-  convertAmountToBigNumber,
-  convertAssetAmountFromBigNumber,
-  convertStringToHex,
-  getDataString,
-  isValidAddress,
-  removeHexPrefix,
-} from 'balance-common';
 import { ledgerEthSignTransaction } from './ledger-eth';
 import { trezorEthSignTransaction } from './trezor-eth';
 import { walletConnectSignTransaction } from './walletconnect';
-import ethUnits from '../references/ethereum-units.json';
-import smartContractMethods from '../references/smartcontract-methods.json';
 
 /**
  * @desc web3 http instance

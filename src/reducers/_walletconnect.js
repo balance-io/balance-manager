@@ -1,4 +1,3 @@
-import WalletConnect from 'walletconnect';
 import { parseError } from 'balance-common';
 import { notificationShow } from './_notification';
 import { modalClose } from './_modal';

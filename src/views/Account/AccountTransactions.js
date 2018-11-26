@@ -424,8 +424,8 @@ class AccountViewTransactions extends Component {
                               ? lang.t('account.tx_self').toUpperCase()
                               : tx.from.toLowerCase() ===
                                 accountAddress.toLowerCase()
-                                ? lang.t('account.tx_to').toUpperCase()
-                                : lang.t('account.tx_from').toUpperCase()}
+                              ? lang.t('account.tx_to').toUpperCase()
+                              : lang.t('account.tx_from').toUpperCase()}
                           </strong>
                         </p>
                         <p>
@@ -433,8 +433,8 @@ class AccountViewTransactions extends Component {
                           accountAddress.toLowerCase()
                             ? tx.to
                             : tx.from
-                              ? tx.from
-                              : lang.t('account.tx_pending')}
+                            ? tx.from
+                            : lang.t('account.tx_pending')}
                         </p>
                       </div>
                     </div>

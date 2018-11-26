@@ -23,9 +23,7 @@ import { notificationShow } from '../../reducers/_notification';
 import {
   capitalize,
   getEth,
-  greaterThan,
   lang,
-  transactionData,
   calcTxFee,
   withSendComponentWithData,
 } from 'balance-common';

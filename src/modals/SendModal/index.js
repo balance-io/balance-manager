@@ -97,12 +97,11 @@ class SendModal extends Component {
                       this.props.sendUpdateRecipient(target.value)
                     }
                   >
-                    {this.props.recipient &&
-                      !this.props.isValidAddress && (
-                        <StyledInvalidAddress>
-                          {lang.t('modal.invalid_address')}
-                        </StyledInvalidAddress>
-                      )}
+                    {this.props.recipient && !this.props.isValidAddress && (
+                      <StyledInvalidAddress>
+                        {lang.t('modal.invalid_address')}
+                      </StyledInvalidAddress>
+                    )}
                     <StyledQRIcon onClick={this.props.toggleQRCodeReader}>
                       <img src={qrIcon} alt="recipient" />
                     </StyledQRIcon>
@@ -231,4 +230,8 @@ class SendModal extends Component {
 export default connect(
   () => ({}),
   { modalClose },
-)(withSendComponentWithData(SendModal, web3SendTransactionMultiWallet));
+)(
+  withSendComponentWithData(SendModal, {
+    sendTransactionCallback: web3SendTransactionMultiWallet,
+  }),
+);

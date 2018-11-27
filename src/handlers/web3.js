@@ -1,17 +1,8 @@
 import Web3 from 'web3';
-import {
-  convertAmountToBigNumber,
-  convertAssetAmountFromBigNumber,
-  convertStringToHex,
-  getDataString,
-  isValidAddress,
-  removeHexPrefix,
-} from 'balance-common';
 import { ledgerEthSignTransaction } from './ledger-eth';
+import piwik from '../piwik';
 import { trezorEthSignTransaction } from './trezor-eth';
 import { walletConnectSignTransaction } from './walletconnect';
-import ethUnits from '../references/ethereum-units.json';
-import smartContractMethods from '../references/smartcontract-methods.json';
 
 /**
  * @desc web3 http instance
@@ -101,7 +92,13 @@ export const web3TrezorSendTransaction = txDetails =>
  * @param {Object} transaction { asset, from, to, amount, gasPrice }
  * @return {Promise}
  */
-export const web3SendTransactionMultiWallet = (transaction, accountType) => {
+export const web3SendTransactionMultiWallet = ({
+  accountType,
+  trackingAmount,
+  trackingName,
+  transaction,
+}) => {
+  piwik.push(['trackEvent', 'Send', accountType, trackingName, trackingAmount]);
   let method = null;
   switch (accountType) {
     case 'METAMASK':

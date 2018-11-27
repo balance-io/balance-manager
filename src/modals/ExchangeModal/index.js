@@ -195,8 +195,8 @@ const StyledDynamicCurrency = styled(StyledAmountCurrency)`
         ? `rgba(${colors.dark}, 0.5)`
         : `none`
       : selected
-        ? `rgb(${colors.dark})`
-        : `rgb(${colors.white})`};
+      ? `rgb(${colors.dark})`
+      : `rgb(${colors.white})`};
   &:hover {
     background: ${({ disabled, fetching, selected }) =>
       !fetching && !selected && !disabled && `rgb(${colors.dark}, 0.1)`};
@@ -538,16 +538,16 @@ class ExchangeModal extends Component {
         : this.props.withdrawalAmount &&
           this.props.withdrawalPrice &&
           this.props.withdrawalPrice.amount
-          ? convertAmountToDisplay(
-              convertAmountFromBigNumber(
-                multiply(
-                  convertAmountToBigNumber(this.props.withdrawalAmount),
-                  this.props.withdrawalPrice.amount,
-                ),
+        ? convertAmountToDisplay(
+            convertAmountFromBigNumber(
+              multiply(
+                convertAmountToBigNumber(this.props.withdrawalAmount),
+                this.props.withdrawalPrice.amount,
               ),
-              this.props.prices,
-            )
-          : null;
+            ),
+            this.props.prices,
+          )
+        : null;
     return (
       <Card
         allowOverflow
@@ -750,13 +750,13 @@ class ExchangeModal extends Component {
                             {withdrawalValue
                               ? withdrawalValue
                               : this.props.showWithdrawalNative
-                                ? `0.00 ${this.props.withdrawalSelected.symbol}`
-                                : `${
-                                    this.props.prices &&
-                                    this.props.prices.selected
-                                      ? this.props.prices.selected.symbol
-                                      : '$'
-                                  }0.00`}
+                              ? `0.00 ${this.props.withdrawalSelected.symbol}`
+                              : `${
+                                  this.props.prices &&
+                                  this.props.prices.selected
+                                    ? this.props.prices.selected.symbol
+                                    : '$'
+                                }0.00`}
                           </p>
                         </StyledHelperText>
                         <StyledHelperText />

@@ -43,7 +43,7 @@ class AccountUniqueTokens extends Component {
         <UniqueTokensContainer>
           <StyledContainer>
             {uniqueTokens.map(token => (
-              <UniqueToken {...token} key={token.id} />
+              <UniqueToken asset={token} key={token.id} />
             ))}
           </StyledContainer>
           <Footer />

@@ -8,12 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Removed
+
+## [0.8.3](https://github.com/balance-io/balance-manager/releases/tag/0.8.3)
+### Added
 * Piwik support
 
 ### Changed
 * Support for more NFT data
-
-### Removed
 
 ## [0.8.2](https://github.com/balance-io/balance-manager/releases/tag/0.8.2)
 ### Removed

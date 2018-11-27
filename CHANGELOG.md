@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [Unreleased]
 
 ### Added
+* Piwik support
 
 ### Changed
+* Support for more NFT data
 
 ### Removed
 

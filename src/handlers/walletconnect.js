@@ -1,5 +1,4 @@
 import WalletConnect from 'walletconnect';
-import { commonStorage } from 'balance-common';
 
 const dappName = 'Balance Manager';
 const bridgeUrl = process.env.REACT_APP_WALLETCONNECT_BRIDGE_v7;

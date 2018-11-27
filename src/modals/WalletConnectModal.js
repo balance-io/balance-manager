@@ -9,7 +9,6 @@ import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import { modalClose } from '../reducers/_modal';
 import { walletConnectClearFields } from '../reducers/_walletconnect';
-import { responsive } from '../styles';
 
 const StyledCard = styled(Card)`
   margin: 0 16px;

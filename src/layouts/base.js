@@ -30,7 +30,7 @@ import { trezorClearState } from '../reducers/_trezor';
 import { walletConnectClearState } from '../reducers/_walletconnect';
 import { commonStorage } from 'balance-common';
 import ReminderRibbon from '../components/ReminderRibbon';
-import { colors, responsive } from '../styles';
+import { colors } from '../styles';
 
 const StyledLayout = styled.div`
   position: relative;
@@ -246,8 +246,8 @@ const BaseLayout = ({
                     accountType === 'LEDGER'
                       ? ledgerUpdateNetwork
                       : accountType === 'TREZOR'
-                        ? trezorUpdateNetwork
-                        : null
+                      ? trezorUpdateNetwork
+                      : null
                   }
                 />
                 <StyledVerticalLine />

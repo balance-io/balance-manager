@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
+## [0.8.3](https://github.com/balance-io/balance-manager/releases/tag/0.8.3)
+### Added
+* Piwik support
+
+### Changed
+* Support for more NFT data
+
 ## [0.8.2](https://github.com/balance-io/balance-manager/releases/tag/0.8.2)
 ### Removed
 * Removed CryptoCompare API key for current balances prices

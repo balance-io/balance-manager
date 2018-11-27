@@ -144,8 +144,8 @@ const StyledPercentage = styled.p`
       ? percentage > 0
         ? `rgb(${colors.green})`
         : percentage < 0
-          ? `rgb(${colors.red})`
-          : `inherit`
+        ? `rgb(${colors.red})`
+        : `inherit`
       : `inherit`};
 `;
 

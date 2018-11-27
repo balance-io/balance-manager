@@ -230,4 +230,8 @@ class SendModal extends Component {
 export default connect(
   () => ({}),
   { modalClose },
-)(withSendComponentWithData(SendModal, web3SendTransactionMultiWallet));
+)(
+  withSendComponentWithData(SendModal, {
+    sendTransactionCallback: web3SendTransactionMultiWallet,
+  }),
+);

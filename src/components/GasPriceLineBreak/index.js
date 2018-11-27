@@ -7,8 +7,8 @@ const GasPriceLineBreak = ({ gasPriceOption }) => (
       gasPriceOption === 'slow'
         ? 'red'
         : gasPriceOption === 'average'
-          ? 'gold'
-          : 'lightGreen'
+        ? 'gold'
+        : 'lightGreen'
     }
     percentage={
       gasPriceOption === 'slow' ? 33 : gasPriceOption === 'average' ? 66 : 100

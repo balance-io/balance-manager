@@ -418,11 +418,11 @@ export const exchangeUpdateWithdrawalAmount = (
   withdrawalNative = disableNative
     ? withdrawalNative
     : withdrawalAmount
-      ? multiply(
-          withdrawalAmount,
-          convertAmountFromBigNumber(withdrawalPrice.amount),
-        )
-      : '';
+    ? multiply(
+        withdrawalAmount,
+        convertAmountFromBigNumber(withdrawalPrice.amount),
+      )
+    : '';
   dispatch({
     type: EXCHANGE_UPDATE_WITHDRAWAL_AMOUNT_REQUEST,
     payload: {

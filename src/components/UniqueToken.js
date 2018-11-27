@@ -131,36 +131,32 @@ const StyledTokenImage = styled.img`
   width: 100%;
 `;
 
-const UniqueToken = ({
-  background,
-  imageUrl,
-  name,
-  lastPrice,
-  currentPrice,
-  id,
-  contractAddress,
-}) => (
+const UniqueToken = ({ asset }) => (
   <StyledToken>
     <StyledCard>
-      <StyledTokenBackground background={background}>
-        <StyledTokenImage src={imageUrl} alt={name} />
+      <StyledTokenBackground background={asset.background}>
+        <StyledTokenImage src={asset.image_preview_url} alt={asset.name} />
       </StyledTokenBackground>
       <StyledInfo>
         <StyledName>
-          {name} • #{id}
+          {asset.name} • #{asset.id}
         </StyledName>
         <StyledCurPrice>
-          {currentPrice ? `${lang.t('time.now')}: ㆔ ${currentPrice}` : ' '}
+          {asset.currentPrice
+            ? `${lang.t('time.now')}: ㆔ ${asset.currentPrice}`
+            : ' '}
         </StyledCurPrice>
         <StyledPrevPrice>
-          {lastPrice
-            ? ` ${lang.t('modal.previous_short')} ㆔ ${lastPrice}`
+          {asset.lastPrice
+            ? ` ${lang.t('modal.previous_short')} ㆔ ${asset.lastPrice}`
             : `${lang.t('modal.new')}!`}
         </StyledPrevPrice>
       </StyledInfo>
     </StyledCard>
     <StyledViewLink
-      href={`https://opensea.io/assets/${contractAddress}/${id}`}
+      href={`https://opensea.io/assets/${asset.asset_contract.address}/${
+        asset.id
+      }`}
       color="blue"
       hoverColor="blueHover"
       activeColor="blueActive"
@@ -174,13 +170,7 @@ const UniqueToken = ({
 );
 
 UniqueToken.propTypes = {
-  background: PropTypes.string.isRequired,
-  imageUrl: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  lastPrice: PropTypes.number,
-  currentPrice: PropTypes.number,
-  id: PropTypes.string.isRequired,
-  contractAddress: PropTypes.string.isRequired,
+  asset: PropTypes.object.isRequired,
 };
 
 export default UniqueToken;

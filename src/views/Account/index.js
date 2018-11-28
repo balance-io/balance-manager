@@ -229,7 +229,7 @@ Account.propTypes = {
   history: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
-  fetching: PropTypes.bool.isRequired,
+  fetching: PropTypes.bool,
   accountInfo: PropTypes.object.isRequired,
   accountAddress: PropTypes.string.isRequired,
   accountType: PropTypes.string.isRequired,

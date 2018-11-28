@@ -94,11 +94,16 @@ export const web3TrezorSendTransaction = txDetails =>
  */
 export const web3SendTransactionMultiWallet = ({
   accountType,
-  trackingAmount,
-  trackingName,
+  tracking,
   transaction,
 }) => {
-  piwik.push(['trackEvent', 'Send', accountType, trackingName, trackingAmount]);
+  piwik.push([
+    'trackEvent',
+    'Send',
+    accountType,
+    tracking.name,
+    tracking.amount,
+  ]);
   let method = null;
   switch (accountType) {
     case 'METAMASK':

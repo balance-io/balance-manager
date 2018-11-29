@@ -106,7 +106,7 @@ const StyledMessage = styled.div`
 `;
 
 class Account extends Component {
-  openExchangeModal = () => this.props.modalOpen('EXCHANGE_MODAL');
+  openExchangeModal = () => this.props.modalOpen('ZRX_INSTANT_MODAL');
   openSendModal = () => this.props.modalOpen('SEND_MODAL');
   openReceiveModal = () => this.props.modalOpen('RECEIVE_MODAL');
 

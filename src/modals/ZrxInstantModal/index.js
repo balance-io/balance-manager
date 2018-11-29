@@ -1,4 +1,3 @@
-import { ZeroExInstant } from '@0x/instant';
 import { lang } from 'balance-common';
 import Button from '../../components/Button';
 import styled from 'styled-components';
@@ -64,6 +63,12 @@ const StyledBottomModal = styled(StyledFlex)`
 `;
 
 class ZrxInstantModal extends Component {
+  componentDidMount = () => {
+    window.zeroExInstant.render({
+      orderSource: 'https://api.relayer.com/sra/v2/',
+    });
+  };
+
   onClose = () => {
     this.props.modalClose();
   };
@@ -71,7 +76,7 @@ class ZrxInstantModal extends Component {
   render = () => {
     return (
       <Card background="lightGrey">
-        <ZeroExInstant orderSource="https://api.relayer.com/sra/v2/" />
+        <div id="zeroExInstantContainer" />
         <StyledBottomModal>
           <StyledActions>
             <Button isModalButton onClick={this.onClose}>

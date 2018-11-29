@@ -16,6 +16,7 @@ import arrowUp from '../../assets/arrow-up.svg';
 import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { modalOpen } from '../../reducers/_modal';
+import { zrxInstantInit } from '../../reducers/_zrxinstant';
 import { colors, fonts, responsive } from '../../styles';
 
 const mdBreakpoint = '712px';
@@ -106,7 +107,7 @@ const StyledMessage = styled.div`
 `;
 
 class Account extends Component {
-  openExchangeModal = () => this.props.modalOpen('ZRX_INSTANT_MODAL');
+  openExchangeModal = () => this.props.zrxInstantInit();
   openSendModal = () => this.props.modalOpen('SEND_MODAL');
   openReceiveModal = () => this.props.modalOpen('RECEIVE_MODAL');
 
@@ -256,6 +257,7 @@ export default withRouter(
     reduxProps,
     {
       modalOpen,
+      zrxInstantInit,
     },
   )(Account),
 );

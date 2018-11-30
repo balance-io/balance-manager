@@ -192,7 +192,6 @@ const BaseLayout = ({
   };
   return (
     <StyledLayout>
-      <div id="zeroExInstantContainer" />
       <ReminderRibbon maxWidth={1000} />
       <Background />
       <Column maxWidth={1000}>

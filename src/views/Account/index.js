@@ -151,21 +151,22 @@ class Account extends Component {
               </StyledAddressWrapper>
 
               <StyledActions>
-                {this.props.network === 'mainnet' && (
-                  <StyledButton
-                    left
-                    color="brightGreen"
-                    hoverColor="brightGreenHover"
-                    activeColor="brightGreenHover"
-                    order={3}
-                    icon={exchangeIcon}
-                    onClick={this.openExchangeModal}
-                  >
-                    <StyledButtonText>
-                      {lang.t('button.exchange')}
-                    </StyledButtonText>
-                  </StyledButton>
-                )}
+                {this.props.network === 'mainnet' &&
+                  this.props.accountType === 'METAMASK' && (
+                    <StyledButton
+                      left
+                      color="brightGreen"
+                      hoverColor="brightGreenHover"
+                      activeColor="brightGreenHover"
+                      order={3}
+                      icon={exchangeIcon}
+                      onClick={this.openExchangeModal}
+                    >
+                      <StyledButtonText>
+                        {lang.t('button.exchange')}
+                      </StyledButtonText>
+                    </StyledButton>
+                  )}
                 <StyledButton
                   left
                   color="blue"

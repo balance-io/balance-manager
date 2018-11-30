@@ -13,7 +13,7 @@
     "url": "https://github.com/balance-io/balance-manager/issues"
   },
   "dependencies": {
-    "@0x/instant": "^1.0.1",
+    "@0x/subproviders": "^2.1.6",
     "@devshack/react-native-storage": "^0.2.2",
     "@ledgerhq/hw-app-eth": "^4.7.3",
     "@ledgerhq/hw-transport-u2f": "^4.7.3",

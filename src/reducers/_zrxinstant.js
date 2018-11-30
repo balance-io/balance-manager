@@ -1,3 +1,10 @@
+import {
+  ledgerEthereumBrowserClientFactoryAsync as ledgerEthereumClientFactoryAsync,
+  LedgerSubprovider,
+  RPCSubprovider,
+  Web3ProviderEngine,
+} from '@0x/subproviders';
+
 const balanceManagerZrxInstantAddress =
   process.env.REACT_APP_ZRX_INSTANT_ADDRESS;
 const balanceManagerZrxInstantRelayer =
@@ -12,7 +19,27 @@ const ZRX_INSTANT_RENDER_MODAL_SUCCESS =
 // -- Actions --------------------------------------------------------------- //
 export const zrxInstantInit = () => (dispatch, getState) => {
   dispatch({ type: ZRX_INSTANT_RENDER_MODAL_REQUEST });
+  const { accountType } = getState().account;
+  const providerEngine = new Web3ProviderEngine();
+  let provider = null;
+  switch (accountType) {
+    case 'LEDGER':
+      const ledgerSubprovider = new LedgerSubprovider({
+        networkId: 1,
+        ledgerEthereumClientFactoryAsync,
+      });
+      providerEngine.addProvider(ledgerSubprovider);
+      providerEngine.addProvider(
+        new RPCSubprovider('https://mainnet.infura.io/'),
+      );
+      break;
+    default:
+      provider = window.ethereum || window.web3.currentProvider;
+      break;
+  }
+  providerEngine.start();
   window.zeroExInstant.render({
+    provider: provider || providerEngine,
     orderSource: balanceManagerZrxInstantRelayer,
     shouldDisablePushToHistory: true,
     affiliateInfo: {

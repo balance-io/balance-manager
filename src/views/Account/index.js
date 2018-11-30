@@ -152,7 +152,8 @@ class Account extends Component {
 
               <StyledActions>
                 {this.props.network === 'mainnet' &&
-                  this.props.accountType === 'METAMASK' && (
+                  (this.props.accountType === 'METAMASK' ||
+                    this.props.accountType === 'LEDGER') && (
                     <StyledButton
                       left
                       color="brightGreen"

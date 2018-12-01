@@ -13,6 +13,7 @@
     "url": "https://github.com/balance-io/balance-manager/issues"
   },
   "dependencies": {
+    "@0x/subproviders": "^2.1.6",
     "@devshack/react-native-storage": "^0.2.2",
     "@ledgerhq/hw-app-eth": "^4.7.3",
     "@ledgerhq/hw-transport-u2f": "^4.7.3",
@@ -34,7 +35,7 @@
     "react-qr-reader": "^2.1.0",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "^1.1.4",
+    "react-scripts": "^2.1.1",
     "redux": "^4.0.0",
     "redux-devtools-extension": "^2.13.2",
     "redux-thunk": "^2.2.0",
@@ -62,7 +63,6 @@
     ]
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.2",
     "cross-env": "^5.2.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-react-app": "^2.1.0",
@@ -74,5 +74,11 @@
     "husky": "^0.14.3",
     "lint-staged": "^7.1.0",
     "prettier": "^1.13.5"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

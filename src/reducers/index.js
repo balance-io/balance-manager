@@ -7,6 +7,7 @@ import metamask from './_metamask';
 import walletconnect from './_walletconnect';
 import notification from './_notification';
 import warning from './_warning';
+import zrxinstant from './_zrxinstant';
 import { account, send } from 'balance-common';
 
 export default combineReducers({
@@ -20,4 +21,5 @@ export default combineReducers({
   notification,
   warning,
   walletconnect,
+  zrxinstant,
 });

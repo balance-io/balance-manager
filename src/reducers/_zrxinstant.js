@@ -41,7 +41,6 @@ export const zrxInstantInit = () => (dispatch, getState) => {
   window.zeroExInstant.render({
     provider: provider || providerEngine,
     orderSource: balanceManagerZrxInstantRelayer,
-    shouldDisablePushToHistory: true,
     affiliateInfo: {
       feeRecipient: balanceManagerZrxInstantAddress,
       feePercentage: 0.01,

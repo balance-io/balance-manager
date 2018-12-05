@@ -22,8 +22,10 @@ export const zrxInstantInit = () => (dispatch, getState) => {
   const { accountType } = getState().account;
   const providerEngine = new Web3ProviderEngine();
   let provider = null;
+  let walletDisplayName = 'Metamask';
   switch (accountType) {
     case 'LEDGER':
+      walletDisplayName = 'Ledger';
       const ledgerSubprovider = new LedgerSubprovider({
         networkId: 1,
         ledgerEthereumClientFactoryAsync,
@@ -39,12 +41,13 @@ export const zrxInstantInit = () => (dispatch, getState) => {
   }
   providerEngine.start();
   window.zeroExInstant.render({
-    provider: provider || providerEngine,
-    orderSource: balanceManagerZrxInstantRelayer,
     affiliateInfo: {
       feeRecipient: balanceManagerZrxInstantAddress,
       feePercentage: 0.01,
     },
+    orderSource: balanceManagerZrxInstantRelayer,
+    provider: provider || providerEngine,
+    walletDisplayName,
   });
   dispatch({ type: ZRX_INSTANT_RENDER_MODAL_SUCCESS });
 };

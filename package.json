@@ -1,8 +1,11 @@
 {
   "name": "balance-manager",
   "description": "Ethereum Wallet Manager Interface for MetaMask, Ledger, Trezor and WalletConnect",
-  "version": "0.8.3",
-  "author": "Pedro Gomes <pedro@balance.io>",
+  "version": "0.8.4",
+  "authors": [
+    "Jin Chung <jin@balance.io>",
+    "Pedro Gomes <pedro@balance.io>"
+  ],
   "license": "GPL-3",
   "homepage": "https://manager.balance.io",
   "repository": {

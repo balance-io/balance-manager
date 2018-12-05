@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Removed
 
+## [0.8.4](https://github.com/balance-io/balance-manager/releases/tag/0.8.4)
+### Added
+* ZeroExInstant support
+
 ## [0.8.3](https://github.com/balance-io/balance-manager/releases/tag/0.8.3)
 ### Added
 * Piwik support

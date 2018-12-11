@@ -232,6 +232,7 @@ export default connect(
   { modalClose },
 )(
   withSendComponentWithData(SendModal, {
+    defaultAsset: 'ETH',
     sendTransactionCallback: web3SendTransactionMultiWallet,
   }),
 );

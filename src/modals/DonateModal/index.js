@@ -228,4 +228,9 @@ export default connect(
     modalClose,
     notificationShow,
   },
-)(withSendComponentWithData(DonateModal, web3SendTransactionMultiWallet));
+)(
+  withSendComponentWithData(DonateModal, {
+    defaultAsset: 'ETH',
+    sendTransactionCallback: web3SendTransactionMultiWallet,
+  }),
+);

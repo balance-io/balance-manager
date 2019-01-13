@@ -97,7 +97,7 @@ class DonateModal extends Component {
       <Card background="lightGrey">
         {!txHash ? (
           !confirm ? (
-            <Form onSubmit={this.onSubmit}>
+            <Form onSubmit={this.props.onSubmit}>
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
                 {lang.t('modal.donate_title', {
@@ -172,7 +172,7 @@ class DonateModal extends Component {
               <GasPanel
                 gasPriceOption={gasPriceOption}
                 gasPrices={gasPrices}
-                updateGasPrice={this.updateGasPrice}
+                updateGasPrice={this.props.updateGasPrice}
               />
 
               <LineBreak noMargin />

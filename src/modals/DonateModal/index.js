@@ -31,10 +31,12 @@ import {
 import {
   StyledIcon,
   StyledFlex,
+  StyledInputContainer,
   StyledBottomModal,
   StyledParagraph,
   StyledAmountCurrency,
   StyledConversionIcon,
+  StyledConversionIconContainer,
   StyledSubTitle,
   StyledActions,
 } from '../modalStyles';
@@ -125,7 +127,7 @@ class DonateModal extends Component {
               </StyledFlex>
 
               <StyledFlex>
-                <StyledFlex>
+                <StyledInputContainer>
                   <Input
                     monospace
                     label={lang.t('input.asset_amount')}
@@ -138,15 +140,15 @@ class DonateModal extends Component {
                   />
 
                   <StyledAmountCurrency>{selected.symbol}</StyledAmountCurrency>
-                </StyledFlex>
+                </StyledInputContainer>
 
                 <StyledFlex>
-                  <StyledConversionIcon>
-                    <img src={convertIcon} alt="≈" />
-                  </StyledConversionIcon>
+                  <StyledConversionIconContainer>
+                    <StyledConversionIcon src={convertIcon} alt="≈" />
+                  </StyledConversionIconContainer>
                 </StyledFlex>
 
-                <StyledFlex>
+                <StyledInputContainer>
                   <Input
                     monospace
                     placeholder="0.0"
@@ -164,7 +166,7 @@ class DonateModal extends Component {
                   <StyledAmountCurrency disabled={!prices[selected.symbol]}>
                     {prices && prices.selected ? prices.selected.currency : ''}
                   </StyledAmountCurrency>
-                </StyledFlex>
+                </StyledInputContainer>
               </StyledFlex>
 
               <GasPanel

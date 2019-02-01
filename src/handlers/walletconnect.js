@@ -1,4 +1,4 @@
-import WalletConnect from 'walletconnect';
+import WalletConnect from '@walletconnect/browser';
 
 const dappName = 'Balance Manager';
 const bridgeUrl = process.env.REACT_APP_WALLETCONNECT_BRIDGE_v7;

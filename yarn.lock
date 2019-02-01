@@ -4166,10 +4166,6 @@ eth-lightwallet@^3.0.1:
     tweetnacl "0.13.2"
     web3 "0.20.2"
 
-eth-parse-uri@^0.6.9:
-  version "0.6.9"
-  resolved "https://registry.yarnpkg.com/eth-parse-uri/-/eth-parse-uri-0.6.9.tgz#2f481b95d062fb8ad5d92cccf10e63e5c4162344"
-
 eth-query@^2.0.2, eth-query@^2.1.0, eth-query@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/eth-query/-/eth-query-2.1.2.tgz#d6741d9000106b51510c72db92d6365456a6da5e"
@@ -6561,12 +6557,6 @@ js-sha3@^0.7.0:
 js-tokens@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
-
-js-walletconnect-core@^0.7.27:
-  version "0.7.27"
-  resolved "https://registry.yarnpkg.com/js-walletconnect-core/-/js-walletconnect-core-0.7.27.tgz#e185ae277713fec69a612f43080096ba8ef59e07"
-  dependencies:
-    eth-parse-uri "^0.6.9"
 
 js-yaml@^3.12.0, js-yaml@^3.7.0, js-yaml@^3.9.0:
   version "3.12.0"
@@ -11211,12 +11201,6 @@ walker@~1.0.5:
   resolved "https://registry.yarnpkg.com/walker/-/walker-1.0.7.tgz#2f7f9b8fd10d677262b18a884e28d19618e028fb"
   dependencies:
     makeerror "1.0.x"
-
-walletconnect@^0.7.25:
-  version "0.7.27"
-  resolved "https://registry.yarnpkg.com/walletconnect/-/walletconnect-0.7.27.tgz#fcba5c36b68a964c90d61cd3e2cfb3c3a5ec902d"
-  dependencies:
-    js-walletconnect-core "^0.7.27"
 
 warning@^3.0.0:
   version "3.0.0"

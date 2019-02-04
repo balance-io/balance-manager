@@ -1,15 +1,13 @@
 import WalletConnect from '@walletconnect/browser';
 
-const dappName = 'Balance Manager';
-const bridgeUrl = process.env.REACT_APP_WALLETCONNECT_BRIDGE_v7;
+const bridge = process.env.REACT_APP_WALLETCONNECT_BRIDGE_v7;
 
 /**
  * @desc init WalletConnect webConnector instance
  * @return {Object}
  */
 export const walletConnectGetSession = async () => {
-  const webConnector = new WalletConnect({ bridgeUrl, dappName });
-  await webConnector.initSession();
+  const webConnector = new WalletConnect({ bridge });
   return webConnector;
 };
 

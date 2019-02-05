@@ -20,7 +20,6 @@ import firefoxLogoImage from '../assets/firefox-logo.svg';
 import firefoxLogoText from '../assets/firefox-text.svg';
 import operaLogoImage from '../assets/opera-logo.svg';
 import operaLogoText from '../assets/opera-text.svg';
-import { walletConnectHasExistingSession } from '../reducers/_walletconnect';
 import { modalOpen } from '../reducers/_modal';
 import { colors, fonts, responsive } from '../styles';
 
@@ -304,21 +303,6 @@ class Home extends Component {
     this.props.accountInitializeState();
   };
 
-  onWalletConnectInit = () => {
-    this.props
-      .walletConnectHasExistingSession()
-      .then(isValid => {
-        if (isValid) {
-          this.props.history.push('/wallet');
-        } else {
-          this.props.modalOpen('WALLET_CONNECT', null);
-        }
-      })
-      .catch(error => {
-        console.log('error checking valid session', error);
-        this.props.modalOpen('WALLET_CONNECT', null);
-      });
-  };
   render = () => (
     <BaseLayout>
       {isMobile() ? (
@@ -386,15 +370,16 @@ class Home extends Component {
                   .
                 </LogoText>
               </LogoSectionMobile>
-              <WalletConnectButton
-                color="walletconnect"
-                hoverColor="walletconnectHover"
-                activeColor="walletconnectActive"
-                onClick={this.onWalletConnectInit}
-                width={`100%`}
-              >
-                {lang.t('homepage.connect_walletconnect.button_mobile')}
-              </WalletConnectButton>
+              <Link to="/wallet">
+                <WalletConnectButton
+                  color="walletconnect"
+                  hoverColor="walletconnectHover"
+                  activeColor="walletconnectActive"
+                  width={`100%`}
+                >
+                  {lang.t('homepage.connect_walletconnect.button_mobile')}
+                </WalletConnectButton>
+              </Link>
             </CardContainerMobile>
           </StyledCard>
           <CardContainerMobile>
@@ -540,15 +525,16 @@ class Home extends Component {
                   .
                 </LogoText>
               </LogoSection>
-              <WalletConnectButton
-                left
-                color="walletconnect"
-                hoverColor="walletconnectHover"
-                activeColor="walletconnectActive"
-                onClick={this.onWalletConnectInit}
-              >
-                {lang.t('homepage.connect_walletconnect.button')}
-              </WalletConnectButton>
+              <Link to="/wallet">
+                <WalletConnectButton
+                  left
+                  color="walletconnect"
+                  hoverColor="walletconnectHover"
+                  activeColor="walletconnectActive"
+                >
+                  {lang.t('homepage.connect_walletconnect.button')}
+                </WalletConnectButton>
+              </Link>
             </CardContainer>
           </StyledCard>
 
@@ -597,7 +583,6 @@ class Home extends Component {
 Home.propTypes = {
   accountInitializeState: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired,
-  walletConnectHasExistingSession: PropTypes.func.isRequired,
 };
 
 export default connect(
@@ -605,6 +590,5 @@ export default connect(
   {
     accountInitializeState,
     modalOpen,
-    walletConnectHasExistingSession,
   },
 )(Home);

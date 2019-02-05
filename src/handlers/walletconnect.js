@@ -1,6 +1,6 @@
 import WalletConnect from '@walletconnect/browser';
 
-const bridge = process.env.REACT_APP_WALLETCONNECT_BRIDGE_v7;
+const bridge = process.env.REACT_APP_WALLETCONNECT_BRIDGE_v1;
 
 /**
  * @desc init WalletConnect webConnector instance
@@ -16,7 +16,7 @@ export const walletConnectGetSession = async () => {
  * @param  {Object}  transaction { from, to, data, value, gasPrice, gasLimit }
  * @return {String}
  */
-export const walletConnectSignTransaction = async transaction => {
+export const walletConnectSendTransaction = async transaction => {
   const webConnector = await walletConnectGetSession();
   if (webConnector.isConnected) {
     return await webConnector.sendTransaction(transaction);

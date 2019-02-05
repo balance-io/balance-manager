@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import { ledgerEthSignTransaction } from './ledger-eth';
 import piwik from '../piwik';
 import { trezorEthSignTransaction } from './trezor-eth';
-import { walletConnectSignTransaction } from './walletconnect';
+import { walletConnectSendTransaction } from './walletconnect';
 
 /**
  * @desc web3 http instance
@@ -51,7 +51,7 @@ export const web3MetamaskSendTransaction = txDetails =>
  */
 export const web3WalletConnectSendTransaction = txDetails =>
   new Promise((resolve, reject) => {
-    walletConnectSignTransaction(txDetails)
+    walletConnectSendTransaction(txDetails)
       .then(txHash => {
         resolve(txHash);
       })

@@ -5,7 +5,6 @@ import {
   accountUpdateNetwork,
 } from 'balance-common';
 import { notificationShow } from './_notification';
-import { modalOpen, modalClose } from './_modal';
 import chains from '../references/chains.json';
 
 // -- Constants ------------------------------------------------------------- //
@@ -26,6 +25,8 @@ export const walletConnectInit = () => async dispatch => {
     bridge: 'https://bridge.walletconnect.org',
   });
 
+  console.log('[walletConnectInit] walletConnector', walletConnector);
+
   dispatch({ type: WALLET_CONNECT_INIT_REQUEST, payload: walletConnector });
 
   if (!walletConnector.connected) {
@@ -37,6 +38,14 @@ export const walletConnectInit = () => async dispatch => {
     } catch (error) {
       dispatch(walletConnectClearState());
     }
+  } else {
+    dispatch(
+      walletConnectHandleSession({
+        newSession: false,
+        accounts: walletConnector.accounts,
+        chainId: walletConnector.chainId,
+      }),
+    );
   }
 
   dispatch(walletConnectRegisterEvents());
@@ -78,7 +87,7 @@ export const walletConnectRegisterEvents = () => async (dispatch, getState) => {
       throw error;
     }
 
-    dispatch(modalClose());
+    WalletConnectQRCodeModal.close();
 
     const { accounts, chainId } = payload.params[0];
     dispatch(
@@ -101,22 +110,26 @@ export const walletConnectRegisterEvents = () => async (dispatch, getState) => {
     if (error) {
       throw error;
     }
-
-    dispatch(walletConnectClearState());
+    if (getState().walletconnect.walletConnector) {
+      dispatch(walletConnectClearState());
+    }
   });
 };
 
 export const walletConnectClearState = () => async (dispatch, getState) => {
   const { walletConnector } = getState().walletconnect;
+  if (walletConnector) {
+    console.log('[walletConnectClearState] walletConnector', walletConnector);
 
-  if (walletConnector && walletConnector.connected) {
     walletConnector.killSession();
-    dispatch(notificationShow('WalletConnect Session Disconnected', true));
-  } else {
-    dispatch(notificationShow('WalletConnect Connection Cancelled', true));
-  }
 
-  dispatch({ type: WALLET_CONNECT_CLEAR_STATE });
+    const notificationMsg = walletConnector.connected
+      ? 'WalletConnect Session Disconnected'
+      : 'WalletConnect Connection Cancelled';
+    dispatch(notificationShow(notificationMsg, true));
+
+    dispatch({ type: WALLET_CONNECT_CLEAR_STATE });
+  }
   window.browserHistory.push('/');
 };
 

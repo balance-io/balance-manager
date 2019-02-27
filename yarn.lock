@@ -991,10 +991,23 @@
     "@walletconnect/types" "^1.0.0-beta.2"
     "@walletconnect/utils" "^1.0.0-beta.3"
 
+"@walletconnect/qrcode-modal@^1.0.0-beta.4":
+  version "1.0.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@walletconnect/qrcode-modal/-/qrcode-modal-1.0.0-beta.4.tgz#447991968768431ee291c07b9ef02366f9bf5220"
+  integrity sha512-IgN5DJ6AaCEe8K02uOUami+lUJxcca2xFA4vrmhqhY23WIU031LQAL/RU84N+aJctnBAP2QKzXLy1fK51C1kcg==
+  dependencies:
+    "@walletconnect/types" "^1.0.0-beta.4"
+    qr-image "^3.2.0"
+
 "@walletconnect/types@^1.0.0-beta.2":
   version "1.0.0-beta.3"
   resolved "https://registry.yarnpkg.com/@walletconnect/types/-/types-1.0.0-beta.3.tgz#15a302808468886331176042f9f98d10ebaecf8e"
   integrity sha512-PiB0F7HF2LN6MWnSUR6HdqlwPJR1gblJIKNLOyfanzJOCIdceAtI5WHkuZOsM4bljUFKXpujMRTw1QmwntOw6g==
+
+"@walletconnect/types@^1.0.0-beta.4":
+  version "1.0.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@walletconnect/types/-/types-1.0.0-beta.4.tgz#8f93fdd41e7170f453cb73661127187bea59a72a"
+  integrity sha512-WOpNTWxNCyaTfrmLAjMLBSzyl3aM/OLu0a9zXJKyJOj4ZyOrKMDB4FRDHeCgIeoQHsEilNzLsr7RiJJZSx/CFA==
 
 "@walletconnect/utils@^1.0.0-beta.3":
   version "1.0.0-beta.3"
@@ -9132,6 +9145,11 @@ punycode@^1.2.4, punycode@^1.4.1:
 q@^1.1.2:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
+
+qr-image@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/qr-image/-/qr-image-3.2.0.tgz#9fa8295beae50c4a149cf9f909a1db464a8672e8"
+  integrity sha1-n6gpW+rlDEoUnPn5CaHbRkqGcug=
 
 qrcode@^1.2.0:
   version "1.3.2"

@@ -1,4 +1,5 @@
 import WalletConnect from '@walletconnect/browser';
+import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import {
   accountUpdateAccountAddress,
   accountUpdateNetwork,
@@ -28,9 +29,14 @@ export const walletConnectInit = () => async dispatch => {
   dispatch({ type: WALLET_CONNECT_INIT_REQUEST, payload: walletConnector });
 
   if (!walletConnector.connected) {
-    walletConnector.createSession().then(() => {
-      dispatch(modalOpen('WALLET_CONNECT', null));
-    });
+    try {
+      await walletConnector.createSession();
+      WalletConnectQRCodeModal.open(walletConnector.uri, () => {
+        dispatch(walletConnectClearState());
+      });
+    } catch (error) {
+      dispatch(walletConnectClearState());
+    }
   }
 
   dispatch(walletConnectRegisterEvents());
@@ -103,10 +109,14 @@ export const walletConnectRegisterEvents = () => async (dispatch, getState) => {
 export const walletConnectClearState = () => async (dispatch, getState) => {
   const { walletConnector } = getState().walletconnect;
 
-  walletConnector.killSession();
+  if (walletConnector && walletConnector.connected) {
+    walletConnector.killSession();
+    dispatch(notificationShow('WalletConnect Session Disconnected', true));
+  } else {
+    dispatch(notificationShow('WalletConnect Connection Cancelled', true));
+  }
 
   dispatch({ type: WALLET_CONNECT_CLEAR_STATE });
-  dispatch(notificationShow('WalletConnect Session Disconnected', true));
   window.browserHistory.push('/');
 };
 

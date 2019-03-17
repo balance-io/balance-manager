@@ -30,6 +30,7 @@
     "i18next": "^11.3.2",
     "jsonp": "^0.2.1",
     "lodash": "^4.17.5",
+    "opencollective-postinstall": "^2.0.2",
     "piwik-react-router": "^0.12.1",
     "prop-types": "^15.6.1",
     "qrcode": "^1.2.0",
@@ -45,7 +46,8 @@
     "styled-components": "^3.2.3",
     "trezor-connect": "^5.0.13",
     "walletconnect": "^0.7.25",
-    "web3": "^1.0.0-beta.34"
+    "web3": "^1.0.0-beta.34",
+    "opencollective": "^1.0.3"
   },
   "scripts": {
     "remove-sourcemaps": "rm -rf build/static/js/*.map",
@@ -56,7 +58,8 @@
     "eject": "react-scripts eject",
     "precommit": "lint-staged",
     "format": "prettier --write \"src/**/*.js\"",
-    "lint": "eslint src --ext .js"
+    "lint": "eslint src --ext .js",
+    "postinstall": "opencollective-postinstall"
   },
   "lint-staged": {
     "src/**/*.js": [
@@ -83,5 +86,9 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/balance-manager"
+  }
 }

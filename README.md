@@ -54,3 +54,33 @@ Stuck on something? Got questions? Want to chat privately? Send <a href="twitter
 Always clone or fork from the `latest` branch.
 We are going to work on making this process as simple as possible.
 At this stage we would encourage you to comment on issues you want to work on and reach out to us over Spectrum or Twitter.
+
+## Contributors
+
+This project exists thanks to all the people who contribute. 
+<a href="https://github.com/balance-io/balance-manager/graphs/contributors"><img src="https://opencollective.com/balance-manager/contributors.svg?width=890&button=false" /></a>
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/balance-manager#backer)]
+
+<a href="https://opencollective.com/balance-manager#backers" target="_blank"><img src="https://opencollective.com/balance-manager/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/balance-manager#sponsor)]
+
+<a href="https://opencollective.com/balance-manager/sponsor/0/website" target="_blank"><img src="https://opencollective.com/balance-manager/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/balance-manager/sponsor/1/website" target="_blank"><img src="https://opencollective.com/balance-manager/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/balance-manager/sponsor/2/website" target="_blank"><img src="https://opencollective.com/balance-manager/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/balance-manager/sponsor/3/website" target="_blank"><img src="https://opencollective.com/balance-manager/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/balance-manager/sponsor/4/website" target="_blank"><img src="https://opencollective.com/balance-manager/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/balance-manager/sponsor/5/website" target="_blank"><img src="https://opencollective.com/balance-manager/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/balance-manager/sponsor/6/website" target="_blank"><img src="https://opencollective.com/balance-manager/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/balance-manager/sponsor/7/website" target="_blank"><img src="https://opencollective.com/balance-manager/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/balance-manager/sponsor/8/website" target="_blank"><img src="https://opencollective.com/balance-manager/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/balance-manager/sponsor/9/website" target="_blank"><img src="https://opencollective.com/balance-manager/sponsor/9/avatar.svg"></a>
+
+

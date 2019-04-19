@@ -234,6 +234,12 @@ const TrustWalletLogo = styled.img`
   width: 52px;
 `;
 
+const WalletConnectLink = styled(Link)`
+  margin: 0 auto;
+  max-width: 315px;
+  width: 100%;
+`;
+
 const WalletConnectLogo = styled.div`
   background-image: url(${walletConnectLogoImage});
   background-repeat: no-repeat;
@@ -370,7 +376,7 @@ class Home extends Component {
                   .
                 </LogoText>
               </LogoSectionMobile>
-              <Link to="/wallet">
+              <WalletConnectLink to="/wallet">
                 <WalletConnectButton
                   color="walletconnect"
                   hoverColor="walletconnectHover"
@@ -379,7 +385,7 @@ class Home extends Component {
                 >
                   {lang.t('homepage.connect_walletconnect.button_mobile')}
                 </WalletConnectButton>
-              </Link>
+              </WalletConnectLink>
             </CardContainerMobile>
           </StyledCard>
           <CardContainerMobile>

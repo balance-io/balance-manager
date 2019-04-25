@@ -974,42 +974,43 @@
   dependencies:
     "@types/ethereum-protocol" "*"
 
-"@walletconnect/browser@^1.0.0-beta.11":
-  version "1.0.0-beta.11"
-  resolved "https://registry.yarnpkg.com/@walletconnect/browser/-/browser-1.0.0-beta.11.tgz#ca826e5c5253e59b492cb406b8eecc45bb33279e"
-  integrity sha512-JTpUvMOBF6G1D46AJIOJRhsRvDZ9GpOJIcOg5jXv95oExtCRqjlVhoEx/i4KiYrIudaFg4+gzI3uhL829aCqjA==
+"@walletconnect/browser@^1.0.0-beta.18":
+  version "1.0.0-beta.18"
+  resolved "https://registry.yarnpkg.com/@walletconnect/browser/-/browser-1.0.0-beta.18.tgz#97af55422c3d0943ba512c91d2cb541bd8403bc2"
+  integrity sha512-2dXIGQxUL0LCAIwIOIpZ8Hemkx4V6qdmRrgtDuaaAgmbMoh45N90e+38jH4wY5T0psITT7BP9Y5ceGLgAz8c+Q==
   dependencies:
-    "@walletconnect/core" "^1.0.0-beta.11"
-    "@walletconnect/types" "^1.0.0-beta.10"
-    "@walletconnect/utils" "^1.0.0-beta.11"
+    "@walletconnect/core" "^1.0.0-beta.18"
+    "@walletconnect/types" "^1.0.0-beta.17"
+    "@walletconnect/utils" "^1.0.0-beta.18"
 
-"@walletconnect/core@^1.0.0-beta.11":
-  version "1.0.0-beta.11"
-  resolved "https://registry.yarnpkg.com/@walletconnect/core/-/core-1.0.0-beta.11.tgz#d83b17488cf0f3fff6818009d705081963ad9fbd"
-  integrity sha512-Lh51x4J9yXTS87C0YtNigVRo+3XggStSTH0VlJrwW7l7XFkBJwDCzYwwKyM5h7w91WGlrn6tSjnJl6nE4V2W/w==
+"@walletconnect/core@^1.0.0-beta.18":
+  version "1.0.0-beta.18"
+  resolved "https://registry.yarnpkg.com/@walletconnect/core/-/core-1.0.0-beta.18.tgz#b43d5d79bb6b7beaca1bf42b0d2500f04fcd3815"
+  integrity sha512-xWs9WkXFlTwSCkUzqXVF49BtCHwtzyAQL9x1MCFWTSGlqK8xapSH+2PEq4k2CHw/Zjh22oK/qBvuYgCdo+RFuw==
   dependencies:
-    "@walletconnect/types" "^1.0.0-beta.10"
-    "@walletconnect/utils" "^1.0.0-beta.11"
+    "@walletconnect/types" "^1.0.0-beta.17"
+    "@walletconnect/utils" "^1.0.0-beta.18"
 
-"@walletconnect/qrcode-modal@^1.0.0-beta.11":
-  version "1.0.0-beta.11"
-  resolved "https://registry.yarnpkg.com/@walletconnect/qrcode-modal/-/qrcode-modal-1.0.0-beta.11.tgz#0dd14b76a1897a95a55153c73697e1ae46860e3b"
-  integrity sha512-BbEv05Bp9n7pWoau1iwiyEggTujuFVKm+vC83aNPcsYNQ0uyxyRfhZkUhnIRg6ry1dsIqeyazBS/Q8/J8Q8PkQ==
+"@walletconnect/qrcode-modal@^1.0.0-beta.18":
+  version "1.0.0-beta.18"
+  resolved "https://registry.yarnpkg.com/@walletconnect/qrcode-modal/-/qrcode-modal-1.0.0-beta.18.tgz#69da4665b0ac3a2b4c171f2adf72005295739bf6"
+  integrity sha512-IBQZf4jo3Iw7bmcTzfpv1eq70+c+rgjxVecg8KzkExf7ivfDcrykkKh0NTWXpHbbWLc2f6YSlC9yePqKydwAFA==
   dependencies:
-    "@walletconnect/types" "^1.0.0-beta.10"
+    "@walletconnect/types" "^1.0.0-beta.17"
     qr-image "^3.2.0"
 
-"@walletconnect/types@^1.0.0-beta.10":
-  version "1.0.0-beta.11"
-  resolved "https://registry.yarnpkg.com/@walletconnect/types/-/types-1.0.0-beta.11.tgz#e9e751268c73945255484adcbddaabda4a81dab4"
-  integrity sha512-LgO/R5WGUIwbn9Euzwbx2tWC/XtlFVtRR3ulSldsl5wUA+y04XlAcHsirp2b3ebuaaOJGcAnfFdwK3Qa7k5K5g==
+"@walletconnect/types@^1.0.0-beta.17":
+  version "1.0.0-beta.18"
+  resolved "https://registry.yarnpkg.com/@walletconnect/types/-/types-1.0.0-beta.18.tgz#c258413d41e4c557b68cef5d22ff463c3b1cd0d6"
+  integrity sha512-cqhVcyNdXEDvnUUD8r7cWI6ZHeIsIOriJMIkOuxslWbaHadnJ0SGStJ9sSINibAMD/ZUEabQZRWA18BxL4jRvQ==
 
-"@walletconnect/utils@^1.0.0-beta.11":
-  version "1.0.0-beta.11"
-  resolved "https://registry.yarnpkg.com/@walletconnect/utils/-/utils-1.0.0-beta.11.tgz#25fadd17973086df8f10d625161c0c3cb1f61bc1"
-  integrity sha512-El+OVX4T+5xZcfCYunHECkPBcX6AKiuhwxzQ1ElQ9jnujEr6Z1+KP1DptLnAGMfvNKZ/dbJlqh8Y1K0wYV0hOQ==
+"@walletconnect/utils@^1.0.0-beta.18":
+  version "1.0.0-beta.18"
+  resolved "https://registry.yarnpkg.com/@walletconnect/utils/-/utils-1.0.0-beta.18.tgz#077569c9c7e525ec8a50f4014eb662ca33694cec"
+  integrity sha512-IgpJyHmtgRmset5gZZ9gTGziZQ5fKWtTud41vosKtQhgvh8+HQkPVWPqj/KxQupLFWK3/ACo1CqlxoKAjctpOQ==
   dependencies:
-    "@walletconnect/types" "^1.0.0-beta.10"
+    "@walletconnect/types" "^1.0.0-beta.17"
+    js-sha3 "^0.8.0"
     lodash.isnumber "^3.0.3"
 
 "@webassemblyjs/ast@1.7.6":
@@ -6587,6 +6588,11 @@ js-sha3@^0.3.1:
 js-sha3@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.7.0.tgz#0a5c57b36f79882573b2d84051f8bb85dd1bd63a"
+
+js-sha3@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.8.0.tgz#b9b7a5da73afad7dedd0f8c463954cbde6818840"
+  integrity sha512-gF1cRrHhIzNfToc802P800N8PpXS+evLLXfsVpowqmAFR9uwbi89WvXg2QspOmXL8QL86J4T1EpFu+yUkwJY3Q==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"

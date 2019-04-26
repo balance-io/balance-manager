@@ -115,8 +115,8 @@ Ledger.propTypes = {
   accounts: PropTypes.array.isRequired,
 };
 
-const reduxProps = ({ account, ledger }) => ({
-  accountType: account.accountType,
+const reduxProps = ({ settings, ledger }) => ({
+  accountType: settings.accountType,
   accounts: ledger.accounts,
   fetching: ledger.fetching,
 });

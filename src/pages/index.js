@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { accountInitializeState, lang } from 'balance-common';
+import { settingsInitializeState, lang } from 'balance-common';
 import Link from '../components/Link';
 import BaseLayout from '../layouts/base';
 import Card from '../components/Card';
@@ -306,7 +306,7 @@ const OperaLogoText = BraveLogoText.extend``;
 
 class Home extends Component {
   componentDidMount = () => {
-    this.props.accountInitializeState();
+    this.props.settingsInitializeState();
   };
 
   render = () => (
@@ -587,14 +587,14 @@ class Home extends Component {
 }
 
 Home.propTypes = {
-  accountInitializeState: PropTypes.func.isRequired,
+  settingsInitializeState: PropTypes.func.isRequired,
   modalOpen: PropTypes.func.isRequired,
 };
 
 export default connect(
   null,
   {
-    accountInitializeState,
+    settingsInitializeState,
     modalOpen,
   },
 )(Home);

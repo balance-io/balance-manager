@@ -65,9 +65,9 @@ AccountUniqueTokens.propTypes = {
   uniqueTokens: PropTypes.array.isRequired,
   fetchingUniqueTokens: PropTypes.bool.isRequired,
 };
-const reduxProps = ({ account }) => ({
-  uniqueTokens: account.uniqueTokens,
-  fetchingUniqueTokens: account.fetchingUniqueTokens,
+const reduxProps = ({ assets }) => ({
+  uniqueTokens: assets.uniqueTokens,
+  fetchingUniqueTokens: assets.fetchingUniqueTokens,
 });
 
 export default connect(

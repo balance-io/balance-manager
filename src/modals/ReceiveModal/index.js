@@ -21,9 +21,9 @@ import {
   StyledCopyToClipboard,
 } from '../modalStyles';
 
-const reduxProps = ({ account }) => ({
-  accountAddress: account.accountAddress,
-  accountType: account.accountType,
+const reduxProps = ({ settings }) => ({
+  accountAddress: settings.accountAddress,
+  accountType: settings.accountType,
 });
 
 const StyledCardContainer = styled.div`

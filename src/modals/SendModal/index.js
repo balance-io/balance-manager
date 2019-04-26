@@ -77,7 +77,7 @@ class SendModal extends Component {
               <div>
                 <DropdownAsset
                   selected={selectedSymbol}
-                  assets={this.props.accountInfo.assets}
+                  assets={this.props.assets}
                   onChange={value => this.props.sendUpdateSelected(value)}
                 />
               </div>

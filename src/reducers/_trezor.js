@@ -1,6 +1,6 @@
 import { lang } from 'balance-common';
 import {
-  accountUpdateAccountAddress,
+  settingsUpdateAccountAddress,
   accountUpdateNetwork,
 } from 'balance-common';
 import { trezorEthInit, trezorEthAccounts } from '../handlers/trezor-eth';
@@ -17,7 +17,7 @@ const TREZOR_CLEAR_STATE = 'trezor/TREZOR_CLEAR_STATE';
 // -- Actions --------------------------------------------------------------- //
 
 export const trezorConnectInit = () => (dispatch, getState) => {
-  const network = getState().account.network;
+  const { network } = getState().settings;
   dispatch({ type: TREZOR_CONNECT_REQUEST });
   trezorEthInit(network)
     .then(() => {
@@ -26,7 +26,7 @@ export const trezorConnectInit = () => (dispatch, getState) => {
           if (accounts.length) {
             dispatch({ type: TREZOR_CONNECT_SUCCESS, payload: accounts });
             dispatch(
-              accountUpdateAccountAddress(accounts[0].address, 'TREZOR'),
+              settingsUpdateAccountAddress(accounts[0].address, 'TREZOR'),
             );
           } else {
             dispatch(
@@ -50,10 +50,10 @@ export const trezorConnectInit = () => (dispatch, getState) => {
 };
 
 export const trezorUpdateNetwork = network => (dispatch, getState) => {
-  const accountAddress = getState().account.accountAddress;
+  const { accountAddress } = getState().settings;
   dispatch({ type: TREZOR_UPDATE_NETWORK, payload: network });
   dispatch(accountUpdateNetwork(network));
-  dispatch(accountUpdateAccountAddress(accountAddress, 'TREZOR'));
+  dispatch(settingsUpdateAccountAddress(accountAddress, 'TREZOR'));
   dispatch(trezorConnectInit());
 };
 

@@ -184,12 +184,10 @@ class AccountBalances extends Component {
     this.setState({ showMoreTokens: !this.state.showMoreTokens });
   };
   render() {
-    const { accountInfo } = this.props;
-    if (!accountInfo.assets) return null;
-    const ethereum = this.props.accountInfo.assets.filter(
-      asset => asset.symbol === 'ETH',
-    )[0];
-    const tokens = this.props.accountInfo.assets.filter(
+    const { accountAddress, assets } = this.props;
+    if (!assets) return null;
+    const ethereum = assets.filter(asset => asset.symbol === 'ETH')[0];
+    const tokens = assets.filter(
       asset => asset.symbol !== 'ETH' && typeof asset === 'object' && !!asset,
     );
     if (tokens.length && tokens.length < 5 && !this.state.disableToggle) {
@@ -243,7 +241,7 @@ class AccountBalances extends Component {
         </StyledEthereum>
         {!!tokensAlwaysDisplay &&
           tokensAlwaysDisplay.map(token => (
-            <StyledToken key={`${accountInfo.address}-${token.symbol}`}>
+            <StyledToken key={`${accountAddress}-${token.symbol}`}>
               <StyledAsset>
                 <AssetIcon asset={token.address} />
                 <p>{token.name}</p>
@@ -265,7 +263,7 @@ class AccountBalances extends Component {
         {!!tokensToggleDisplay.length &&
           this.state.showMoreTokens &&
           tokensToggleDisplay.map(token => (
-            <StyledToken key={`${accountInfo.address}-${token.symbol}`}>
+            <StyledToken key={`${accountAddress}-${token.symbol}`}>
               <StyledAsset data-toggle="tooltip" title={token.name}>
                 <AssetIcon asset={token.address} />
                 <p>{ellipseText(token.name, 30)}</p>
@@ -307,7 +305,7 @@ class AccountBalances extends Component {
           ) : (
             <div />
           )}
-          <p>{`${accountInfo.total ? accountInfo.total.display : '———'}`}</p>
+          {/* <p>{`${accountInfo.total ? accountInfo.total.display : '———'}`}</p> */}
         </StyledLastRow>
       </StyledGrid>
     );
@@ -315,10 +313,12 @@ class AccountBalances extends Component {
 }
 
 AccountBalances.propTypes = {
-  accountInfo: PropTypes.object.isRequired,
+  accountAddress: PropTypes.string.isRequired,
+  assets: PropTypes.object.isRequired,
 };
-const reduxProps = ({ account }) => ({
-  accountInfo: account.accountInfo,
+const reduxProps = ({ settings, assets }) => ({
+  accountAddress: settings.accountAddress,
+  assets: assets.assets,
 });
 
 export default connect(

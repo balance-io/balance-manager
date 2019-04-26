@@ -1,6 +1,6 @@
 import { lang } from 'balance-common';
 import {
-  accountUpdateAccountAddress,
+  settingsUpdateAccountAddress,
   accountUpdateNetwork,
 } from 'balance-common';
 import { ledgerEthInit, ledgerEthAccounts } from '../handlers/ledger-eth';
@@ -26,7 +26,7 @@ export const ledgerConnectInit = () => (dispatch, getState) => {
           if (accounts.length) {
             dispatch({ type: LEDGER_CONNECT_SUCCESS, payload: accounts });
             dispatch(
-              accountUpdateAccountAddress(accounts[0].address, 'LEDGER'),
+              settingsUpdateAccountAddress(accounts[0].address, 'LEDGER'),
             );
           } else {
             dispatch(
@@ -48,10 +48,10 @@ export const ledgerConnectInit = () => (dispatch, getState) => {
 };
 
 export const ledgerUpdateNetwork = network => (dispatch, getState) => {
-  const accountAddress = getState().account.accountAddress;
+  const { accountAddress } = getState().settings;
   dispatch({ type: LEDGER_UPDATE_NETWORK, payload: network });
   dispatch(accountUpdateNetwork(network));
-  dispatch(accountUpdateAccountAddress(accountAddress, 'LEDGER'));
+  dispatch(settingsUpdateAccountAddress(accountAddress, 'LEDGER'));
 };
 
 export const ledgerClearState = () => dispatch => {

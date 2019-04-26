@@ -19,7 +19,7 @@ const ZRX_INSTANT_RENDER_MODAL_SUCCESS =
 // -- Actions --------------------------------------------------------------- //
 export const zrxInstantInit = () => (dispatch, getState) => {
   dispatch({ type: ZRX_INSTANT_RENDER_MODAL_REQUEST });
-  const { accountType } = getState().account;
+  const { accountType } = getState().settings;
   const providerEngine = new Web3ProviderEngine();
   let provider = null;
   let walletDisplayName = 'Metamask';

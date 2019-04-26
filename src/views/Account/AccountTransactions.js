@@ -572,7 +572,6 @@ class AccountViewTransactions extends Component {
 }
 
 AccountViewTransactions.propTypes = {
-  account: PropTypes.object.isRequired,
   accountUpdateHasPendingTransaction: PropTypes.func.isRequired,
   fetchingTransactions: PropTypes.bool.isRequired,
   hasPendingTransaction: PropTypes.bool,
@@ -581,13 +580,12 @@ AccountViewTransactions.propTypes = {
   transactions: PropTypes.array.isRequired,
 };
 
-const reduxProps = ({ account }) => ({
-  transactions: account.transactions,
-  fetchingTransactions: account.fetchingTransactions,
-  accountAddress: account.accountAddress,
-  account: account.accountInfo,
-  network: account.network,
-  nativeCurrency: account.nativeCurrency,
+const reduxProps = ({ settings, transactions }) => ({
+  transactions: transactions.transactions,
+  fetchingTransactions: transactions.fetchingTransactions,
+  accountAddress: settings.accountAddress,
+  network: settings.network,
+  nativeCurrency: settings.nativeCurrency,
 });
 
 export default connect(

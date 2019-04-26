@@ -115,8 +115,8 @@ Trezor.propTypes = {
   accounts: PropTypes.array.isRequired,
 };
 
-const reduxProps = ({ account, trezor }) => ({
-  accountType: account.accountType,
+const reduxProps = ({ settings, trezor }) => ({
+  accountType: settings.accountType,
   accounts: trezor.accounts,
   fetching: trezor.fetching,
 });

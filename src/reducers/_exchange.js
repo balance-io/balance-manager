@@ -108,7 +108,7 @@ const EXCHANGE_CLEAR_FIELDS = 'exchange/EXCHANGE_CLEAR_FIELDS';
 // -- Actions --------------------------------------------------------------- //
 
 export const exchangeGetGasPrices = () => (dispatch, getState) => {
-  const { prices } = getState().account;
+  const { prices } = getState().prices;
   const { gasLimit } = getState().exchange;
   dispatch({ type: EXCHANGE_GET_GAS_PRICE_REQUEST });
   apiGetGasPrices()
@@ -128,7 +128,7 @@ export const exchangeGetGasPrices = () => (dispatch, getState) => {
 
 export const exchangeGetWithdrawalPrice = () => (dispatch, getState) => {
   const { withdrawalSelected } = getState().exchange;
-  const { prices } = getState().account;
+  const { prices } = getState().prices;
   dispatch({ type: EXCHANGE_GET_WITHDRAWAL_PRICE_REQUEST });
   const nativeSelected = prices.selected.currency;
   const withdrawalSymbol = withdrawalSelected.symbol;
@@ -498,12 +498,10 @@ export const exchangeUpdateWithdrawalNative = withdrawalNative => (
 
 export const exchangeMaxBalance = () => (dispatch, getState) => {
   const { depositSelected, gasPrice, exchangeDetails } = getState().exchange;
-  const { accountInfo } = getState().account;
+  const { assets } = getState().assets;
   let amount = '';
   if (depositSelected.symbol === 'ETH') {
-    const ethereum = accountInfo.assets.filter(
-      asset => asset.symbol === 'ETH',
-    )[0];
+    const ethereum = assets.filter(asset => asset.symbol === 'ETH')[0];
     const balanceAmount = ethereum.balance.amount;
     const txFeeAmount = gasPrice.txFee.value.amount;
     const remaining = convertStringToNumber(
@@ -520,15 +518,9 @@ export const exchangeMaxBalance = () => (dispatch, getState) => {
 };
 
 export const exchangeModalInit = () => (dispatch, getState) => {
-  const {
-    accountAddress,
-    accountInfo,
-    shapeshiftAvailable,
-  } = getState().account;
-  if (!shapeshiftAvailable) return;
-  const depositSelected = accountInfo.assets.filter(
-    asset => asset.symbol === 'ETH',
-  )[0];
+  const { accountAddress } = getState().settings;
+  const { assets } = getState().assets;
+  const depositSelected = assets.filter(asset => asset.symbol === 'ETH')[0];
   dispatch({
     type: EXCHANGE_GET_AVAILABLE_REQUEST,
     payload: { address: accountAddress, depositSelected },
@@ -539,7 +531,7 @@ export const exchangeModalInit = () => (dispatch, getState) => {
       const availableSymbols = withdrawalAssets.map(
         availableAsset => availableAsset.symbol,
       );
-      const depositAssets = accountInfo.assets.filter(
+      const depositAssets = assets.filter(
         asset => availableSymbols.indexOf(asset.symbol) !== -1,
       );
       const withdrawalSelected = withdrawalAssets[0];

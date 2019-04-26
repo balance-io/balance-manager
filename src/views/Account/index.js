@@ -233,7 +233,7 @@ Account.propTypes = {
   match: PropTypes.object.isRequired,
   modalOpen: PropTypes.func.isRequired,
   fetching: PropTypes.bool,
-  accountInfo: PropTypes.object.isRequired,
+  assets: PropTypes.object.isRequired,
   accountAddress: PropTypes.string.isRequired,
   accountType: PropTypes.string.isRequired,
   fetchingWallet: PropTypes.bool,
@@ -245,13 +245,13 @@ Account.defaultProps = {
   fetchingMessage: '',
 };
 
-const reduxProps = ({ account }) => ({
-  accountAddress: account.accountAddress,
-  accountInfo: account.accountInfo,
-  accountType: account.accountType,
-  fetching: account.fetching,
-  hasPendingTransaction: account.hasPendingTransaction,
-  network: account.network,
+const reduxProps = ({ settings, assets, transactions }) => ({
+  accountAddress: settings.accountAddress,
+  assets: assets.assets,
+  accountType: settings.accountType,
+  fetching: settings.fetching,
+  hasPendingTransaction: transactions.hasPendingTransaction,
+  network: settings.network,
 });
 
 export default withRouter(

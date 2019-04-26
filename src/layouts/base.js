@@ -19,10 +19,11 @@ import nativeCurrencies from '../references/native-currencies.json';
 import { ledgerUpdateNetwork } from '../reducers/_ledger';
 import { trezorUpdateNetwork } from '../reducers/_trezor';
 import {
-  accountChangeNativeCurrency,
-  accountClearState,
-  accountUpdateAccountAddress,
-  accountChangeLanguage,
+  settingsChangeNativeCurrency,
+  assetsClearState,
+  transactionsClearState,
+  settingsUpdateAccountAddress,
+  settingsChangeLanguage,
 } from 'balance-common';
 import { metamaskClearState } from '../reducers/_metamask';
 import { ledgerClearState } from '../reducers/_ledger';
@@ -126,11 +127,12 @@ const StyledFooterRight = styled.div`
 
 const BaseLayout = ({
   accountAddress,
-  accountChangeLanguage,
-  accountChangeNativeCurrency,
-  accountClearState,
+  settingsChangeLanguage,
+  settingsChangeNativeCurrency,
+  assetsClearState,
+  transactionsClearState,
   accountType,
-  accountUpdateAccountAddress,
+  settingsUpdateAccountAddress,
   children,
   language,
   ledgerAccounts,
@@ -178,7 +180,8 @@ const BaseLayout = ({
     accountAddress;
   const openSendModal = () => modalOpen('DONATION_MODAL');
   const disconnectAccount = () => {
-    accountClearState();
+    assetsClearState();
+    transactionsClearState();
     commonStorage.resetAccount(accountAddress);
     if (accountType === 'TREZOR') {
       trezorClearState();
@@ -213,7 +216,7 @@ const BaseLayout = ({
                     selected={accountAddress}
                     options={addresses}
                     onChange={address =>
-                      accountUpdateAccountAddress(address, 'LEDGER')
+                      settingsUpdateAccountAddress(address, 'LEDGER')
                     }
                   />
                   <StyledVerticalLine />
@@ -229,7 +232,7 @@ const BaseLayout = ({
                     selected={accountAddress}
                     options={addresses}
                     onChange={address =>
-                      accountUpdateAccountAddress(address, 'TREZOR')
+                      settingsUpdateAccountAddress(address, 'TREZOR')
                     }
                   />
                   <StyledVerticalLine />
@@ -255,7 +258,7 @@ const BaseLayout = ({
                   displayKey={`currency`}
                   selected={nativeCurrency}
                   options={nativeCurrencies}
-                  onChange={accountChangeNativeCurrency}
+                  onChange={settingsChangeNativeCurrency}
                 />
                 <StyledVerticalLine />
               </Fragment>
@@ -264,7 +267,7 @@ const BaseLayout = ({
               displayKey={`description`}
               selected={language}
               options={languages}
-              onChange={accountChangeLanguage}
+              onChange={settingsChangeLanguage}
             />
           </StyledIndicators>
         </StyledHeader>
@@ -294,10 +297,11 @@ const BaseLayout = ({
 };
 
 BaseLayout.propTypes = {
-  accountChangeNativeCurrency: PropTypes.func.isRequired,
-  accountClearState: PropTypes.func.isRequired,
-  accountUpdateAccountAddress: PropTypes.func.isRequired,
-  accountChangeLanguage: PropTypes.func.isRequired,
+  settingsChangeNativeCurrency: PropTypes.func.isRequired,
+  assetsClearState: PropTypes.func.isRequired,
+  transactionsClearState: PropTypes.func.isRequired,
+  settingsUpdateAccountAddress: PropTypes.func.isRequired,
+  settingsChangeLanguage: PropTypes.func.isRequired,
   accountType: PropTypes.string.isRequired,
   accountAddress: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
@@ -318,15 +322,15 @@ BaseLayout.propTypes = {
   web3Available: PropTypes.bool.isRequired,
 };
 
-const reduxProps = ({ account, ledger, trezor, metamask, warning }) => ({
-  accountType: account.accountType,
-  accountAddress: account.accountAddress,
-  nativeCurrency: account.nativeCurrency,
+const reduxProps = ({ settings, ledger, trezor, metamask, warning }) => ({
+  accountType: settings.accountType,
+  accountAddress: settings.accountAddress,
+  nativeCurrency: settings.nativeCurrency,
   metamaskFetching: metamask.fetching,
-  language: account.language,
+  language: settings.language,
   ledgerFetching: ledger.fetching,
   trezorFetching: trezor.fetching,
-  network: account.network,
+  network: settings.network,
   ledgerAccounts: ledger.accounts,
   trezorAccounts: trezor.accounts,
   web3Available: metamask.web3Available,
@@ -336,10 +340,11 @@ const reduxProps = ({ account, ledger, trezor, metamask, warning }) => ({
 export default connect(
   reduxProps,
   {
-    accountChangeLanguage,
-    accountChangeNativeCurrency,
-    accountClearState,
-    accountUpdateAccountAddress,
+    settingsChangeLanguage,
+    settingsChangeNativeCurrency,
+    assetsClearState,
+    transactionsClearState,
+    settingsUpdateAccountAddress,
     ledgerClearState,
     ledgerUpdateNetwork,
     metamaskClearState,

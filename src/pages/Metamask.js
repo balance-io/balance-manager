@@ -73,8 +73,8 @@ Metamask.defaultProps = {
   accountAddress: null,
 };
 
-const reduxProps = ({ account, metamask }) => ({
-  accountType: account.accountType,
+const reduxProps = ({ settings, metamask }) => ({
+  accountType: settings.accountType,
   web3Available: metamask.web3Available,
   network: metamask.network,
   accountAddress: metamask.accountAddress,

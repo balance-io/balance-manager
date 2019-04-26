@@ -8,12 +8,15 @@ import walletconnect from './_walletconnect';
 import notification from './_notification';
 import warning from './_warning';
 import zrxinstant from './_zrxinstant';
-import { account, send } from 'balance-common';
+import { settings, assets, prices, transactions, send } from 'balance-common';
 
 export default combineReducers({
   exchange,
   send,
-  account,
+  settings,
+  assets,
+  prices,
+  transactions,
   modal,
   ledger,
   trezor,

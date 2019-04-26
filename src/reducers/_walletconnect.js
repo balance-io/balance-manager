@@ -1,7 +1,7 @@
 import WalletConnect from '@walletconnect/browser';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import {
-  accountUpdateAccountAddress,
+  settingsUpdateAccountAddress,
   accountUpdateNetwork,
 } from 'balance-common';
 import { notificationShow } from './_notification';
@@ -75,7 +75,7 @@ export const walletConnectHandleSession = ({
     type,
     payload: { accountAddress, network },
   });
-  dispatch(accountUpdateAccountAddress(accountAddress, 'WALLETCONNECT'));
+  dispatch(settingsUpdateAccountAddress(accountAddress, 'WALLETCONNECT'));
   dispatch(accountUpdateNetwork(network));
 };
 

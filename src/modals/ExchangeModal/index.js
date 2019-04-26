@@ -389,7 +389,7 @@ class ExchangeModal extends Component {
     }
     if (!this.props.confirm) {
       if (this.props.depositSelected.symbol === 'ETH') {
-        const ethereum = this.props.accountInfo.assets.filter(
+        const ethereum = this.props.assets.filter(
           asset => asset.symbol === 'ETH',
         )[0];
         const balanceAmount = ethereum.balance.amount;
@@ -412,7 +412,7 @@ class ExchangeModal extends Component {
           return;
         }
       } else {
-        const ethereum = this.props.accountInfo.assets.filter(
+        const ethereum = this.props.assets.filter(
           asset => asset.symbol === 'ETH',
         )[0];
         const etherBalanceAmount = ethereum.balance.amount;
@@ -450,14 +450,14 @@ class ExchangeModal extends Component {
     const withdrawalAssets = this.props.withdrawalAssets.filter(
       asset => asset.symbol !== this.props.depositSelected.symbol,
     );
-    const balance = this.props.accountInfo.assets.filter(
+    const balance = this.props.assets.filter(
       asset => asset.symbol === this.props.depositSelected.symbol,
     )[0].balance.display;
-    const depositNative = this.props.accountInfo.assets.filter(
+    const depositNative = this.props.assets.filter(
       asset => asset.symbol === this.props.depositSelected.symbol,
     )[0].native;
     const depositValue = depositNative
-      ? this.props.accountInfo.assets.filter(
+      ? this.props.assets.filter(
           asset => asset.symbol === this.props.depositSelected.symbol,
         )[0].native.balance.display
       : '';
@@ -953,7 +953,7 @@ ExchangeModal.propTypes = {
   withdrawalInput: PropTypes.string.isRequired,
   withdrawalAmount: PropTypes.string.isRequired,
   withdrawalPrice: PropTypes.object.isRequired,
-  accountInfo: PropTypes.object.isRequired,
+  assets: PropTypes.object.isRequired,
   accountType: PropTypes.string.isRequired,
   network: PropTypes.string.isRequired,
   prices: PropTypes.object.isRequired,
@@ -962,7 +962,7 @@ ExchangeModal.propTypes = {
   fetchingShapeshift: PropTypes.bool.isRequired,
 };
 
-const reduxProps = ({ modal, exchange, account }) => ({
+const reduxProps = ({ prices, assets, exchange, settings }) => ({
   fetchingRate: exchange.fetchingRate,
   fetchingFinal: exchange.fetchingFinal,
   fetching: exchange.fetching,
@@ -982,13 +982,13 @@ const reduxProps = ({ modal, exchange, account }) => ({
   withdrawalInput: exchange.withdrawalInput,
   withdrawalAmount: exchange.withdrawalAmount,
   withdrawalPrice: exchange.withdrawalPrice,
-  accountInfo: account.accountInfo,
-  accountType: account.accountType,
-  network: account.network,
-  prices: account.prices,
-  nativeCurrency: account.nativeCurrency,
-  shapeshiftAvailable: account.shapeshiftAvailable,
-  fetchingShapeshift: account.fetchingShapeshift,
+  assets: assets.assets,
+  accountType: settings.accountType,
+  network: settings.network,
+  prices: prices.prices,
+  nativeCurrency: settings.nativeCurrency,
+  shapeshiftAvailable: settings.shapeshiftAvailable,
+  fetchingShapeshift: settings.fetchingShapeshift,
 });
 
 export default connect(

@@ -23,7 +23,7 @@
     "@walletconnect/browser": "^1.0.0-beta.18",
     "@walletconnect/qrcode-modal": "^1.0.0-beta.18",
     "axios": "^0.18.0",
-    "balance-common": "^0.6.1",
+    "balance-common": "^0.6.9",
     "bignumber.js": "^7.0.1",
     "bowser": "^2.0.0-alpha.4",
     "ethereumjs-tx": "^1.3.4",

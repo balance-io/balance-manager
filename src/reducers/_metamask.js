@@ -1,7 +1,7 @@
 import { parseError } from 'balance-common';
 import { modalClose } from './_modal';
 import {
-  accountUpdateAccountAddress,
+  settingsUpdateAccountAddress,
   accountUpdateNetwork,
 } from 'balance-common';
 import { notificationShow } from './_notification';
@@ -60,14 +60,14 @@ export const metamaskUpdateMetamaskAccount = () => (dispatch, getState) => {
       payload: accountAddress,
     });
     if (accountAddress)
-      dispatch(accountUpdateAccountAddress(accountAddress, 'METAMASK'));
+      dispatch(settingsUpdateAccountAddress(accountAddress, 'METAMASK'));
   }
 };
 
 export const metamaskConnectInit = () => (dispatch, getState) => {
   const accountAddress = getState().metamask.accountAddress;
   if (accountAddress)
-    dispatch(accountUpdateAccountAddress(accountAddress, 'METAMASK'));
+    dispatch(settingsUpdateAccountAddress(accountAddress, 'METAMASK'));
   dispatch({ type: METAMASK_CONNECT_REQUEST });
   if (window.ethereum || window.web3) {
     getMetamaskNetwork()

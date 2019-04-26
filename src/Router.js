@@ -37,8 +37,8 @@ Router.contextTypes = {
   signup: PropTypes.any,
 };
 
-const reduxProps = ({ account }) => ({
-  language: account.language,
+const reduxProps = ({ settings }) => ({
+  language: settings.language,
 });
 
 export default withRouter(

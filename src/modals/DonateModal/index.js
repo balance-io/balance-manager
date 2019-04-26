@@ -43,7 +43,7 @@ const balanceManagerEthAddress =
   process.env.REACT_APP_DONATION_ADDRESS ||
   '0x0000000000000000000000000000000000000000';
 
-const reduxProps = ({ modal, send, account }) => ({
+const reduxProps = ({ prices, send, assets, settings }) => ({
   recipient: send.recipient,
   nativeAmount: send.nativeAmount,
   assetAmount: send.assetAmount,
@@ -55,11 +55,11 @@ const reduxProps = ({ modal, send, account }) => ({
   gasLimit: send.gasLimit,
   gasPriceOption: send.gasPriceOption,
   confirm: send.confirm,
-  accountInfo: account.accountInfo,
-  accountType: account.accountType,
-  network: account.network,
-  nativeCurrency: account.nativeCurrency,
-  prices: account.prices,
+  assets: assets.assets,
+  accountType: settings.accountType,
+  network: settings.network,
+  nativeCurrency: settings.nativeCurrency,
+  prices: prices.prices,
 });
 
 class DonateModal extends Component {
@@ -75,7 +75,7 @@ class DonateModal extends Component {
 
   render = () => {
     const {
-      accountInfo,
+      assets,
       accountType,
       assetAmount,
       sendUpdateNativeAmount,
@@ -106,10 +106,7 @@ class DonateModal extends Component {
               </StyledSubTitle>
 
               <div>
-                <DropdownAsset
-                  selected={'ETH'}
-                  assets={[getEth(accountInfo.assets)]}
-                />
+                <DropdownAsset selected={'ETH'} assets={[getEth(assets)]} />
               </div>
 
               <StyledFlex>

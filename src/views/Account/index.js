@@ -59,7 +59,7 @@ const StyledTop = styled.div`
 const StyledAddressWrapper = styled.div`
   display: inline-flex;
   flex-direction: column;
-  flex: 1
+  flex: 1;
   width: 100%;
 `;
 

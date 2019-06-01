@@ -65,20 +65,11 @@ const StyledViewLink = styled.a`
 `;
 
 const StyledToken = styled.div`
-  display: inline-block;
   font-size: 14px;
-  padding: 0 10px;
-  width: 25%;
   text-align: center;
   margin-bottom: 20px;
-
-  @media (max-width: 640px) {
-    width: 50%;
-  }
-
-  @media (max-width: 480px) {
-    width: 100%;
-  }
+  -webkit-column-break-inside: avoid;
+  break-inside: avoid-column;
 `;
 
 const StyledInfo = styled.div`

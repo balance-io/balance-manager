@@ -113,7 +113,7 @@ const UniqueToken = ({ asset }) => (
       </StyledTokenBackground>
       <StyledToolGroup>
         <StyledInfo>
-          <StyledName>{asset.name}</StyledName>
+          <StyledName title={asset.name}>{asset.name}</StyledName>
           {asset.currentPrice && (
             <StyledCurPrice>
               {asset.currentPrice

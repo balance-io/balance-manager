@@ -2,65 +2,33 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { lang } from 'balance-common';
-import { colors, fonts, shadows, transitions } from '../styles';
+import { transitions } from '../styles';
 
 const StyledViewLink = styled.a`
   transition: ${transitions.button};
   position: relative;
-  border: none;
   display: inline-block;
   border-style: none;
   box-sizing: border-box;
-  background-color: ${({ outline, color }) =>
-    outline ? 'transparent' : `rgb(${colors[color]})`};
-  border: ${({ outline, color }) =>
-    outline ? `1px solid rgb(${colors[color]})` : 'none'};
-  color: ${({ outline, color }) =>
-    outline ? `rgb(${colors[color]})` : `rgb(${colors.white})`};
-  box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)};
-  border-radius: 8px;
-  font-size: ${fonts.size.h6};
-  font-weight: ${fonts.weight.semibold};
-  padding: ${({ icon, left }) =>
-    icon ? (left ? '7px 12px 8px 28px' : '7px 28px 8px 12px') : '8px 12px'};
-  height: 32px;
-  cursor: ${({ disabled }) => (disabled ? 'auto' : 'pointer')};
-  will-change: transform;
+  background-color: white;
+  box-shadow: 0 0 0 1px #bbb, 0 1px 2px rgba(0, 0, 0, 0.07);
+  padding: 6px 10px;
+  margin: 0;
+  color: #757575;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.07);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  border: none;
+  text-decoration: none;
+  border-radius: 4px;
+  appearance: none;
 
-  &:disabled {
-    opacity: 0.6;
-    box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)};
-  }
-
-  @media (hover: hover) {
-    &:hover {
-      transform: ${({ disabled }) => (!disabled ? 'translateY(-1px)' : 'none')};
-      background-color: ${({ disabled, hoverColor, color }) =>
-        !disabled
-          ? hoverColor
-            ? `rgb(${colors[hoverColor]})`
-            : `rgb(${colors[color]})`
-          : `rgb(${colors[color]})`};
-      box-shadow: ${({ disabled, outline }) =>
-        !disabled
-          ? outline
-            ? 'none'
-            : `${shadows.hover}`
-          : `${shadows.soft}`};
-    }
-  }
-
-  &:active {
-    transform: ${({ disabled }) => (!disabled ? 'translateY(1px)' : 'none')};
-    background-color: ${({ disabled, activeColor, color }) =>
-      !disabled
-        ? activeColor
-          ? `rgb(${colors[activeColor]})`
-          : `rgb(${colors[color]})`
-        : `rgb(${colors[color]})`};
-    box-shadow: ${({ outline }) => (outline ? 'none' : `${shadows.soft}`)};
-    color: ${({ outline, color }) =>
-      outline ? `rgb(${colors[color]})` : `rgba(${colors.whiteTransparent})`};
+  &:hover {
+    box-shadow: 0 0 0 1px #bbb, 0 1px 2px rgba(0, 0, 0, 0.07);
+    color: #444;
   }
 `;
 
@@ -72,35 +40,49 @@ const StyledToken = styled.div`
   break-inside: avoid-column;
 `;
 
+const StyledToolGroup = styled.div`
+  padding: 16px;
+  display: flex;
+`;
+
 const StyledInfo = styled.div`
-  padding: 15px 24px !important;
-  line-height: 24px;
+  white-space: nowrap;
+  flex: 1;
   text-overflow: ellipsis;
   overflow: hidden;
+  margin-right: 8px;
 `;
 
 const StyledName = styled.div`
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.3em;
+  color: #333;
+  margin: 0 0 2px 0;
   white-space: nowrap;
-  text-overflow: ellipsis;
   overflow: hidden;
-  font-weight: 800;
+  text-overflow: ellipsis;
+  max-width: 100%;
 `;
 
-const StyledPrevPrice = styled.small`
+const StyledPrevPrice = styled.span`
+  font-size: 12px;
+  line-height: 1em;
+  color: #999;
+  margin: 0;
+  padding: 0;
+  border: 0;
   display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 `;
 
 const StyledCurPrice = styled.span`
-  font-weight: 600
+  font-weight: 600;
   width: 65%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-trasform: uppercase;
-  color: #3291e9 !important
+  text-transform: uppercase;
+  color: #3291e9 !important;
   float: right !important;
   display: block;
   text-align: right;
@@ -108,10 +90,10 @@ const StyledCurPrice = styled.span`
 
 const StyledCard = styled.div`
   text-align: left;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12),
-    0 3px 1px -2px rgba(0, 0, 0, 0.2);
   background: white;
   margin-bottom: 10px;
+  border-radius: 2px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
 `;
 
 const StyledTokenBackground = styled.div`
@@ -120,6 +102,7 @@ const StyledTokenBackground = styled.div`
 
 const StyledTokenImage = styled.img`
   width: 100%;
+  vertical-align: middle;
 `;
 
 const UniqueToken = ({ asset }) => (
@@ -128,35 +111,34 @@ const UniqueToken = ({ asset }) => (
       <StyledTokenBackground background={asset.background}>
         <StyledTokenImage src={asset.image_preview_url} alt={asset.name} />
       </StyledTokenBackground>
-      <StyledInfo>
-        <StyledName>
-          {asset.name} • #{asset.id}
-        </StyledName>
-        <StyledCurPrice>
-          {asset.currentPrice
-            ? `${lang.t('time.now')}: ㆔ ${asset.currentPrice}`
-            : ' '}
-        </StyledCurPrice>
-        <StyledPrevPrice>
-          {asset.lastPrice
-            ? ` ${lang.t('modal.previous_short')} ㆔ ${asset.lastPrice}`
-            : `${lang.t('modal.new')}!`}
-        </StyledPrevPrice>
-      </StyledInfo>
+      <StyledToolGroup>
+        <StyledInfo>
+          <StyledName>{asset.name}</StyledName>
+          {asset.currentPrice && (
+            <StyledCurPrice>
+              {asset.currentPrice
+                ? `${lang.t('time.now')}: ㆔ ${asset.currentPrice}`
+                : ' '}
+            </StyledCurPrice>
+          )}
+
+          <StyledPrevPrice>
+            {asset.lastPrice
+              ? ` ${lang.t('modal.previous_short')} ㆔ ${asset.lastPrice}`
+              : `${lang.t('modal.new')}!`}
+          </StyledPrevPrice>
+        </StyledInfo>
+        <StyledViewLink
+          href={`https://opensea.io/assets/${asset.asset_contract.address}/${
+            asset.id
+          }`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {lang.t('button.view')}
+        </StyledViewLink>
+      </StyledToolGroup>
     </StyledCard>
-    <StyledViewLink
-      href={`https://opensea.io/assets/${asset.asset_contract.address}/${
-        asset.id
-      }`}
-      color="blue"
-      hoverColor="blueHover"
-      activeColor="blueActive"
-      left
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {lang.t('button.view')}
-    </StyledViewLink>
   </StyledToken>
 );
 

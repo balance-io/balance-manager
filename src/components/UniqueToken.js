@@ -93,6 +93,7 @@ const StyledCard = styled.div`
   background: white;
   margin-bottom: 10px;
   border-radius: 2px;
+  overflow: hidden;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
 `;
 

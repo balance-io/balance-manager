@@ -20,13 +20,8 @@ import { modalClose } from '../../reducers/_modal';
 import { web3SendTransactionMultiWallet } from '../../handlers/web3';
 import { notificationShow } from '../../reducers/_notification';
 import lang from '../../languages';
-
-import {
-  capitalize,
-  getEth,
-  calcTxFee,
-  withSendComponentWithData,
-} from 'balance-common';
+import { capitalize, getEth, calcTxFee } from '../../helpers/utilities';
+import { withSendComponentWithData } from '../../components/SendComponentWithData';
 
 import {
   StyledIcon,

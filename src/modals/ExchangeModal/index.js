@@ -29,20 +29,20 @@ import {
   exchangeMaxBalance,
 } from '../../reducers/_exchange';
 import { notificationShow } from '../../reducers/_notification';
+import { capitalize } from '../../helpers/utilities';
 import {
   add,
-  capitalize,
   convertAmountFromBigNumber,
   convertAmountToDisplay,
   convertNumberToString,
-  getCountdown,
   multiply,
   divide,
   greaterThan,
   smallerThan,
   convertAmountToBigNumber,
   handleSignificantDecimals,
-} from 'balance-common';
+} from '../../helpers/bignumber';
+import { getCountdown } from '../../helpers/time';
 import { fonts, colors, responsive, transitions } from '../../styles';
 
 import {

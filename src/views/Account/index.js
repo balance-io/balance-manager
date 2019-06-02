@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import lang from '../../languages';
-import { capitalize } from 'balance-common';
+import { capitalize } from '../../helpers/utilities';
 import TabMenu from '../../components/TabMenu';
 import Card from '../../components/Card';
 import Button from '../../components/Button';

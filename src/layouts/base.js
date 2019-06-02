@@ -23,12 +23,12 @@ import {
   accountClearState,
   accountUpdateAccountAddress,
   accountChangeLanguage,
-} from 'balance-common';
+} from '../reducers/_account';
 import { metamaskClearState } from '../reducers/_metamask';
 import { ledgerClearState } from '../reducers/_ledger';
 import { trezorClearState } from '../reducers/_trezor';
 import { walletConnectClearState } from '../reducers/_walletconnect';
-import { commonStorage } from 'balance-common';
+import * as commonStorage from '../handlers/commonStorage';
 import ReminderRibbon from '../components/ReminderRibbon';
 import { colors } from '../styles';
 

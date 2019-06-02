@@ -2,7 +2,10 @@ import EthereumTx from 'ethereumjs-tx';
 import TransportU2F from '@ledgerhq/hw-transport-u2f';
 import AppEth from '@ledgerhq/hw-app-eth';
 import ethereumNetworks from '../references/ethereum-networks.json';
-import { removeHexPrefix, getDerivationPathComponents } from 'balance-common';
+import {
+  removeHexPrefix,
+  getDerivationPathComponents,
+} from '../helpers/utilities';
 
 /**
  * @desc Ledger ETH App instance

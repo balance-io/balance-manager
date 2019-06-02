@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import jsonp from 'jsonp';
 import Button from './Button';
-import { isValidEmail } from 'balance-common';
+import { isValidEmail } from '../helpers/validators';
 import lang from '../languages';
 import { fonts, colors, transitions } from '../styles';
 

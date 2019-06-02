@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import lang from '../../languages';
 import clipboardIcon from '../../assets/clipboard.png';
-import { toChecksumAddress } from 'balance-common';
+import { toChecksumAddress } from '../../handlers/web3';
 import { notificationShow } from '../../reducers/_notification';
 import {
   StyledCopyToClipboard,

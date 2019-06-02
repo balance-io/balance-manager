@@ -3,7 +3,7 @@ import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import {
   accountUpdateAccountAddress,
   accountUpdateNetwork,
-} from 'balance-common';
+} from '../reducers/_account';
 import { notificationShow } from './_notification';
 import chains from '../references/chains.json';
 

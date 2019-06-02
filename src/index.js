@@ -6,7 +6,7 @@ import { globalStyles } from './styles';
 import { bootIntercom } from './helpers/bootIntercom';
 import Root from './Root';
 import Storage from '@devshack/react-native-storage';
-import { commonStorage } from 'balance-common';
+import * as commonStorage from './handlers/commonStorage';
 import lang, { resources } from './languages';
 
 const storage = new Storage({

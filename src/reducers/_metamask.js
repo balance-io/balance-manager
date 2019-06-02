@@ -1,9 +1,9 @@
-import { parseError } from 'balance-common';
+import { parseError } from '../handlers/parsers';
 import { modalClose } from './_modal';
 import {
   accountUpdateAccountAddress,
   accountUpdateNetwork,
-} from 'balance-common';
+} from '../reducers/_account';
 import { notificationShow } from './_notification';
 import networkList from '../references/ethereum-networks.json';
 

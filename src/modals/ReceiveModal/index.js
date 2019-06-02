@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-import { capitalize } from 'balance-common';
+import { capitalize } from '../../helpers/utilities';
 import lang from '../../languages';
 
 import Card from '../../components/Card';

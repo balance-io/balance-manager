@@ -20,12 +20,9 @@ import qrIcon from '../../assets/qr-code-bnw.png';
 
 import { modalClose } from '../../reducers/_modal';
 import lang from '../../languages';
-import {
-  calcTxFee,
-  capitalize,
-  withSendComponentWithData,
-} from 'balance-common';
 import { web3SendTransactionMultiWallet } from '../../handlers/web3';
+import { capitalize, calcTxFee } from '../../helpers/utilities';
+import { withSendComponentWithData } from '../../components/SendComponentWithData';
 
 import {
   StyledIcon,

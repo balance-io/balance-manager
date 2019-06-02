@@ -9,7 +9,7 @@ import {
   parseError,
   parseGasPrices,
   sendTransaction,
-} from 'balance-common';
+} from '../handlers/api';
 import { web3SendTransactionMultiWallet } from '../handlers/web3';
 import {
   convertAmountFromBigNumber,
@@ -21,12 +21,12 @@ import {
   greaterThanOrEqual,
   multiply,
   subtract,
-} from 'balance-common';
+} from '../helpers/bignumber';
 import { notificationShow } from './_notification';
 import {
   accountUpdateTransactions,
   accountUpdateHasPendingTransaction,
-} from 'balance-common';
+} from '../reducers/_account';
 import ethUnits from '../references/ethereum-units.json';
 
 // -- Constants ------------------------------------------------------------- //

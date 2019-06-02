@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import lang from '../languages';
-import { accountInitializeState } from 'balance-common';
+import { accountInitializeState } from '../reducers/_account';
 import Link from '../components/Link';
 import BaseLayout from '../layouts/base';
 import Card from '../components/Card';

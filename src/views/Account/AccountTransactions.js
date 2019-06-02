@@ -13,10 +13,8 @@ import ToggleIndicator from '../../components/ToggleIndicator';
 import TransactionStatus from '../../components/TransactionStatus';
 import etherscanLogo from '../../assets/etherscan-logo.svg';
 import ethplorerLogo from '../../assets/ethplorer-logo.svg';
-import {
-  accountUpdateHasPendingTransaction,
-  getLocalTimeDate,
-} from 'balance-common';
+import { accountUpdateHasPendingTransaction } from '../../reducers/_account';
+import { getLocalTimeDate } from '../../helpers/time';
 import { colors, fonts, shadows, responsive } from '../../styles';
 
 const StyledGrid = styled.div`

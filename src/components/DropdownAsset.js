@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import selector from '../assets/selector-grey.svg';
-import { ellipseText } from 'balance-common';
+import { ellipseText } from '../helpers/utilities';
 import { fonts, colors, shadows, responsive, transitions } from '../styles';
 import AssetIcon from './AssetIcon';
 import ClickOutside from './ClickOutside';

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { lang } from 'balance-common';
+import lang from '../languages';
 import { colors, fonts, shadows, transitions } from '../styles';
 
 const StyledViewLink = styled.a`

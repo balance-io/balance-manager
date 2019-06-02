@@ -1,8 +1,8 @@
-import { lang } from 'balance-common';
+import lang from '../languages';
 import {
   accountUpdateAccountAddress,
   accountUpdateNetwork,
-} from 'balance-common';
+} from '../reducers/_account';
 import { trezorEthInit, trezorEthAccounts } from '../handlers/trezor-eth';
 import { notificationShow } from './_notification';
 

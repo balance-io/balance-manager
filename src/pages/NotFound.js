@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { lang } from 'balance-common';
+import lang from '../languages';
 import BaseLayout from '../layouts/base';
 import Link from '../components/Link';
 

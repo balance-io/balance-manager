@@ -1,8 +1,8 @@
-import { lang } from 'balance-common';
+import lang from '../languages';
 import {
   accountUpdateAccountAddress,
   accountUpdateNetwork,
-} from 'balance-common';
+} from '../reducers/_account';
 import { ledgerEthInit, ledgerEthAccounts } from '../handlers/ledger-eth';
 import { notificationShow } from './_notification';
 

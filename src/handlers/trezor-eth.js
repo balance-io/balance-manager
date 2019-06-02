@@ -1,6 +1,6 @@
 import EthereumTx from 'ethereumjs-tx';
 import ethereumNetworks from '../references/ethereum-networks.json';
-import { lang } from 'balance-common';
+import lang from '../languages';
 
 const HDKey = require('ethereumjs-wallet/hdkey');
 

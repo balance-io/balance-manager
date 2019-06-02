@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { capitalize, lang } from 'balance-common';
+import { capitalize } from '../../helpers/utilities';
+import lang from '../../languages';
 
 import MetamaskLogo from '../../components/MetamaskLogo';
 import LedgerLogo from '../../components/LedgerLogo';

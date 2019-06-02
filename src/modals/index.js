@@ -5,14 +5,12 @@ import styled from 'styled-components';
 
 import Column from '../components/Column';
 
-import ExchangeModal from './ExchangeModal';
 import SendModal from './SendModal';
 import ReceiveModal from './ReceiveModal';
 import DonateModal from './DonateModal';
 import WalletConnectModal from './WalletConnectModal';
 import { modalClose } from '../reducers/_modal';
-import { sendClearFields } from 'balance-common';
-import { exchangeClearFields } from '../reducers/_exchange';
+import { sendClearFields } from '../reducers/_send';
 
 import { colors, transitions } from '../styles';
 
@@ -56,14 +54,11 @@ class Modal extends Component {
   static propTypes = {
     modalClose: PropTypes.func.isRequired,
     sendClearFields: PropTypes.func.isRequired,
-    exchangeClearFields: PropTypes.func.isRequired,
     modal: PropTypes.string.isRequired,
   };
 
   modalController = () => {
     switch (this.props.modal) {
-      case 'EXCHANGE_MODAL':
-        return <ExchangeModal />;
       case 'SEND_MODAL':
         return <SendModal />;
       case 'DONATION_MODAL':
@@ -79,7 +74,6 @@ class Modal extends Component {
 
   onClose = () => {
     this.props.sendClearFields();
-    this.props.exchangeClearFields();
     this.props.modalClose();
   };
 
@@ -108,6 +102,5 @@ export default connect(
   {
     modalClose,
     sendClearFields,
-    exchangeClearFields,
   },
 )(Modal);

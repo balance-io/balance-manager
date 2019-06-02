@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
-import { lang } from 'balance-common';
+import lang from '../languages';
 import { walletConnectInit } from '../reducers/_walletconnect';
 import { fonts, colors } from '../styles';
 

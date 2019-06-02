@@ -19,13 +19,10 @@ import arrowUp from '../../assets/arrow-up.svg';
 import qrIcon from '../../assets/qr-code-bnw.png';
 
 import { modalClose } from '../../reducers/_modal';
-import {
-  calcTxFee,
-  capitalize,
-  lang,
-  withSendComponentWithData,
-} from 'balance-common';
+import lang from '../../languages';
 import { web3SendTransactionMultiWallet } from '../../handlers/web3';
+import { capitalize, calcTxFee } from '../../helpers/utilities';
+import { withSendComponentWithData } from '../../components/SendComponentWithData';
 
 import {
   StyledIcon,

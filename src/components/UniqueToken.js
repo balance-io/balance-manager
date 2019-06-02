@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { lang } from 'balance-common';
 import { transitions } from '../styles';
+import OpenSeaPlaceholder from '../assets/no-image-placeholder-ship.png';
 
 const StyledViewLink = styled.a`
   transition: ${transitions.button};
@@ -102,42 +103,50 @@ const StyledTokenImage = styled.img`
   vertical-align: middle;
 `;
 
-const UniqueToken = ({ asset }) => (
-  <StyledToken>
-    <StyledCard>
-      <StyledTokenBackground background={asset.background}>
-        <StyledTokenImage src={asset.image_preview_url} alt={asset.name} />
-      </StyledTokenBackground>
-      <StyledToolGroup>
-        <StyledInfo>
-          <StyledName title={asset.name}>{asset.name}</StyledName>
-          {asset.currentPrice && (
-            <StyledCurPrice>
-              {asset.currentPrice
-                ? `${lang.t('time.now')}: ㆔ ${asset.currentPrice}`
-                : ' '}
-            </StyledCurPrice>
-          )}
+const UniqueToken = ({ asset }) => {
+  if (!asset.image_preview_url) {
+    asset.image_preview_url = OpenSeaPlaceholder;
+  }
+  if (!asset.name) {
+    asset.name = `${asset.asset_contract.name} #${asset.id}`;
+  }
+  return (
+    <StyledToken>
+      <StyledCard>
+        <StyledTokenBackground background={asset.background}>
+          <StyledTokenImage src={asset.image_preview_url} alt={asset.name} />
+        </StyledTokenBackground>
+        <StyledToolGroup>
+          <StyledInfo>
+            <StyledName title={asset.name}>{asset.name}</StyledName>
+            {asset.currentPrice && (
+              <StyledCurPrice>
+                {asset.currentPrice
+                  ? `${lang.t('time.now')}: ㆔ ${asset.currentPrice}`
+                  : ' '}
+              </StyledCurPrice>
+            )}
 
-          <StyledPrevPrice>
-            {asset.lastPrice
-              ? ` ${lang.t('modal.previous_short')} ㆔ ${asset.lastPrice}`
-              : `${lang.t('modal.new')}!`}
-          </StyledPrevPrice>
-        </StyledInfo>
-        <StyledViewLink
-          href={`https://opensea.io/assets/${asset.asset_contract.address}/${
-            asset.id
-          }`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {lang.t('button.view')}
-        </StyledViewLink>
-      </StyledToolGroup>
-    </StyledCard>
-  </StyledToken>
-);
+            <StyledPrevPrice>
+              {asset.lastPrice
+                ? ` ${lang.t('modal.previous_short')} ㆔ ${asset.lastPrice}`
+                : `${lang.t('modal.new')}!`}
+            </StyledPrevPrice>
+          </StyledInfo>
+          <StyledViewLink
+            href={`https://opensea.io/assets/${asset.asset_contract.address}/${
+              asset.id
+            }`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {lang.t('button.view')}
+          </StyledViewLink>
+        </StyledToolGroup>
+      </StyledCard>
+    </StyledToken>
+  );
+};
 
 UniqueToken.propTypes = {
   asset: PropTypes.object.isRequired,

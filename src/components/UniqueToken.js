@@ -35,9 +35,6 @@ const StyledViewLink = styled.a`
 const StyledToken = styled.div`
   font-size: 14px;
   text-align: center;
-  margin-bottom: 20px;
-  -webkit-column-break-inside: avoid;
-  break-inside: avoid-column;
 `;
 
 const StyledToolGroup = styled.div`
@@ -91,7 +88,6 @@ const StyledCurPrice = styled.span`
 const StyledCard = styled.div`
   text-align: left;
   background: white;
-  margin-bottom: 10px;
   border-radius: 2px;
   overflow: hidden;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);

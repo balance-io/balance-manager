@@ -14,8 +14,9 @@ const UniqueTokensContainer = styled.div`
 
 const StyledContainer = styled.div`
   margin: 20px;
-  columns: 200px;
-  column-gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-gap: 20px;
 `;
 
 const StyledCard = styled(Card)`

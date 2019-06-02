@@ -13,11 +13,10 @@ const UniqueTokensContainer = styled.div`
 `;
 
 const StyledContainer = styled.div`
-  background: #f7f8fc;
-  border: 2px solid #e2e2e2;
-  border-radius: 15px;
-  padding: 20px 10px 0px;
-  margin: 15px;
+  margin: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-gap: 20px;
 `;
 
 const StyledCard = styled(Card)`

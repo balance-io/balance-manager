@@ -28,6 +28,7 @@ const StyledLightbox = styled.div`
   visibility: ${({ modal }) => (modal ? 'visible' : 'hidden')};
   pointer-events: ${({ modal }) => (modal ? 'auto' : 'none')};
   background: rgba(${colors.dark}, 0.2);
+  max-height: 100vh;
 `;
 
 const StyledHitbox = styled.div`

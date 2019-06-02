@@ -17,9 +17,6 @@ import convertIcon from '../../assets/convert-icon.svg';
 import arrowUp from '../../assets/arrow-up.svg';
 
 import { modalClose } from '../../reducers/_modal';
-import { web3SendTransactionMultiWallet } from '../../handlers/web3';
-import { notificationShow } from '../../reducers/_notification';
-
 import {
   capitalize,
   getEth,
@@ -27,6 +24,7 @@ import {
   calcTxFee,
   withSendComponentWithData,
 } from 'balance-common';
+import { web3SendTransactionMultiWallet } from '../../handlers/web3';
 
 import {
   StyledIcon,
@@ -34,37 +32,22 @@ import {
   StyledBottomModal,
   StyledParagraph,
   StyledAmountCurrency,
+  StyledInputContainer,
+  StyledConversionContainer,
+  StyledConversionIconContainer,
   StyledConversionIcon,
   StyledSubTitle,
   StyledActions,
+  StyledMaxBalance,
+  StyledJustifyContent,
 } from '../modalStyles';
 
 const balanceManagerEthAddress =
   process.env.REACT_APP_DONATION_ADDRESS ||
   '0x0000000000000000000000000000000000000000';
 
-const reduxProps = ({ modal, send, account }) => ({
-  recipient: send.recipient,
-  nativeAmount: send.nativeAmount,
-  assetAmount: send.assetAmount,
-  txHash: send.txHash,
-  address: send.address,
-  selected: send.selected,
-  gasPrices: send.gasPrices,
-  gasPrice: send.gasPrice,
-  gasLimit: send.gasLimit,
-  gasPriceOption: send.gasPriceOption,
-  confirm: send.confirm,
-  accountInfo: account.accountInfo,
-  accountType: account.accountType,
-  network: account.network,
-  nativeCurrency: account.nativeCurrency,
-  prices: account.prices,
-});
-
 class DonateModal extends Component {
   static propTypes = {
-    notificationShow: PropTypes.func.isRequired,
     modalClose: PropTypes.func.isRequired,
   };
 
@@ -73,46 +56,36 @@ class DonateModal extends Component {
     this.props.modalClose();
   };
 
-  render = () => {
-    const {
-      accountInfo,
-      accountType,
-      assetAmount,
-      sendUpdateNativeAmount,
-      sendUpdateAssetAmount,
-      selected,
-      prices,
-      nativeCurrency,
-      gasPriceOption,
-      nativeAmount,
-      gasPrices,
-      txHash,
-      network,
-      confirm,
-    } = this.props;
+  componentDidMount = () => {
+    this.props.sendUpdateRecipient(balanceManagerEthAddress);
+  };
 
-    return (
-      <Card background="lightGrey">
-        {!txHash ? (
-          !confirm ? (
-            <Form onSubmit={this.onSubmit}>
+  render = () => (
+    <Card background="lightGrey">
+      {!this.props.txHash ? (
+        !this.props.confirm ? (
+          <Form onSubmit={this.props.onSubmit}>
+            <StyledJustifyContent>
               <StyledSubTitle>
                 <StyledIcon color="grey" icon={arrowUp} />
-                {lang.t('modal.donate_title', {
+                {lang.t('modal.send_title', {
                   walletName: capitalize(
-                    `${accountType}${lang.t('modal.default_wallet')}`,
+                    `${this.props.accountType}${lang.t(
+                      'modal.default_wallet',
+                    )}`,
                   ),
                 })}
               </StyledSubTitle>
+            </StyledJustifyContent>
+            <div>
+              <DropdownAsset
+                selected={'ETH'}
+                assets={[getEth(this.props.accountInfo.assets)]}
+              />
+            </div>
 
-              <div>
-                <DropdownAsset
-                  selected={'ETH'}
-                  assets={[getEth(accountInfo.assets)]}
-                />
-              </div>
-
-              <StyledFlex>
+            <StyledFlex>
+              <StyledInputContainer>
                 <Input
                   monospace
                   label={lang.t('input.donation_address')}
@@ -122,110 +95,112 @@ class DonateModal extends Component {
                   placeholder={balanceManagerEthAddress}
                   disabled
                 />
-              </StyledFlex>
+              </StyledInputContainer>
+            </StyledFlex>
 
-              <StyledFlex>
-                <StyledFlex>
-                  <Input
-                    monospace
-                    label={lang.t('input.asset_amount')}
-                    placeholder="0.0"
-                    type="text"
-                    value={assetAmount}
-                    onChange={({ target }) =>
-                      sendUpdateAssetAmount(target.value)
-                    }
-                  />
+            <StyledConversionContainer>
+              <StyledInputContainer>
+                <Input
+                  monospace
+                  label={lang.t('input.asset_amount')}
+                  placeholder="0.0"
+                  type="text"
+                  value={this.props.assetAmount}
+                  onChange={({ target }) =>
+                    this.props.sendUpdateAssetAmount(target.value)
+                  }
+                >
+                  <StyledAmountCurrency>{'ETH'}</StyledAmountCurrency>
+                </Input>
+                <StyledMaxBalance onClick={this.props.onSendMaxBalance}>
+                  {lang.t('modal.send_max')}
+                </StyledMaxBalance>
+              </StyledInputContainer>
 
-                  <StyledAmountCurrency>{selected.symbol}</StyledAmountCurrency>
-                </StyledFlex>
+              <StyledConversionIconContainer>
+                <StyledConversionIcon src={convertIcon} alt="≈" />
+              </StyledConversionIconContainer>
 
-                <StyledFlex>
-                  <StyledConversionIcon>
-                    <img src={convertIcon} alt="≈" />
-                  </StyledConversionIcon>
-                </StyledFlex>
-
-                <StyledFlex>
-                  <Input
-                    monospace
-                    placeholder="0.0"
-                    type="text"
-                    value={nativeAmount}
-                    disabled={
-                      !prices[nativeCurrency] ||
-                      !prices[nativeCurrency][selected.symbol]
-                    }
-                    onChange={({ target }) =>
-                      sendUpdateNativeAmount(target.value)
-                    }
-                  />
-
-                  <StyledAmountCurrency disabled={!prices[selected.symbol]}>
-                    {prices && prices.selected ? prices.selected.currency : ''}
+              <StyledInputContainer>
+                <Input
+                  monospace
+                  placeholder="0.0"
+                  type="text"
+                  value={this.props.nativeAmount}
+                  disabled={
+                    !this.props.prices[this.props.nativeCurrency] ||
+                    !this.props.prices[this.props.nativeCurrency]['ETH']
+                  }
+                  onChange={({ target }) =>
+                    this.props.sendUpdateNativeAmount(target.value)
+                  }
+                >
+                  <StyledAmountCurrency disabled={!this.props.prices['ETH']}>
+                    {this.props.prices &&
+                      this.props.prices.selected &&
+                      this.props.prices.selected.currency}
                   </StyledAmountCurrency>
-                </StyledFlex>
-              </StyledFlex>
+                </Input>
+              </StyledInputContainer>
+            </StyledConversionContainer>
 
-              <GasPanel
-                gasPriceOption={gasPriceOption}
-                gasPrices={gasPrices}
-                updateGasPrice={this.updateGasPrice}
-              />
-
-              <LineBreak noMargin />
-
-              <StyledBottomModal>
-                <StyledActions>
-                  <Button onClick={this.onClose}>
-                    {lang.t('button.cancel')}
-                  </Button>
-
-                  <StyledParagraph>
-                    <span>{`${lang.t('modal.gas_fee')}: ${calcTxFee(
-                      this.props.gasPrices,
-                      this.props.gasPriceOption,
-                      this.props.nativeCurrency,
-                    )}`}</span>
-                  </StyledParagraph>
-
-                  <Button
-                    left
-                    color="blue"
-                    icon={arrowUp}
-                    disabled={
-                      balanceManagerEthAddress.length !== 42 ||
-                      (selected.symbol !== 'ETH' && !Number(assetAmount))
-                    }
-                    type="submit"
-                  >
-                    {lang.t('button.send')}
-                  </Button>
-                </StyledActions>
-              </StyledBottomModal>
-            </Form>
-          ) : (
-            <ApproveTransactionModal
-              accountType={accountType}
-              onClose={this.onClose}
+            <GasPanel
+              gasPriceOption={this.props.gasPriceOption}
+              gasPrices={this.props.gasPrices}
+              updateGasPrice={this.props.updateGasPrice}
             />
-          )
+
+            <LineBreak noMargin />
+
+            <StyledBottomModal>
+              <StyledActions>
+                <Button onClick={this.onClose}>
+                  {lang.t('button.cancel')}
+                </Button>
+
+                <StyledParagraph>
+                  <span>{`${lang.t('modal.gas_fee')}: ${calcTxFee(
+                    this.props.gasPrices,
+                    this.props.gasPriceOption,
+                    this.props.nativeCurrency,
+                  )}`}</span>
+                </StyledParagraph>
+
+                <Button
+                  left
+                  isModalButton
+                  color="blue"
+                  icon={arrowUp}
+                  disabled={!Number(this.props.assetAmount)}
+                  type="submit"
+                >
+                  <span>{lang.t('button.send')}</span>
+                </Button>
+              </StyledActions>
+            </StyledBottomModal>
+          </Form>
         ) : (
-          <SuccessModal
-            txHash={txHash}
-            network={network}
+          <ApproveTransactionModal
+            accountType={this.props.accountType}
             onClose={this.onClose}
           />
-        )}
-      </Card>
-    );
-  };
+        )
+      ) : (
+        <SuccessModal
+          txHash={this.props.txHash}
+          network={this.props.network}
+          onClose={this.onClose}
+        />
+      )}
+    </Card>
+  );
 }
 
 export default connect(
-  reduxProps,
-  {
-    modalClose,
-    notificationShow,
-  },
-)(withSendComponentWithData(DonateModal, web3SendTransactionMultiWallet));
+  () => ({}),
+  { modalClose },
+)(
+  withSendComponentWithData(DonateModal, {
+    sendTransactionCallback: web3SendTransactionMultiWallet,
+  }),
+);

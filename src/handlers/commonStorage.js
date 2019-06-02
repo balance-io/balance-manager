@@ -1,4 +1,3 @@
-import { differenceInMinutes } from 'date-fns';
 import { omit, pickBy } from 'lodash';
 
 const defaultVersion = '0.1.0';

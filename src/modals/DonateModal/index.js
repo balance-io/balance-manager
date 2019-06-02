@@ -19,11 +19,11 @@ import arrowUp from '../../assets/arrow-up.svg';
 import { modalClose } from '../../reducers/_modal';
 import { web3SendTransactionMultiWallet } from '../../handlers/web3';
 import { notificationShow } from '../../reducers/_notification';
+import lang from '../../languages';
 
 import {
   capitalize,
   getEth,
-  lang,
   calcTxFee,
   withSendComponentWithData,
 } from 'balance-common';

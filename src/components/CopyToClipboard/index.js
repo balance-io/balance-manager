@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { lang } from 'balance-common';
+import lang from '../../languages';
 import clipboardIcon from '../../assets/clipboard.png';
 import { toChecksumAddress } from 'balance-common';
 import { notificationShow } from '../../reducers/_notification';

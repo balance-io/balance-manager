@@ -1,0 +1,179 @@
+{
+  "translation": {
+    "homepage": {
+      "connect_metamask": {
+        "description": "Conéctate a la extensión de Chrome de Metamask.",
+        "button": "Conectar MetaMask"
+      },
+      "connect_ledger": {
+        "description": "Conéctate y firma tus transacciones con tu ",
+        "link_text": "Ledger Wallet",
+        "link_title": "Compra un Ledger hardware wallet",
+        "button": "Conectar Ledger"
+      },
+      "connect_trezor": {
+        "description": "Conéctate y firma tus transacciones con tu ",
+        "link_text": "Trezor Wallet",
+        "link_title": "Compra un Trezor hardware wallet",
+        "button": "Conectar Trezor"
+      },
+      "connect_walletconnect": {
+        "description": "Conéctate y firmat con tu wallet móvil de WalletConnect.",
+        "button": "Conectar WalletConnect"
+      },
+      "coming_soon": "Próximamente."
+    },
+    "account": {
+      "tab_balances": "Saldos",
+      "tab_transactions": "Transacciones",
+      "tab_interactions": "Interacciones",
+      "tab_balances_tooltip": "Saldos de Ethereum y Tokens",
+      "tab_transactions_tooltip": "Transacciones y Transferencias de Tokens",
+      "tab_interactions_tooltip": "Interacciones de Smart Contracts",
+      "label_asset": "Activo",
+      "label_quantity": "Cantidad",
+      "label_price": "Precio",
+      "label_24h": "24h",
+      "label_status": "Estado",
+      "label_total": "Total",
+      "show": "Mostrar",
+      "hide": "Esconder",
+      "token": "token",
+      "tokens": "tokens",
+      "no_market_value": "sin valor de mercado",
+      "low_market_value": "con bajo valor de mercado",
+      "tx_hash": "Hash de Transacción",
+      "tx_timestamp": "Fecha/Hora",
+      "tx_fee": "Tarifa",
+      "tx_to": "Hacia",
+      "tx_from": "Desde",
+      "tx_self": "Yo",
+      "tx_sent": "Enviado",
+      "tx_received": "Recibido",
+      "tx_failed": "Fallido",
+      "tx_pending": "Pendiente",
+      "show_all": "Mostrar todo",
+      "show_less": "Mostrar menos",
+      "unknown_token": "Token Desconocido"
+    },
+    "button": {
+      "connect_walletconnect": "Utilizar WalletConnect",
+      "donate": "Donar ETH",
+      "exchange": "Cambiar",
+      "send": "Enviar",
+      "receive": "Recibir",
+      "close": "Cerrar",
+      "cancel": "Cancelar",
+      "go_back": "Regressar",
+      "send_another": "Enviar otro",
+      "notify_me": "Ser notificado",
+      "try_again": "Intentar otra vez"
+    },
+    "input": {
+      "recipient_address": "Recipiente Dirección",
+      "private_key": "Llave Privada",
+      "asset_amount": "Cantidad",
+      "donation_address": "Balance Manager Dirección",
+      "email": "Email",
+      "password": "Password",
+      "input_text": "Input",
+      "email_placeholder": "tu@email.com",
+      "password_placeholder": "••••••••••",
+      "input_placeholder": "Escribe aquí"
+    },
+    "modal": {
+      "receive_title": "Recibir a {{walletName}}",
+      "exchange_title": "Intercambiar de {{walletName}}",
+      "send_title": "Enviar de {{walletName}}",
+      "approve_tx": "Aprobar transacción en {{walletType}}",
+      "confirm_tx": "Confirmar transacción de {{walletName}}",
+      "invalid_address": "Dirección inválida",
+      "send_max": "Enviar máximo",
+      "exchange_max": "Intercambiar máximo",
+      "default_wallet": " Cartera",
+      "gas_slow": "Lento",
+      "gas_average": "Medio",
+      "donate_title": "Enviar de {{walletName}} a Balance Manager",
+      "gas_fast": "Rápido",
+      "gas_fee": "Tarifa",
+      "tx_confirm_sender": "Remitente",
+      "tx_confirm_recipient": "Recipiente",
+      "tx_confirm_amount": "Cantidad",
+      "tx_confirm_fee": "Tarifa de transacción",
+      "tx_hash": "Hash de Transacción",
+      "tx_verify": "Verifique su transacción aquí",
+      "deposit_dropdown_label": "Intercambiar mi",
+      "withdrawal_dropdown_label": "por",
+      "deposit_input_label": "Pagar",
+      "withdrawal_input_label": "Obtener",
+      "tx_fee": "Tarifa de transacción",
+      "exchange_fee": "Tarifa de cambio"
+    },
+    "message": {
+      "web3_not_available": "Instala la extension de Chrome de MetaMask",
+      "web3_not_unlocked": "Por favor desbloquear su cartera MetaMask",
+      "web3_unknown_network": "Red desconocida, por favor cambie a otro",
+      "page_not_found": "404 Página no encontrada",
+      "coming_soon": "Próximamente...",
+      "click_to_copy_to_clipboard": "Haz clic para copiar al clipboard",
+      "failed_request": "Solicitud fallida, por favor refrescar",
+      "failed_ledger_connection": "Error al conectar a Ledger, por favor verifica tu dispositivo",
+      "failed_trezor_connection": "Error al conectar a Trezor, por favor verifica tu dispositivo",
+      "no_transactions": "No se encontraron transacciones para esta cuenta",
+      "no_interactions": "No se encontraron interacciones para esta cuenta",
+      "please_connect_ledger": "Por favor conecta y desbloquea Ledger y luego selecciona Ethereum",
+      "please_connect_trezor": "Por favor conecta y desbloquea Trezor y luego selecciona Ethereum",
+      "exchange_not_available": "Intercambio no está disponible en su área",
+      "learn_more": "Aprende más"
+    },
+    "notification": {
+      "error": {
+        "no_accounts_found": "No se encontraron cuentas de Ethereum",
+        "invalid_address": "Dirección inválida, verifica nuevamente",
+        "insufficient_balance": "Saldo insuficiente en esta cuenta",
+        "insufficient_for_fees": "Saldo insuficiente para cubrir las tarifas de transacción",
+        "invalid_address_scanned": "Dirección inválida escaneada, intenta nuevamente",
+        "invalid_private_key_scanned": "Llave privada inválida, intenta nuevamente",
+        "failed_scanning_qr_code": "Error al escanear el código QR, intenta nuevamente",
+        "failed_get_gas_prices": "Error al obtener los precios de Gas Ethereum",
+        "failed_get_tx_fee": "Error al estimar la tarifa de transacción",
+        "failed_get_account_tx": "Error al obtener transacciones de cuenta",
+        "generic_error": "Algo salió mal, intenta nuevamente"
+      },
+      "info": {
+        "address_copied_to_clipboard": "Dirección copiada al clipboard"
+      }
+    },
+    "warning": {
+      "user_is_offline": "Conexión offline, por favor verifica tu conexión a Internet",
+      "user_is_online": "¡Conectado! Estás de vuelta online"
+    },
+    "subscribe_form": {
+      "email_already_subscribed": "Lo sentimos, ya te has registrado con este correo electrónico",
+      "too_many_signup_request": "Demasiadas solicitudes de registro, inténtalo de nuevo más tarde",
+      "successful": "Verifica tu email",
+      "sending": "Enviando...",
+      "generic_error": "Uy! Algo salió mal"
+    },
+    "time": {
+      "ms": "ms",
+      "milisecond": "milisegundo",
+      "miliseconds": "milisegundos",
+      "s": "s",
+      "sec": "seg",
+      "secs": "segs",
+      "second": "segundo",
+      "seconds": "segundos",
+      "min": "min",
+      "mins": "mins",
+      "minute": "minuto",
+      "minutes": "minutos",
+      "hr": "hr",
+      "hrs": "hrs",
+      "hour": "hora",
+      "hours": "horas",
+      "day": "dia",
+      "days": "dias"
+    }
+  }
+}

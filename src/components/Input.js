@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { keyframes } from 'styled-components';
-import { lang } from 'balance-common';
+import lang from '../languages';
 import { colors, fonts, shadows, responsive } from '../styles';
 
 const shimmer = keyframes`

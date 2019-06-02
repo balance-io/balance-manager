@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { lang } from 'balance-common';
+import lang from '../../languages';
 import Card from '../../components/Card';
 import ButtonCustom from '../../components/ButtonCustom';
 import LineBreak from '../../components/LineBreak';

@@ -1,0 +1,166 @@
+{
+  "translation": {
+    "homepage": {
+      "connect_metamask": {
+        "description": "Connetti all'estensione di Chrome MetaMask.",
+        "button": "Connetti a MetaMask"
+      },
+      "connect_ledger": {
+        "description": "Connetti ed accedi con il tuo ",
+        "link_text": "Ledger hardware wallet",
+        "link_title": "Acquista un hardware wallet Ledger",
+        "button": "Connetti a Ledger"
+      },
+      "connect_walletconnect": "Collegati ed accedi al tuo wallet WalletConnect.",
+      "coming_soon": "In arrivo."
+    },
+    "account": {
+      "tab_balances": "Saldo",
+      "tab_transactions": "Transazioni",
+      "tab_interactions": "Interazioni",
+      "tab_balances_tooltip": "Saldo di Ethereum e Token",
+      "tab_transactions_tooltip": "Transazioni e Transferimenti dei Token",
+      "tab_interactions_tooltip": "Interazioni di Smart Contracts",
+      "label_asset": "Asset",
+      "label_quantity": "Quantità",
+      "label_price": "Prezzo",
+      "label_24h": "24h",
+      "label_status": "Stato",
+      "label_total": "Totale",
+      "show": "Mostra",
+      "hide": "Nascondi",
+      "token": "token",
+      "tokens": "token",
+      "no_market_value": "senza valore di mercato",
+      "low_market_value": "con basso valore di mercato",
+      "tx_hash": "Hash della Transazione",
+      "tx_timestamp": "Data/Ora",
+      "tx_fee": "Commissioni",
+      "tx_to": "A",
+      "tx_from": "Da",
+      "tx_self": "Io",
+      "tx_sent": "Inviata",
+      "tx_received": "Ricevuta",
+      "tx_failed": "Fallita",
+      "tx_pending": "In attesa",
+      "show_all": "Mostra tutto",
+      "show_less": "Mostra meno",
+      "unknown_token": "Token Sconosciuto"
+    },
+    "button": {
+      "connect_walletconnect": "Usa WalletConnect",
+      "exchange": "Scambia",
+      "send": "Invia",
+      "donate": "Dona ETH",
+      "receive": "Ricevi",
+      "close": "Chiudi",
+      "cancel": "Cancella",
+      "go_back": "Indietro",
+      "send_another": "Invia un altro",
+      "notify_me": "Imposta notifica",
+      "try_again": "Prova ancora"
+    },
+    "input": {
+      "recipient_address": "Indirizzo Destinatario",
+      "private_key": "Chiave Privata",
+      "donation_address": "Indirizzo di Balance Manager",
+      "asset_amount": "Quantità",
+      "email": "Email",
+      "password": "Password",
+      "input_text": "Input",
+      "email_placeholder": "tua@email.com",
+      "password_placeholder": "••••••••••",
+      "input_placeholder": "Scrivi qui"
+    },
+    "modal": {
+      "receive_title": "Ricevi a {{walletName}}",
+      "exchange_title": "Scambia da {{walletName}}",
+      "donate_title": "Invia da {{walletName}} a Balance Manager",
+      "send_title": "Invia da {{walletName}}",
+      "approve_tx": "Approva transazioni su {{walletType}}",
+      "confirm_tx": "Conferma transazione da {{walletName}}",
+      "invalid_address": "Indirizzo Non Valido",
+      "send_max": "Invia max",
+      "exchange_max": "Scambia max",
+      "default_wallet": " Wallet",
+      "gas_slow": "Lento",
+      "gas_average": "Medio",
+      "gas_fast": "Veloce",
+      "gas_fee": "Costi di commissione",
+      "tx_confirm_sender": "Mittente",
+      "tx_confirm_recipient": "Destinatario",
+      "tx_confirm_amount": "Quantità",
+      "tx_confirm_fee": "Commissioni per la Transazione",
+      "tx_hash": "Hash della Transazione",
+      "tx_verify": "Verify your transaction here",
+      "deposit_dropdown_label": "Scambia i miei",
+      "withdrawal_dropdown_label": "per",
+      "deposit_input_label": "Paga",
+      "withdrawal_input_label": "Ottieni",
+      "tx_fee": "Commissioni per la Transazione",
+      "exchange_fee": "Commissioni per il Cambio"
+    },
+    "message": {
+      "web3_not_available": "Installa l'estensione di Chrome MetaMask",
+      "web3_not_unlocked": "Per favore sblocca il tuo wallet MetaMask",
+      "web3_unknown_network": "Network sconosciuto, per favore passa ad un altro",
+      "page_not_found": "404 Pagina Non Trovata",
+      "coming_soon": "In arrivo...",
+      "click_to_copy_to_clipboard": "Clicca per copiare negli appunti",
+      "failed_request": "Richiesta fallita, per favore ricarica la pagina",
+      "failed_ledger_connection": "Collegamento a Ledger fallito, controlla il tuo dispositivo",
+      "no_transactions": "Nessuna transazione trovata per questo account",
+      "no_interactions": "Nessuna interazione trovata per questo account",
+      "please_connect_ledger": "Collega e sblocca Ledger, poi seleziona Ethereum"
+    },
+    "notification": {
+      "error": {
+        "no_accounts_found": "Nessun Account Ethereum Trovato",
+        "invalid_address": "Indirizzo non valido, per favore controlla di nuovo",
+        "insufficient_balance": "Saldo insufficiente per questo account",
+        "insufficient_for_fees": "Saldo insufficiente per coprire i costi di transazione",
+        "invalid_address_scanned": "Indirizzo non valido, per favore prova di nuovo",
+        "invalid_private_key_scanned": "Chiave Privata non valida, per favore prova di nuovo",
+        "failed_scanning_qr_code": "Scannerizzazione QR code fallita, per favore prova di nuovo",
+        "failed_get_gas_prices": "Ottenimento prezzi Gas fallito",
+        "failed_get_tx_fee": "Stima costi di transazione fallita",
+        "failed_get_account_tx": "Ottenimento transazioni account fallito",
+        "generic_error": "Qualcosa è andato storto, prova di nuovo"
+      },
+      "info": {
+        "address_copied_to_clipboard": "Indirizzo copiato negli appunti"
+      }
+    },
+    "warning": {
+      "user_is_offline": "Connessione assente, controlla tua connessione internet",
+      "user_is_online": "Connesso! Sei di nuovo online"
+    },
+    "subscribe_form": {
+      "email_already_subscribed": "Ci dispiace, ti sei già registrato con questa mail",
+      "too_many_signup_request": "Troppe richiesta di registrazione, riprova più tardi",
+      "successful": "Controlla la tua email",
+      "sending": "Invio...",
+      "generic_error": "Oops, qualcosa è andato storto"
+    },
+    "time": {
+      "ms": "ms",
+      "milisecond": "millisecondo",
+      "miliseconds": "millisecondi",
+      "s": "s",
+      "sec": "sec",
+      "secs": "sec",
+      "second": "secondo",
+      "seconds": "secondi",
+      "min": "min",
+      "mins": "min",
+      "minute": "minuto",
+      "minutes": "minuti",
+      "hr": "hr",
+      "hrs": "hr",
+      "hour": "ora",
+      "hours": "ore",
+      "day": "giorno",
+      "days": "giorni"
+    }
+  }
+}

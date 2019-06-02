@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Spinner from './Spinner';
-import { lang } from 'balance-common';
+import lang from '../languages';
 import circle from '../assets/circle.svg';
 import txSentIcon from '../assets/arrow-sent.svg';
 import txReceivedIcon from '../assets/arrow-received.svg';

@@ -6,6 +6,7 @@ import BaseLayout from '../layouts/base';
 import Account from '../views/Account';
 import Card from '../components/Card';
 import { lang } from 'balance-common';
+import { walletConnectInit } from '../reducers/_walletconnect';
 import { fonts, colors } from '../styles';
 
 const StyledWrapper = styled.div`
@@ -22,27 +23,27 @@ const StyledMessage = styled.div`
 
 class Wallet extends Component {
   componentDidMount() {
-    if (!this.props.accountAddress) {
-      console.log('wallet page does not have account address');
-      this.props.history.push('/');
-    }
+    this.props.walletConnectInit();
   }
 
-  render = () => (
-    <BaseLayout>
-      <StyledWrapper>
-        {this.props.fetching || this.props.accountAddress ? (
-          <Account match={this.props.match} />
-        ) : (
-          <Card minHeight={200} fetching={this.props.fetching}>
-            <StyledMessage>
-              {lang.t('message.walletconnect_not_unlocked')}
-            </StyledMessage>
-          </Card>
-        )}
-      </StyledWrapper>
-    </BaseLayout>
-  );
+  render = () => {
+    const { fetching, accountAddress, match } = this.props;
+    return (
+      <BaseLayout>
+        <StyledWrapper>
+          {fetching || accountAddress ? (
+            <Account fetchingWallet={fetching} match={match} />
+          ) : (
+            <Card minHeight={200} fetching={fetching}>
+              <StyledMessage>
+                {lang.t('message.walletconnect_not_unlocked')}
+              </StyledMessage>
+            </Card>
+          )}
+        </StyledWrapper>
+      </BaseLayout>
+    );
+  };
 }
 
 Wallet.propTypes = {
@@ -62,5 +63,5 @@ const reduxProps = ({ walletconnect }) => ({
 
 export default connect(
   reduxProps,
-  null,
+  { walletConnectInit },
 )(Wallet);

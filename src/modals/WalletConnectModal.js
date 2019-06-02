@@ -8,7 +8,7 @@ import Loader from '../components/Loader';
 import QRCodeDisplay from '../components/QRCodeDisplay';
 import Button from '../components/Button';
 import { modalClose } from '../reducers/_modal';
-import { walletConnectClearFields } from '../reducers/_walletconnect';
+import { walletConnectClearState } from '../reducers/_walletconnect';
 
 const StyledCard = styled(Card)`
   margin: 0 16px;
@@ -39,19 +39,19 @@ class WalletConnectModal extends Component {
     this.isSmallScreen = window.innerWidth < 530;
   }
   onClose = () => {
-    this.props.walletConnectClearFields();
+    this.props.walletConnectClearState();
     this.props.modalClose();
   };
 
   render = () => {
-    const { qrcode } = this.props;
+    const { uri } = this.props.walletConnector;
     return (
       <StyledCard maxWidth={this.isSmallScreen ? 305 : 427} background="white">
         <StyledContainer>
           <StyledQRCodeWrapper>
-            {qrcode ? (
+            {uri ? (
               <StyledQRCodeDisplay
-                data={qrcode}
+                data={uri}
                 scale={this.isSmallScreen ? 5 : 7}
               />
             ) : (
@@ -79,13 +79,13 @@ WalletConnectModal.propTypes = {
 };
 
 const reduxProps = ({ modal, walletconnect }) => ({
-  qrcode: walletconnect.qrcode,
+  walletConnector: walletconnect.walletConnector,
 });
 
 export default connect(
   reduxProps,
   {
     modalClose,
-    walletConnectClearFields,
+    walletConnectClearState,
   },
 )(WalletConnectModal);

@@ -1,8 +1,7 @@
 import Web3 from 'web3';
-import { ledgerEthSignTransaction } from './ledger-eth';
 import piwik from '../piwik';
+import { ledgerEthSignTransaction } from './ledger-eth';
 import { trezorEthSignTransaction } from './trezor-eth';
-import { walletConnectSignTransaction } from './walletconnect';
 
 /**
  * @desc web3 http instance
@@ -51,13 +50,18 @@ export const web3MetamaskSendTransaction = txDetails =>
  */
 export const web3WalletConnectSendTransaction = txDetails =>
   new Promise((resolve, reject) => {
-    walletConnectSignTransaction(txDetails)
-      .then(txHash => {
-        resolve(txHash);
-      })
-      .catch(error => {
-        reject(error);
-      });
+    const { walletConnector } = window.reduxStore.getState().walletconnect;
+    if (walletConnector.connected) {
+      walletConnector
+        .sendTransaction(txDetails)
+        .then(({ result }) => resolve(result))
+        .catch(error => reject(error));
+    } else {
+      const error = new Error(
+        'WalletConnect session has expired. Please reconnect.',
+      );
+      reject(error);
+    }
   });
 
 /**

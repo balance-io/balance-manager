@@ -11,6 +11,10 @@
     "id": 4,
     "value": "Rinkeby"
   },
+  "goerli": {
+    "id": 4,
+    "value": "Görli"
+  },
   "kovan": {
     "id": 42,
     "value": "Kovan"

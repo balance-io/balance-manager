@@ -57,7 +57,8 @@
     "eject": "react-scripts eject",
     "precommit": "lint-staged",
     "format": "prettier --write \"src/**/*.js\"",
-    "lint": "eslint src --ext .js"
+    "lint": "eslint src --ext .js",
+    "version": "auto-changelog -t keepachangelog -p && git add CHANGELOG.md"
   },
   "lint-staged": {
     "src/**/*.js": [
@@ -67,6 +68,7 @@
     ]
   },
   "devDependencies": {
+    "auto-changelog": "^1.13.0",
     "cross-env": "^5.2.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-react-app": "^2.1.0",

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [Unreleased]
 
 ### Added
+* Ramp Instant (https://instant.ramp.network/) integration
 
 ### Changed
 
@@ -92,7 +93,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 * Added WalletConnect support
 
 ### Changed
- 
+
 ### Removed
 
 ## [0.6.1](https://github.com/balance-io/balance-manager/releases/tag/0.6.1)

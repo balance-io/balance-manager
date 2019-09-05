@@ -13,6 +13,7 @@ import AccountBalances from './AccountBalances';
 import AccountTransactions from './AccountTransactions';
 import AccountUniqueTokens from './AccountUniqueTokens';
 import arrowUp from '../../assets/arrow-up.svg';
+import arrowDown from '../../assets/arrow-received.svg';
 import exchangeIcon from '../../assets/exchange-icon.svg';
 import qrCode from '../../assets/qr-code-transparent.svg';
 import { modalOpen } from '../../reducers/_modal';
@@ -108,6 +109,7 @@ const StyledMessage = styled.div`
 
 class Account extends Component {
   openExchangeModal = () => this.props.zrxInstantInit();
+  openBuyModal = () => this.props.modalOpen('BUY_MODAL');
   openSendModal = () => this.props.modalOpen('SEND_MODAL');
   openReceiveModal = () => this.props.modalOpen('RECEIVE_MODAL');
 
@@ -151,6 +153,18 @@ class Account extends Component {
               </StyledAddressWrapper>
 
               <StyledActions>
+                <StyledButton
+                  left
+                  color="brightGreen"
+                  hoverColor="brightGreenHover"
+                  activeColor="brightGreenHover"
+                  order={3}
+                  icon={arrowDown}
+                  onClick={this.openBuyModal}
+                >
+                  <StyledButtonText>{lang.t('button.buy')}</StyledButtonText>
+                </StyledButton>
+
                 {this.props.network === 'mainnet' &&
                   (this.props.accountType === 'METAMASK' ||
                     this.props.accountType === 'LEDGER') && (

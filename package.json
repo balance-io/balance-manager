@@ -20,6 +20,7 @@
     "@devshack/react-native-storage": "^0.2.2",
     "@ledgerhq/hw-app-eth": "^4.7.3",
     "@ledgerhq/hw-transport-u2f": "^4.7.3",
+    "@ramp-network/ramp-instant-sdk": "^1.0.0",
     "@walletconnect/browser": "^1.0.0-beta.18",
     "@walletconnect/qrcode-modal": "^1.0.0-beta.18",
     "axios": "^0.18.0",

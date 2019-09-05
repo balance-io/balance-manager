@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import Column from '../components/Column';
 
+import BuyModal from './BuyModal';
 import ExchangeModal from './ExchangeModal';
 import SendModal from './SendModal';
 import ReceiveModal from './ReceiveModal';
@@ -62,6 +63,8 @@ class Modal extends Component {
 
   modalController = () => {
     switch (this.props.modal) {
+      case 'BUY_MODAL':
+        return <BuyModal />;
       case 'EXCHANGE_MODAL':
         return <ExchangeModal />;
       case 'SEND_MODAL':
